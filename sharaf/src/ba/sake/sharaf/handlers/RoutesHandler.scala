@@ -36,14 +36,13 @@ private[sharaf] final class RoutesHandler(routes: Routes) extends HttpHandler {
 
   private def fillReqParams(exchange: HttpServerExchange): RequestParams = {
     val relPath =
-      if exchange.getRelativePath.startsWith("/")
-      then exchange.getRelativePath.drop(1)
+      if exchange.getRelativePath.startsWith("/") then exchange.getRelativePath.drop(1)
       else exchange.getRelativePath
     val pathSegments = relPath.split("/")
     val path = Path(pathSegments*)
 
-    val queryParams = exchange.getQueryParameters().asScala.toSeq.map {
-      (k, v) => (k, v.asScala.toSeq)
+    val queryParams = exchange.getQueryParameters().asScala.toMap.map { (k, v) =>
+      (k, v.asScala.toSeq)
     }
     val queryString = new QueryString(queryParams)
 

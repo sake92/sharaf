@@ -28,6 +28,7 @@ final class HttpServer(routes: Routes, port: Int = 9000) {
       )
       .build()
     undertowServer.start()
+    println(s"Started HTTP server at port $port")
   }
 
   def stop(): Unit = {

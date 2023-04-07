@@ -4,7 +4,7 @@ package routing
 import scala.util.Try
 import java.util.UUID
 
-class RoutingTest extends munit.FunSuite {
+class PathTest extends munit.FunSuite {
 
   test("path matching") {
     val uuidValue = UUID.randomUUID
@@ -30,40 +30,12 @@ class RoutingTest extends munit.FunSuite {
     }
   }
 
-  test("query params matching") {
-    Seq(
-      QueryString("a" -> Seq()),
-      QueryString("a" -> Seq("")),
-      QueryString("a" -> Seq("a1")),
-      QueryString("a" -> Seq("a1", "a2"))
-    ).foreach { case qps @ ?("a" -> qSeq(as)) =>
-      assertEquals(as, qps.params.toMap.apply("a"))
-    }
-
-    Seq(
-      QueryString("a" -> Seq("")),
-      QueryString("a" -> Seq("a1")),
-      QueryString("a" -> Seq("a1", "a2"))
-    ).foreach { case qps @ ?("a" -> q(a)) =>
-      assertEquals(a, qps.params.toMap.apply("a").head)
-    }
-
-    Seq(
-      QueryString("a" -> Seq("")),
-      QueryString("a" -> Seq("a1")),
-      QueryString("a" -> Seq("a1", "a2"))
-    ).foreach { case qps @ ?("a" -> qOpt(aOpt)) =>
-      val res = qps.params.toMap.get("a").flatMap(_.headOption)
-      assertEquals(aOpt, res)
-    }
-  }
-
 }
 
 enum Sort extends java.lang.Enum[Sort]:
   case email, name
 
-given FromUrlParam[Sort] = new {
+given FromPathParam[Sort] = new {
   override def extract(str: String): Option[Sort] =
     Try(Sort.valueOf(str)).toOption
 }

@@ -1,10 +1,10 @@
 import mill._
-import mill.scalalib._, publish._
+import mill.scalalib._, scalafmt._, publish._
 
 import $ivy.`de.tototec::de.tobiasroeser.mill.vcs.version::0.1.4`
 import de.tobiasroeser.mill.vcs.version.VcsVersion
 
-object sharaf extends ScalaModule with PublishModule {
+object sharaf extends ScalaModule with PublishModule with ScalafmtModule {
 
   def scalaVersion = "3.2.2"
 
@@ -14,7 +14,8 @@ object sharaf extends ScalaModule with PublishModule {
   )
 
   def scalacOptions = super.scalacOptions() ++ Seq(
-    "-Yretain-trees"
+    "-deprecation",
+    "-Yretain-trees",
   )
 
   def repositoriesTask() = T.task {
