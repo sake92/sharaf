@@ -28,7 +28,10 @@ final class HttpServer(routes: Routes, port: Int = 9000) {
       )
       .build()
     undertowServer.start()
-    println(s"Started HTTP server at port $port")
+    
+    val info = undertowServer.getListenerInfo().get(0)
+    val url = s"${info.getProtcol}:/${info.getAddress}"
+    println(s"Started HTTP server at $url")
   }
 
   def stop(): Unit = {

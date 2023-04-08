@@ -28,7 +28,7 @@ private[sharaf] final class RoutesHandler(routes: Routes) extends HttpHandler {
         .getOrElse("text/plain")
       exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, contentType)
 
-      exchange.setResponseCode(response.status)
+      exchange.setStatusCode(response.status)
 
       exchange.getResponseSender().send(response.body)
     }
