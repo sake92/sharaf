@@ -4,6 +4,7 @@ import java.io.InputStream
 import java.nio.charset.StandardCharsets
 
 import ba.sake.tupson.*
+import io.undertow.server.HttpServerExchange
 
 case class Request(
     is: InputStream
@@ -18,4 +19,7 @@ case class Request(
 
 object Request {
   def current(using req: Request): Request = req
+
+  private[sharaf] def fromHttpServerExchange(ex: HttpServerExchange): Request =
+    Request(ex.getInputStream)
 }

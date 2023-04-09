@@ -9,7 +9,7 @@ import io.undertow.util.StatusCodes
 
 import ba.sake.sharaf.*
 
-private[sharaf] final class RoutesHandler(routes: Routes) extends HttpHandler {
+final class RoutesHandler private (routes: Routes) extends HttpHandler {
 
   override def handleRequest(exchange: HttpServerExchange): Unit = {
     exchange.startBlocking()
@@ -17,7 +17,7 @@ private[sharaf] final class RoutesHandler(routes: Routes) extends HttpHandler {
       exchange.dispatch(this)
     } else {
 
-      given Request(exchange.getInputStream)
+      given Request = Request.fromHttpServerExchange(exchange)
 
       val reqParams = fillReqParams(exchange)
       val response = routes.applyOrElse(reqParams, _ => Response("Not Founddd")) // TODO
@@ -49,4 +49,9 @@ private[sharaf] final class RoutesHandler(routes: Routes) extends HttpHandler {
     (exchange.getRequestMethod(), path, queryString)
   }
 
+}
+
+object RoutesHandler {
+  def apply(routes: Routes): RoutesHandler =
+    new RoutesHandler(routes)
 }
