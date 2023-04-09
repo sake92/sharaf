@@ -32,6 +32,14 @@ import io.undertow.util.Methods
 
 }
 
-case class CreateUser(name: String) derives JsonRW
+case class CreateUser(name: String) derives JsonRW {
+  if name.isBlank then
+    throw ValidationException(
+      List(
+        ValidationError("name", "Name is blank"),
+        ValidationError("name", "Name is stupid"),
+      )
+    )
+}
 
 case class UserQuery(name: String, age: Option[Int]) derives FromQueryString

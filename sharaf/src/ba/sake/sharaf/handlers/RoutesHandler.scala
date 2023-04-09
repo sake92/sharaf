@@ -20,7 +20,17 @@ final class RoutesHandler private (routes: Routes) extends HttpHandler {
       given Request = Request.fromHttpServerExchange(exchange)
 
       val reqParams = fillReqParams(exchange)
-      val response = routes.applyOrElse(reqParams, _ => Response("Not Founddd")) // TODO
+      val response = routes.applyOrElse(
+        reqParams,
+        _ => {
+          // TODO handle properly when multiple accepts..
+          val acceptContentType = exchange.getRequestHeaders().get(Headers.ACCEPT)
+          if acceptContentType.getFirst() == "application/json" then {
+            val problemDetails = ProblemDetails(404, "Not Found")
+            Response.json(problemDetails).withStatus(404)
+          } else Response("Not Found").withStatus(404)
+        }
+      )
 
       val contentType = response.headers
         .get(Headers.CONTENT_TYPE_STRING)
