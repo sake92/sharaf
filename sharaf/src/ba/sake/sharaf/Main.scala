@@ -4,12 +4,9 @@ import ba.sake.tupson.*
 import ba.sake.sharaf.routing.*
 import io.undertow.util.HttpString
 import io.undertow.util.Methods
+import java.util.UUID
 
 @main def sharafMain: Unit = {
-
-  // TODO middleware, npr da se mogu dodat headeri:
-  // PRIJE: Request=>Request
-  // POSLIJE: Response=>Response
 
   val getRoutes: Routes = {
     case (GET(), Path("users", int(userId)), _) =>
@@ -33,13 +30,10 @@ import io.undertow.util.Methods
 }
 
 case class CreateUser(name: String) derives JsonRW {
-  if name.isBlank then
-    throw ValidationException(
-      List(
-        ValidationError("name", "Name is blank"),
-        ValidationError("name", "Name is stupid"),
-      )
-    )
+  Validation.assertAll(
+    ("name", !name.isBlank, "Name must not be blank"),
+    ("name", name.length >= 3, "Name must be 3+ length")
+  )
 }
 
-case class UserQuery(name: String, age: Option[Int]) derives FromQueryString
+case class UserQuery(uuid: UUID, age: Option[Int]) derives FromQueryString

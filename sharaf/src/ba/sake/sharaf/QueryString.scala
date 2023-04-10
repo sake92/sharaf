@@ -2,6 +2,8 @@ package ba.sake.sharaf
 
 import scala.deriving.*
 import scala.compiletime.*
+import java.util.UUID
+import scala.util.Try
 
 final class QueryString(
     val params: Map[String, Seq[String]]
@@ -30,11 +32,13 @@ trait FromQueryStringParam[T] {
 object FromQueryStringParam {
 
   private def error(tpe: String, value: Any): Nothing =
-    throw new ValidationException(s"Invalid $tpe: '$value'")
+    throw ValidationException(s"Invalid $tpe: '$value'")
 
   given FromQueryStringParam[String] = _.flatMap(_.headOption)
   given FromQueryStringParam[Int] =
     _.flatMap(_.headOption.map(v => v.toIntOption.getOrElse(error("Int", v))))
+  given FromQueryStringParam[UUID] =
+    _.flatMap(_.headOption.map(uuidStr => Try(UUID.fromString(uuidStr)).toOption.getOrElse(error("UUID", uuidStr))))
 
   given [T](using
       fqsp: FromQueryStringParam[T]

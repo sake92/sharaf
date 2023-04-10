@@ -13,7 +13,7 @@ final class RoutesHandler private (routes: Routes) extends HttpHandler {
 
   override def handleRequest(exchange: HttpServerExchange): Unit = {
     exchange.startBlocking()
-    if (exchange.isInIoThread()) {
+    if (exchange.isInIoThread) {
       exchange.dispatch(this)
     } else {
 
@@ -24,8 +24,8 @@ final class RoutesHandler private (routes: Routes) extends HttpHandler {
         reqParams,
         _ => {
           // TODO handle properly when multiple accepts..
-          val acceptContentType = exchange.getRequestHeaders().get(Headers.ACCEPT)
-          if acceptContentType.getFirst() == "application/json" then {
+          val acceptContentType = exchange.getRequestHeaders.get(Headers.ACCEPT)
+          if acceptContentType.getFirst == "application/json" then {
             val problemDetails = ProblemDetails(404, "Not Found")
             Response.json(problemDetails).withStatus(404)
           } else Response("Not Found").withStatus(404)
@@ -36,11 +36,11 @@ final class RoutesHandler private (routes: Routes) extends HttpHandler {
         .get(Headers.CONTENT_TYPE_STRING)
         .map(_.head)
         .getOrElse("text/plain")
-      exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, contentType)
+      exchange.getResponseHeaders.put(Headers.CONTENT_TYPE, contentType)
 
       exchange.setStatusCode(response.status)
 
-      exchange.getResponseSender().send(response.body)
+      exchange.getResponseSender.send(response.body)
     }
   }
 
@@ -51,12 +51,12 @@ final class RoutesHandler private (routes: Routes) extends HttpHandler {
     val pathSegments = relPath.split("/")
     val path = Path(pathSegments*)
 
-    val queryParams = exchange.getQueryParameters().asScala.toMap.map { (k, v) =>
+    val queryParams = exchange.getQueryParameters.asScala.toMap.map { (k, v) =>
       (k, v.asScala.toSeq)
     }
     val queryString = new QueryString(queryParams)
 
-    (exchange.getRequestMethod(), path, queryString)
+    (exchange.getRequestMethod, path, queryString)
   }
 
 }

@@ -75,7 +75,7 @@ object ErrorMapper {
   val json: ErrorMapper = (e, req) =>
     e match {
       case ex: ValidationException =>
-        val fieldValidationErrors = ex.errors.map(err => ValidationProblem(err.name, err.reason))
+        val fieldValidationErrors = ex.errors.map(err => ValidationProblem(err.reason, err.name))
         val problemDetails = ProblemDetails(
           400,
           "Validation errors",
@@ -111,10 +111,10 @@ case class ProblemDetails(
     detail: String = "",
     `type`: Option[URI] = None, // general error description URL
     instance: Option[URI] = None, // this particular error URL
-    invalidParams: List[ValidationProblem] = List.empty
+    invalidParams: Seq[ValidationProblem] = Seq.empty
 ) derives JsonRW
 
 case class ValidationProblem(
-    name: String,
-    reason: String
+    reason: String,
+    name: Option[String]
 ) derives JsonRW
