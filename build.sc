@@ -10,7 +10,7 @@ object sharaf extends ScalaModule with PublishModule with ScalafmtModule {
 
   def ivyDeps = Agg(
     ivy"io.undertow:undertow-core:2.3.5.Final",
-    ivy"ba.sake::tupson:0.5.1"
+    ivy"ba.sake::tupson:0.5.1-12-b6b51a"
   )
 
   def scalacOptions = super.scalacOptions() ++ Seq(

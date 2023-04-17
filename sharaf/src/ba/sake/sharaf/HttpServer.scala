@@ -10,10 +10,10 @@ type RequestParams = (HttpString, Path, QueryString)
 
 type Routes = Request ?=> PartialFunction[RequestParams, Response]
 
-final class HttpServer private (handler: HttpHandler, port: Int) {
+// TODO add websocket handler
+final class HttpServer(handler: HttpHandler, port: Int) {
 
-  // escape hatch..
-  var undertowServer: Undertow = _
+  private var undertowServer: Undertow = _
 
   def withHandler(handler: HttpHandler): HttpServer =
     new HttpServer(handler, port)
@@ -50,11 +50,11 @@ object HttpServer {
       DefaultPort
     )
 
-  def of(routes: Routes, errorMapper: ErrorMapper = ErrorMapper.noop): HttpServer =
+  def of(routes: Routes): HttpServer =
     new HttpServer(
       ErrorHandler(
         RoutesHandler(routes),
-        errorMapper
+        { case _ if false => Response("should not happen") }
       ),
       DefaultPort
     )

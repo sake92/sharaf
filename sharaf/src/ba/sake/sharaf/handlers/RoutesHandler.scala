@@ -8,6 +8,7 @@ import io.undertow.util.Headers
 import io.undertow.util.StatusCodes
 
 import ba.sake.sharaf.*
+import io.undertow.util.HttpString
 
 final class RoutesHandler private (routes: Routes) extends HttpHandler {
 
@@ -16,6 +17,8 @@ final class RoutesHandler private (routes: Routes) extends HttpHandler {
     if (exchange.isInIoThread) {
       exchange.dispatch(this)
     } else {
+
+      //exchange.getAttachment()
 
       given Request = Request.fromHttpServerExchange(exchange)
 
@@ -40,6 +43,13 @@ final class RoutesHandler private (routes: Routes) extends HttpHandler {
 
       exchange.setStatusCode(response.status)
 
+      // TODO REMOVE
+      response.headers.foreach { case (name, values) =>
+        exchange.getResponseHeaders.putAll(new HttpString(name), values.asJava)
+      }
+      exchange.getResponseHeaders.put(new HttpString("Access-Control-Allow-Origin"), "*")
+
+      // nothing after this line is applied!
       exchange.getResponseSender.send(response.body)
     }
   }

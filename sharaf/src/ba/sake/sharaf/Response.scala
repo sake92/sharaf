@@ -6,7 +6,7 @@ import ba.sake.tupson.*
 case class Response(
     body: String,
     status: Int = 200,
-    headers: Map[String, Seq[String]] = Map.empty
+    headers: Map[String, Seq[String]] = Map(Headers.CONTENT_TYPE_STRING -> Seq("text/plain"))
 ) {
   def withStatus(status: Int) = copy(status = status)
 

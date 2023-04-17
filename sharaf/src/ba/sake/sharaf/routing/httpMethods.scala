@@ -18,3 +18,11 @@ object PUT:
 object DELETE:
   def unapply[T](str: HttpString): Boolean =
     Methods.DELETE == str
+
+object OPTIONS:
+  def unapply[T](str: HttpString): Boolean =
+    Methods.OPTIONS == str
+
+object PATCH:
+  def unapply[T](str: HttpString): Boolean =
+    Methods.PATCH == str

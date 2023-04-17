@@ -9,6 +9,7 @@ import ba.sake.sharaf.*
 import io.undertow.util.Headers
 import java.net.URI
 import org.typelevel.jawn.ast.*
+import ba.sake.validation.FieldsValidationException
 
 final class ErrorHandler private (
     httpHandler: HttpHandler,
@@ -30,67 +31,65 @@ final class ErrorHandler private (
 
         // TODO handle properly when multiple accepts..
         val acceptContentType = exchange.getRequestHeaders().get(Headers.ACCEPT)
-        val response =
+        val responseOpt =
           if acceptContentType.getFirst() == "application/json" then {
             val mapper = errorMapper.orElse(ErrorMapper.json)
-            val response = mapper((e, request))
-            response.withHeader(Headers.CONTENT_TYPE_STRING, "application/json")
+            mapper.lift(e)
           } else {
             val mapper = errorMapper.orElse(ErrorMapper.default)
-            val response = mapper((e, request))
-            response.withHeader(Headers.CONTENT_TYPE_STRING, "text/plain")
+            mapper.lift(e)
           }
 
-        val contentType = response.headers(Headers.CONTENT_TYPE_STRING).head
-        exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, contentType)
+        responseOpt.foreach { response =>
+          val contentType = response.headers(Headers.CONTENT_TYPE_STRING).head
+          exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, contentType)
 
-        exchange.setStatusCode(response.status)
+          exchange.setStatusCode(response.status)
 
-        exchange.getResponseSender().send(response.body)
+          exchange.getResponseSender().send(response.body)
+        }
+        // TODO if no error match, just propagate
+
       }
   }
 
 }
 
 object ErrorHandler {
-  def apply(httpHandler: HttpHandler, errorMapper: ErrorMapper = ErrorMapper.noop): ErrorHandler =
+  def apply(httpHandler: HttpHandler, errorMapper: ErrorMapper): ErrorHandler =
     new ErrorHandler(httpHandler, errorMapper)
 }
 
 /////////////
-type ErrorMapper = PartialFunction[(Throwable, Request), Response]
+type ErrorMapper = PartialFunction[Throwable, Response]
 
 object ErrorMapper {
-  val default: ErrorMapper = (e, req) =>
-    e match {
-      case ex: ValidationException =>
-        val fieldValidationErrors = ex.errors.mkString("[", "; ", "]")
-        Response(s"Validation errors: $fieldValidationErrors").withStatus(400)
-      case pe: ParsingException =>
-        Response(e.getMessage()).withStatus(400)
-      case te: TupsonException =>
-        Response(e.getMessage()).withStatus(400)
-    }
-
-  val json: ErrorMapper = (e, req) =>
-    e match {
-      case ex: ValidationException =>
-        val fieldValidationErrors = ex.errors.map(err => ValidationProblem(err.reason, err.name))
-        val problemDetails = ProblemDetails(
-          400,
-          "Validation errors",
-          invalidParams = fieldValidationErrors
-        )
-        Response.json(problemDetails).withStatus(400)
-      case pe: ParsingException =>
-        Response(e.getMessage()).withStatus(400)
-      case te: TupsonException =>
-        Response(e.getMessage()).withStatus(400)
-    }
-
-  val noop: ErrorMapper = {
-    case _ if false => Response("") // by default no match
+  val default: ErrorMapper = {
+    case e: FieldsValidationException =>
+      val fieldValidationErrors = e.errors.mkString("[", "; ", "]")
+      Response(s"Validation errors: $fieldValidationErrors").withStatus(400)
+    case e: ParsingException =>
+      Response(e.getMessage()).withStatus(400)
+    case e: TupsonException =>
+      Response(e.getMessage()).withStatus(400)
   }
+
+  val json: ErrorMapper = {
+    case e: FieldsValidationException =>
+      val fieldValidationErrors = e.errors.map(err => ArgumentProblem(err.path, err.msg, Some(err.fieldValue.toString)))
+      val problemDetails = ProblemDetails(400, "Validation errors", invalidArguments = fieldValidationErrors)
+      Response.json(problemDetails).withStatus(400)
+    case e: ParsingException =>
+      val parsingErrors = e.errors.map(err => ArgumentProblem(err.path, err.msg, err.value.map(_.toString)))
+      val problemDetails = ProblemDetails(400, "JSON Parsing errors", invalidArguments = parsingErrors)
+      Response.json(problemDetails).withStatus(400)
+    case e: TupsonException =>
+      Response.json(ProblemDetails(400, "JSON parsing error", e.getMessage)).withStatus(400)
+    case e =>
+      e.printStackTrace()
+      Response.json(ProblemDetails(500, "Internal error", e.getMessage)).withStatus(400)
+  }
+
 }
 
 /////////////
@@ -98,7 +97,7 @@ given JsonRW[URI] = new {
 
   override def write(value: URI): JValue = JString(value.toString)
 
-  override def parse(jValue: JValue): URI = jValue match
+  override def parse(path: String, jValue: JValue): URI = jValue match
     case JString(s) => URI.create(s)
     case _          => throw TupsonException(s"Invalid URI '$jValue'")
 
@@ -111,10 +110,11 @@ case class ProblemDetails(
     detail: String = "",
     `type`: Option[URI] = None, // general error description URL
     instance: Option[URI] = None, // this particular error URL
-    invalidParams: Seq[ValidationProblem] = Seq.empty
+    invalidArguments: Seq[ArgumentProblem] = Seq.empty
 ) derives JsonRW
 
-case class ValidationProblem(
+case class ArgumentProblem(
+    path: String,
     reason: String,
-    name: Option[String]
+    value: Option[String]
 ) derives JsonRW
