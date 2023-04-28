@@ -48,8 +48,13 @@ object sharaf extends SharafModule with PublishModule {
 }
 
 object examples extends mill.Module {
+  object json extends SharafModule {
+    def moduleDeps = Seq(sharaf)
+  }
+  object form extends SharafModule {
+    def moduleDeps = Seq(sharaf)
+  }
   object todo extends SharafModule {
-
     def moduleDeps = Seq(sharaf)
   }
 }

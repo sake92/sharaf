@@ -1,10 +1,12 @@
+package demo
+
+import io.undertow.Undertow
 import ba.sake.sharaf.*
 import ba.sake.sharaf.routing.*
 import ba.sake.sharaf.handlers.*
 import ba.sake.tupson.JsonRW
-import io.undertow.Undertow
 
-@main def todosMain: Unit = {
+@main def main: Unit = {
 
   val todosRepo = new TodosRepo
 

@@ -66,6 +66,14 @@ object FromQueryStringParam {
 
   given [T](using
       fqsp: FromQueryStringParam[T]
+  ): FromQueryStringParam[Set[T]] = new {
+    def extract(name: String, valuesOpt: Option[Seq[String]]): Option[Set[T]] =
+      val values = valuesOpt.getOrElse(Seq.empty)
+      Some(values.flatMap(v => fqsp.extract(name, Some(Seq(v)))).toSet)
+  }
+
+  given [T](using
+      fqsp: FromQueryStringParam[T]
   ): FromQueryStringParam[Option[T]] = new {
     def extract(name: String, valuesOpt: Option[Seq[String]]): Option[Option[T]] =
       val values = valuesOpt.getOrElse(Seq.empty)

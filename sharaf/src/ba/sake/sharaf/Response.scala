@@ -20,4 +20,9 @@ object Response {
   def json[T: JsonRW](body: T): Response =
     Response(body.toJson)
       .withHeader(Headers.CONTENT_TYPE_STRING, "application/json")
+  def json[T: JsonRW](bodyOpt: Option[T], name: String): Response = bodyOpt match
+    case None => throw new NotFoundException(name)
+    case Some(body) =>
+      Response(body.toJson)
+        .withHeader(Headers.CONTENT_TYPE_STRING, "application/json")
 }

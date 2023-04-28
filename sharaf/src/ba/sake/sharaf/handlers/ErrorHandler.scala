@@ -27,7 +27,7 @@ final class ErrorHandler private (
     case NonFatal(e) =>
       if (exchange.isResponseChannelAvailable()) {
 
-        val request = Request.fromHttpServerExchange(exchange)
+        val request = Request.create(exchange)
 
         // TODO handle properly when multiple accepts..
         val acceptContentType = exchange.getRequestHeaders().get(Headers.ACCEPT)
@@ -50,6 +50,9 @@ final class ErrorHandler private (
         }
         // TODO if no error match, just propagate
 
+        println(responseOpt)
+        throw e
+
       }
   }
 
@@ -67,29 +70,39 @@ type ErrorMapper = PartialFunction[Throwable, Response]
 
 object ErrorMapper {
   val default: ErrorMapper = {
+    case e: NotFoundException =>
+      Response(e.getMessage).withStatus(404)
     case e: FieldsValidationException =>
       val fieldValidationErrors = e.errors.mkString("[", "; ", "]")
       Response(s"Validation errors: $fieldValidationErrors").withStatus(400)
+    // json
     case e: ParsingException =>
       Response(e.getMessage()).withStatus(400)
     case e: TupsonException =>
       Response(e.getMessage()).withStatus(400)
+    // form
+    case e: FormsonException =>
+      Response(e.getMessage()).withStatus(400)
   }
 
   val json: ErrorMapper = {
+    case e: NotFoundException =>
+      val problemDetails = ProblemDetails(400, "Not Found", e.getMessage)
+      Response.json(problemDetails).withStatus(404)
     case e: FieldsValidationException =>
       val fieldValidationErrors = e.errors.map(err => ArgumentProblem(err.path, err.msg, Some(err.value.toString)))
       val problemDetails = ProblemDetails(400, "Validation errors", invalidArguments = fieldValidationErrors)
       Response.json(problemDetails).withStatus(400)
+    // json
     case e: ParsingException =>
       val parsingErrors = e.errors.map(err => ArgumentProblem(err.path, err.msg, err.value.map(_.toString)))
       val problemDetails = ProblemDetails(400, "JSON Parsing errors", invalidArguments = parsingErrors)
       Response.json(problemDetails).withStatus(400)
     case e: TupsonException =>
       Response.json(ProblemDetails(400, "JSON parsing error", e.getMessage)).withStatus(400)
-    case e =>
-      e.printStackTrace()
-      Response.json(ProblemDetails(500, "Internal error", e.getMessage)).withStatus(400)
+    // form
+    case e: FormsonException =>
+      Response.json(ProblemDetails(400, "Form parsing error", e.getMessage)).withStatus(400)
   }
 
 }

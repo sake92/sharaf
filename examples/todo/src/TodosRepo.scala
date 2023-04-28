@@ -1,3 +1,5 @@
+package demo
+
 import java.util.UUID
 import ba.sake.tupson.JsonRW
 

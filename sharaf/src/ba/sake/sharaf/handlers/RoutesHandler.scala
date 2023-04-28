@@ -20,7 +20,7 @@ final class RoutesHandler private (routes: Routes) extends HttpHandler {
 
       //exchange.getAttachment()
 
-      given Request = Request.fromHttpServerExchange(exchange)
+      given Request = Request.create(exchange)
 
       val reqParams = fillReqParams(exchange)
       val response = routes.applyOrElse(
