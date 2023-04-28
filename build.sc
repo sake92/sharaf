@@ -4,18 +4,11 @@ import mill.scalalib._, scalafmt._, publish._
 import $ivy.`de.tototec::de.tobiasroeser.mill.vcs.version::0.1.4`
 import de.tobiasroeser.mill.vcs.version.VcsVersion
 
-object sharaf extends ScalaModule with PublishModule with ScalafmtModule {
-
+trait SharafModule extends ScalaModule with ScalafmtModule {
   def scalaVersion = "3.2.2"
-
-  def ivyDeps = Agg(
-    ivy"io.undertow:undertow-core:2.3.5.Final",
-    ivy"ba.sake::tupson:0.5.1-12-b6b51a"
-  )
-
   def scalacOptions = super.scalacOptions() ++ Seq(
     "-deprecation",
-    "-Yretain-trees",
+    "-Yretain-trees"
   )
 
   def repositoriesTask() = T.task {
@@ -23,6 +16,14 @@ object sharaf extends ScalaModule with PublishModule with ScalafmtModule {
       coursier.maven.MavenRepository("https://jitpack.io")
     )
   }
+}
+
+object sharaf extends SharafModule with PublishModule {
+
+  def ivyDeps = Agg(
+    ivy"io.undertow:undertow-core:2.3.5.Final",
+    ivy"ba.sake::tupson:0.5.1-12-b6b51a-DIRTY2eb8c085"
+  )
 
   def artifactName = "sharaf"
 
@@ -43,5 +44,12 @@ object sharaf extends ScalaModule with PublishModule with ScalafmtModule {
     def ivyDeps = Agg(
       ivy"org.scalameta::munit::0.7.29"
     )
+  }
+}
+
+object examples extends mill.Module {
+  object todo extends SharafModule {
+
+    def moduleDeps = Seq(sharaf)
   }
 }

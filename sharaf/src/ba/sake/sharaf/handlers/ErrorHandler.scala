@@ -56,6 +56,8 @@ final class ErrorHandler private (
 }
 
 object ErrorHandler {
+  def apply(httpHandler: HttpHandler): ErrorHandler =
+    apply(httpHandler, { case _ if false => Response("should not happen") })
   def apply(httpHandler: HttpHandler, errorMapper: ErrorMapper): ErrorHandler =
     new ErrorHandler(httpHandler, errorMapper)
 }
@@ -76,7 +78,7 @@ object ErrorMapper {
 
   val json: ErrorMapper = {
     case e: FieldsValidationException =>
-      val fieldValidationErrors = e.errors.map(err => ArgumentProblem(err.path, err.msg, Some(err.fieldValue.toString)))
+      val fieldValidationErrors = e.errors.map(err => ArgumentProblem(err.path, err.msg, Some(err.value.toString)))
       val problemDetails = ProblemDetails(400, "Validation errors", invalidArguments = fieldValidationErrors)
       Response.json(problemDetails).withStatus(400)
     case e: ParsingException =>
