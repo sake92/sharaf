@@ -8,7 +8,7 @@
 
 ./mill __.reformat
 
-./mill sharaf.__.test
+./mill sharaf.test
 
 ./mill examples.runMain bla
 
@@ -24,4 +24,4 @@ git push origin 0.5.1
 
 # TODOs
 
-- sql parser reorder OFFSET LIMIT ???
+- 

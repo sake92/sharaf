@@ -5,6 +5,7 @@ import io.undertow.server.HttpHandler
 import io.undertow.server.HttpServerExchange
 
 import ba.sake.tupson.*
+import ba.sake.formson.*
 import ba.sake.sharaf.*
 import io.undertow.util.Headers
 import java.net.URI
@@ -48,11 +49,9 @@ final class ErrorHandler private (
 
           exchange.getResponseSender().send(response.body)
         }
-        // TODO if no error match, just propagate
 
-        println(responseOpt)
+        // if no error match, just propagate
         throw e
-
       }
   }
 

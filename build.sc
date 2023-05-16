@@ -4,21 +4,7 @@ import mill.scalalib._, scalafmt._, publish._
 import $ivy.`de.tototec::de.tobiasroeser.mill.vcs.version::0.1.4`
 import de.tobiasroeser.mill.vcs.version.VcsVersion
 
-trait SharafModule extends ScalaModule with ScalafmtModule {
-  def scalaVersion = "3.2.2"
-  def scalacOptions = super.scalacOptions() ++ Seq(
-    "-deprecation",
-    "-Yretain-trees"
-  )
-
-  def repositoriesTask() = T.task {
-    super.repositoriesTask() ++ Seq(
-      coursier.maven.MavenRepository("https://jitpack.io")
-    )
-  }
-}
-
-object sharaf extends SharafModule with PublishModule {
+object sharaf extends BaseModule with PublishModule {
 
   def ivyDeps = Agg(
     ivy"io.undertow:undertow-core:2.3.5.Final",
@@ -47,14 +33,29 @@ object sharaf extends SharafModule with PublishModule {
   }
 }
 
+trait BaseModule extends ScalaModule with ScalafmtModule {
+  def scalaVersion = "3.2.2"
+  def scalacOptions = super.scalacOptions() ++ Seq(
+    "-deprecation",
+    "-Yretain-trees"
+  )
+
+  def repositoriesTask() = T.task {
+    super.repositoriesTask() ++ Seq(
+      coursier.maven.MavenRepository("https://jitpack.io")
+    )
+  }
+}
+
+////////////////////
 object examples extends mill.Module {
-  object json extends SharafModule {
+  object json extends BaseModule {
     def moduleDeps = Seq(sharaf)
   }
-  object form extends SharafModule {
+  object form extends BaseModule {
     def moduleDeps = Seq(sharaf)
   }
-  object todo extends SharafModule {
+  object todo extends BaseModule {
     def moduleDeps = Seq(sharaf)
   }
 }
