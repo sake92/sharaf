@@ -17,10 +17,16 @@ case class Response(
 }
 
 object Response {
-  def json[T: JsonRW](body: T): Response =
+
+  def withHtmlBody(body: String): Response =
+    Response(body.toJson)
+      .withHeader(Headers.CONTENT_TYPE_STRING, "text/html; charset=utf-8")
+
+  def withJsonBody[T: JsonRW](body: T): Response =
     Response(body.toJson)
       .withHeader(Headers.CONTENT_TYPE_STRING, "application/json")
-  def json[T: JsonRW](bodyOpt: Option[T], name: String): Response = bodyOpt match
+
+  def withJsonBody[T: JsonRW](bodyOpt: Option[T], name: String): Response = bodyOpt match
     case None => throw new NotFoundException(name)
     case Some(body) =>
       Response(body.toJson)

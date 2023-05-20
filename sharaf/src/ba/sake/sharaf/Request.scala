@@ -12,18 +12,23 @@ import io.undertow.server.handlers.form.FormParserFactory
 final class Request(
     private val ex: HttpServerExchange
 ) {
+
+  /** Please use this with caution! */
+  val underlyingHttpServerExchange: HttpServerExchange = ex
+
   lazy val bodyString: String =
     new String(ex.getInputStream.readAllBytes(), StandardCharsets.UTF_8)
 
+  // TODO rename to jsonBody
   def bodyJson[T](using rw: JsonRW[T]): T =
     bodyString.parseJson[T]
 
-  def bodyForm[T <: Product](using ffd: FromFormData[T]): T = {
+  def bodyForm[T <: Product](using rw: FormRW[T]): T = {
     val parser = FormParserFactory.builder.build.createParser(ex)
     val uFormData = parser.parseBlocking()
 
     val formData = Request.undertowFormData2Formson(uFormData)
-    ffd.bind("", formData)
+    rw.read("", formData)
   }
 }
 

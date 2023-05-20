@@ -11,7 +11,6 @@ import io.undertow.Undertow
 
   val routes: Routes = { case (POST(), Path("form"), _) =>
     val req = Request.current.bodyForm[CreateCustomerForm]
-    //  val req2 = Request.current.bodyForm[Int]
     Response(req.toString)
   }
 
@@ -38,7 +37,7 @@ case class CreateCustomerForm(
     photo: java.nio.file.Path,
     address: CreateAddressForm,
     hobbies: List[String]
-) derives FromFormData {
+) derives FormRW {
   validate(
     check(name).is(!_.isBlank, "must not be blank")
   )
@@ -46,4 +45,4 @@ case class CreateCustomerForm(
 
 case class CreateAddressForm(
     street: String
-) derives FromFormData
+) derives FormRW

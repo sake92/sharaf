@@ -34,7 +34,7 @@ object sharaf extends BaseModule with PublishModule {
 }
 
 trait BaseModule extends ScalaModule with ScalafmtModule {
-  def scalaVersion = "3.2.2"
+  def scalaVersion = "3.3.0-RC6"
   def scalacOptions = super.scalacOptions() ++ Seq(
     "-deprecation",
     "-Yretain-trees"

@@ -87,21 +87,21 @@ object ErrorMapper {
   val json: ErrorMapper = {
     case e: NotFoundException =>
       val problemDetails = ProblemDetails(400, "Not Found", e.getMessage)
-      Response.json(problemDetails).withStatus(404)
+      Response.withJsonBody(problemDetails).withStatus(404)
     case e: FieldsValidationException =>
       val fieldValidationErrors = e.errors.map(err => ArgumentProblem(err.path, err.msg, Some(err.value.toString)))
       val problemDetails = ProblemDetails(400, "Validation errors", invalidArguments = fieldValidationErrors)
-      Response.json(problemDetails).withStatus(400)
+      Response.withJsonBody(problemDetails).withStatus(400)
     // json
     case e: ParsingException =>
       val parsingErrors = e.errors.map(err => ArgumentProblem(err.path, err.msg, err.value.map(_.toString)))
       val problemDetails = ProblemDetails(400, "JSON Parsing errors", invalidArguments = parsingErrors)
-      Response.json(problemDetails).withStatus(400)
+      Response.withJsonBody(problemDetails).withStatus(400)
     case e: TupsonException =>
-      Response.json(ProblemDetails(400, "JSON parsing error", e.getMessage)).withStatus(400)
+      Response.withJsonBody(ProblemDetails(400, "JSON parsing error", e.getMessage)).withStatus(400)
     // form
     case e: FormsonException =>
-      Response.json(ProblemDetails(400, "Form parsing error", e.getMessage)).withStatus(400)
+      Response.withJsonBody(ProblemDetails(400, "Form parsing error", e.getMessage)).withStatus(400)
   }
 
 }

@@ -18,8 +18,6 @@ final class RoutesHandler private (routes: Routes) extends HttpHandler {
       exchange.dispatch(this)
     } else {
 
-      //exchange.getAttachment()
-
       given Request = Request.create(exchange)
 
       val reqParams = fillReqParams(exchange)
@@ -30,7 +28,7 @@ final class RoutesHandler private (routes: Routes) extends HttpHandler {
           val acceptContentType = exchange.getRequestHeaders.get(Headers.ACCEPT)
           if acceptContentType.getFirst == "application/json" then {
             val problemDetails = ProblemDetails(404, "Not Found")
-            Response.json(problemDetails).withStatus(404)
+            Response.withJsonBody(problemDetails).withStatus(404)
           } else Response("Not Found").withStatus(404)
         }
       )
