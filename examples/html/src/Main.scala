@@ -6,12 +6,13 @@ import ba.sake.sharaf.*
 import ba.sake.sharaf.routing.*
 import ba.sake.sharaf.handlers.*
 import io.undertow.Undertow
+import ba.sake.hepek.html.HtmlPage
+import scalatags.Text.all._
 
 @main def main: Unit = {
 
-  val routes: Routes = { case (POST(), Path("form"), _) =>
-    val req = Request.current.bodyForm[CreateCustomerForm]
-    Response.withBody(req.toString)
+  val routes: Routes = { case (GET(), Path("html"), _) =>
+    Response.withBody(MyPage: HtmlPage)
   }
 
   val server = Undertow
@@ -32,17 +33,9 @@ import io.undertow.Undertow
 
 }
 
-case class CreateCustomerForm(
-    name: String,
-    photo: java.nio.file.Path,
-    address: CreateAddressForm,
-    hobbies: List[String]
-) derives FormRW {
-  validate(
-    check(name).is(!_.isBlank, "must not be blank")
+object MyPage extends HtmlPage {
+  override def bodyContent: Frag = div(
+    "oppppppp",
+    img(src := "scala.png")
   )
 }
-
-case class CreateAddressForm(
-    street: String
-) derives FormRW

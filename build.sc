@@ -8,7 +8,8 @@ object sharaf extends BaseModule with PublishModule {
 
   def ivyDeps = Agg(
     ivy"io.undertow:undertow-core:2.3.5.Final",
-    ivy"ba.sake::tupson:0.5.1-12-b6b51a-DIRTY2eb8c085"
+    ivy"ba.sake::tupson:0.5.1-12-b6b51a-DIRTY2eb8c085",
+    ivy"ba.sake::hepek-components:0.10.0+0-3aaeebf1+20230522-1255-SNAPSHOT",
   )
 
   def artifactName = "sharaf"
@@ -49,6 +50,9 @@ trait BaseModule extends ScalaModule with ScalafmtModule {
 
 ////////////////////
 object examples extends mill.Module {
+  object html extends BaseModule {
+    def moduleDeps = Seq(sharaf)
+  }
   object json extends BaseModule {
     def moduleDeps = Seq(sharaf)
   }

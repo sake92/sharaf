@@ -8,7 +8,7 @@ import io.undertow.server.handlers.resource.ClassPathResourceManager
 object SharafHandler {
   def apply(routes: Routes): HttpHandler =
     ResourceHandler(
-      ClassPathResourceManager(SharafHandler.getClass.getClassLoader, "resources/static"),
+      ClassPathResourceManager(SharafHandler.getClass.getClassLoader, "static"),
       RoutesHandler(routes)
     )
 

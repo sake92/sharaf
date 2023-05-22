@@ -33,7 +33,7 @@ var db = Seq.empty[CustomerRes]
     .addHttpListener(8181, "localhost")
     .setHandler(
       ErrorHandler(
-        RoutesHandler(routes)
+        SharafHandler(routes)
       )
     )
     .build()

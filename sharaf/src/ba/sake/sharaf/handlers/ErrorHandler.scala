@@ -47,7 +47,7 @@ final class ErrorHandler private (
 
           exchange.setStatusCode(response.status)
 
-         // exchange.getResponseSender().send(response.body)
+        // exchange.getResponseSender().send(response.body)
         }
 
         // if no error match, just propagate
@@ -60,7 +60,7 @@ final class ErrorHandler private (
 object ErrorHandler {
   // TODO accept multiple errormappers, one per content type ?
   def apply(httpHandler: HttpHandler): ErrorHandler =
-   apply(httpHandler, { case _ if false => Response("should not happen") })
+    apply(httpHandler, { case _ if false => Response.withBody("should not happen") })
   def apply(httpHandler: HttpHandler, errorMapper: ErrorMapper[String]): ErrorHandler =
     new ErrorHandler(httpHandler, errorMapper)
 }
@@ -71,18 +71,18 @@ type ErrorMapper[T] = PartialFunction[Throwable, Response[T]]
 object ErrorMapper {
   val default: ErrorMapper[String] = {
     case e: NotFoundException =>
-      Response(e.getMessage).withStatus(404)
+      Response.withBody(e.getMessage).withStatus(404)
     case e: FieldsValidationException =>
       val fieldValidationErrors = e.errors.mkString("[", "; ", "]")
-      Response(s"Validation errors: $fieldValidationErrors").withStatus(400)
+      Response.withBody(s"Validation errors: $fieldValidationErrors").withStatus(400)
     // json
     case e: ParsingException =>
-      Response(e.getMessage()).withStatus(400)
+      Response.withBody(e.getMessage()).withStatus(400)
     case e: TupsonException =>
-      Response(e.getMessage()).withStatus(400)
+      Response.withBody(e.getMessage()).withStatus(400)
     // form
     case e: FormsonException =>
-      Response(e.getMessage()).withStatus(400)
+      Response.withBody(e.getMessage()).withStatus(400)
   }
 
   val json: ErrorMapper[ProblemDetails] = {

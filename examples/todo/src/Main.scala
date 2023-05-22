@@ -45,7 +45,8 @@ import ba.sake.tupson.JsonRW
       Response.withBody(todo2Resp(todo))
 
     case (OPTIONS(), _, _) =>
-      Response("")
+      Response.withBody("")
+        // TODO ..
         // SAMO u response za PRAVI REQUEST
         // ako je missing, onda ta domena nema pravo pristupa
         // ako ima, mora bit == Origin headeru!
@@ -55,7 +56,7 @@ import ba.sake.tupson.JsonRW
   }
 
   val handler = ErrorHandler(
-    RoutesHandler(routes)
+    SharafHandler(routes)
   )
 
   val server = Undertow

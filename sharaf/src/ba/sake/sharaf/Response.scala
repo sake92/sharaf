@@ -10,10 +10,10 @@ import java.nio.file.Files
 import io.undertow.util.HttpString
 import io.undertow.server.HttpServerExchange
 import io.undertow.server.handlers.resource.ResourceHandler
+import ba.sake.hepek.html.HtmlPage
 
 
-
-case class Response[T](
+case class Response[T] private (
     body: T,
     status: Int = 200,
     headers: Map[String, Seq[String]] = Map.empty
@@ -48,6 +48,14 @@ object ResponseWritable {
       Headers.CONTENT_TYPE_STRING -> Seq("text/plain")
     )
   }
+  given ResponseWritable[HtmlPage] = new {
+    override def write(value: HtmlPage, exchange: HttpServerExchange): Unit =
+      val htmlText= "<!DOCTYPE html>" + value.contents
+      exchange.getResponseSender.send(htmlText)
+    override def headers: Seq[(String, Seq[String])] = Seq(
+      Headers.CONTENT_TYPE_STRING -> Seq("text/html; charset=utf-8")
+    )
+  }
   given [T: JsonRW]: ResponseWritable[T] = new {
     override def write(value: T, exchange: HttpServerExchange): Unit =
       exchange.getResponseSender.send(value.toJson)
@@ -55,20 +63,6 @@ object ResponseWritable {
       Headers.CONTENT_TYPE_STRING -> Seq("application/json")
     )
   }
-  /*
-  given ResponseWritable[Resource] = new {
-
-    override def write(value: Resource, exchange: HttpServerExchange): Unit = value match
-      case Resource.Classpath(path) => 
-        //out.write(Files.readAllBytes(value))
-      case Resource.File(path) =>
-        Files.copy(path, exchange.getOutputStream)
-
-      // TODO resolve content type
-    override def headers: Seq[(String, Seq[String])] = Seq(
-      Headers.CONTENT_TYPE_STRING -> Seq("application/json")
-    )
-  }*/
   
 }
 

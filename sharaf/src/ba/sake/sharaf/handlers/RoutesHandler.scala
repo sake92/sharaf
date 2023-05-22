@@ -30,7 +30,7 @@ final class RoutesHandler private (routes: Routes) extends HttpHandler {
           if acceptContentType.getFirst == "application/json" then {
             val problemDetails = ProblemDetails(404, "Not Found")
             writeResponse(Response.withBody(problemDetails).withStatus(404), exchange)
-          } else writeResponse(Response("Not Found").withStatus(404), exchange)
+          } else writeResponse(Response.withBody("Not Found").withStatus(404), exchange)
 
     }
   }
