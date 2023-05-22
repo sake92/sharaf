@@ -15,17 +15,17 @@ var db = Seq.empty[CustomerRes]
   val routes: Routes = {
     case (GET(), Path("customers", uuid(id)), _) =>
       val customerOpt = db.find(_.id == id)
-      Response.withJsonBody(customerOpt, s"Customer with id=$id")
+      Response.withBody(customerOpt, s"Customer with id=$id")
 
     case (GET(), Path("customers"), q[UserQuery](query)) =>
       val customers = db.filter(c => query.name.contains(c.name))
-      Response.withJsonBody(customers)
+      Response.withBody(customers)
 
     case (POST(), Path("customers"), _) =>
       val req = Request.current.bodyJson[CreateCustomerReq]
       val res = CustomerRes(UUID.randomUUID(), req.name, AddressRes(req.address.street))
       db = db.appended(res)
-      Response.withJsonBody(res)
+      Response.withBody(res)
   }
 
   val server = Undertow

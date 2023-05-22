@@ -3,7 +3,6 @@ package ba.sake.sharaf.handlers
 import scala.jdk.CollectionConverters.*
 import io.undertow.server.HttpHandler
 import io.undertow.server.HttpServerExchange
-import io.undertow.server.handlers.ResponseCodeHandler
 import io.undertow.util.Headers
 import io.undertow.util.StatusCodes
 
@@ -21,34 +20,18 @@ final class RoutesHandler private (routes: Routes) extends HttpHandler {
       given Request = Request.create(exchange)
 
       val reqParams = fillReqParams(exchange)
-      val response = routes.applyOrElse(
-        reqParams,
-        _ => {
-          // TODO handle properly when multiple accepts..
+
+      val resOpt = routes.lift(reqParams)
+
+      resOpt match
+        case Some(res) => writeResponse(res, exchange)
+        case None =>
           val acceptContentType = exchange.getRequestHeaders.get(Headers.ACCEPT)
           if acceptContentType.getFirst == "application/json" then {
             val problemDetails = ProblemDetails(404, "Not Found")
-            Response.withJsonBody(problemDetails).withStatus(404)
-          } else Response("Not Found").withStatus(404)
-        }
-      )
+            writeResponse(Response.withBody(problemDetails).withStatus(404), exchange)
+          } else writeResponse(Response("Not Found").withStatus(404), exchange)
 
-      val contentType = response.headers
-        .get(Headers.CONTENT_TYPE_STRING)
-        .map(_.head)
-        .getOrElse("text/plain")
-      exchange.getResponseHeaders.put(Headers.CONTENT_TYPE, contentType)
-
-      exchange.setStatusCode(response.status)
-
-      // TODO REMOVE
-      response.headers.foreach { case (name, values) =>
-        exchange.getResponseHeaders.putAll(new HttpString(name), values.asJava)
-      }
-      exchange.getResponseHeaders.put(new HttpString("Access-Control-Allow-Origin"), "*")
-
-      // nothing after this line is applied!
-      exchange.getResponseSender.send(response.body)
     }
   }
 
@@ -65,6 +48,18 @@ final class RoutesHandler private (routes: Routes) extends HttpHandler {
     val queryString = new QueryString(queryParams)
 
     (exchange.getRequestMethod, path, queryString)
+  }
+
+  private def writeResponse(response: Response[?], exchange: HttpServerExchange): Unit = {
+    // headers
+    val allHeaders = response.rw.headers ++ response.headers
+    allHeaders.foreach { case (name, values) =>
+      exchange.getResponseHeaders.putAll(new HttpString(name), values.asJava)
+    }
+    // status code
+    exchange.setStatusCode(response.status)
+    // body
+    response.rw.write(response.body, exchange)
   }
 
 }

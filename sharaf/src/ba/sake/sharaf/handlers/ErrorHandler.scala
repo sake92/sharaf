@@ -14,7 +14,7 @@ import ba.sake.validation.FieldsValidationException
 
 final class ErrorHandler private (
     httpHandler: HttpHandler,
-    errorMapper: ErrorMapper
+    errorMapper: ErrorMapper[String]
 ) extends HttpHandler {
 
   override def handleRequest(exchange: HttpServerExchange): Unit = try {
@@ -47,7 +47,7 @@ final class ErrorHandler private (
 
           exchange.setStatusCode(response.status)
 
-          exchange.getResponseSender().send(response.body)
+         // exchange.getResponseSender().send(response.body)
         }
 
         // if no error match, just propagate
@@ -58,17 +58,18 @@ final class ErrorHandler private (
 }
 
 object ErrorHandler {
+  // TODO accept multiple errormappers, one per content type ?
   def apply(httpHandler: HttpHandler): ErrorHandler =
-    apply(httpHandler, { case _ if false => Response("should not happen") })
-  def apply(httpHandler: HttpHandler, errorMapper: ErrorMapper): ErrorHandler =
+   apply(httpHandler, { case _ if false => Response("should not happen") })
+  def apply(httpHandler: HttpHandler, errorMapper: ErrorMapper[String]): ErrorHandler =
     new ErrorHandler(httpHandler, errorMapper)
 }
 
 /////////////
-type ErrorMapper = PartialFunction[Throwable, Response]
+type ErrorMapper[T] = PartialFunction[Throwable, Response[T]]
 
 object ErrorMapper {
-  val default: ErrorMapper = {
+  val default: ErrorMapper[String] = {
     case e: NotFoundException =>
       Response(e.getMessage).withStatus(404)
     case e: FieldsValidationException =>
@@ -84,24 +85,24 @@ object ErrorMapper {
       Response(e.getMessage()).withStatus(400)
   }
 
-  val json: ErrorMapper = {
+  val json: ErrorMapper[ProblemDetails] = {
     case e: NotFoundException =>
       val problemDetails = ProblemDetails(400, "Not Found", e.getMessage)
-      Response.withJsonBody(problemDetails).withStatus(404)
+      Response.withBody(problemDetails).withStatus(404)
     case e: FieldsValidationException =>
       val fieldValidationErrors = e.errors.map(err => ArgumentProblem(err.path, err.msg, Some(err.value.toString)))
       val problemDetails = ProblemDetails(400, "Validation errors", invalidArguments = fieldValidationErrors)
-      Response.withJsonBody(problemDetails).withStatus(400)
+      Response.withBody(problemDetails).withStatus(400)
     // json
     case e: ParsingException =>
       val parsingErrors = e.errors.map(err => ArgumentProblem(err.path, err.msg, err.value.map(_.toString)))
       val problemDetails = ProblemDetails(400, "JSON Parsing errors", invalidArguments = parsingErrors)
-      Response.withJsonBody(problemDetails).withStatus(400)
+      Response.withBody(problemDetails).withStatus(400)
     case e: TupsonException =>
-      Response.withJsonBody(ProblemDetails(400, "JSON parsing error", e.getMessage)).withStatus(400)
+      Response.withBody(ProblemDetails(400, "JSON parsing error", e.getMessage)).withStatus(400)
     // form
     case e: FormsonException =>
-      Response.withJsonBody(ProblemDetails(400, "Form parsing error", e.getMessage)).withStatus(400)
+      Response.withBody(ProblemDetails(400, "Form parsing error", e.getMessage)).withStatus(400)
   }
 
 }

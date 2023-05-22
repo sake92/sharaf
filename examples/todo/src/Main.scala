@@ -15,24 +15,24 @@ import ba.sake.tupson.JsonRW
 
   val routes: Routes = {
     case (GET(), Path(""), _) =>
-      Response.withJsonBody(todosRepo.getTodos().map(todo2Resp))
+      Response.withBody(todosRepo.getTodos().map(todo2Resp))
 
     case (GET(), Path("todos", uuid(id)), _) =>
       val todo = todosRepo.getTodo(id)
-      Response.withJsonBody(todo2Resp(todo))
+      Response.withBody(todo2Resp(todo))
 
     case (POST(), Path(""), _) =>
       val reqBody = Request.current.bodyJson[CreateTodo]
       val newTodo = todosRepo.add(reqBody)
-      Response.withJsonBody(todo2Resp(newTodo))
+      Response.withBody(todo2Resp(newTodo))
 
     case (DELETE(), Path(""), _) =>
       todosRepo.deleteAll()
-      Response.withJsonBody(List.empty[TodoResponse])
+      Response.withBody(List.empty[TodoResponse])
 
     case (DELETE(), Path("todos", uuid(id)), _) =>
       todosRepo.delete(id)
-      Response.withJsonBody(todosRepo.getTodos().map(todo2Resp))
+      Response.withBody(todosRepo.getTodos().map(todo2Resp))
 
     case (PATCH(), Path("todos", uuid(id)), _) =>
       val reqBody = Request.current.bodyJson[PatchTodo]
@@ -42,7 +42,7 @@ import ba.sake.tupson.JsonRW
       reqBody.url.foreach(u => todo = todo.copy(url = u))
       reqBody.order.foreach(o => todo = todo.copy(order = Some(o)))
       todosRepo.set(todo)
-      Response.withJsonBody(todo2Resp(todo))
+      Response.withBody(todo2Resp(todo))
 
     case (OPTIONS(), _, _) =>
       Response("")
