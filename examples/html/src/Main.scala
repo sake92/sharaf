@@ -17,7 +17,7 @@ import scalatags.Text.all._
       Response.withBody(htmlPage)
     case (GET(), Path("scala.png"), _) =>
       val resource = Resource.fromClassPath("static/scala.png")
-      Response.withBody(resource)
+      Response.withBodyOpt(resource, "NotFound")
   }
 
   val server = Undertow

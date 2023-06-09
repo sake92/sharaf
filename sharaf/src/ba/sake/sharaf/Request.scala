@@ -1,6 +1,5 @@
 package ba.sake.sharaf
 
-import java.io.InputStream
 import java.nio.charset.StandardCharsets
 import scala.jdk.CollectionConverters.*
 import ba.sake.tupson.*

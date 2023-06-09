@@ -6,10 +6,9 @@ import scala.jdk.CollectionConverters.*
 import io.undertow.server.HttpHandler
 import io.undertow.server.HttpServerExchange
 import io.undertow.util.Headers
-import io.undertow.util.HttpString
-import io.undertow.util.StatusCodes
 
 import ba.sake.sharaf.*
+import ba.sake.querson.RawQueryString
 
 final class RoutesHandler private (routes: Routes, errorMapper: ErrorMapper[String] = ErrorMapper.empty)
     extends HttpHandler {
@@ -62,12 +61,12 @@ final class RoutesHandler private (routes: Routes, errorMapper: ErrorMapper[Stri
     val pathSegments = relPath.split("/")
     val path = Path(pathSegments*)
 
-    val queryParams = exchange.getQueryParameters.asScala.toMap.map { (k, v) =>
+    val queryParams: RawQueryString = exchange.getQueryParameters.asScala.toMap.map { (k, v) =>
       (k, v.asScala.toSeq)
     }
-    val queryString = new QueryString(queryParams)
 
-    (exchange.getRequestMethod, path, queryString)
+
+    (exchange.getRequestMethod, path, queryParams)
   }
 
 }

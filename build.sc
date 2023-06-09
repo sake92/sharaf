@@ -1,20 +1,55 @@
 import mill._
 import mill.scalalib._, scalafmt._, publish._
 
-import $ivy.`de.tototec::de.tobiasroeser.mill.vcs.version::0.1.4`
-import de.tobiasroeser.mill.vcs.version.VcsVersion
+import $ivy.`io.chris-kipp::mill-ci-release::0.1.9`
+import io.kipp.mill.ci.release.CiReleaseModule
 
-object sharaf extends BaseModule with PublishModule {
-
-  def ivyDeps = Agg(
-    ivy"io.undertow:undertow-core:2.3.5.Final",
-    ivy"ba.sake::tupson:0.5.1-14-3620d5-DIRTYd4843a04",
-    ivy"ba.sake::hepek-components:0.10.0+0-3aaeebf1+20230522-1255-SNAPSHOT",
-  )
+object sharaf extends SharafPublishModule {
 
   def artifactName = "sharaf"
 
-  override def publishVersion: T[String] = VcsVersion.vcsState().format()
+  def ivyDeps = Agg(
+    ivy"io.undertow:undertow-core:2.3.5.Final",
+    ivy"ba.sake::tupson:0.6.0",
+    ivy"ba.sake::hepek-components:0.10.0+0-3aaeebf1+20230522-1255-SNAPSHOT",
+  )
+
+  def moduleDeps = Seq(querson, formson)
+
+  object test extends Tests with TestModule.Munit {
+    def ivyDeps = Agg(
+      ivy"org.scalameta::munit::0.7.29"
+    )
+  }
+}
+
+object querson extends SharafPublishModule {
+
+  def artifactName = "querson"
+
+  def ivyDeps = Agg(
+    ivy"ba.sake::tupson:0.6.0",
+  )
+
+  object test extends Tests with TestModule.Munit {
+    def ivyDeps = Agg(
+      ivy"org.scalameta::munit::0.7.29"
+    )
+  }
+}
+
+object formson extends SharafPublishModule {
+
+  def artifactName = "formson"
+
+  object test extends Tests with TestModule.Munit {
+    def ivyDeps = Agg(
+      ivy"org.scalameta::munit::0.7.29"
+    )
+  }
+}
+
+trait SharafPublishModule extends SharafCommonModule with CiReleaseModule {
 
   def pomSettings = PomSettings(
     organization = "ba.sake",
@@ -26,40 +61,29 @@ object sharaf extends BaseModule with PublishModule {
       Developer("sake92", "Sakib Hadžiavdić", "https://sake.ba")
     )
   )
-
-  object test extends Tests with TestModule.Munit {
-    def ivyDeps = Agg(
-      ivy"org.scalameta::munit::0.7.29"
-    )
-  }
 }
 
-trait BaseModule extends ScalaModule with ScalafmtModule {
-  def scalaVersion = "3.3.0-RC6"
+trait SharafCommonModule extends ScalaModule with ScalafmtModule {
+  def scalaVersion = "3.3.0"
   def scalacOptions = super.scalacOptions() ++ Seq(
     "-deprecation",
-    "-Yretain-trees"
+    "-Yretain-trees",
+    "-Wunused:all"
   )
-
-  def repositoriesTask() = T.task {
-    super.repositoriesTask() ++ Seq(
-      coursier.maven.MavenRepository("https://jitpack.io")
-    )
-  }
 }
 
 ////////////////////
 object examples extends mill.Module {
-  object html extends BaseModule {
+  object html extends SharafCommonModule {
     def moduleDeps = Seq(sharaf)
   }
-  object json extends BaseModule {
+  object json extends SharafCommonModule {
     def moduleDeps = Seq(sharaf)
   }
-  object form extends BaseModule {
+  object form extends SharafCommonModule {
     def moduleDeps = Seq(sharaf)
   }
-  object todo extends BaseModule {
+  object todo extends SharafCommonModule {
     def moduleDeps = Seq(sharaf)
   }
 }

@@ -1,13 +1,10 @@
 package ba.sake.sharaf.handlers
 
 import java.time.Duration
-import java.net.URI
 import scala.jdk.CollectionConverters.*
 import io.undertow.server.HttpHandler
 import io.undertow.server.HttpServerExchange
-import io.undertow.server.handlers.ResponseCodeHandler
 import io.undertow.util.Headers
-import io.undertow.util.StatusCodes
 import io.undertow.util.HttpString
 import io.undertow.util.Methods
 

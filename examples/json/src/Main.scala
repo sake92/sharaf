@@ -7,6 +7,7 @@ import ba.sake.tupson.*
 import ba.sake.sharaf.*
 import ba.sake.sharaf.routing.*
 import ba.sake.sharaf.handlers.*
+import ba.sake.querson.*
 
 var db = Seq.empty[CustomerRes]
 
@@ -42,4 +43,4 @@ var db = Seq.empty[CustomerRes]
 
 }
 
-case class UserQuery(name: Set[String]) derives FromQueryString
+case class UserQuery(name: Set[String]) derives QueryStringRW

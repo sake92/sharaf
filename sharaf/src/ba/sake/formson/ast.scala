@@ -12,7 +12,7 @@ type FlatFormValues = Map[String, Seq[FormValue]]
 
 // internal representation
 enum FormDataInternal(val tpe: String) {
-  case Simple(values: FormValue) extends FormDataInternal("simple value")
+  case Simple(value: FormValue) extends FormDataInternal("simple value")
   case Obj(values: Map[String, FormDataInternal]) extends FormDataInternal("object")
   case Sequence(values: SortedMap[Int, Seq[FormDataInternal]]) extends FormDataInternal("sequence")
 }

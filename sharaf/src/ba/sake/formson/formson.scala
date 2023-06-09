@@ -1,13 +1,11 @@
 package ba.sake.formson
 
-import scala.collection.mutable
 import scala.deriving.*
 import scala.compiletime.*
 import java.util.UUID
 import scala.util.Try
 import ba.sake.validation.*
 import java.nio.file.Path
-import scala.collection.SortedMap
 
 trait FormRW[T] {
   def read(path: String, formData: FormData): T

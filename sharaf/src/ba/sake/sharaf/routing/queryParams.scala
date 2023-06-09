@@ -1,8 +1,12 @@
 package ba.sake.sharaf.routing
 
-import ba.sake.sharaf.*
+import scala.util.Try
+
+import ba.sake.querson.*
 
 object q {
-  def unapply[T](qs: QueryString)(using fqs: FromQueryString[T]): Option[T] =
-    fqs.bind(qs.params)
+  def unapply[T](qs: RawQueryString)(using fqs: QueryStringRW[T]): Option[T] = {
+    val obj = parseQueryString(qs)
+    Try(fqs.parse("", obj)).toOption
+  }
 }

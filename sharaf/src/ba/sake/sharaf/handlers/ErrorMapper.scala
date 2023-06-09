@@ -1,14 +1,10 @@
 package ba.sake.sharaf.handlers
 
 import scala.jdk.CollectionConverters.*
-import scala.util.control.NonFatal
-import io.undertow.server.HttpHandler
-import io.undertow.server.HttpServerExchange
 
 import ba.sake.tupson.*
 import ba.sake.formson.*
 import ba.sake.sharaf.*
-import io.undertow.util.Headers
 import java.net.URI
 import org.typelevel.jawn.ast.*
 import ba.sake.validation.FieldsValidationException

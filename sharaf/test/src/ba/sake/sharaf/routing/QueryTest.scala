@@ -1,44 +1,43 @@
 package ba.sake.sharaf
 package routing
 
-import scala.util.Try
-import java.util.UUID
+import ba.sake.querson.*
 
 class QueryTest extends munit.FunSuite {
 
   test("query params matching") {
-    Seq(
-      QueryString(),
-      QueryString("a" -> Seq()),
-      QueryString("a" -> Seq("")),
-      QueryString("a" -> Seq("a1")),
-      QueryString("a" -> Seq("a1", "a2"))
+    Seq[RawQueryString](
+      Map(),
+      Map("a" -> Seq())
+      //Map("a" -> Seq("")),
+      //Map("a" -> Seq("a1")),
+      //Map("a" -> Seq("a1", "a2"))
     ).foreach { case qps @ q[Query1](res) =>
-      assertEquals(res.a, qps.params.get("a").toSeq.flatten)
+      assertEquals(res.a, qps.get("a").toSeq.flatten)
     }
 
     Seq(
-      QueryString(),
-      QueryString("a" -> Seq("")),
-      QueryString("a" -> Seq("a1")),
-      QueryString("a" -> Seq("a1", "a2"))
+      Map(),
+      Map("a" -> Seq("")),
+      Map("a" -> Seq("a1")),
+      Map("a" -> Seq("a1", "a2"))
     ).foreach { case qps @ q[Query2](res) =>
-      val expected = qps.params.get("a").flatMap(_.headOption)
+      val expected = qps.get("a").flatMap(_.headOption)
       assertEquals(res.a, expected)
     }
 
     Seq(
-      QueryString("a" -> Seq("")),
-      QueryString("a" -> Seq("a1")),
-      QueryString("a" -> Seq("a1", "a2"))
+      Map("a" -> Seq("")),
+      Map("a" -> Seq("a1")),
+      Map("a" -> Seq("a1", "a2"))
     ).foreach { case qps @ q[Query3](res) =>
-      assertEquals(res.a, qps.params.apply("a").head)
+      assertEquals(res.a, qps.apply("a").head)
     }
 
   }
 
 }
 
-case class Query1(a: Seq[String]) derives FromQueryString
-case class Query2(a: Option[String]) derives FromQueryString
-case class Query3(a: String) derives FromQueryString
+case class Query1(a: Seq[String]) derives QueryStringRW
+case class Query2(a: Option[String]) derives QueryStringRW
+case class Query3(a: String) derives QueryStringRW
