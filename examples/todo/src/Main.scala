@@ -55,9 +55,7 @@ import ba.sake.tupson.JsonRW
         .withHeader("Access-Control-Allow-Methods", "GET,HEAD,POST,OPTIONS,PATCH,DELETE") // SAMO ZA OPTIONS
   }
 
-  val handler = ErrorHandler(
-    SharafHandler(routes)
-  )
+  val handler = RoutesHandler(routes)
 
   val server = Undertow
     .builder()

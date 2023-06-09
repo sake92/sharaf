@@ -13,7 +13,7 @@
 ./mill examples.runMain bla
 
 # for local dev/test
-./mill sharaf.publishM2Local
+./mill sharaf.publishLocal
 
 git diff
 git commit -am "msg"

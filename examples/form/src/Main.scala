@@ -17,11 +17,7 @@ import io.undertow.Undertow
   val server = Undertow
     .builder()
     .addHttpListener(8181, "localhost")
-    .setHandler(
-      ErrorHandler(
-        SharafHandler(routes)
-      )
-    )
+    .setHandler(RoutesHandler(routes))
     .build()
 
   server.start()

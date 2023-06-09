@@ -15,7 +15,7 @@ var db = Seq.empty[CustomerRes]
   val routes: Routes = {
     case (GET(), Path("customers", uuid(id)), _) =>
       val customerOpt = db.find(_.id == id)
-      Response.withBody(customerOpt, s"Customer with id=$id")
+      Response.withBodyOpt(customerOpt, s"Customer with id=$id")
 
     case (GET(), Path("customers"), q[UserQuery](query)) =>
       val customers = db.filter(c => query.name.contains(c.name))
@@ -31,11 +31,7 @@ var db = Seq.empty[CustomerRes]
   val server = Undertow
     .builder()
     .addHttpListener(8181, "localhost")
-    .setHandler(
-      ErrorHandler(
-        SharafHandler(routes)
-      )
-    )
+    .setHandler(RoutesHandler(routes))
     .build()
 
   server.start()

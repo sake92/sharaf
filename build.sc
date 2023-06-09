@@ -8,7 +8,7 @@ object sharaf extends BaseModule with PublishModule {
 
   def ivyDeps = Agg(
     ivy"io.undertow:undertow-core:2.3.5.Final",
-    ivy"ba.sake::tupson:0.5.1-12-b6b51a-DIRTY2eb8c085",
+    ivy"ba.sake::tupson:0.5.1-14-3620d5-DIRTYd4843a04",
     ivy"ba.sake::hepek-components:0.10.0+0-3aaeebf1+20230522-1255-SNAPSHOT",
   )
 

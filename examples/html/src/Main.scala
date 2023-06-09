@@ -11,18 +11,19 @@ import scalatags.Text.all._
 
 @main def main: Unit = {
 
-  val routes: Routes = { case (GET(), Path("html"), _) =>
-    Response.withBody(MyPage: HtmlPage)
+  val routes: Routes = {
+    case (GET(), Path("html"), _) =>
+      val htmlPage: HtmlPage = MyPage
+      Response.withBody(htmlPage)
+    case (GET(), Path("scala.png"), _) =>
+      val resource = Resource.fromClassPath("static/scala.png")
+      Response.withBody(resource)
   }
 
   val server = Undertow
     .builder()
     .addHttpListener(8181, "localhost")
-    .setHandler(
-      ErrorHandler(
-        SharafHandler(routes)
-      )
-    )
+    .setHandler(RoutesHandler(routes))
     .build()
 
   server.start()

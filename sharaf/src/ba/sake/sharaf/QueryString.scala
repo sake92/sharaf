@@ -84,6 +84,10 @@ object FromQueryStringParam {
 
 ////////
 // binds a case class from query params
+// TODO
+// - recursive on FromQueryString i.e. page.limit=4, page.offset=10 :)
+// - accept DEFAULT VALUE!
+// - derive simple enums
 trait FromQueryString[T] {
   def bind(qParams: Map[String, Seq[String]]): Option[T]
 }

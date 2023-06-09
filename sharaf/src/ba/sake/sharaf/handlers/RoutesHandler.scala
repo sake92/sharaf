@@ -1,15 +1,18 @@
 package ba.sake.sharaf.handlers
 
+import scala.util.control.NonFatal
 import scala.jdk.CollectionConverters.*
+
 import io.undertow.server.HttpHandler
 import io.undertow.server.HttpServerExchange
 import io.undertow.util.Headers
+import io.undertow.util.HttpString
 import io.undertow.util.StatusCodes
 
 import ba.sake.sharaf.*
-import io.undertow.util.HttpString
 
-final class RoutesHandler private (routes: Routes) extends HttpHandler {
+final class RoutesHandler private (routes: Routes, errorMapper: ErrorMapper[String] = ErrorMapper.empty)
+    extends HttpHandler {
 
   override def handleRequest(exchange: HttpServerExchange): Unit = {
     exchange.startBlocking()
@@ -17,20 +20,37 @@ final class RoutesHandler private (routes: Routes) extends HttpHandler {
       exchange.dispatch(this)
     } else {
 
-      given Request = Request.create(exchange)
+      try {
+        given Request = Request.create(exchange)
 
-      val reqParams = fillReqParams(exchange)
+        val reqParams = fillReqParams(exchange)
+        val resOpt = routes.lift(reqParams)
 
-      val resOpt = routes.lift(reqParams)
+        // if no match, a 500 will be returned by Undertow
+        resOpt.foreach { res =>
+          ResponseWritable.writeResponse(res, exchange)
+        }
+      } catch {
+        case NonFatal(e) if exchange.isResponseChannelAvailable =>
+          // TODO handle properly when multiple accepts..
+          val acceptContentType = exchange.getRequestHeaders().get(Headers.ACCEPT)
+          val responseOpt =
+            if acceptContentType.getFirst() == "application/json" then {
+              val mapper = errorMapper.orElse(ErrorMapper.json)
+              mapper.lift(e)
+            } else {
+              val mapper = errorMapper.orElse(ErrorMapper.default)
+              mapper.lift(e)
+            }
 
-      resOpt match
-        case Some(res) => writeResponse(res, exchange)
-        case None =>
-          val acceptContentType = exchange.getRequestHeaders.get(Headers.ACCEPT)
-          if acceptContentType.getFirst == "application/json" then {
-            val problemDetails = ProblemDetails(404, "Not Found")
-            writeResponse(Response.withBody(problemDetails).withStatus(404), exchange)
-          } else writeResponse(Response.withBody("Not Found").withStatus(404), exchange)
+          responseOpt match {
+            case Some(response) => ResponseWritable.writeResponse(response, exchange)
+            case None           =>
+              // if no error response match, just propagate.
+              // will return 500
+              throw e
+          }
+      }
 
     }
   }
@@ -48,18 +68,6 @@ final class RoutesHandler private (routes: Routes) extends HttpHandler {
     val queryString = new QueryString(queryParams)
 
     (exchange.getRequestMethod, path, queryString)
-  }
-
-  private def writeResponse(response: Response[?], exchange: HttpServerExchange): Unit = {
-    // headers
-    val allHeaders = response.rw.headers ++ response.headers
-    allHeaders.foreach { case (name, values) =>
-      exchange.getResponseHeaders.putAll(new HttpString(name), values.asJava)
-    }
-    // status code
-    exchange.setStatusCode(response.status)
-    // body
-    response.rw.write(response.body, exchange)
   }
 
 }
