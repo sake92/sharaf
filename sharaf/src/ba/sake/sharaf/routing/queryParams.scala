@@ -6,7 +6,6 @@ import ba.sake.querson.*
 
 object q {
   def unapply[T](qs: RawQueryString)(using fqs: QueryStringRW[T]): Option[T] = {
-    val obj = parseQueryString(qs)
-    Try(fqs.parse("", obj)).toOption
+    Try(qs.parseQueryString[T]).toOption
   }
 }

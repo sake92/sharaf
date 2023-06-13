@@ -13,13 +13,13 @@ import ba.sake.validation.FieldsValidationException
 type ErrorMapper[T] = PartialFunction[Throwable, Response[T]]
 
 object ErrorMapper {
-  val empty : ErrorMapper[String] = new PartialFunction[Throwable, Response[String]] {
+  val empty: ErrorMapper[String] = new PartialFunction[Throwable, Response[String]] {
 
     override def apply(v1: Throwable): Response[String] = ???
 
     override def isDefinedAt(x: Throwable): Boolean = false
   }
-  
+
   val default: ErrorMapper[String] = {
     case e: NotFoundException =>
       Response.withBody(e.getMessage).withStatus(404)

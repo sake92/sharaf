@@ -35,9 +35,7 @@ object QueryStringParamRW {
     override def write(path: String, value: Int): String = s"$path=$value"
 
     override def parse(path: String, values: Seq[String]): Int =
-      println("Parsing int " + values)
       val str = QueryStringParamRW[String].parse(path, values)
-      println(str.toIntOption)
       str.toIntOption.getOrElse(typeError(path, "Int", str))
   }
 
@@ -68,7 +66,7 @@ object QueryStringParamRW {
 
     override def parse(path: String, values: Seq[String]): Set[T] =
       QueryStringParamRW[Seq[T]].parse(path, values).toSet
-    
+
     override def default: Option[Set[T]] = Some(Set.empty)
   }
 

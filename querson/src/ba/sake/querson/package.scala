@@ -1,4 +1,11 @@
-package ba.sake.querson 
+package ba.sake.querson
+
+extension (rawQueryString: RawQueryString) {
+  def parseQueryString[T](using rw: QueryStringRW[T]): T =
+    val obj = parse(rawQueryString)
+    rw.parse("", obj)
+
+}
 
 /* exceptions */
 sealed class QuersonException(msg: String, cause: Throwable = null) extends Exception(msg, cause)

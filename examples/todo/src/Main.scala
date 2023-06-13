@@ -45,7 +45,8 @@ import ba.sake.tupson.JsonRW
       Response.withBody(todo2Resp(todo))
 
     case (OPTIONS(), _, _) =>
-      Response.withBody("")
+      Response
+        .withBody("")
         // TODO ..
         // SAMO u response za PRAVI REQUEST
         // ako je missing, onda ta domena nema pravo pristupa

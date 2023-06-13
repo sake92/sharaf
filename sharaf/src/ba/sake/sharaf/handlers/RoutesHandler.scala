@@ -65,7 +65,6 @@ final class RoutesHandler private (routes: Routes, errorMapper: ErrorMapper[Stri
       (k, v.asScala.toSeq)
     }
 
-
     (exchange.getRequestMethod, path, queryParams)
   }
 
