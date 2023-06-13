@@ -8,10 +8,8 @@ import scala.quoted.*
 
 import ba.sake.validation.*
 
-// binds a case class from query params
-// TODO
-// - accept DEFAULT VALUE!
-// - derive simple enums
+/** Maps a `T` to/from query params string
+  */
 trait QueryStringRW[T] {
 
   // TODO QueryStringData.Obj ??
@@ -30,9 +28,10 @@ object QueryStringRW {
   private def derivedMacro[T: Type](using Quotes): Expr[QueryStringRW[T]] = {
     import quotes.reflect.*
 
+    // TODO only summon ProductOf ??
     val mirror: Expr[Mirror.Of[T]] = Expr.summon[Mirror.Of[T]].getOrElse {
       report.errorAndAbort(
-        s"Cannot derive QueryStringRW[${Type.show[T]}] automatically because it is not a case class"
+        s"Cannot derive QueryStringRW[${Type.show[T]}] automatically because ${Type.show[T]} is not an ADT"
       )
     }
 
@@ -140,7 +139,7 @@ object QueryStringRW {
           }
         }
 
-      case hmm => report.errorAndAbort(s"Sum types not supported ")
+      case hmm => report.errorAndAbort(s"Sum types are not supported ")
   }
 
   /* macro utils */
@@ -154,19 +153,12 @@ object QueryStringRW {
     Expr.summon[QueryStringParamRW[Elem]].getOrElse {
       Expr.summon[QueryStringRW[Elem]].getOrElse {
         report.errorAndAbort(
-          s"There is no instance of QueryStringRW[${Type.show[Elem]}] available"
+          s"There is no instance of QueryStringParamRW[${Type.show[Elem]}] or QueryStringRW[${Type.show[Elem]}] available"
         )
       }
     }
 
-  private def isSingletonCasesEnum[T: Type](using Quotes): Expr[Boolean] =
-    import quotes.reflect.*
-    val ts = TypeRepr.of[T].typeSymbol
-    Expr(ts.flags.is(Flags.Enum) && ts.companionClass.methodMember("values").nonEmpty)
-
-  private def defaultValuesExpr[T: Type](using
-      Quotes
-  ): Expr[List[(String, Option[() => Any])]] =
+  private def defaultValuesExpr[T: Type](using Quotes): Expr[List[(String, Option[() => Any])]] =
     import quotes.reflect._
     def exprOfOption(
         oet: (Expr[String], Option[Expr[Any]])

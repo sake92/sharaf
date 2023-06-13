@@ -3,8 +3,10 @@ package ba.sake.querson
 import java.util.UUID
 import scala.util.Try
 import ba.sake.validation.*
+import scala.deriving.*
+import scala.quoted.*
 
-/** Write/read T from/to a sequence of query param values
+/** Maps a `T` to/from query param values
   */
 trait QueryStringParamRW[T] {
 
@@ -58,9 +60,7 @@ object QueryStringParamRW {
     override def default: Option[Seq[T]] = Some(Seq.empty)
   }
 
-  given [T](using
-      fqsp: QueryStringParamRW[T]
-  ): QueryStringParamRW[Set[T]] with {
+  given [T](using fqsp: QueryStringParamRW[T]): QueryStringParamRW[Set[T]] with {
     override def write(path: String, value: Set[T]): String =
       QueryStringParamRW[Seq[T]].write(path, value.toSeq)
 
@@ -70,9 +70,7 @@ object QueryStringParamRW {
     override def default: Option[Set[T]] = Some(Set.empty)
   }
 
-  given [T](using
-      fqsp: QueryStringParamRW[T]
-  ): QueryStringParamRW[Option[T]] with {
+  given [T](using fqsp: QueryStringParamRW[T]): QueryStringParamRW[Option[T]] with {
     override def write(path: String, value: Option[T]): String =
       QueryStringParamRW[Seq[T]].write(path, value.toSeq)
 
@@ -82,6 +80,57 @@ object QueryStringParamRW {
     override def default: Option[Option[T]] = Some(None)
   }
 
+  /* macro derived instances */
+  inline def derived[T]: QueryStringParamRW[T] = ${ derivedMacro[T] }
+
+  private def derivedMacro[T: Type](using Quotes): Expr[QueryStringParamRW[T]] = {
+    import quotes.reflect.*
+
+    val mirror: Expr[Mirror.Of[T]] = Expr.summon[Mirror.Of[T]].getOrElse {
+      report.errorAndAbort(
+        s"Cannot derive QueryStringParamRW[${Type.show[T]}] automatically because ${Type.show[T]} is not an ADT"
+      )
+    }
+
+    mirror match
+      case '{
+            type label <: Tuple;
+            $m: Mirror.SumOf[T] { type MirroredElemLabels = `label` }
+          } =>
+        val labels = Expr(Type.valueOfTuple[label].map(_.toList.map(_.toString)).getOrElse(List.empty))
+
+        val isSingleCasesEnum = isSingletonCasesEnum[T]
+        if !isSingleCasesEnum then
+          report.errorAndAbort(
+            s"Cannot derive QueryStringParamRW[${Type.show[T]}] automatically because ${Type.show[T]} is not a singleton-cases enum"
+          )
+
+        val companion = TypeRepr.of[T].typeSymbol.companionModule.termRef
+        val valueOfSelect = Select.unique(Ident(companion), "valueOf").symbol
+        '{
+          new QueryStringParamRW[T] {
+            override def write(path: String, value: T): String =
+              val index = $m.ordinal(value)
+              $labels(index)
+
+            override def parse(path: String, values: Seq[String]): T =
+              ${
+                val bla = '{ values.head }
+                Block(Nil, Apply(Select(Ident(companion), valueOfSelect), List(bla.asTerm))).asExprOf[T]
+              }
+          }
+        }
+
+      case hmm => report.errorAndAbort(s"Product types not supported ")
+  }
+
+  /* macro utils */
+  private def isSingletonCasesEnum[T: Type](using Quotes): Boolean =
+    import quotes.reflect.*
+    val ts = TypeRepr.of[T].typeSymbol
+    ts.flags.is(Flags.Enum) && ts.companionClass.methodMember("values").nonEmpty
+
+    /* utils */
   private def typeError(name: String, tpe: String, value: Any): Nothing =
     throw FieldsValidationException(
       Seq(FieldValidationError(name, value, s"invalid $tpe"))

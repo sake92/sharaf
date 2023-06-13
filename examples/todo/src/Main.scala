@@ -51,7 +51,7 @@ import ba.sake.tupson.JsonRW
         // SAMO u response za PRAVI REQUEST
         // ako je missing, onda ta domena nema pravo pristupa
         // ako ima, mora bit == Origin headeru!
-        //.withHeader("Access-Control-Allow-Origin", "*") // može biti dinamički normala
+        // .withHeader("Access-Control-Allow-Origin", "*") // može biti dinamički normala
         .withHeader("Access-Control-Allow-Headers", "*") // SAMO ZA OPTIONS
         .withHeader("Access-Control-Allow-Methods", "GET,HEAD,POST,OPTIONS,PATCH,DELETE") // SAMO ZA OPTIONS
   }

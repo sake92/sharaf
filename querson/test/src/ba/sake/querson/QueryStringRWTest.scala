@@ -22,6 +22,15 @@ class QueryStringRWTest extends munit.FunSuite {
     }
   }
 
+  test("parseQueryString should parse singleton-cases enum") {
+    Seq[(RawQueryString, QueryEnum)](
+      (Map("color" -> Seq("Red")), QueryEnum(Color.Red))
+    ).foreach { case (rawQS, expected) =>
+      val res = rawQS.parseQueryString[QueryEnum]
+      assertEquals(res, expected)
+    }
+  }
+
   test("parseQueryString should parse sequence") {
     Seq[(RawQueryString, QuerySeq)](
       (Map(), QuerySeq(Seq())),
@@ -87,6 +96,11 @@ class QueryStringRWTest extends munit.FunSuite {
 }
 
 case class QuerySimple(str: String, int: Int, uuid: UUID) derives QueryStringRW
+
+enum Color derives QueryStringParamRW:
+  case Red
+  case Blue
+case class QueryEnum(color: Color) derives QueryStringRW
 
 case class QuerySeq(a: Seq[String]) derives QueryStringRW
 
