@@ -28,7 +28,7 @@ object QueryStringRW {
   private def derivedMacro[T: Type](using Quotes): Expr[QueryStringRW[T]] = {
     import quotes.reflect.*
 
-    // TODO only summon ProductOf ??
+    // only summon ProductOf ??
     val mirror: Expr[Mirror.Of[T]] = Expr.summon[Mirror.Of[T]].getOrElse {
       report.errorAndAbort(
         s"Cannot derive QueryStringRW[${Type.show[T]}] automatically because ${Type.show[T]} is not an ADT"
@@ -52,12 +52,13 @@ object QueryStringRW {
               val valueAsProd = ${ 'value.asExprOf[Product] }
               $labels.zip(valueAsProd.productIterator).zip($rwInstances).foreach {
                 case ((k, v), rw: QueryStringParamRW[?]) =>
+                  // TODO a.b or a[b]
                   val pathh = if path.isBlank then k else s"$path.$k"
                   queryParams += rw.asInstanceOf[QueryStringParamRW[Any]].write(pathh, v)
                 case ((k, v), rw: QueryStringRW[?]) =>
                   queryParams += rw.asInstanceOf[QueryStringRW[Any]].write(k, v)
               }
-              queryParams.mkString("&")
+              queryParams.filterNot(_.isBlank).mkString("&")
             }
 
             override def parse(path: String, qParams: QueryStringData.Obj): T = {

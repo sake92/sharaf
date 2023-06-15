@@ -5,6 +5,8 @@ import scala.util.Try
 import ba.sake.validation.*
 import scala.deriving.*
 import scala.quoted.*
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 /** Maps a `T` to/from query param values
   */
@@ -20,29 +22,51 @@ trait QueryStringParamRW[T] {
 
 }
 
-// TODO derive simple enums :)
+// TODO encode strings properly
 object QueryStringParamRW {
 
   def apply[T](using instance: QueryStringParamRW[T]): QueryStringParamRW[T] = instance
 
   given QueryStringParamRW[String] with {
 
-    override def write(path: String, value: String): String = s"$path=$value"
+    override def write(path: String, value: String): String =
+      val urlEncodedValue = URLEncoder.encode(value, StandardCharsets.UTF_8)
+      s"$path=$urlEncodedValue"
 
     override def parse(path: String, values: Seq[String]): String =
       values.headOption.getOrElse(parseError(path, "missing"))
   }
 
   given QueryStringParamRW[Int] with {
-    override def write(path: String, value: Int): String = s"$path=$value"
+    override def write(path: String, value: Int): String =
+      QueryStringParamRW[String].write(path, value.toString)
 
     override def parse(path: String, values: Seq[String]): Int =
       val str = QueryStringParamRW[String].parse(path, values)
       str.toIntOption.getOrElse(typeError(path, "Int", str))
   }
 
+  given QueryStringParamRW[Long] with {
+    override def write(path: String, value: Long): String =
+      QueryStringParamRW[String].write(path, value.toString)
+
+    override def parse(path: String, values: Seq[String]): Long =
+      val str = QueryStringParamRW[String].parse(path, values)
+      str.toIntOption.getOrElse(typeError(path, "Long", str))
+  }
+
+  given QueryStringParamRW[Double] with {
+    override def write(path: String, value: Double): String =
+      QueryStringParamRW[String].write(path, value.toString)
+
+    override def parse(path: String, values: Seq[String]): Double =
+      val str = QueryStringParamRW[String].parse(path, values)
+      str.toDoubleOption.getOrElse(typeError(path, "Double", str))
+  }
+
   given QueryStringParamRW[UUID] with {
-    override def write(path: String, value: UUID): String = s"$path=$value"
+    override def write(path: String, value: UUID): String =
+      QueryStringParamRW[String].write(path, value.toString)
 
     override def parse(path: String, values: Seq[String]): UUID =
       val str = QueryStringParamRW[String].parse(path, values)
@@ -111,7 +135,8 @@ object QueryStringParamRW {
           new QueryStringParamRW[T] {
             override def write(path: String, value: T): String =
               val index = $m.ordinal(value)
-              $labels(index)
+              val label = $labels(index)
+              QueryStringParamRW[String].write(path, label)
 
             override def parse(path: String, values: Seq[String]): T =
               ${

@@ -4,7 +4,11 @@ extension (rawQueryString: RawQueryString) {
   def parseQueryString[T](using rw: QueryStringRW[T]): T =
     val obj = parse(rawQueryString)
     rw.parse("", obj)
+}
 
+extension [T](value: T)(using rw: QueryStringRW[T]) {
+  def toQueryString: String =
+    rw.write("", value)
 }
 
 /* exceptions */
