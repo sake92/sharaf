@@ -29,7 +29,7 @@ extension [T](value: T)(using rw: QueryStringRW[T]) {
     val qsData = rw.write("", value)
     writeToRawQS("", qsData, config)
 
-    /** Serializes `T` to query string, with values URL encoded.
+    /** Serializes `T` to query string, with key/values URL encoded.
       *
       * @param rw
       *   Typeclass that does the heavy lifting

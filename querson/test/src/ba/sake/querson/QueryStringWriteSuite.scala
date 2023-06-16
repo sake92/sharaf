@@ -18,6 +18,11 @@ class QueryStringWriteSuite extends munit.FunSuite {
     assertEquals(res1, s"str=some+text&uuid=$uuid&int=42")
   }
 
+  test("toQueryString should write encode query parameters properly") {
+    val res1 = QuerySimpleReservedChars("wh!#at%t he&stu$f?@[]").toQueryString()
+    assertEquals(res1, "what%25the%26stu%24f%3F%40%5B%5D=wh%21%23at%25t+he%26stu%24f%3F%40%5B%5D")
+  }
+
   test("toQueryString should write enum query parameters to string") {
     val res1 = QueryEnum(Color.Red).toQueryString()
     assertEquals(res1, "color=Red")

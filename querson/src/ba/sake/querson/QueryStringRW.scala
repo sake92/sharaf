@@ -83,13 +83,13 @@ object QueryStringRW {
       Sequence(data)
 
     override def parse(path: String, qsData: QueryStringData): Seq[T] = qsData match
-      case Sequence(values) => rethrowingKeysErrors(path, values)
+      case Sequence(values) => parseRethrowingErrors(path, values)
       case other            => typeMismatchError(path, "Seq", other, None)
 
     override def default: Option[Seq[T]] = Some(Seq.empty)
   }
 
-  private def rethrowingKeysErrors[T](path: String, values: Seq[QueryStringData])(using
+  private def parseRethrowingErrors[T](path: String, values: Seq[QueryStringData])(using
       rw: QueryStringRW[T]
   ): Seq[T] = {
     val parsedValues = ArrayDeque.empty[T]

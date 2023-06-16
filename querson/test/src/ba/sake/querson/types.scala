@@ -7,6 +7,7 @@ enum Color derives QueryStringRW:
   case Blue
 
 case class QuerySimple(str: String, int: Int, uuid: UUID) derives QueryStringRW
+case class QuerySimpleReservedChars(`what%the&stu$f?@[]`: String) derives QueryStringRW
 
 case class QueryEnum(color: Color) derives QueryStringRW
 
