@@ -2,11 +2,12 @@ package ba.sake.querson
 
 import java.util.UUID
 
-case class QuerySimple(str: String, int: Int, uuid: UUID) derives QueryStringRW
-
-enum Color derives QueryStringParamRW:
+enum Color derives QueryStringRW:
   case Red
   case Blue
+
+case class QuerySimple(str: String, int: Int, uuid: UUID) derives QueryStringRW
+
 case class QueryEnum(color: Color) derives QueryStringRW
 
 case class QuerySeq(a: Seq[String]) derives QueryStringRW

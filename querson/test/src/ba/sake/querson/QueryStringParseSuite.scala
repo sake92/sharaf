@@ -6,7 +6,7 @@ class QueryStringParseSuite extends munit.FunSuite {
 
   val uuid = UUID.fromString("ef42f9e9-79b9-45eb-a938-95ac75aedf87")
 
-  test("parseQueryString should parse simple key/values") {
+  test("parseRawQueryString should parse simple key/values") {
     Seq[(RawQueryString, QuerySimple)](
       (
         Map(
@@ -17,21 +17,21 @@ class QueryStringParseSuite extends munit.FunSuite {
         QuerySimple("text", 42, uuid)
       )
     ).foreach { case (rawQS, expected) =>
-      val res = rawQS.parseQueryString[QuerySimple]
+      val res = rawQS.parseRawQueryString[QuerySimple]
       assertEquals(res, expected)
     }
   }
 
-  test("parseQueryString should parse singleton-cases enum") {
+  test("parseRawQueryString should parse singleton-cases enum") {
     Seq[(RawQueryString, QueryEnum)](
       (Map("color" -> Seq("Red")), QueryEnum(Color.Red))
     ).foreach { case (rawQS, expected) =>
-      val res = rawQS.parseQueryString[QueryEnum]
+      val res = rawQS.parseRawQueryString[QueryEnum]
       assertEquals(res, expected)
     }
   }
 
-  test("parseQueryString should parse sequence") {
+  test("parseRawQueryString should parse sequence") {
     Seq[(RawQueryString, QuerySeq)](
       (Map(), QuerySeq(Seq())),
       (Map("a" -> Seq()), QuerySeq(Seq())),
@@ -49,12 +49,12 @@ class QueryStringParseSuite extends munit.FunSuite {
         QuerySeq(Seq("a0", "a00", "a0_1", "a0_11", "a1", "a3")) // sorted nicely
       )
     ).foreach { case (rawQS, expected) =>
-      val res = rawQS.parseQueryString[QuerySeq]
+      val res = rawQS.parseRawQueryString[QuerySeq]
       assertEquals(res, expected)
     }
   }
 
-  test("parseQueryString should parse nested fields") {
+  test("parseRawQueryString should parse nested fields") {
     Seq[(RawQueryString, QueryNested)](
       (
         Map(
@@ -73,12 +73,12 @@ class QueryStringParseSuite extends munit.FunSuite {
         QueryNested("text", Page(3, 50))
       )
     ).foreach { case (rawQS, expected) =>
-      val res = rawQS.parseQueryString[QueryNested]
+      val res = rawQS.parseRawQueryString[QueryNested]
       assertEquals(res, expected)
     }
   }
 
-  test("parseQueryString should parse falling back to defaults") {
+  test("parseRawQueryString should parse falling back to defaults") {
     Seq[(RawQueryString, QueryDefaults)](
       (
         Map(),
@@ -89,7 +89,7 @@ class QueryStringParseSuite extends munit.FunSuite {
         QueryDefaults("q1", Some("optValue"), Seq("seq1", "seq2"))
       )
     ).foreach { case (rawQS, expected) =>
-      val res = rawQS.parseQueryString[QueryDefaults]
+      val res = rawQS.parseRawQueryString[QueryDefaults]
       assertEquals(res, expected)
     }
   }

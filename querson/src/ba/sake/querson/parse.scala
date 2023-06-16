@@ -11,11 +11,11 @@ import scala.collection.immutable.SortedMap
   *   Query string AST
   */
 
-def parse(rawQueryString: RawQueryString): QueryStringData.Obj = {
+def parseRawQS(rawQueryString: RawQueryString): QueryStringData = {
   val parser = new QuersonParser(rawQueryString)
   val qsInternal = parser.parse()
 
-  fromInternal(qsInternal).asInstanceOf[QueryStringData.Obj]
+  fromInternal(qsInternal)
 }
 
 private def fromInternal(fdi: QueryStringInternal): QueryStringData = fdi match
@@ -23,6 +23,12 @@ private def fromInternal(fdi: QueryStringInternal): QueryStringData = fdi match
   case QueryStringInternal.Obj(values)   => QueryStringData.Obj(values.view.mapValues(fromInternal).toMap)
   case QueryStringInternal.Sequence(valuesMap) =>
     QueryStringData.Sequence(valuesMap.values.toSeq.flatten.map(fromInternal))
+
+// internal, temporary representation
+private[querson] enum QueryStringInternal(val tpe: String):
+  case Simple(value: String) extends QueryStringInternal("simple value")
+  case Sequence(values: SortedMap[Int, Seq[QueryStringInternal]]) extends QueryStringInternal("sequence")
+  case Obj(values: Map[String, QueryStringInternal]) extends QueryStringInternal("object")
 
 ////////////////// INTERNAL parsing..
 private[querson] class QuersonParser(rawQueryString: RawQueryString) {
