@@ -6,6 +6,9 @@ import java.nio.charset.StandardCharsets
 val DefaultConfig = Config(SeqWriteMode.Brackets, ObjWriteMode.Brackets)
 
 extension (rawQueryString: RawQueryString) {
+
+  /** Parses `T` from a RawQueryString map.
+    */
   def parseRawQueryString[T](using rw: QueryStringRW[T]): T =
     val obj = parseRawQS(rawQueryString)
     rw.parse("", obj)
@@ -13,10 +16,28 @@ extension (rawQueryString: RawQueryString) {
 
 extension [T](value: T)(using rw: QueryStringRW[T]) {
 
+  /** Serializes `T` to RawQueryString map. Note that values are **not** URL encoded.
+    *
+    * @param rw
+    *   Typeclass that does the heavy lifting
+    * @param config
+    *   Configures how to serialize sequences and nested objects
+    * @return
+    *   RawQueryString map
+    */
   def toRawQueryString(config: Config = DefaultConfig): RawQueryString =
     val qsData = rw.write("", value)
     writeToRawQS("", qsData, config)
 
+    /** Serializes `T` to query string, with values URL encoded.
+      *
+      * @param rw
+      *   Typeclass that does the heavy lifting
+      * @param config
+      *   Configures how to serialize sequences and nested objects
+      * @return
+      *   Query parameters string
+      */
   def toQueryString(config: Config = DefaultConfig): String =
     val rawQsData = toRawQueryString(config)
     rawQsData

@@ -1,5 +1,7 @@
 package ba.sake.querson
 
+/** Represents a raw query string map. Values are not encoded.
+  */
 type RawQueryString = Map[String, Seq[String]]
 
 enum QueryStringData(val tpe: String):

@@ -1,14 +1,17 @@
 package ba.sake.querson
 
+import java.util.UUID
+
 import scala.deriving.*
 import scala.quoted.*
 import scala.reflect.ClassTag
 import scala.collection.mutable.ArrayDeque
+import scala.util.Try
 
 import ba.sake.validation.*
-import java.util.UUID
+import QueryStringData.*
 
-/** Maps a `T` to/from query params string
+/** Maps a `T` to/from query params string map
   */
 trait QueryStringRW[T] {
 
@@ -27,23 +30,22 @@ object QueryStringRW {
 
   given QueryStringRW[String] with {
     override def write(path: String, value: String): QueryStringData =
-      QueryStringData.Simple(value)
+      Simple(value)
 
     override def parse(path: String, qsData: QueryStringData): String = qsData match
-      case QueryStringData.Simple(value) => value
-      // TODO better handle case when multiple values
-      case seq: QueryStringData.Sequence => seq.values.head.asInstanceOf[QueryStringData.Simple].value
-      case other                         => parseError(path, "Unexpected QueryStringData: $other")
+      case Simple(value)                    => value
+      case Sequence(Seq(Simple(value), _*)) => value
+      case Sequence(Seq())                  => parseError(path, s"is missing")
+      case other                            => parseError(path, s"has invalid type: ${other.tpe}")
   }
 
   given QueryStringRW[Int] with {
     override def write(path: String, value: Int): QueryStringData =
       QueryStringRW[String].write(path, value.toString)
 
-      // TODO error handling..
     override def parse(path: String, qsData: QueryStringData): Int =
       val str = QueryStringRW[String].parse(path, qsData)
-      str.toInt
+      str.toIntOption.getOrElse(typeError(path, "Int", str))
   }
 
   given QueryStringRW[UUID] with {
@@ -52,20 +54,7 @@ object QueryStringRW {
 
     override def parse(path: String, qsData: QueryStringData): UUID =
       val str = QueryStringRW[String].parse(path, qsData)
-      UUID.fromString(str)
-  }
-
-  given [T](using rw: QueryStringRW[T]): QueryStringRW[Seq[T]] with {
-    override def write(path: String, values: Seq[T]): QueryStringData =
-      val data = values.map(v => rw.write(path, v))
-      QueryStringData.Sequence(data)
-
-    // TODO try catch all items, rethrow
-    override def parse(path: String, qsData: QueryStringData): Seq[T] = qsData match
-      case QueryStringData.Sequence(values) => values.map(v => rw.parse(path, v))
-      case other                            => typeError(path, "Seq", other)
-
-    override def default: Option[Seq[T]] = Some(Seq.empty)
+      Try(UUID.fromString(str)).toOption.getOrElse(typeError(path, "UUID", str))
   }
 
   given [T](using fqsp: QueryStringRW[T]): QueryStringRW[Option[T]] with {
@@ -76,6 +65,42 @@ object QueryStringRW {
       QueryStringRW[Seq[T]].parse(path, qsData).headOption
 
     override def default: Option[Option[T]] = Some(None)
+  }
+
+  /* collections */
+  given [T](using rw: QueryStringRW[T]): QueryStringRW[Seq[T]] with {
+    override def write(path: String, values: Seq[T]): QueryStringData =
+      val data = values.map(v => rw.write(path, v))
+      Sequence(data)
+
+    override def parse(path: String, qsData: QueryStringData): Seq[T] = qsData match
+      case Sequence(values) => rethrowingKeysErrors(path, values)
+      case other            => typeMismatchError(path, "Seq", other, None)
+
+    override def default: Option[Seq[T]] = Some(Seq.empty)
+  }
+
+  private def rethrowingKeysErrors[T](path: String, values: Seq[QueryStringData])(using
+      rw: QueryStringRW[T]
+  ): Seq[T] = {
+    val parsedValues = ArrayDeque.empty[T]
+    val keyErrors = ArrayDeque.empty[ParseError]
+    val validationErrors = ArrayDeque.empty[FieldValidationError]
+    values.zipWithIndex.foreach { case (v, i) =>
+      val subPath = s"$path[$i]"
+      try {
+        parsedValues += rw.parse(subPath, v)
+      } catch {
+        case pe: ParsingException =>
+          keyErrors ++= pe.errors
+        case e: FieldsValidationException =>
+          validationErrors ++= e.errors
+      }
+    }
+    if keyErrors.nonEmpty then throw ParsingException(keyErrors.toSeq)
+    if validationErrors.nonEmpty then throw FieldsValidationException(validationErrors.toSeq)
+
+    parsedValues.toSeq
   }
 
   /* macro derived instances */
@@ -110,12 +135,13 @@ object QueryStringRW {
                 val res = rw.asInstanceOf[QueryStringRW[Any]].write(k, v)
                 queryStringMap += (k -> res)
               }
-              QueryStringData.Obj(queryStringMap.toMap)
+              Obj(queryStringMap.toMap)
             }
 
             override def parse(path: String, qsData: QueryStringData): T = {
-              // TODO handle exc
-              val qParamsMap = qsData.asInstanceOf[QueryStringData.Obj].values
+              val qParamsMap =
+                if qsData.isInstanceOf[Obj] then qsData.asInstanceOf[Obj].values
+                else typeMismatchError(path, "Object", qsData, None)
 
               val arguments = ArrayDeque.empty[Any]
               val keyErrors = ArrayDeque.empty[ParseError]
@@ -199,8 +225,24 @@ object QueryStringRW {
 
             override def parse(path: String, qsData: QueryStringData): T =
               ${
-                val valueQuote = '{ QueryStringRW[String].parse(path, qsData) }
-                Block(Nil, Apply(Select(Ident(companion), valueOfSelect), List(valueQuote.asTerm))).asExprOf[T]
+                val labelQuote = '{ QueryStringRW[String].parse(path, qsData) }
+                val tryBlock =
+                  Block(Nil, Apply(Select(Ident(companion), valueOfSelect), List(labelQuote.asTerm))).asExprOf[T]
+                '{
+                  try {
+                    $tryBlock
+                  } catch {
+                    case e: IllegalArgumentException =>
+                      throw ParsingException(
+                        ParseError(
+                          path,
+                          s"Enum value not found: '${$labelQuote}'. Possible values: ${$labels.map(l => s"'$l'").mkString(", ")}",
+                          Some($labelQuote)
+                        )
+                      )
+                  }
+                }
+
               }
           }
         }
@@ -251,11 +293,19 @@ object QueryStringRW {
     Expr.ofList(terms)
 
   /* utils */
-  private def typeError(name: String, tpe: String, value: Any): Nothing =
-    throw FieldsValidationException(
-      Seq(FieldValidationError(name, value, s"invalid $tpe"))
+  private def typeError(path: String, tpe: String, value: Any): Nothing =
+    throw ParsingException(ParseError(path, s"invalid $tpe", Some(value)))
+
+  private def typeMismatchError(
+      path: String,
+      expectedType: String,
+      qsData: QueryStringData,
+      value: Option[Any]
+  ): Nothing =
+    throw ParsingException(
+      ParseError(path, s"should be ${expectedType} but it is ${qsData.tpe}", value)
     )
 
-  private def parseError(name: String, msg: String): Nothing =
-    throw ParsingException(ParseError(name, msg))
+  private def parseError(path: String, msg: String): Nothing =
+    throw ParsingException(ParseError(path, msg))
 }

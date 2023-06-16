@@ -10,7 +10,7 @@ private[querson] def writeToRawQS(path: String, qsData: QueryStringData, config:
 private def writeObj(path: String, qsDataObj: Obj, config: Config): RawQueryString = {
   val acc = scala.collection.mutable.Map.empty[String, Seq[String]]
 
-  qsDataObj.values.foreach { (k, v) =>
+  qsDataObj.values.foreach { case (k, v) =>
     val subPath =
       if path.isBlank then k
       else

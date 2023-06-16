@@ -2,6 +2,7 @@ package ba.sake.querson
 
 import java.util.UUID
 
+// TODO test parsing exceptions
 class QueryStringParseSuite extends munit.FunSuite {
 
   val uuid = UUID.fromString("ef42f9e9-79b9-45eb-a938-95ac75aedf87")
@@ -91,6 +92,74 @@ class QueryStringParseSuite extends munit.FunSuite {
     ).foreach { case (rawQS, expected) =>
       val res = rawQS.parseRawQueryString[QueryDefaults]
       assertEquals(res, expected)
+    }
+  }
+
+  test("parseRawQueryString should throw nice errors") {
+
+    locally {
+      val ex = intercept[ParsingException] { Map().parseRawQueryString[QuerySimple] }
+      assertEquals(
+        ex.errors,
+        Seq(
+          ParseError("str", "is missing", None),
+          ParseError("int", "is missing", None),
+          ParseError("uuid", "is missing", None)
+        )
+      )
+    }
+
+    locally {
+      val ex = intercept[ParsingException] {
+        Map("str" -> Seq(), "int" -> Seq("not_an_int"), "uuid" -> Seq("uuidddd_NOT"))
+          .parseRawQueryString[QuerySimple]
+      }
+      assertEquals(
+        ex.errors,
+        Seq(
+          ParseError("str", "is missing", None),
+          ParseError("int", "invalid Int", Some("not_an_int")),
+          ParseError("uuid", "invalid UUID", Some("uuidddd_NOT"))
+        )
+      )
+    }
+
+    locally {
+      val ex = intercept[ParsingException] {
+        Map("color" -> Seq("Yellow")).parseRawQueryString[QueryEnum]
+      }
+      assertEquals(
+        ex.errors,
+        Seq(ParseError("color", "Enum value not found: 'Yellow'. Possible values: 'Red', 'Blue'", Some("Yellow")))
+      )
+    }
+
+    // nested
+    locally {
+      val ex = intercept[ParsingException] {
+        Map().parseRawQueryString[QueryNested]
+      }
+      assertEquals(ex.errors, Seq(ParseError("search", "is missing", None), ParseError("p", "is missing", None)))
+    }
+
+    locally {
+      val ex = intercept[ParsingException] {
+        Map("p" -> Seq()).parseRawQueryString[QueryNested]
+      }
+      assertEquals(
+        ex.errors,
+        Seq(ParseError("search", "is missing", None), ParseError("p", "should be Object but it is sequence", None))
+      )
+    }
+
+    locally {
+      val ex = intercept[ParsingException] {
+        Map("search" -> Seq(""), "p.number" -> Seq("3a")).parseRawQueryString[QueryNested]
+      }
+      assertEquals(
+        ex.errors,
+        Seq(ParseError("p.number", "invalid Int", Some("3a")), ParseError("p.size", "is missing", None))
+      )
     }
   }
 }
