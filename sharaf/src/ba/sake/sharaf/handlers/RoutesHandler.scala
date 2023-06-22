@@ -8,7 +8,6 @@ import io.undertow.server.HttpServerExchange
 import io.undertow.util.Headers
 
 import ba.sake.sharaf.*
-import ba.sake.querson.QueryStringMap
 
 final class RoutesHandler private (routes: Routes, errorMapper: ErrorMapper[String] = ErrorMapper.empty)
     extends HttpHandler {
@@ -61,11 +60,7 @@ final class RoutesHandler private (routes: Routes, errorMapper: ErrorMapper[Stri
     val pathSegments = relPath.split("/")
     val path = Path(pathSegments*)
 
-    val queryParams: QueryStringMap = exchange.getQueryParameters.asScala.toMap.map { (k, v) =>
-      (k, v.asScala.toSeq)
-    }
-
-    (exchange.getRequestMethod, path, queryParams)
+    (exchange.getRequestMethod, path)
   }
 
 }

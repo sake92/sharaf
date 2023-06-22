@@ -4,6 +4,7 @@ import java.nio.charset.StandardCharsets
 import scala.jdk.CollectionConverters.*
 import ba.sake.tupson.*
 import ba.sake.formson.*
+import ba.sake.querson.*
 import io.undertow.server.HttpServerExchange
 import io.undertow.server.handlers.form.{FormData => UFormData}
 import io.undertow.server.handlers.form.FormParserFactory
@@ -27,6 +28,13 @@ final class Request(
 
     val formData = Request.undertowFormData2Formson(uFormData)
     rw.read("", formData)
+  }
+
+  def queryParams[T](using rw: QueryStringRW[T]): T = {
+    val queryParams: QueryStringMap = ex.getQueryParameters.asScala.toMap.map { (k, v) =>
+      (k, v.asScala.toSeq)
+    }
+    queryParams.parseQueryStringMap
   }
 }
 

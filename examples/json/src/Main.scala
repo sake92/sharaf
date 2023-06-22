@@ -24,15 +24,16 @@ var db = Seq.empty[CustomerRes]
 
 class JsonApiServer(port: Int) {
   private val routes: Routes = {
-    case (GET(), Path("customers", uuid(id)), _) =>
+    case GET() -> Path("customers", uuid(id)) =>
       val customerOpt = db.find(_.id == id)
       Response.withBodyOpt(customerOpt, s"Customer with id=$id")
 
-    case (GET(), Path("customers"), q[UserQuery](query)) =>
+    case GET() -> Path("customers") =>
+      val query = Request.current.queryParams[UserQuery]
       val customers = if query.name.isEmpty then db else db.filter(c => query.name.contains(c.name))
       Response.withBody(customers)
 
-    case (POST(), Path("customers"), _) =>
+    case POST() -> Path("customers") =>
       val req = Request.current.bodyJson[CreateCustomerReq]
       val res = CustomerRes(UUID.randomUUID(), req.name, AddressRes(req.address.street))
       db = db.appended(res)

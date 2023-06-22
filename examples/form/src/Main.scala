@@ -9,7 +9,7 @@ import io.undertow.Undertow
 
 @main def main: Unit = {
 
-  val routes: Routes = { case (POST(), Path("form"), _) =>
+  val routes: Routes = { case POST() -> Path("form") =>
     val req = Request.current.bodyForm[CreateCustomerForm]
     Response.withBody(req.toString)
   }

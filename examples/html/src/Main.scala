@@ -10,10 +10,10 @@ import scalatags.Text.all._
 @main def main: Unit = {
 
   val routes: Routes = {
-    case (GET(), Path("html"), _) =>
+    case GET() -> Path("html") =>
       val htmlPage: HtmlPage = MyPage
       Response.withBody(htmlPage)
-    case (GET(), Path("scala.png"), _) =>
+    case GET() -> Path("scala.png") =>
       val resource = Resource.fromClassPath("static/scala.png")
       Response.withBodyOpt(resource, "NotFound")
   }
