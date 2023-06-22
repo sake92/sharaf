@@ -5,29 +5,29 @@ import java.nio.charset.StandardCharsets
 
 val DefaultConfig = Config(SeqWriteMode.Brackets, ObjWriteMode.Brackets)
 
-extension (rawQueryString: RawQueryString) {
+extension (queryStringMap: QueryStringMap) {
 
-  /** Parses `T` from a RawQueryString map.
+  /** Parses `T` from a QueryStringMap map.
     */
-  def parseRawQueryString[T](using rw: QueryStringRW[T]): T =
-    val obj = parseRawQS(rawQueryString)
+  def parseQueryStringMap[T](using rw: QueryStringRW[T]): T =
+    val obj = parseQSMap(queryStringMap)
     rw.parse("", obj)
 }
 
 extension [T](value: T)(using rw: QueryStringRW[T]) {
 
-  /** Serializes `T` to RawQueryString map. Note that values are **not** URL encoded.
+  /** Serializes `T` to QueryStringMap map. Note that values are **not** URL encoded.
     *
     * @param rw
     *   Typeclass that does the heavy lifting
     * @param config
     *   Configures how to serialize sequences and nested objects
     * @return
-    *   RawQueryString map
+    *   QueryStringMap
     */
-  def toRawQueryString(config: Config = DefaultConfig): RawQueryString =
+  def toQueryStringMap(config: Config = DefaultConfig): QueryStringMap =
     val qsData = rw.write("", value)
-    writeToRawQS("", qsData, config)
+    writeToQSMap("", qsData, config)
 
     /** Serializes `T` to query string, with key/values URL encoded.
       *
@@ -39,8 +39,8 @@ extension [T](value: T)(using rw: QueryStringRW[T]) {
       *   Query parameters string
       */
   def toQueryString(config: Config = DefaultConfig): String =
-    val rawQsData = toRawQueryString(config)
-    rawQsData
+    val qsMap = toQueryStringMap(config)
+    qsMap
       .flatMap { case (k, values) =>
         values.map { v =>
           val encodedValue = URLEncoder.encode(v, StandardCharsets.UTF_8)

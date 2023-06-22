@@ -12,6 +12,7 @@ case class QuerySimpleReservedChars(`what%the&stu$f?@[]`: String) derives QueryS
 case class QueryEnum(color: Color) derives QueryStringRW
 
 case class QuerySeq(a: Seq[String]) derives QueryStringRW
+case class QuerySeqSeq(a: Seq[Seq[String]]) derives QueryStringRW
 
 case class QueryNested(search: String, p: Page) derives QueryStringRW
 case class Page(number: Int, size: Int) derives QueryStringRW

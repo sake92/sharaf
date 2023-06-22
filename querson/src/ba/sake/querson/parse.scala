@@ -2,19 +2,20 @@ package ba.sake.querson
 
 import scala.collection.mutable
 import scala.collection.immutable.SortedMap
+import fastparse.Parsed.Success
+import fastparse.Parsed.Failure
 
 /** Takes a raw map of query string and converts it into a JSON-like AST
   *
-  * @param rawQueryString
+  * @param qsMap
   *   Raw map of query string
   * @return
   *   Query string AST
   */
 
-def parseRawQS(rawQueryString: RawQueryString): QueryStringData = {
-  val parser = new QuersonParser(rawQueryString)
+def parseQSMap(queryStringMap: QueryStringMap): QueryStringData = {
+  val parser = new QuersonParser(queryStringMap)
   val qsInternal = parser.parse()
-
   fromInternal(qsInternal)
 }
 
@@ -31,14 +32,15 @@ private[querson] enum QueryStringInternal(val tpe: String):
   case Obj(values: Map[String, QueryStringInternal]) extends QueryStringInternal("object")
 
 ////////////////// INTERNAL parsing..
-private[querson] class QuersonParser(rawQueryString: RawQueryString) {
+private[querson] class QuersonParser(qsMap: QueryStringMap) {
   import QueryStringInternal.*
 
   def parse(): Obj = {
 
     // for every key we get an AST (object) with possibly recursive values
-    val objects = rawQueryString.map { case (key, values) =>
-      parseInternal(key, values)
+    val objects = qsMap.map { case (key, values) =>
+      val keyParts = KeyParser(key).parse()
+      parseInternal(keyParts, values).asInstanceOf[Obj]
     }.toSeq
 
     // then we merge all of them to one object
@@ -75,7 +77,7 @@ private[querson] class QuersonParser(rawQueryString: RawQueryString) {
       Sequence(seqAcc.to(SortedMap))
 
     case (first, second) =>
-      throw new FormsonParsingException(s"Unmergeable objects: ${first.tpe} and ${second.tpe} ")
+      throw new QuersonException(s"Unmergeable objects: ${first.tpe} and ${second.tpe}")
   }
 
   private def mergeObjects(flatObjects: Seq[Obj]): Obj = {
@@ -86,46 +88,49 @@ private[querson] class QuersonParser(rawQueryString: RawQueryString) {
       .asInstanceOf[Obj]
   }
 
-  private def parseInternal(rawKey: String, values: Seq[String]): Obj = {
+  private def parseInternal(keyParts: Seq[String], values: Seq[String]): QueryStringInternal = {
 
-    val seqRegex = "(.+)\\[([0-9]+)\\](.*)".r // abc[123]
-    val bracketsKeyRegex = "(.+)\\[(.+)\\](.*)".r // abc[def]
-    val emptySeqRegex = "(.+)\\[\\](.*)".r // abc[]
-    val dotKeyRegex = "(.+)\\.(.+)".r // abc.def
+    keyParts match
+      case Seq(key, rest: _*) =>
+        val adaptedKey = if key.isBlank then "0" else key
+        adaptedKey.toIntOption match
+          case Some(index) =>
+            if rest.isEmpty
+            then Sequence(SortedMap(index -> values.map(Simple.apply)))
+            else Sequence(SortedMap(index -> Seq(parseInternal(rest, values))))
 
-    rawKey match
-      case seqRegex(key, idx, rest) =>
-        val internalValues =
-          if rest.isBlank then values.map(Simple.apply)
-          else Seq(parseInternal(rest, values))
-        val index = idx.toInt
-        val seq = Sequence(SortedMap(index -> internalValues))
-        Obj(Map(key -> seq))
+          case None =>
+            if rest.isEmpty then Obj(Map(key -> Sequence(SortedMap(0 -> values.map(Simple.apply)))))
+            else Obj(Map(key -> parseInternal(rest, values)))
 
-      case bracketsKeyRegex(key, subKey, subRest) =>
-        val rest = if subRest.isBlank then subKey else s"$subKey.$subRest"
-        val internalValues = parseInternal(rest, values)
-        Obj(Map(key -> internalValues))
-
-      case emptySeqRegex(key, rest) =>
-        val internalValues =
-          if rest.isBlank then values.map(Simple.apply)
-          else Seq(parseInternal(rest, values))
-        val seq = Sequence(SortedMap(0 -> internalValues))
-        Obj(Map(key -> seq))
-
-      case dotKeyRegex(key, rest) =>
-        val internalValues = parseInternal(rest, values)
-        Obj(Map(key -> internalValues))
-
-      case key =>
-        val valuesAsData = values.map(Simple.apply)
-        val seq = Sequence(SortedMap(0 -> valuesAsData))
-        Obj(Map(key -> seq))
+      case Seq() => throw QuersonException("Empty key parts")
   }
 
 }
 
-class FormsonParsingException(
-    val msg: String
-) extends Exception(msg)
+private[querson] class KeyParser(key: String) {
+  import fastparse._, NoWhitespace._
+
+  private val ForbiddenKeyChars = Set('[', ']', '.')
+
+  def parse(): Seq[String] = {
+
+    val res = fastparse.parse(key, parseFinal(_))
+    res match
+      case Success((firstKey, subKeys), index) => subKeys.prepended(firstKey)
+      case f: Failure                          => throw new QuersonException(f.msg)
+  }
+
+  private def parseFinal[$: P] = P(
+    Start ~ parseKey ~ (parseBracketedSubKey | parseDottedSubKey | parseIndex).rep(min = 0) ~ End
+  )
+
+  private def parseKey[$: P] = P(CharPred(c => !ForbiddenKeyChars(c) && !c.isWhitespace).rep(min = 1).!)
+
+  private def parseBracketedSubKey[$: P] = P("[" ~ parseKey ~ "]")
+
+  private def parseDottedSubKey[$: P] = P("." ~ parseKey)
+
+  private def parseIndex[$: P] = P("[" ~ CharIn("0-9").rep(min = 0).! ~ "]")
+
+}

@@ -12,7 +12,7 @@ val q = QuerySimple("my text", 5, Seq(3.14, 2.71))
 q.toQueryString()
 // str=my+text&seq[0]=3.14&seq[1]=2.71&int=5
 
-q.toRawQueryString()
+q.toQueryStringMap()
 // Map(str -> List(my text), seq[0] -> List(3.14), seq[1] -> List(2.71), int -> List(5))
 
 /* parsing */
@@ -20,7 +20,7 @@ Map(
     "str" -> Seq("my text"),
     "int" -> Seq("5"),
     "seq" -> Seq("3.14", "2.71")
-).parseRawQueryString[QuerySimple]
+).parseQueryStringMap[QuerySimple]
 // QuerySimple(my text,5,List(3.14, 2.71))
 ```
 
@@ -54,7 +54,7 @@ Map(
     "sort[by]" -> Seq("name"),
     "sort[order]" -> Seq("desc"),
     "search" -> Seq("Bob")
-).parseRawQueryString[UsersSearchQS]
+).parseQueryStringMap[UsersSearchQS]
 // UsersSearchQS(Bob,UserSortQS(name,desc),PageQS(3,42))
 ```
 
@@ -80,5 +80,5 @@ q.toQueryString(config)
 ### TODO
 
 - extract to a separate repo
-
+- revisit instanceof calls
 

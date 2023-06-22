@@ -89,6 +89,17 @@ object QueryStringRW {
     override def default: Option[Seq[T]] = Some(Seq.empty)
   }
 
+  given [T](using rw: QueryStringRW[T]): QueryStringRW[Set[T]] with {
+    override def write(path: String, values: Set[T]): QueryStringData =
+      QueryStringRW[Seq[T]].write(path, values.toSeq)
+
+    override def parse(path: String, qsData: QueryStringData): Set[T] = qsData match
+      case Sequence(values) => parseRethrowingErrors(path, values).toSet
+      case other            => typeMismatchError(path, "Set", other, None)
+
+    override def default: Option[Set[T]] = Some(Set.empty)
+  }
+
   private def parseRethrowingErrors[T](path: String, values: Seq[QueryStringData])(using
       rw: QueryStringRW[T]
   ): Seq[T] = {
