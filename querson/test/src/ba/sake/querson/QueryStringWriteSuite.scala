@@ -31,13 +31,13 @@ class QueryStringWriteSuite extends munit.FunSuite {
   test("toQueryString should write seq query parameters to string") {
     val queryData = QuerySeq(Seq("x", "y", "z"))
     assertEquals(queryData.toQueryString(cfgSeqNoBrackets), "a=x&a=y&a=z")
-    assertEquals(queryData.toQueryString(cfgSeqEmptyBrackets), "a[]=x&a[]=y&a[]=z")
-    assertEquals(queryData.toQueryString(cfgSeqBrackets), "a[2]=z&a[0]=x&a[1]=y")
+    assertEquals(queryData.toQueryString(cfgSeqEmptyBrackets), "a%5B%5D=x&a%5B%5D=y&a%5B%5D=z")
+    assertEquals(queryData.toQueryString(cfgSeqBrackets), "a%5B2%5D=z&a%5B0%5D=x&a%5B1%5D=y")
   }
 
   test("toQueryString should write object query parameters to string") {
     val queryData = QueryNested("what?", Page(5, 42))
-    assertEquals(queryData.toQueryString(cfgObjBrackets), "search=what%3F&p[number]=5&p[size]=42")
+    assertEquals(queryData.toQueryString(cfgObjBrackets), "search=what%3F&p%5Bnumber%5D=5&p%5Bsize%5D=42")
     assertEquals(queryData.toQueryString(cfgObjDots), "search=what%3F&p.size=42&p.number=5")
   }
 

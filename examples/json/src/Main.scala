@@ -13,13 +13,23 @@ var db = Seq.empty[CustomerRes]
 
 @main def main: Unit = {
 
-  val routes: Routes = {
+  val server = JsonApiServer(8181).server
+  server.start()
+
+  // TODO add a wrapper for this stuff ?
+  val serverInfo = server.getListenerInfo().get(0)
+  val url = s"${serverInfo.getProtcol}:/${serverInfo.getAddress}"
+  println(s"Started JsonApiServer at $url")
+}
+
+class JsonApiServer(port: Int) {
+  private val routes: Routes = {
     case (GET(), Path("customers", uuid(id)), _) =>
       val customerOpt = db.find(_.id == id)
       Response.withBodyOpt(customerOpt, s"Customer with id=$id")
 
     case (GET(), Path("customers"), q[UserQuery](query)) =>
-      val customers = db.filter(c => query.name.contains(c.name))
+      val customers = if query.name.isEmpty then db else db.filter(c => query.name.contains(c.name))
       Response.withBody(customers)
 
     case (POST(), Path("customers"), _) =>
@@ -31,16 +41,9 @@ var db = Seq.empty[CustomerRes]
 
   val server = Undertow
     .builder()
-    .addHttpListener(8181, "localhost")
+    .addHttpListener(port, "localhost")
     .setHandler(RoutesHandler(routes))
     .build()
-
-  server.start()
-
-  val serverInfo = server.getListenerInfo().get(0)
-  val url = s"${serverInfo.getProtcol}:/${serverInfo.getAddress}"
-  println(s"Started HTTP server at $url")
-
 }
 
 case class UserQuery(name: Set[String]) derives QueryStringRW

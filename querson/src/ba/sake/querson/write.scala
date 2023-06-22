@@ -1,8 +1,6 @@
 package ba.sake.querson
 
 import QueryStringData.*
-import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
 
 private[querson] def writeToQSMap(path: String, qsData: QueryStringData, config: Config): QueryStringMap = qsData match
   case simple: Simple => Map(path -> Seq(simple.value))
@@ -12,14 +10,13 @@ private[querson] def writeToQSMap(path: String, qsData: QueryStringData, config:
 private def writeObj(path: String, qsDataObj: Obj, config: Config): QueryStringMap = {
   val acc = scala.collection.mutable.Map.empty[String, Seq[String]]
 
-  qsDataObj.values.foreach { case (k, v) =>
-    val encodedKey = URLEncoder.encode(k, StandardCharsets.UTF_8)
+  qsDataObj.values.foreach { case (key, v) =>
     val subPath =
-      if path.isBlank then encodedKey
+      if path.isBlank then key
       else
         config.objWriteMode match
-          case ObjWriteMode.Brackets => s"$path[$encodedKey]"
-          case ObjWriteMode.Dots     => s"$path.$encodedKey"
+          case ObjWriteMode.Brackets => s"$path[$key]"
+          case ObjWriteMode.Dots     => s"$path.$key"
 
     acc ++= writeToQSMap(subPath, v, config)
   }

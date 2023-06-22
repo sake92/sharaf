@@ -43,8 +43,9 @@ extension [T](value: T)(using rw: QueryStringRW[T]) {
     qsMap
       .flatMap { case (k, values) =>
         values.map { v =>
+          val encodedKey = URLEncoder.encode(k, StandardCharsets.UTF_8)
           val encodedValue = URLEncoder.encode(v, StandardCharsets.UTF_8)
-          s"$k=$encodedValue"
+          s"$encodedKey=$encodedValue"
         }
       }
       .mkString("&")

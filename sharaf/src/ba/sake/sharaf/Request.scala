@@ -18,7 +18,6 @@ final class Request(
   lazy val bodyString: String =
     new String(ex.getInputStream.readAllBytes(), StandardCharsets.UTF_8)
 
-  // TODO rename to jsonBody
   def bodyJson[T](using rw: JsonRW[T]): T =
     bodyString.parseJson[T]
 

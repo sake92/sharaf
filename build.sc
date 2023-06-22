@@ -11,16 +11,12 @@ object sharaf extends SharafPublishModule {
   def ivyDeps = Agg(
     ivy"io.undertow:undertow-core:2.3.5.Final",
     ivy"ba.sake::tupson:0.6.0",
-    ivy"ba.sake::hepek-components:0.10.0+0-3aaeebf1+20230522-1255-SNAPSHOT",
+    ivy"ba.sake::hepek-components:0.10.0+0-3aaeebf1+20230522-1255-SNAPSHOT"
   )
 
   def moduleDeps = Seq(querson, formson)
 
-  object test extends Tests with TestModule.Munit {
-    def ivyDeps = Agg(
-      ivy"org.scalameta::munit::0.7.29"
-    )
-  }
+  object test extends Tests with SharafTestModule
 }
 
 object querson extends SharafPublishModule {
@@ -29,25 +25,18 @@ object querson extends SharafPublishModule {
 
   def ivyDeps = Agg(
     ivy"ba.sake::tupson:0.6.0", // TODO we need just the validation stuff..
-    ivy"com.lihaoyi::fastparse:3.0.1"
+    ivy"com.lihaoyi::fastparse:3.0.1",
+    ivy"com.lihaoyi::requests:0.8.0" // TODO move to a separate module
   )
 
-  object test extends Tests with TestModule.Munit {
-    def ivyDeps = Agg(
-      ivy"org.scalameta::munit::0.7.29"
-    )
-  }
+  object test extends Tests with SharafTestModule
 }
 
 object formson extends SharafPublishModule {
 
   def artifactName = "formson"
 
-  object test extends Tests with TestModule.Munit {
-    def ivyDeps = Agg(
-      ivy"org.scalameta::munit::0.7.29"
-    )
-  }
+  object test extends Tests with SharafTestModule
 }
 
 trait SharafPublishModule extends SharafCommonModule with CiReleaseModule {
@@ -73,18 +62,28 @@ trait SharafCommonModule extends ScalaModule with ScalafmtModule {
   )
 }
 
+trait SharafTestModule extends TestModule.Munit {
+  def ivyDeps = Agg(
+    ivy"org.scalameta::munit::0.7.29"
+  )
+}
+
 ////////////////////
 object examples extends mill.Module {
   object html extends SharafCommonModule {
     def moduleDeps = Seq(sharaf)
+    object test extends Tests with SharafTestModule
   }
   object json extends SharafCommonModule {
     def moduleDeps = Seq(sharaf)
+    object test extends Tests with SharafTestModule
   }
   object form extends SharafCommonModule {
     def moduleDeps = Seq(sharaf)
+    object test extends Tests with SharafTestModule
   }
   object todo extends SharafCommonModule {
     def moduleDeps = Seq(sharaf)
+    object test extends Tests with SharafTestModule
   }
 }
