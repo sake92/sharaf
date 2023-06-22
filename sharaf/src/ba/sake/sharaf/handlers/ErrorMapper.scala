@@ -2,8 +2,9 @@ package ba.sake.sharaf.handlers
 
 import scala.jdk.CollectionConverters.*
 
-import ba.sake.tupson.*
-import ba.sake.formson.*
+import ba.sake.tupson
+import ba.sake.tupson.JsonRW
+import ba.sake.formson
 import ba.sake.sharaf.*
 import java.net.URI
 import org.typelevel.jawn.ast.*
@@ -27,12 +28,12 @@ object ErrorMapper {
       val fieldValidationErrors = e.errors.mkString("[", "; ", "]")
       Response.withBody(s"Validation errors: $fieldValidationErrors").withStatus(400)
     // json
-    case e: ParsingException =>
+    case e: tupson.ParsingException =>
       Response.withBody(e.getMessage()).withStatus(400)
-    case e: TupsonException =>
+    case e: tupson.TupsonException =>
       Response.withBody(e.getMessage()).withStatus(400)
     // form
-    case e: FormsonException =>
+    case e: formson.ParsingException =>
       Response.withBody(e.getMessage()).withStatus(400)
   }
 
@@ -45,14 +46,14 @@ object ErrorMapper {
       val problemDetails = ProblemDetails(400, "Validation errors", invalidArguments = fieldValidationErrors)
       Response.withBody(problemDetails).withStatus(400)
     // json
-    case e: ParsingException =>
+    case e: tupson.ParsingException =>
       val parsingErrors = e.errors.map(err => ArgumentProblem(err.path, err.msg, err.value.map(_.toString)))
       val problemDetails = ProblemDetails(400, "JSON Parsing errors", invalidArguments = parsingErrors)
       Response.withBody(problemDetails).withStatus(400)
-    case e: TupsonException =>
+    case e: tupson.TupsonException =>
       Response.withBody(ProblemDetails(400, "JSON parsing error", e.getMessage)).withStatus(400)
     // form
-    case e: FormsonException =>
+    case e: formson.ParsingException =>
       Response.withBody(ProblemDetails(400, "Form parsing error", e.getMessage)).withStatus(400)
   }
 

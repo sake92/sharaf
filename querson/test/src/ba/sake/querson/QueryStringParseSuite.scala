@@ -59,18 +59,25 @@ class QueryStringParseSuite extends munit.FunSuite {
       (Map(), QuerySeqSeq(Seq())),
       (Map("a" -> Seq()), QuerySeqSeq(Seq())),
       (Map("a[][]" -> Seq("")), QuerySeqSeq(Seq(Seq("")))),
-    //  (Map("a" -> Seq("a1")), QuerySeqSeq(Seq("a1"))),
-    //  (Map("a" -> Seq("a1", "a2")), QuerySeqSeq(Seq("a1", "a2"))),
-    //  (Map("a[]" -> Seq("a1", "a2")), QuerySeqSeq(Seq("a1", "a2"))),
+      (Map("a[][0]" -> Seq("a1")), QuerySeqSeq(Seq(Seq("a1"))))
+      // TODO fix
       /*(
         Map(
-          "a[3]" -> Seq("a3"),
-          "a" -> Seq("a0", "a00"),
-          "a[]" -> Seq("a0_1", "a0_11"),
-          "a[1]" -> Seq("a1")
+          "a[1][3]" -> Seq("a13"),
+          "a[2][3]" -> Seq("a23"),
+          "a[][5]" -> Seq("a05"),
+          "a[1][1]" -> Seq("a11"),
+          "a[0][2]" -> Seq("a02")
         ),
-        QuerySeqSeq(Seq("a0", "a00", "a0_1", "a0_11", "a1", "a3")) // sorted nicely
-      )*/
+        QuerySeqSeq(
+          Seq(
+            List("a02", "a05"),
+            List("a11", "a13"),
+            List("a23")
+          )
+        ) // sorted nicely
+
+      ) */
     ).foreach { case (qsMap, expected) =>
       val res = qsMap.parseQueryStringMap[QuerySeqSeq]
       assertEquals(res, expected)

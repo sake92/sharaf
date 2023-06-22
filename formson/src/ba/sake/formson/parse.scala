@@ -1,45 +1,43 @@
-package ba.sake.querson
+package ba.sake.formson
 
 import scala.collection.mutable
 import scala.collection.immutable.SortedMap
 import fastparse.Parsed.Success
 import fastparse.Parsed.Failure
 
-/** Takes a raw map of query string and converts it into a JSON-like AST
+/** Takes a raw map of form data and converts it into a JSON-like AST
   *
-  * @param qsMap
-  *   Raw map of query string
+  * @param formDataMap
+  *   Raw map of form data
   * @return
-  *   Query string AST
+  *   Form data AST
   */
 
-def parseQSMap(queryStringMap: QueryStringMap): QueryStringData = {
-  val parser = new QuersonParser(queryStringMap)
-  val qsInternal = parser.parse()
-  fromInternal(qsInternal)
+def parseFDMap(formDataMap: FormDataMap): FormData = {
+  val parser = new FormsonParser(formDataMap)
+  val formDataInternal = parser.parse()
+  fromInternal(formDataInternal)
 }
 
-private def fromInternal(qsi: QueryStringInternal): QueryStringData = qsi match
-  case QueryStringInternal.Simple(value)       => QueryStringData.Simple(value)
-  case QueryStringInternal.Obj(values)         => QueryStringData.Obj(values.view.mapValues(fromInternal).toMap)
-  case QueryStringInternal.Sequence(valuesMap) =>
-    // TODO doesnt work for List[List[T]]
-    QueryStringData.Sequence(valuesMap.values.toSeq.flatten.map(fromInternal))
+private def fromInternal(fdi: FormDataInternal): FormData = fdi match
+  case FormDataInternal.Simple(value)       => FormData.Simple(value)
+  case FormDataInternal.Obj(values)         => FormData.Obj(values.view.mapValues(fromInternal).toMap)
+  case FormDataInternal.Sequence(valuesMap) => FormData.Sequence(valuesMap.values.toSeq.flatten.map(fromInternal))
 
 // internal, temporary representation
-private[querson] enum QueryStringInternal(val tpe: String):
-  case Simple(value: String) extends QueryStringInternal("simple value")
-  case Sequence(values: SortedMap[Int, Seq[QueryStringInternal]]) extends QueryStringInternal("sequence")
-  case Obj(values: Map[String, QueryStringInternal]) extends QueryStringInternal("object")
+private[formson] enum FormDataInternal(val tpe: String):
+  case Simple(value: FormValue) extends FormDataInternal("simple value")
+  case Sequence(values: SortedMap[Int, Seq[FormDataInternal]]) extends FormDataInternal("sequence")
+  case Obj(values: Map[String, FormDataInternal]) extends FormDataInternal("object")
 
 ////////////////// INTERNAL parsing..
-private[querson] class QuersonParser(qsMap: QueryStringMap) {
-  import QueryStringInternal.*
+private[formson] class FormsonParser(formDataMap: FormDataMap) {
+  import FormDataInternal.*
 
   def parse(): Obj = {
 
     // for every key we get an AST (object) with possibly recursive values
-    val objects = qsMap.map { case (key, values) =>
+    val objects = formDataMap.map { case (key, values) =>
       val keyParts = KeyParser(key).parse()
       parseInternal(keyParts, values).asInstanceOf[Obj]
     }.toSeq
@@ -48,7 +46,7 @@ private[querson] class QuersonParser(qsMap: QueryStringMap) {
     mergeObjects(objects)
   }
 
-  private def merge(acc: QueryStringInternal, second: QueryStringInternal): QueryStringInternal = (acc, second) match {
+  private def merge(acc: FormDataInternal, second: FormDataInternal): FormDataInternal = (acc, second) match {
 
     case (Simple(_), Simple(_)) =>
       // - if we get many values we juts merge them into a sequence
@@ -78,7 +76,7 @@ private[querson] class QuersonParser(qsMap: QueryStringMap) {
       Sequence(seqAcc.to(SortedMap))
 
     case (first, second) =>
-      throw new QuersonException(s"Unmergeable objects: ${first.tpe} and ${second.tpe}")
+      throw new FormsonException(s"Unmergeable objects: ${first.tpe} and ${second.tpe}")
   }
 
   private def mergeObjects(flatObjects: Seq[Obj]): Obj = {
@@ -89,7 +87,7 @@ private[querson] class QuersonParser(qsMap: QueryStringMap) {
       .asInstanceOf[Obj]
   }
 
-  private def parseInternal(keyParts: Seq[String], values: Seq[String]): QueryStringInternal = {
+  private def parseInternal(keyParts: Seq[String], values: Seq[FormValue]): FormDataInternal = {
 
     keyParts match
       case Seq(key, rest: _*) =>
@@ -104,12 +102,12 @@ private[querson] class QuersonParser(qsMap: QueryStringMap) {
             if rest.isEmpty then Obj(Map(key -> Sequence(SortedMap(0 -> values.map(Simple.apply)))))
             else Obj(Map(key -> parseInternal(rest, values)))
 
-      case Seq() => throw QuersonException("Empty key parts")
+      case Seq() => throw FormsonException("Empty key parts")
   }
 
 }
 
-private[querson] class KeyParser(key: String) {
+private[formson] class KeyParser(key: String) {
   import fastparse._, NoWhitespace._
 
   private val ForbiddenKeyChars = Set('[', ']', '.')
@@ -119,7 +117,7 @@ private[querson] class KeyParser(key: String) {
     val res = fastparse.parse(key, parseFinal(_))
     res match
       case Success((firstKey, subKeys), index) => subKeys.prepended(firstKey)
-      case f: Failure                          => throw new QuersonException(f.msg)
+      case f: Failure                          => throw new FormsonException(f.msg)
   }
 
   private def parseFinal[$: P] = P(

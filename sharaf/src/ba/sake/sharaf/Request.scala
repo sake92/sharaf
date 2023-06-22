@@ -6,7 +6,7 @@ import ba.sake.tupson.*
 import ba.sake.formson.*
 import ba.sake.querson.*
 import io.undertow.server.HttpServerExchange
-import io.undertow.server.handlers.form.{FormData => UFormData}
+import io.undertow.server.handlers.form.FormData as UFormData
 import io.undertow.server.handlers.form.FormParserFactory
 
 final class Request(
@@ -22,12 +22,12 @@ final class Request(
   def bodyJson[T](using rw: JsonRW[T]): T =
     bodyString.parseJson[T]
 
-  def bodyForm[T <: Product](using rw: FormRW[T]): T = {
+  def bodyForm[T <: Product](using rw: FormDataRW[T]): T = {
     val parser = FormParserFactory.builder.build.createParser(ex)
     val uFormData = parser.parseBlocking()
 
     val formData = Request.undertowFormData2Formson(uFormData)
-    rw.read("", formData)
+    rw.parse("", formData)
   }
 
   def queryParams[T](using rw: QueryStringRW[T]): T = {
@@ -55,6 +55,6 @@ object Request {
       map += (key -> formValues.toSeq)
     }
 
-    parseForm(map.toMap)
+    parseFDMap(map.toMap)
   }
 }

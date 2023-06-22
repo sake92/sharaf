@@ -33,7 +33,7 @@ case class CreateCustomerForm(
     photo: java.nio.file.Path,
     address: CreateAddressForm,
     hobbies: List[String]
-) derives FormRW {
+) derives FormDataRW {
   validate(
     check(name).is(!_.isBlank, "must not be blank")
   )
@@ -41,4 +41,4 @@ case class CreateCustomerForm(
 
 case class CreateAddressForm(
     street: String
-) derives FormRW
+) derives FormDataRW
