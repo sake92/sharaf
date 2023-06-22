@@ -74,7 +74,7 @@ object FormDataRW {
     override def parse(path: String, formData: FormData): Path = formData match
       case Simple(FormValue.File(value))                    => value
       case Sequence(Seq(Simple(FormValue.File(value)), _*)) => value
-      case Sequence(Seq())                                  => parseError(path, s"is missing")
+      case Sequence(Seq())                                  => parseError(path, "is missing")
       case other                                            => parseError(path, s"has invalid type: ${other.tpe}")
   }
 
@@ -85,8 +85,10 @@ object FormDataRW {
     override def parse(path: String, formData: FormData): Array[Byte] = formData match
       case Simple(FormValue.ByteArray(value))                    => value
       case Sequence(Seq(Simple(FormValue.ByteArray(value)), _*)) => value
-      case Sequence(Seq())                                       => parseError(path, s"is missing")
-      case other                                                 => parseError(path, s"has invalid type: ${other.tpe}")
+      case Sequence(Seq())                                       => parseError(path, "is missing")
+      case other =>
+        println(other)
+        parseError(path, s"has invalid type: ${other.tpe}")
   }
 
   given [T](using rw: FormDataRW[T]): FormDataRW[Option[T]] with {

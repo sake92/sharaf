@@ -10,6 +10,7 @@ import io.undertow.util.Methods
 
 import ba.sake.sharaf.*
 
+// TODO integrate into handler and test it
 final class CorsHandler private (corsSettings: CorsSettings) extends HttpHandler {
 
   private val accessControlAllowOrigin = new HttpString("Access-Control-Allow-Origin")

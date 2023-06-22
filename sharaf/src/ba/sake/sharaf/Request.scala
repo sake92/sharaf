@@ -23,6 +23,7 @@ final class Request(
     bodyString.parseJson[T]
 
   def bodyForm[T <: Product](using rw: FormDataRW[T]): T = {
+    // TODO morebit null WTFFF provjerit jel ima forme uopće, možda fali header i to..
     val parser = FormParserFactory.builder.build.createParser(ex)
     val uFormData = parser.parseBlocking()
 
@@ -49,7 +50,13 @@ object Request {
     uFormData.forEach { key =>
       val values = uFormData.get(key).asScala
       val formValues = values.map { value =>
-        if value.isFileItem then FormValue.File(value.getFileItem.getFile)
+        if value.isFileItem then
+          val fileItem = value.getFileItem
+          if fileItem.isInMemory then
+            val byteArray = Array.ofDim[Byte](fileItem.getInputStream.available)
+            fileItem.getInputStream.read(byteArray)
+            FormValue.ByteArray(byteArray)
+          else FormValue.File(fileItem.getFile)
         else FormValue.Str(value.getValue)
       }
       map += (key -> formValues.toSeq)

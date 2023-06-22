@@ -25,8 +25,13 @@ final class RoutesHandler private (routes: Routes, errorMapper: ErrorMapper[Stri
         val resOpt = routes.lift(reqParams)
 
         // if no match, a 500 will be returned by Undertow
-        resOpt.foreach { res =>
-          ResponseWritable.writeResponse(res, exchange)
+        resOpt match {
+          case Some(res) => ResponseWritable.writeResponse(res, exchange)
+          case None      =>
+            // TODO delegate to ErrorMapper..
+            val problemDetails = ProblemDetails(404, "Not Found")
+            val res = Response.withBody(problemDetails).withStatus(404)
+            ResponseWritable.writeResponse(res, exchange)
         }
       } catch {
         case NonFatal(e) if exchange.isResponseChannelAvailable =>
@@ -42,8 +47,9 @@ final class RoutesHandler private (routes: Routes, errorMapper: ErrorMapper[Stri
             }
 
           responseOpt match {
-            case Some(response) => ResponseWritable.writeResponse(response, exchange)
-            case None           =>
+            case Some(response) =>
+              ResponseWritable.writeResponse(response, exchange)
+            case None =>
               // if no error response match, just propagate.
               // will return 500
               throw e

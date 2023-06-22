@@ -1,25 +1,14 @@
 package demo
 
-import ba.sake.validation.*
-import ba.sake.formson.*
 import ba.sake.sharaf.*
 import ba.sake.sharaf.routing.*
 import ba.sake.sharaf.handlers.*
 import io.undertow.Undertow
+import java.nio.file.Files
 
 @main def main: Unit = {
 
-  val routes: Routes = { case POST() -> Path("form") =>
-    val req = Request.current.bodyForm[CreateCustomerForm]
-    Response.withBody(req.toString)
-  }
-
-  val server = Undertow
-    .builder()
-    .addHttpListener(8181, "localhost")
-    .setHandler(RoutesHandler(routes))
-    .build()
-
+  val server = FormApiServer(8181).server
   server.start()
 
   val serverInfo = server.getListenerInfo().get(0)
@@ -28,17 +17,17 @@ import io.undertow.Undertow
 
 }
 
-case class CreateCustomerForm(
-    name: String,
-    photo: java.nio.file.Path,
-    address: CreateAddressForm,
-    hobbies: List[String]
-) derives FormDataRW {
-  validate(
-    check(name).is(!_.isBlank, "must not be blank")
-  )
-}
+class FormApiServer(port: Int) {
+  private val routes: Routes = { case POST() -> Path("form") =>
+    val req = Request.current.bodyForm[CreateCustomerForm]
+    println(s"Got form request: $req")
+    val fileAsString = Files.readString(req.file)
+    Response.withBody(CreateCustomerResponse(fileAsString))
+  }
 
-case class CreateAddressForm(
-    street: String
-) derives FormDataRW
+  val server = Undertow
+    .builder()
+    .addHttpListener(port, "localhost")
+    .setHandler(RoutesHandler(routes))
+    .build()
+}

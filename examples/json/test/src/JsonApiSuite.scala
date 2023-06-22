@@ -33,15 +33,15 @@ class JsonApiSuite extends munit.FunSuite {
       assertEquals(resBody.name, "Meho")
       assertEquals(resBody.address, AddressRes("nizbrdo"))
 
-      // add second one
-      requests.post(
-        s"$baseUrl/customers",
-        data = CreateCustomerReq("Hamo", CreateAddressReq("tamo")).toJson,
-        headers = Map("Content-Type" -> "application/json")
-      )
-
       resBody
     }
+
+    // add second one
+    requests.post(
+      s"$baseUrl/customers",
+      data = CreateCustomerReq("Hamo", CreateAddressReq("tamo")).toJson,
+      headers = Map("Content-Type" -> "application/json")
+    )
 
     // second GET -> new customers
     locally {

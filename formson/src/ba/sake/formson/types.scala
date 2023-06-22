@@ -4,7 +4,7 @@ import java.nio.file.Path
 
 enum FormValue(val tpe: String) {
   case Str(value: String) extends FormValue("simple value")
-  case File(value: Path) extends FormValue("a file")
+  case File(value: Path) extends FormValue("file")
   case ByteArray(value: Array[Byte]) extends FormValue("byte array")
 }
 

@@ -25,7 +25,7 @@ object querson extends SharafPublishModule {
 
   def ivyDeps = Agg(
     ivy"ba.sake::tupson:0.6.0", // TODO we need just the validation stuff..
-    ivy"com.lihaoyi::fastparse:3.0.1",
+    ivy"com.lihaoyi::fastparse:3.0.1"
   )
 
   object test extends Tests with SharafTestModule

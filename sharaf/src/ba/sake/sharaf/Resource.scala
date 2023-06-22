@@ -11,5 +11,5 @@ object Resource {
   def fromClassPath(path: String): Option[Resource] =
     Option(cprm.getResource(path)).map(ClasspathResource(_))
 
-  private[sharaf] final class ClasspathResource(val underlying: UResource) extends Resource
+  final class ClasspathResource(val underlying: UResource) extends Resource
 }

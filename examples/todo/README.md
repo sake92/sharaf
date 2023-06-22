@@ -1,7 +1,16 @@
 
+Run from repo root:
+
+```scala
+
+./mill examples.todo.run
+
+```
+
+
 ## "integration" testing
 
-- run `./mill examples.todo.run`
+- run as above
 - open https://todobackend.com/specs/index.html in browser
 - enter https://localhost:8181 as target
 
