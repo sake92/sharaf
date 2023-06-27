@@ -10,18 +10,16 @@ import java.net.URI
 import org.typelevel.jawn.ast.*
 import ba.sake.validation.FieldsValidationException
 
-///////////// TODO Seq[ErrorMapper] with content types..
-type ErrorMapper[T] = PartialFunction[Throwable, Response[T]]
+/*
+Why not HTTP content negotiation?
+https://wiki.whatwg.org/wiki/Why_not_conneg
+ */
+
+type ErrorMapper = PartialFunction[Throwable, Response[?]]
 
 object ErrorMapper {
-  val empty: ErrorMapper[String] = new PartialFunction[Throwable, Response[String]] {
 
-    override def apply(v1: Throwable): Response[String] = ???
-
-    override def isDefinedAt(x: Throwable): Boolean = false
-  }
-
-  val default: ErrorMapper[String] = {
+  val default: ErrorMapper = {
     case e: NotFoundException =>
       Response.withBody(e.getMessage).withStatus(404)
     case e: FieldsValidationException =>
@@ -37,7 +35,7 @@ object ErrorMapper {
       Response.withBody(e.getMessage()).withStatus(400)
   }
 
-  val json: ErrorMapper[ProblemDetails] = {
+  val json: ErrorMapper = {
     case e: NotFoundException =>
       val problemDetails = ProblemDetails(404, "Not Found", e.getMessage)
       Response.withBody(problemDetails).withStatus(404)

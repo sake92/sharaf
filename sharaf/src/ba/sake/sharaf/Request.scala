@@ -8,6 +8,7 @@ import ba.sake.querson.*
 import io.undertow.server.HttpServerExchange
 import io.undertow.server.handlers.form.FormData as UFormData
 import io.undertow.server.handlers.form.FormParserFactory
+import io.undertow.util.HttpString
 
 final class Request(
     private val ex: HttpServerExchange
@@ -16,6 +17,15 @@ final class Request(
   /** Please use this with caution! */
   val underlyingHttpServerExchange: HttpServerExchange = ex
 
+  /* QUERY */
+  def queryParams[T](using rw: QueryStringRW[T]): T = {
+    val queryParams: QueryStringMap = ex.getQueryParameters.asScala.toMap.map { (k, v) =>
+      (k, v.asScala.toSeq)
+    }
+    queryParams.parseQueryStringMap
+  }
+
+  /* BODY */
   lazy val bodyString: String =
     new String(ex.getInputStream.readAllBytes(), StandardCharsets.UTF_8)
 
@@ -31,12 +41,14 @@ final class Request(
     rw.parse("", formData)
   }
 
-  def queryParams[T](using rw: QueryStringRW[T]): T = {
-    val queryParams: QueryStringMap = ex.getQueryParameters.asScala.toMap.map { (k, v) =>
-      (k, v.asScala.toSeq)
-    }
-    queryParams.parseQueryStringMap
+  /* HEADERS */
+  def headers: Map[HttpString, Seq[String]] = {
+    val hMap = ex.getRequestHeaders
+    hMap.getHeaderNames.asScala.map { name =>
+      name -> hMap.get(name).asScala.toSeq
+    }.toMap
   }
+
 }
 
 object Request {

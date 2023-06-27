@@ -1,16 +1,13 @@
 package ba.sake.sharaf.handlers
 
 import scala.util.control.NonFatal
-import scala.jdk.CollectionConverters.*
 
 import io.undertow.server.HttpHandler
 import io.undertow.server.HttpServerExchange
-import io.undertow.util.Headers
 
 import ba.sake.sharaf.*
 
-final class RoutesHandler private (routes: Routes, errorMapper: ErrorMapper[String] = ErrorMapper.empty)
-    extends HttpHandler {
+final class RoutesHandler private (routes: Routes, errorMapper: ErrorMapper) extends HttpHandler {
 
   override def handleRequest(exchange: HttpServerExchange): Unit = {
     exchange.startBlocking()
@@ -18,34 +15,23 @@ final class RoutesHandler private (routes: Routes, errorMapper: ErrorMapper[Stri
       exchange.dispatch(this)
     } else {
 
-      try {
-        given Request = Request.create(exchange)
+      val request = Request.create(exchange)
+      given Request = request
 
-        val reqParams = fillReqParams(exchange)
+      val reqParams = fillReqParams(exchange)
+
+      try {
+
         val resOpt = routes.lift(reqParams)
 
         // if no match, a 500 will be returned by Undertow
         resOpt match {
           case Some(res) => ResponseWritable.writeResponse(res, exchange)
-          case None      =>
-            // TODO delegate to ErrorMapper..
-            val problemDetails = ProblemDetails(404, "Not Found")
-            val res = Response.withBody(problemDetails).withStatus(404)
-            ResponseWritable.writeResponse(res, exchange)
+          case None      => throw NotFoundException("")
         }
       } catch {
         case NonFatal(e) if exchange.isResponseChannelAvailable =>
-          // TODO handle properly when multiple accepts..
-          val acceptContentType = exchange.getRequestHeaders().get(Headers.ACCEPT)
-          val responseOpt =
-            if acceptContentType.getFirst() == "application/json" then {
-              val mapper = errorMapper.orElse(ErrorMapper.json)
-              mapper.lift(e)
-            } else {
-              val mapper = errorMapper.orElse(ErrorMapper.default)
-              mapper.lift(e)
-            }
-
+          val responseOpt = errorMapper.lift(e)
           responseOpt match {
             case Some(response) =>
               ResponseWritable.writeResponse(response, exchange)
@@ -72,6 +58,6 @@ final class RoutesHandler private (routes: Routes, errorMapper: ErrorMapper[Stri
 }
 
 object RoutesHandler {
-  def apply(routes: Routes): RoutesHandler =
-    new RoutesHandler(routes)
+  def apply(routes: Routes, errorMapper: ErrorMapper = ErrorMapper.default): RoutesHandler =
+    new RoutesHandler(routes, errorMapper)
 }
