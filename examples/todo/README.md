@@ -12,6 +12,6 @@ Run from repo root:
 
 - run as above
 - open https://todobackend.com/specs/index.html in browser
-- enter https://localhost:8181 as target
+- enter http://localhost:8181 as target
 
 

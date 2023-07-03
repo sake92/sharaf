@@ -15,7 +15,6 @@ import ba.sake.tupson.JsonRW
 
   val routes: Routes = {
     case GET() -> Path("") =>
-      println("AAAAAAAAAAAA")
       Response.withBody(todosRepo.getTodos().map(todo2Resp))
 
     case GET() -> Path("todos", uuid(id)) =>
@@ -45,16 +44,6 @@ import ba.sake.tupson.JsonRW
       todosRepo.set(todo)
       Response.withBody(todo2Resp(todo))
 
-    case OPTIONS() -> _ =>
-      Response
-        .withBody("")
-        // TODO ..
-        // SAMO u response za PRAVI REQUEST
-        // ako je missing, onda ta domena nema pravo pristupa
-        // ako ima, mora bit == Origin headeru!
-        .withHeader("Access-Control-Allow-Origin", "*") // može biti dinamički normala
-        .withHeader("Access-Control-Allow-Headers", "*") // SAMO ZA OPTIONS
-        .withHeader("Access-Control-Allow-Methods", "GET,HEAD,POST,OPTIONS,PATCH,DELETE") // SAMO ZA OPTIONS
   }
 
   val handler = RoutesHandler(routes)
@@ -63,7 +52,7 @@ import ba.sake.tupson.JsonRW
     .builder()
     .addHttpListener(8181, "localhost")
     .setHandler(
-      handler
+      CorsHandler(handler, CorsSettings(allowedOrigins = Set("https://todobackend.com")))
     )
     .build()
   server.start()
