@@ -14,6 +14,7 @@ object sharaf extends SharafPublishModule {
     ivy"ba.sake::hepek-components:0.10.0+0-3aaeebf1+20230522-1255-SNAPSHOT"
   )
 
+  // TODO depend on artifacts when published
   def moduleDeps = Seq(querson, formson)
 
   object test extends Tests with SharafTestModule
