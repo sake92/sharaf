@@ -5,6 +5,7 @@ import scala.jdk.CollectionConverters.*
 import ba.sake.tupson.*
 import ba.sake.formson.*
 import ba.sake.querson.*
+import ba.sake.validson.*
 import io.undertow.server.HttpServerExchange
 import io.undertow.server.handlers.form.FormData as UFormData
 import io.undertow.server.handlers.form.FormParserFactory
@@ -29,16 +30,16 @@ final class Request(
   lazy val bodyString: String =
     new String(ex.getInputStream.readAllBytes(), StandardCharsets.UTF_8)
 
-  def bodyJson[T](using rw: JsonRW[T]): T =
-    bodyString.parseJson[T]
+  def bodyJson[T: Validator](using rw: JsonRW[T]): T =
+    bodyString.parseJson[T].validateOrThrow
 
-  def bodyForm[T <: Product](using rw: FormDataRW[T]): T = {
+  def bodyForm[T <: Product: Validator](using rw: FormDataRW[T]): T = {
     // TODO morebit null WTFFF provjerit jel ima forme uopće, možda fali header i to..
     val parser = FormParserFactory.builder.build.createParser(ex)
     val uFormData = parser.parseBlocking()
 
     val formData = Request.undertowFormData2Formson(uFormData)
-    rw.parse("", formData)
+    rw.parse("", formData).validateOrThrow
   }
 
   /* HEADERS */

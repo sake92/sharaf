@@ -24,8 +24,10 @@ object querson extends SharafPublishModule {
 
   def artifactName = "querson"
 
+  // TODO depend on artifacts when published
+  def moduleDeps = Seq(validson)
+
   def ivyDeps = Agg(
-    ivy"ba.sake::tupson:0.6.0", // TODO we need just the validation stuff..
     ivy"com.lihaoyi::fastparse:3.0.1"
   )
 
@@ -36,13 +38,26 @@ object formson extends SharafPublishModule {
 
   def artifactName = "formson"
 
+  // TODO depend on artifacts when published
+  def moduleDeps = Seq(validson)
+
   object test extends Tests with SharafTestModule
 
   def ivyDeps = Agg(
-    ivy"ba.sake::tupson:0.6.0", // TODO we need just the validation stuff..
     ivy"com.lihaoyi::fastparse:3.0.1",
     ivy"com.lihaoyi::requests:0.8.0" // TODO move to a separate module
   )
+}
+
+object validson extends SharafPublishModule {
+
+  def artifactName = "validson"
+
+  def ivyDeps = Agg(
+    ivy"com.lihaoyi::sourcecode::0.3.0"
+  )
+
+  object test extends Tests with SharafTestModule
 }
 
 trait SharafPublishModule extends SharafCommonModule with CiReleaseModule {

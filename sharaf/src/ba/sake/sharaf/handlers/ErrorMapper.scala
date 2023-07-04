@@ -8,7 +8,7 @@ import ba.sake.formson
 import ba.sake.sharaf.*
 import java.net.URI
 import org.typelevel.jawn.ast.*
-import ba.sake.validation.FieldsValidationException
+import ba.sake.validson.ValidationException
 
 /*
 Why not HTTP content negotiation?
@@ -22,7 +22,7 @@ object ErrorMapper {
   val default: ErrorMapper = {
     case e: NotFoundException =>
       Response.withBody(e.getMessage).withStatus(404)
-    case e: FieldsValidationException =>
+    case e: ValidationException =>
       val fieldValidationErrors = e.errors.mkString("[", "; ", "]")
       Response.withBody(s"Validation errors: $fieldValidationErrors").withStatus(400)
     // json
@@ -39,7 +39,7 @@ object ErrorMapper {
     case e: NotFoundException =>
       val problemDetails = ProblemDetails(404, "Not Found", e.getMessage)
       Response.withBody(problemDetails).withStatus(404)
-    case e: FieldsValidationException =>
+    case e: ValidationException =>
       val fieldValidationErrors = e.errors.map(err => ArgumentProblem(err.path, err.msg, Some(err.value.toString)))
       val problemDetails = ProblemDetails(400, "Validation errors", invalidArguments = fieldValidationErrors)
       Response.withBody(problemDetails).withStatus(400)

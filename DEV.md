@@ -8,12 +8,12 @@
 
 ./mill __.reformat
 
-./mill sharaf.test
+./mill __.test
 
 ./mill examples.runMain bla
 
 # for local dev/test
-./mill sharaf.publishLocal
+./mill __.publishLocal
 
 git diff
 git commit -am "msg"
@@ -24,4 +24,4 @@ git push origin 0.5.1
 
 # TODOs
 
-- 
+- remove validation or replace with https://jap-company.github.io/fields/docs/overview/

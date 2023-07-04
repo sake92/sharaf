@@ -9,8 +9,6 @@ import ba.sake.sharaf.routing.*
 import ba.sake.sharaf.handlers.*
 import ba.sake.querson.*
 
-var db = Seq.empty[CustomerRes]
-
 @main def main: Unit = {
 
   val server = JsonApiServer(8181).server
@@ -23,6 +21,9 @@ var db = Seq.empty[CustomerRes]
 }
 
 class JsonApiServer(port: Int) {
+
+  private var db = Seq.empty[CustomerRes]
+
   private val routes: Routes = {
     case GET() -> Path("customers", uuid(id)) =>
       val customerOpt = db.find(_.id == id)

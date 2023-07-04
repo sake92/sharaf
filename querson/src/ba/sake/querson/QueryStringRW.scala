@@ -8,7 +8,6 @@ import scala.reflect.ClassTag
 import scala.collection.mutable.ArrayDeque
 import scala.util.Try
 
-import ba.sake.validation.*
 import QueryStringData.*
 
 /** Maps a `T` to/from query params string map
@@ -105,7 +104,6 @@ object QueryStringRW {
   ): Seq[T] = {
     val parsedValues = ArrayDeque.empty[T]
     val keyErrors = ArrayDeque.empty[ParseError]
-    val validationErrors = ArrayDeque.empty[FieldValidationError]
     values.zipWithIndex.foreach { case (v, i) =>
       val subPath = s"$path[$i]"
       try {
@@ -113,12 +111,9 @@ object QueryStringRW {
       } catch {
         case pe: ParsingException =>
           keyErrors ++= pe.errors
-        case e: FieldsValidationException =>
-          validationErrors ++= e.errors
       }
     }
     if keyErrors.nonEmpty then throw ParsingException(keyErrors.toSeq)
-    if validationErrors.nonEmpty then throw FieldsValidationException(validationErrors.toSeq)
 
     parsedValues.toSeq
   }
@@ -165,7 +160,6 @@ object QueryStringRW {
 
               val arguments = ArrayDeque.empty[Any]
               val keyErrors = ArrayDeque.empty[ParseError]
-              val keyValidationErrors = ArrayDeque.empty[FieldValidationError]
               val defaultValuesMap = $defaultValues.toMap
 
               $labels.zip($rwInstances).foreach { case (label, rw) =>
@@ -190,13 +184,9 @@ object QueryStringRW {
                         case pe: ParsingException =>
                           keyErrors ++= pe.errors
                           None
-                        case e: FieldsValidationException =>
-                          keyValidationErrors ++= e.errors
-                          None
                       }
                     }
 
-                  //  TODO macro generate validation typeclass...
                   argOpt
                     .orElse(defaultOpt.map(_()))
                     .orElse(globalDefault)
@@ -207,17 +197,8 @@ object QueryStringRW {
               }
 
               if keyErrors.nonEmpty then throw ParsingException(keyErrors.toSeq)
-              if keyValidationErrors.nonEmpty then throw FieldsValidationException(keyValidationErrors.toSeq)
 
-              try {
-                // TODO validation..
-                $m.fromProduct(Tuple.fromArray(arguments.toArray))
-              } catch {
-                case fve: FieldsValidationException =>
-                  val validationErrors =
-                    keyValidationErrors.toSeq ++ fve.errors.map(e => e.withPath(s"$path.${e.path}"))
-                  throw new FieldsValidationException(validationErrors)
-              }
+              $m.fromProduct(Tuple.fromArray(arguments.toArray))
             }
           }
         }
@@ -267,7 +248,7 @@ object QueryStringRW {
           }
         }
 
-      case hmm => report.errorAndAbort(s"Sum types are not supported ")
+      case hmm => report.errorAndAbort("Sum types are not supported")
   }
 
   /* macro utils */

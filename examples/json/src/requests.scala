@@ -1,17 +1,25 @@
 package demo
 
-import ba.sake.validation.*
 import ba.sake.tupson.JsonRW
+import ba.sake.validson.*
 
-case class CreateCustomerReq(name: String, address: CreateAddressReq) derives JsonRW {
-  validate(
-    check(name).is(!_.isBlank, "must not be blank")
-  )
-}
+case class CreateCustomerReq private (name: String, address: CreateAddressReq) derives JsonRW
 
-case class CreateAddressReq(street: String) derives JsonRW {
-  validate(
-    check(street).is(!_.isBlank, "must not be blank"),
-    check(street).is(_.length >= 3, "must be >= 3")
-  )
-}
+object CreateCustomerReq:
+  // smart constructor, hard to get invalid object constructed
+  def create(name: String, address: CreateAddressReq): CreateCustomerReq =
+    val res = new CreateCustomerReq(name, address)
+    res.validateOrThrow
+
+  given Validator[CreateCustomerReq] = Validator
+    .derived[CreateCustomerReq]
+    .and(_.name, !_.isBlank, "must not be blank")
+
+//////
+case class CreateAddressReq(street: String) derives JsonRW
+
+object CreateAddressReq:
+  given Validator[CreateAddressReq] = Validator
+    .derived[CreateAddressReq]
+    .and(_.street, !_.isBlank, "must not be blank")
+    .and(_.street, _.length >= 3, "must be >= 3")
