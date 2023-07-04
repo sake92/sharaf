@@ -25,4 +25,4 @@ git push origin $VERSION
 
 # TODOs
 
-- remove validation or replace with https://jap-company.github.io/fields/docs/overview/
+- cookies

@@ -1,0 +1,20 @@
+
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  test:
+    name: test ${{ matrix.java }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        java: [adopt@1.8, openjdk@1.11.0, openjdk@1.17.0]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: olafurpg/setup-scala@v13
+        with:
+          java-version: ${{ matrix.java }}
+      - run: ./mill __.test

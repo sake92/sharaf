@@ -17,7 +17,7 @@ object sharaf extends SharafPublishModule {
   // TODO depend on artifacts when published
   def moduleDeps = Seq(querson, formson)
 
-  object test extends Tests with SharafTestModule
+  object test extends ScalaTests with SharafTestModule
 }
 
 object querson extends SharafPublishModule {
@@ -31,7 +31,7 @@ object querson extends SharafPublishModule {
     ivy"com.lihaoyi::fastparse:3.0.1"
   )
 
-  object test extends Tests with SharafTestModule
+  object test extends ScalaTests with SharafTestModule
 }
 
 object formson extends SharafPublishModule {
@@ -41,7 +41,7 @@ object formson extends SharafPublishModule {
   // TODO depend on artifacts when published
   def moduleDeps = Seq(validson)
 
-  object test extends Tests with SharafTestModule
+  object test extends ScalaTests with SharafTestModule
 
   def ivyDeps = Agg(
     ivy"com.lihaoyi::fastparse:3.0.1",
@@ -57,7 +57,7 @@ object validson extends SharafPublishModule {
     ivy"com.lihaoyi::sourcecode::0.3.0"
   )
 
-  object test extends Tests with SharafTestModule
+  object test extends ScalaTests with SharafTestModule
 }
 
 trait SharafPublishModule extends SharafCommonModule with CiReleaseModule {
@@ -93,18 +93,18 @@ trait SharafTestModule extends TestModule.Munit {
 object examples extends mill.Module {
   object html extends SharafCommonModule {
     def moduleDeps = Seq(sharaf)
-    object test extends Tests with SharafTestModule
+    object test extends ScalaTests with SharafTestModule
   }
   object json extends SharafCommonModule {
     def moduleDeps = Seq(sharaf)
-    object test extends Tests with SharafTestModule
+    object test extends ScalaTests with SharafTestModule
   }
   object form extends SharafCommonModule {
     def moduleDeps = Seq(sharaf)
-    object test extends Tests with SharafTestModule
+    object test extends ScalaTests with SharafTestModule
   }
   object todo extends SharafCommonModule {
     def moduleDeps = Seq(sharaf)
-    object test extends Tests with SharafTestModule
+    object test extends ScalaTests with SharafTestModule
   }
 }

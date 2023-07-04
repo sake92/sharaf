@@ -34,12 +34,13 @@ final class Request(
     bodyString.parseJson[T].validateOrThrow
 
   def bodyForm[T <: Product: Validator](using rw: FormDataRW[T]): T = {
-    // TODO morebit null WTFFF provjerit jel ima forme uopće, možda fali header i to..
-    val parser = FormParserFactory.builder.build.createParser(ex)
-    val uFormData = parser.parseBlocking()
-
-    val formData = Request.undertowFormData2Formson(uFormData)
-    rw.parse("", formData).validateOrThrow
+    // returns null if content-type is not suitable
+    Option(FormParserFactory.builder.build.createParser(ex)) match
+      case None => throw new SharafException("The specified content type is not supported")
+      case Some(parser) =>
+        val uFormData = parser.parseBlocking()
+        val formData = Request.undertowFormData2Formson(uFormData)
+        rw.parse("", formData).validateOrThrow    
   }
 
   /* HEADERS */
