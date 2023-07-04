@@ -11,8 +11,7 @@ import scalatags.Text.all._
 
   val routes: Routes = {
     case GET() -> Path("html") =>
-      val htmlPage: HtmlPage = MyPage
-      Response.withBody(htmlPage)
+      Response.withBody(MyPage)
     case GET() -> Path("scala.png") =>
       val resource = Resource.fromClassPath("static/scala.png")
       Response.withBodyOpt(resource, "NotFound")

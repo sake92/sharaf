@@ -10,8 +10,8 @@ object sharaf extends SharafPublishModule {
 
   def ivyDeps = Agg(
     ivy"io.undertow:undertow-core:2.3.5.Final",
-    ivy"ba.sake::tupson:0.6.0",
-    ivy"ba.sake::hepek-components:0.10.0+0-3aaeebf1+20230522-1255-SNAPSHOT"
+    ivy"ba.sake::tupson:0.7.0",
+    ivy"ba.sake::hepek-components:0.11.1"
   )
 
   // TODO depend on artifacts when published
