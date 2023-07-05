@@ -19,3 +19,4 @@ case class Page(number: Int, size: Int) derives QueryStringRW
 
 // Option and Seq have global defaults (in typeclass instance)
 case class QueryDefaults(q: String = "default", opt: Option[String], seq: Seq[String]) derives QueryStringRW
+case class QueryNestedDefaults(search: String = "default", p: Page = Page(0, 10)) derives QueryStringRW

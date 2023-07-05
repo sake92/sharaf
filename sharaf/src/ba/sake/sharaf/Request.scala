@@ -19,12 +19,13 @@ final class Request(
   val underlyingHttpServerExchange: HttpServerExchange = ex
 
   /* QUERY */
-  def queryParams[T](using rw: QueryStringRW[T]): T = {
-    val queryParams: QueryStringMap = ex.getQueryParameters.asScala.toMap.map { (k, v) =>
+  lazy val queryParamsMap: QueryStringMap =
+    ex.getQueryParameters.asScala.toMap.map { (k, v) =>
       (k, v.asScala.toSeq)
     }
-    queryParams.parseQueryStringMap
-  }
+
+  def queryParams[T: Validator](using rw: QueryStringRW[T]): T =
+    queryParamsMap.parseQueryStringMap.validateOrThrow
 
   /* BODY */
   lazy val bodyString: String =
@@ -40,7 +41,7 @@ final class Request(
       case Some(parser) =>
         val uFormData = parser.parseBlocking()
         val formData = Request.undertowFormData2Formson(uFormData)
-        rw.parse("", formData).validateOrThrow    
+        rw.parse("", formData).validateOrThrow
   }
 
   /* HEADERS */

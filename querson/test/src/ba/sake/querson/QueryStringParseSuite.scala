@@ -122,6 +122,21 @@ class QueryStringParseSuite extends munit.FunSuite {
       val res = qsMap.parseQueryStringMap[QueryDefaults]
       assertEquals(res, expected)
     }
+
+    Seq[(QueryStringMap, QueryNestedDefaults)](
+      (
+        Map(),
+        QueryNestedDefaults("default", Page(0, 10))
+      ),
+      (
+        Map("search" -> Seq("q1"), "p.number" -> Seq("3"), "p.size" -> Seq("50")),
+        QueryNestedDefaults("q1", Page(3, 50))
+      )
+    ).foreach { case (qsMap, expected) =>
+      val res = qsMap.parseQueryStringMap[QueryNestedDefaults]
+      assertEquals(res, expected)
+    }
+
   }
 
   test("parseQueryStringMap should throw nice errors") {
