@@ -18,8 +18,8 @@
 git diff
 git commit -am "msg"
 
-$VERSION="0.5.1"
-git tag -a $VERSION -m "Fix stuff"
+$VERSION="0.0.1"
+git tag -a $VERSION -m "First release"
 git push origin $VERSION
 ```
 

@@ -20,10 +20,10 @@ Also, you can use undertow's lower level API, to implement WebSocket for example
 
 Sharaf bundles a set of libraries:
 - [querson](./querson) for query parameters
-- [hepek-components](https://github.com/sake92/tupson) for HTML (with [scalatags](https://github.com/com-lihaoyi/scalatags))
+- [hepek-components](https://github.com/sake92/hepek) for HTML (with [scalatags](https://github.com/com-lihaoyi/scalatags))
 - [tupson](https://github.com/sake92/tupson) for JSON
-- [formson](https://github.com/sake92/tupson) for forms
-- [validson](https://github.com/sake92/tupson) for validation
+- [formson](./formson) for forms
+- [validson](./formson) for validation
 
 There are a bunch of [examples](./examples) to get you started.
 
