@@ -5,7 +5,6 @@ import scala.jdk.CollectionConverters.*
 import ba.sake.tupson.*
 import ba.sake.formson.*
 import ba.sake.querson.*
-import ba.sake.validson.*
 import io.undertow.server.HttpServerExchange
 import io.undertow.server.handlers.form.FormData as UFormData
 import io.undertow.server.handlers.form.FormParserFactory
@@ -24,24 +23,24 @@ final class Request(
       (k, v.asScala.toSeq)
     }
 
-  def queryParams[T: Validator](using rw: QueryStringRW[T]): T =
-    queryParamsMap.parseQueryStringMap.validateOrThrow
+  def queryParams[T <: Product](using rw: QueryStringRW[T]): T =
+    queryParamsMap.parseQueryStringMap
 
   /* BODY */
   lazy val bodyString: String =
     new String(ex.getInputStream.readAllBytes(), StandardCharsets.UTF_8)
 
-  def bodyJson[T: Validator](using rw: JsonRW[T]): T =
-    bodyString.parseJson[T].validateOrThrow
+  def bodyJson[T](using rw: JsonRW[T]): T =
+    bodyString.parseJson[T]
 
-  def bodyForm[T <: Product: Validator](using rw: FormDataRW[T]): T = {
+  def bodyForm[T <: Product](using rw: FormDataRW[T]): T = {
     // returns null if content-type is not suitable
     Option(FormParserFactory.builder.build.createParser(ex)) match
       case None => throw new SharafException("The specified content type is not supported")
       case Some(parser) =>
         val uFormData = parser.parseBlocking()
         val formData = Request.undertowFormData2Formson(uFormData)
-        rw.parse("", formData).validateOrThrow
+        rw.parse("", formData)
   }
 
   /* HEADERS */
