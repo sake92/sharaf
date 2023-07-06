@@ -3,7 +3,7 @@ package ba.sake.querson
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
-val DefaultConfig = Config(SeqWriteMode.Brackets, ObjWriteMode.Brackets)
+val DefaultQuersonConfig = Config(SeqWriteMode.Brackets, ObjWriteMode.Dots)
 
 extension (queryStringMap: QueryStringMap) {
 
@@ -25,8 +25,8 @@ extension [T](value: T)(using rw: QueryStringRW[T]) {
     * @return
     *   QueryStringMap
     */
-  def toQueryStringMap(config: Config = DefaultConfig): QueryStringMap =
-    val qsData = rw.write("", value)
+  def toQueryStringMap(config: Config = DefaultQuersonConfig): QueryStringMap =
+    val qsData = rw.write("", Option(value)).getOrElse(throw QuersonException("value not provided"))
     writeToQSMap("", qsData, config)
 
     /** Serializes `T` to query string, with key/values URL encoded.
@@ -38,7 +38,7 @@ extension [T](value: T)(using rw: QueryStringRW[T]) {
       * @return
       *   Query parameters string
       */
-  def toQueryString(config: Config = DefaultConfig): String =
+  def toQueryString(config: Config = DefaultQuersonConfig): String =
     val qsMap = toQueryStringMap(config)
     qsMap
       .flatMap { case (k, values) =>
@@ -51,10 +51,17 @@ extension [T](value: T)(using rw: QueryStringRW[T]) {
       .mkString("&")
 }
 
-case class Config(seqWriteMode: SeqWriteMode, objWriteMode: ObjWriteMode)
+case class Config(seqWriteMode: SeqWriteMode, objWriteMode: ObjWriteMode) {
+  def withSeqBrackets = copy(seqWriteMode = SeqWriteMode.Brackets)
+  def withSeqNoBrackets = copy(seqWriteMode = SeqWriteMode.NoBrackets)
+  def withSeqEmptyBrackets = copy(seqWriteMode = SeqWriteMode.EmptyBrackets)
+
+  def withObjBrackets = copy(objWriteMode = ObjWriteMode.Brackets)
+  def withObjDots = copy(objWriteMode = ObjWriteMode.Dots)
+}
 
 enum SeqWriteMode:
-  case NoBrackets, EmptyBrackets, Brackets
+  case Brackets, NoBrackets, EmptyBrackets
 
 enum ObjWriteMode:
   case Brackets, Dots
