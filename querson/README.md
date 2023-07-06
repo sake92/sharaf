@@ -72,7 +72,7 @@ Querson is *very forgiving* when *parsing* these keys, so in most cases it will 
 When you need to write the values, you can provide a configuration object:
 ```scala
 // use no brackets for sequences, and use dots for objects
-val config = Config(SeqWriteMode.NoBrackets, ObjWriteMode.Dots)
+val config = DefaultFormsonConfig.withSeqNoBrackets.withObjDots
 q.toQueryString(config)
 // seq=1&seq=2&obj.x=4&obj.y=6
 ```
