@@ -26,7 +26,7 @@ extension [T](value: T)(using rw: QueryStringRW[T]) {
     *   QueryStringMap
     */
   def toQueryStringMap(config: Config = DefaultQuersonConfig): QueryStringMap =
-    val qsData = rw.write("", Option(value)).getOrElse(throw QuersonException("value not provided"))
+    val qsData = rw.write("", value)
     writeToQSMap("", qsData, config)
 
     /** Serializes `T` to query string, with key/values URL encoded.
