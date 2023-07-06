@@ -6,12 +6,12 @@ class QueryStringWriteSuite extends munit.FunSuite {
 
   val uuid = UUID.fromString("ef42f9e9-79b9-45eb-a938-95ac75aedf87")
 
-  val cfgSeqNoBrackets = Config(SeqWriteMode.NoBrackets, ObjWriteMode.Brackets)
-  val cfgSeqEmptyBrackets = Config(SeqWriteMode.EmptyBrackets, ObjWriteMode.Brackets)
-  val cfgSeqBrackets = Config(SeqWriteMode.Brackets, ObjWriteMode.Brackets)
+  val cfgSeqBrackets = DefaultQuersonConfig.withSeqBrackets.withObjBrackets
+  val cfgSeqNoBrackets = DefaultQuersonConfig.withSeqNoBrackets.withObjBrackets
+  val cfgSeqEmptyBrackets = DefaultQuersonConfig.withSeqEmptyBrackets.withObjBrackets
 
-  val cfgObjBrackets = Config(SeqWriteMode.NoBrackets, ObjWriteMode.Brackets)
-  val cfgObjDots = Config(SeqWriteMode.NoBrackets, ObjWriteMode.Dots)
+  val cfgObjBrackets = DefaultQuersonConfig.withSeqNoBrackets.withObjBrackets
+  val cfgObjDots = DefaultQuersonConfig.withSeqNoBrackets.withObjDots
 
   test("toQueryString should write simple query parameters to string") {
     val res1 = QuerySimple("some text", 42, uuid).toQueryString()

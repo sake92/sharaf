@@ -1,6 +1,6 @@
 package ba.sake.formson
 
-val DefaultConfig = Config(SeqWriteMode.Brackets, ObjWriteMode.Brackets)
+val DefaultFormsonConfig = Config(SeqWriteMode.Brackets, ObjWriteMode.Brackets)
 
 extension (formDataMap: FormDataMap) {
 
@@ -22,16 +22,23 @@ extension [T](value: T)(using rw: FormDataRW[T]) {
     * @return
     *   FormDataMap
     */
-  def toFormDataMap(config: Config = DefaultConfig): FormDataMap =
+  def toFormDataMap(config: Config = DefaultFormsonConfig): FormDataMap =
     val formData = rw.write("", value)
     writeToFDMap("", formData, config)
 
 }
 
-case class Config(seqWriteMode: SeqWriteMode, objWriteMode: ObjWriteMode)
+case class Config(seqWriteMode: SeqWriteMode, objWriteMode: ObjWriteMode) {
+  def withSeqBrackets = copy(seqWriteMode = SeqWriteMode.Brackets)
+  def withSeqNoBrackets = copy(seqWriteMode = SeqWriteMode.NoBrackets)
+  def withSeqEmptyBrackets = copy(seqWriteMode = SeqWriteMode.EmptyBrackets)
+
+  def withObjBrackets = copy(objWriteMode = ObjWriteMode.Brackets)
+  def withObjDots = copy(objWriteMode = ObjWriteMode.Dots)
+}
 
 enum SeqWriteMode:
-  case NoBrackets, EmptyBrackets, Brackets
+  case Brackets, NoBrackets, EmptyBrackets
 
 enum ObjWriteMode:
   case Brackets, Dots

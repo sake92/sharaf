@@ -7,12 +7,12 @@ class FormDataWriteSuite extends munit.FunSuite {
 
   val uuid = UUID.fromString("ef42f9e9-79b9-45eb-a938-95ac75aedf87")
 
-  val cfgSeqNoBrackets = Config(SeqWriteMode.NoBrackets, ObjWriteMode.Brackets)
-  val cfgSeqEmptyBrackets = Config(SeqWriteMode.EmptyBrackets, ObjWriteMode.Brackets)
-  val cfgSeqBrackets = Config(SeqWriteMode.Brackets, ObjWriteMode.Brackets)
+  val cfgSeqBrackets = DefaultFormsonConfig.withSeqBrackets.withObjBrackets
+  val cfgSeqNoBrackets = DefaultFormsonConfig.withSeqNoBrackets.withObjBrackets
+  val cfgSeqEmptyBrackets = DefaultFormsonConfig.withSeqEmptyBrackets.withObjBrackets
 
-  val cfgObjBrackets = Config(SeqWriteMode.NoBrackets, ObjWriteMode.Brackets)
-  val cfgObjDots = Config(SeqWriteMode.NoBrackets, ObjWriteMode.Dots)
+  val cfgObjBrackets = DefaultFormsonConfig.withSeqNoBrackets.withObjBrackets
+  val cfgObjDots = DefaultFormsonConfig.withSeqNoBrackets.withObjDots
 
   /*
   test("toQueryString should write simple query parameters to string") {
@@ -47,5 +47,5 @@ class FormDataWriteSuite extends munit.FunSuite {
     val res1 = QueryDefaults(opt = None, seq = Seq.empty).toQueryString()
     assertEquals(res1, "q=default")
   }
-*/
+   */
 }

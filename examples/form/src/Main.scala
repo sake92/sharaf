@@ -1,10 +1,13 @@
 package demo
 
+import java.nio.file.Files
+
+import io.undertow.Undertow
+
 import ba.sake.sharaf.*
 import ba.sake.sharaf.routing.*
 import ba.sake.sharaf.handlers.*
-import io.undertow.Undertow
-import java.nio.file.Files
+import ba.sake.validson.*
 
 @main def main: Unit = {
 
@@ -19,7 +22,7 @@ import java.nio.file.Files
 
 class FormApiServer(port: Int) {
   private val routes: Routes = { case POST() -> Path("form") =>
-    val req = Request.current.bodyForm[CreateCustomerForm]
+    val req = Request.current.bodyForm[CreateCustomerForm].validateOrThrow
     println(s"Got form request: $req")
     val fileAsString = Files.readString(req.file)
     Response.withBody(CreateCustomerResponse(fileAsString))

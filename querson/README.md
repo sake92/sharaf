@@ -79,6 +79,5 @@ q.toQueryString(config)
 
 ### TODO
 
-- extract to a separate repo
 - revisit instanceof calls
 

@@ -1,10 +1,12 @@
 package demo
 
 import io.undertow.Undertow
+
 import ba.sake.sharaf.*
 import ba.sake.sharaf.routing.*
 import ba.sake.sharaf.handlers.*
-import ba.sake.tupson.JsonRW
+import ba.sake.tupson.*
+import ba.sake.validson.*
 
 @main def main: Unit = {
 
@@ -22,7 +24,7 @@ import ba.sake.tupson.JsonRW
       Response.withBody(todo2Resp(todo))
 
     case POST() -> Path("") =>
-      val reqBody = Request.current.bodyJson[CreateTodo]
+      val reqBody = Request.current.bodyJson[CreateTodo].validateOrThrow
       val newTodo = todosRepo.add(reqBody)
       Response.withBody(todo2Resp(newTodo))
 
@@ -35,7 +37,7 @@ import ba.sake.tupson.JsonRW
       Response.withBody(todosRepo.getTodos().map(todo2Resp))
 
     case PATCH() -> Path("todos", uuid(id)) =>
-      val reqBody = Request.current.bodyJson[PatchTodo]
+      val reqBody = Request.current.bodyJson[PatchTodo].validateOrThrow
       var todo = todosRepo.getTodo(id)
       reqBody.title.foreach(t => todo = todo.copy(title = t))
       reqBody.completed.foreach(c => todo = todo.copy(completed = c))

@@ -46,8 +46,6 @@ class FormApiSuite extends munit.FunSuite {
     )
   }
 
-  // TODO extract into a sharaf-test module
-  // which users would add to their test-classpath
   val serverFixture = new Fixture[Undertow]("JsonApiServer") {
     private var underlyingServer: Undertow = _
     def apply() = underlyingServer

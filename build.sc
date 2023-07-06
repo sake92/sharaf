@@ -14,7 +14,6 @@ object sharaf extends SharafPublishModule {
     ivy"ba.sake::hepek-components:0.11.1"
   )
 
-  // TODO depend on artifacts when published
   def moduleDeps = Seq(querson, formson)
 
   object test extends ScalaTests with SharafTestModule
@@ -24,7 +23,6 @@ object querson extends SharafPublishModule {
 
   def artifactName = "querson"
 
-  // TODO depend on artifacts when published
   def moduleDeps = Seq(validson)
 
   def ivyDeps = Agg(
@@ -38,7 +36,6 @@ object formson extends SharafPublishModule {
 
   def artifactName = "formson"
 
-  // TODO depend on artifacts when published
   def moduleDeps = Seq(validson)
 
   object test extends ScalaTests with SharafTestModule

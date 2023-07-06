@@ -8,13 +8,13 @@ import ba.sake.sharaf.*
 import ba.sake.sharaf.routing.*
 import ba.sake.sharaf.handlers.*
 import ba.sake.querson.*
+import ba.sake.validson.*
 
 @main def main: Unit = {
 
   val server = JsonApiServer(8181).server
   server.start()
 
-  // TODO add a wrapper for this stuff ?
   val serverInfo = server.getListenerInfo().get(0)
   val url = s"${serverInfo.getProtcol}:/${serverInfo.getAddress}"
   println(s"Started JsonApiServer at $url")
@@ -30,12 +30,12 @@ class JsonApiServer(port: Int) {
       Response.withBodyOpt(customerOpt, s"Customer with id=$id")
 
     case GET() -> Path("customers") =>
-      val query = Request.current.queryParams[UserQuery]
+      val query = Request.current.queryParams[UserQuery].validateOrThrow
       val customers = if query.name.isEmpty then db else db.filter(c => query.name.contains(c.name))
       Response.withBody(customers)
 
     case POST() -> Path("customers") =>
-      val req = Request.current.bodyJson[CreateCustomerReq]
+      val req = Request.current.bodyJson[CreateCustomerReq].validateOrThrow
       val res = CustomerRes(UUID.randomUUID(), req.name, AddressRes(req.address.street))
       db = db.appended(res)
       Response.withBody(res)
