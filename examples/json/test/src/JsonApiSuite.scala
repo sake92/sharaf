@@ -26,7 +26,7 @@ class JsonApiSuite extends munit.FunSuite {
 
     // create a few customers
     val firstCustomer = locally {
-      val reqBody = CreateCustomerReq.create("Meho", CreateAddressReq("nizbrdo"))
+      val reqBody = CreateCustomerReq.of("Meho", CreateAddressReq("nizbrdo"))
       val res =
         requests.post(s"$baseUrl/customers", data = reqBody.toJson, headers = Map("Content-Type" -> "application/json"))
       assertEquals(res.statusCode, 200)
@@ -41,7 +41,7 @@ class JsonApiSuite extends munit.FunSuite {
     // add second one
     requests.post(
       s"$baseUrl/customers",
-      data = CreateCustomerReq.create("Hamo", CreateAddressReq("tamo")).toJson,
+      data = CreateCustomerReq.of("Hamo", CreateAddressReq("tamo")).toJson,
       headers = Map("Content-Type" -> "application/json")
     )
 

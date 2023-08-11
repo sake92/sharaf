@@ -7,7 +7,7 @@ case class CreateCustomerReq private (name: String, address: CreateAddressReq) d
 
 object CreateCustomerReq:
   // smart constructor, hard to get invalid object constructed
-  def create(name: String, address: CreateAddressReq): CreateCustomerReq =
+  def of(name: String, address: CreateAddressReq): CreateCustomerReq =
     val res = new CreateCustomerReq(name, address)
     res.validateOrThrow
 
