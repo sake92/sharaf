@@ -86,7 +86,6 @@ object FormDataRW {
       case Sequence(Seq(Simple(FormValue.ByteArray(value)), _*)) => value
       case Sequence(Seq())                                       => parseError(path, "is missing")
       case other =>
-        println(other)
         parseError(path, s"has invalid type: ${other.tpe}")
   }
 

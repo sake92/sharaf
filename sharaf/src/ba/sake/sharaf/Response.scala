@@ -1,9 +1,8 @@
 package ba.sake.sharaf
 
-import java.nio.file.Files
-
 import scala.jdk.CollectionConverters.*
 
+import io.undertow.io.IoCallback
 import io.undertow.server.HttpServerExchange
 import io.undertow.util.Headers
 import io.undertow.util.HttpString
@@ -76,7 +75,7 @@ object ResponseWritable {
   given ResponseWritable[Resource] = new {
     override def write(value: Resource, exchange: HttpServerExchange): Unit = value match
       case res: Resource.ClasspathResource =>
-        Files.copy(res.underlying.getFilePath, exchange.getOutputStream)
+        res.underlying.serve(exchange.getResponseSender(), exchange, IoCallback.END_EXCHANGE)
 
     override def headers(value: Resource): Seq[(String, Seq[String])] = value match
       case res: Resource.ClasspathResource => {
