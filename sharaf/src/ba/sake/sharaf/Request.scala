@@ -30,7 +30,7 @@ final class Request(
   private val formBodyParserFactory = locally {
     val parserFactoryBuilder = FormParserFactory.builder
     parserFactoryBuilder.setDefaultCharset("utf-8")
-     parserFactoryBuilder.build
+    parserFactoryBuilder.build
   }
   lazy val bodyString: String =
     new String(ex.getInputStream.readAllBytes(), StandardCharsets.UTF_8)

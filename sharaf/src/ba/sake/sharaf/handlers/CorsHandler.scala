@@ -72,7 +72,7 @@ object CorsHandler {
 // https://developer.mozilla.org/en-US/docs/Glossary/CORS-safelisted_request_header
 case class CorsSettings(
     pathPrefixes: Set[String] = Set("/"),
-    allowedOrigins: Set[String] = Set("*"),
+    allowedOrigins: Set[String] = Set.empty,
     allowedHttpMethods: Set[HttpString] =
       Set(Methods.GET, Methods.HEAD, Methods.OPTIONS, Methods.POST, Methods.PUT, Methods.PATCH, Methods.DELETE),
     allowedHttpHeaders: Set[HttpString] =

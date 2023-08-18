@@ -29,7 +29,7 @@ class FormApiServer(port: Int) {
 
   val server = Undertow
     .builder()
-    .addHttpListener(port, "localhost")
-    .setHandler(RoutesHandler(routes))
+    .addHttpListener(port, "0.0.0.0")
+    .setHandler(ErrorHandler(RoutesHandler(routes)))
     .build()
 }

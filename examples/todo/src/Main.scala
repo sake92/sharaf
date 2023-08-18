@@ -48,13 +48,16 @@ import ba.sake.validson.*
 
   }
 
-  val handler = RoutesHandler(routes)
-
   val server = Undertow
     .builder()
-    .addHttpListener(8181, "localhost")
+    .addHttpListener(8181, "0.0.0.0")
     .setHandler(
-      CorsHandler(handler, CorsSettings(allowedOrigins = Set("https://todobackend.com")))
+      ErrorHandler(
+        CorsHandler(
+          RoutesHandler(routes),
+          CorsSettings(allowedOrigins = Set("https://todobackend.com"))
+        )
+      )
     )
     .build()
   server.start()

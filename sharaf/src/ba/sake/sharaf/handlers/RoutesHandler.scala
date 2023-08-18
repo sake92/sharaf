@@ -1,13 +1,11 @@
 package ba.sake.sharaf.handlers
 
-import scala.util.control.NonFatal
-
 import io.undertow.server.HttpHandler
 import io.undertow.server.HttpServerExchange
 
 import ba.sake.sharaf.*
 
-final class RoutesHandler private (routes: Routes, errorMapper: ErrorMapper) extends HttpHandler {
+final class RoutesHandler private (routes: Routes) extends HttpHandler {
 
   override def handleRequest(exchange: HttpServerExchange): Unit = {
     exchange.startBlocking()
@@ -20,28 +18,13 @@ final class RoutesHandler private (routes: Routes, errorMapper: ErrorMapper) ext
 
       val reqParams = fillReqParams(exchange)
 
-      try {
+      val resOpt = routes.lift(reqParams)
 
-        val resOpt = routes.lift(reqParams)
-
-        // if no match, a 500 will be returned by Undertow
-        resOpt match {
-          case Some(res) => ResponseWritable.writeResponse(res, exchange)
-          case None      => throw NotFoundException("")
-        }
-      } catch {
-        case NonFatal(e) if exchange.isResponseChannelAvailable =>
-          val responseOpt = errorMapper.lift(e)
-          responseOpt match {
-            case Some(response) =>
-              ResponseWritable.writeResponse(response, exchange)
-            case None =>
-              // if no error response match, just propagate.
-              // will return 500
-              throw e
-          }
+      // if no match, a 500 will be returned by Undertow
+      resOpt match {
+        case Some(res) => ResponseWritable.writeResponse(res, exchange)
+        case None      => throw NotFoundException("")
       }
-
     }
   }
 
@@ -58,6 +41,6 @@ final class RoutesHandler private (routes: Routes, errorMapper: ErrorMapper) ext
 }
 
 object RoutesHandler {
-  def apply(routes: Routes, errorMapper: ErrorMapper = ErrorMapper.default): RoutesHandler =
-    new RoutesHandler(routes, errorMapper)
+  def apply(routes: Routes): RoutesHandler =
+    new RoutesHandler(routes)
 }

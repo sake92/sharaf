@@ -44,7 +44,7 @@ class JsonApiServer(port: Int) {
   val server = Undertow
     .builder()
     .addHttpListener(port, "localhost")
-    .setHandler(RoutesHandler(routes, ErrorMapper.json))
+    .setHandler(ErrorHandler(RoutesHandler(routes), ErrorMapper.json))
     .build()
 }
 
