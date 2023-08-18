@@ -18,8 +18,8 @@
 git diff
 git commit -am "msg"
 
-$VERSION="0.0.3"
-git tag -a $VERSION -m "Fix resource serving"
+$VERSION="0.0.4"
+git tag -a $VERSION -m "Improve error handling"
 git push origin $VERSION
 ```
 

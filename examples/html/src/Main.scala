@@ -19,7 +19,7 @@ import scalatags.Text.all._
 
   val server = Undertow
     .builder()
-    .addHttpListener(8181, "0.0.0.0")
+    .addHttpListener(8181, "localhost")
     .setHandler(ErrorHandler(RoutesHandler(routes)))
     .build()
 
