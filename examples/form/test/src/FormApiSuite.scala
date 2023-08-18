@@ -20,7 +20,7 @@ class FormApiSuite extends munit.FunSuite {
       Resource.fromClassPath("example.txt").get.asInstanceOf[Resource.ClasspathResource].underlying.getFile.toPath
 
     val reqBody =
-      CreateCustomerForm("Meho", exampleFile, CreateAddressForm("street123"), List("hobby1", "hobby2"))
+      CreateCustomerForm("Meho", exampleFile, CreateAddressForm("street123ž"), List("hobby1", "hobby2"))
     val res = requests.post(
       s"$baseUrl/form",
       data = formData2RequestsMultipart(reqBody.toFormDataMap())
@@ -29,6 +29,8 @@ class FormApiSuite extends munit.FunSuite {
     assertEquals(res.statusCode, 200)
     assertEquals(res.headers("content-type"), Seq("application/json")) // it returns JSON content..
     val resBody = res.text.parseJson[CreateCustomerResponse]
+    // this tests utf-8 encoding too :)
+    assertEquals(resBody.street, "street123ž")
     assertEquals(resBody.fileContents, "This is a text file :)")
   }
 

@@ -24,7 +24,7 @@ class FormApiServer(port: Int) {
   private val routes: Routes = { case POST() -> Path("form") =>
     val req = Request.current.bodyForm[CreateCustomerForm].validateOrThrow
     val fileAsString = Files.readString(req.file)
-    Response.withBody(CreateCustomerResponse(fileAsString))
+    Response.withBody(CreateCustomerResponse(req.address.street, fileAsString))
   }
 
   val server = Undertow

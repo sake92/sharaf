@@ -33,6 +33,9 @@ object Response {
     case Some(value) => withBody(value)
     case None        => throw NotFoundException(name)
 
+  def redirect(location: String): Response[String] =
+    withBody("").withStatus(301).withHeader("Location", location)
+
 }
 
 trait ResponseWritable[T] {

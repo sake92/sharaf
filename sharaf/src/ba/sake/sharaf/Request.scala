@@ -27,6 +27,11 @@ final class Request(
     queryParamsMap.parseQueryStringMap
 
   /* BODY */
+  private val formBodyParserFactory = locally {
+    val parserFactoryBuilder = FormParserFactory.builder
+    parserFactoryBuilder.setDefaultCharset("utf-8")
+     parserFactoryBuilder.build
+  }
   lazy val bodyString: String =
     new String(ex.getInputStream.readAllBytes(), StandardCharsets.UTF_8)
 
@@ -35,7 +40,8 @@ final class Request(
 
   def bodyForm[T <: Product](using rw: FormDataRW[T]): T = {
     // returns null if content-type is not suitable
-    Option(FormParserFactory.builder.build.createParser(ex)) match
+    val parser = formBodyParserFactory.createParser(ex)
+    Option(parser) match
       case None => throw new SharafException("The specified content type is not supported")
       case Some(parser) =>
         val uFormData = parser.parseBlocking()
@@ -59,6 +65,7 @@ object Request {
   private[sharaf] def create(ex: HttpServerExchange): Request =
     Request(ex)
 
+  // TODO move to utils somewhere
   private[sharaf] def undertowFormData2Formson(uFormData: UFormData): FormData = {
     val map = scala.collection.mutable.Map.empty[String, Seq[FormValue]]
     uFormData.forEach { key =>
