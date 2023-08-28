@@ -24,4 +24,3 @@ Why name "sharaf"?
 
 Šaraf means a "screw" in Bosnian, which reminds me of scala spiral logo.
 
-fsdfsf
