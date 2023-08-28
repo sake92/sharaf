@@ -5,9 +5,13 @@ on:
     branches:
     - main
     tags: ["*"]
+  workflow_run:
+    workflows: ["CI"]
+    types:
+      - completed
 jobs:
   publish:
-    if: github.repository == 'sake92/sharaf'
+    if: github.repository == 'sake92/sharaf' && github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
