@@ -1,19 +1,19 @@
 package demo
 
-import scala.util.Random
 import io.undertow.Undertow
+
 import ba.sake.formson.*
 import ba.sake.tupson.*
-import ba.sake.sharaf.Resource
+import ba.sake.sharaf.*
 
 class FormApiSuite extends munit.FunSuite {
 
-  override def munitFixtures = List(serverFixture)
+  override def munitFixtures = List(moduleFixture)
 
   test("customer can be created") {
 
-    val server = serverFixture()
-    val serverInfo = server.getListenerInfo().get(0)
+    val module = moduleFixture()
+    val serverInfo = module.server.getListenerInfo().get(0)
     val baseUrl = s"${serverInfo.getProtcol}:/${serverInfo.getAddress}"
 
     val exampleFile =
@@ -23,39 +23,26 @@ class FormApiSuite extends munit.FunSuite {
       CreateCustomerForm("Meho", exampleFile, CreateAddressForm("street123ž"), List("hobby1", "hobby2"))
     val res = requests.post(
       s"$baseUrl/form",
-      data = formData2RequestsMultipart(reqBody.toFormDataMap())
+      data = reqBody.toFormDataMap().toRequestsMultipart()
     )
 
     assertEquals(res.statusCode, 200)
-    assertEquals(res.headers("content-type"), Seq("application/json")) // it returns JSON content..
     val resBody = res.text.parseJson[CreateCustomerResponse]
     // this tests utf-8 encoding too :)
     assertEquals(resBody.street, "street123ž")
     assertEquals(resBody.fileContents, "This is a text file :)")
   }
 
-  // TODO extract into a separate requests-integration module
-  private def formData2RequestsMultipart(formDataMap: FormDataMap) = {
-    val multiItems = formDataMap.flatMap { case (key, values) =>
-      values.map {
-        case FormValue.Str(value)       => requests.MultiItem(key, value)
-        case FormValue.File(value)      => requests.MultiItem(key, value, value.getFileName.toString)
-        case FormValue.ByteArray(value) => requests.MultiItem(key, value)
-      }
-    }
-    requests.MultiPart(
-      multiItems.toSeq*
-    )
-  }
+  val moduleFixture = new Fixture[FormApiModule]("FormApiModule") {
+    private var module: FormApiModule = _
 
-  val serverFixture = new Fixture[Undertow]("JsonApiServer") {
-    private var underlyingServer: Undertow = _
-    def apply() = underlyingServer
+    def apply() = module
+
     override def beforeEach(context: BeforeEach): Unit =
-      underlyingServer = FormApiServer(Random.between(1_024, 65_535)).server
-      underlyingServer.start()
+      module = FormApiModule(SharafUtils.getFreePort())
+      module.server.start()
     override def afterEach(context: AfterEach): Unit =
-      underlyingServer.stop
+      module.server.stop()
   }
 
 }

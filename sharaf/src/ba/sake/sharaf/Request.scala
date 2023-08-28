@@ -2,13 +2,15 @@ package ba.sake.sharaf
 
 import java.nio.charset.StandardCharsets
 import scala.jdk.CollectionConverters.*
-import ba.sake.tupson.*
-import ba.sake.formson.*
-import ba.sake.querson.*
+
 import io.undertow.server.HttpServerExchange
 import io.undertow.server.handlers.form.FormData as UFormData
 import io.undertow.server.handlers.form.FormParserFactory
 import io.undertow.util.HttpString
+
+import ba.sake.tupson.*
+import ba.sake.formson.*
+import ba.sake.querson.*
 
 final class Request(
     private val ex: HttpServerExchange
@@ -32,13 +34,14 @@ final class Request(
     parserFactoryBuilder.setDefaultCharset("utf-8")
     parserFactoryBuilder.build
   }
+
   lazy val bodyString: String =
     new String(ex.getInputStream.readAllBytes(), StandardCharsets.UTF_8)
 
   def bodyJson[T](using rw: JsonRW[T]): T =
     bodyString.parseJson[T]
 
-  def bodyForm[T <: Product](using rw: FormDataRW[T]): T = {
+  def bodyForm[T <: Product](using rw: FormDataRW[T]): T =
     // returns null if content-type is not suitable
     val parser = formBodyParserFactory.createParser(ex)
     Option(parser) match
@@ -47,15 +50,13 @@ final class Request(
         val uFormData = parser.parseBlocking()
         val formData = Request.undertowFormData2Formson(uFormData)
         rw.parse("", formData)
-  }
 
   /* HEADERS */
-  def headers: Map[HttpString, Seq[String]] = {
+  def headers: Map[HttpString, Seq[String]] =
     val hMap = ex.getRequestHeaders
     hMap.getHeaderNames.asScala.map { name =>
       name -> hMap.get(name).asScala.toSeq
     }.toMap
-  }
 
 }
 

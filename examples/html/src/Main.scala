@@ -10,11 +10,12 @@ import scalatags.Text.all._
 @main def main: Unit = {
 
   val routes: Routes = {
-    case GET() -> Path("html") =>
-      Response.withBody(MyPage)
-    case GET() -> Path("scala.png") =>
-      val resource = Resource.fromClassPath("static/scala.png")
+    case GET() -> Path("images", imageName) =>
+      val resource = Resource.fromClassPath(s"static/images/$imageName")
       Response.withBodyOpt(resource, "NotFound")
+
+    case GET() -> Path() =>
+      Response.withBody(MyPage)
   }
 
   val server = Undertow
@@ -33,7 +34,7 @@ import scalatags.Text.all._
 
 val MyPage = new HtmlPage {
   override def bodyContent: Frag = div(
-    "oppppppp",
-    img(src := "scala.png")
+    "Hello sharaf!",
+    img(src := "images/scala.png")
   )
 }

@@ -3,24 +3,23 @@ package demo
 import java.util.UUID
 import io.undertow.Undertow
 
-import ba.sake.tupson.*
 import ba.sake.sharaf.*
 import ba.sake.sharaf.routing.*
 import ba.sake.sharaf.handlers.*
-import ba.sake.querson.*
+import ba.sake.tupson.*
 import ba.sake.validson.*
 
 @main def main: Unit = {
 
-  val server = JsonApiServer(8181).server
+  val server = JsonApiModule(8181).server
   server.start()
 
   val serverInfo = server.getListenerInfo().get(0)
   val url = s"${serverInfo.getProtcol}:/${serverInfo.getAddress}"
-  println(s"Started JsonApiServer at $url")
+  println(s"Started HTTP server at $url")
 }
 
-class JsonApiServer(port: Int) {
+class JsonApiModule(port: Int) {
 
   private var db = Seq.empty[CustomerRes]
 
@@ -47,5 +46,3 @@ class JsonApiServer(port: Int) {
     .setHandler(ErrorHandler(RoutesHandler(routes), ErrorMapper.json))
     .build()
 }
-
-case class UserQuery(name: Set[String]) derives QueryStringRW

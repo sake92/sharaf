@@ -11,7 +11,8 @@ object sharaf extends SharafPublishModule {
   def ivyDeps = Agg(
     ivy"io.undertow:undertow-core:2.3.7.Final",
     ivy"ba.sake::tupson:0.7.0",
-    ivy"ba.sake::hepek-components:0.13.0"
+    ivy"ba.sake::hepek-components:0.13.0",
+    ivy"com.lihaoyi::requests:0.8.0"
   )
 
   def moduleDeps = Seq(querson, formson)
@@ -24,6 +25,8 @@ object querson extends SharafPublishModule {
   def artifactName = "querson"
 
   def moduleDeps = Seq(validson)
+
+  def pomSettings = super.pomSettings().copy(description = "Simple query params library")
 
   def ivyDeps = Agg(
     ivy"com.lihaoyi::fastparse:3.0.1"
@@ -38,11 +41,12 @@ object formson extends SharafPublishModule {
 
   def moduleDeps = Seq(validson)
 
+def pomSettings = super.pomSettings().copy(description = "Simple form binding library")
+
   object test extends ScalaTests with SharafTestModule
 
   def ivyDeps = Agg(
-    ivy"com.lihaoyi::fastparse:3.0.1",
-    ivy"com.lihaoyi::requests:0.8.0" // TODO move to a separate module
+    ivy"com.lihaoyi::fastparse:3.0.1"
   )
 }
 
@@ -53,6 +57,8 @@ object validson extends SharafPublishModule {
   def ivyDeps = Agg(
     ivy"com.lihaoyi::sourcecode::0.3.0"
   )
+
+  def pomSettings = super.pomSettings().copy(description = "Simple validation library")
 
   object test extends ScalaTests with SharafTestModule
 }
@@ -102,6 +108,14 @@ object examples extends mill.Module {
   }
   object todo extends SharafCommonModule {
     def moduleDeps = Seq(sharaf)
+    object test extends ScalaTests with SharafTestModule
+  }
+  object oauth2 extends SharafCommonModule {
+    def moduleDeps = Seq(sharaf)
+    def ivyDeps = Agg(
+      ivy"org.pac4j:undertow-pac4j:5.0.1",
+      ivy"org.pac4j:pac4j-oauth:5.7.0",
+    )
     object test extends ScalaTests with SharafTestModule
   }
 }

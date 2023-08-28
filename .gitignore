@@ -3,6 +3,8 @@ target/
 *.class
 *.log
 
+.idea/
+
 .bloop/
 .metals/
 .bsp/
