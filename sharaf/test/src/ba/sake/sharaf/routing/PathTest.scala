@@ -7,8 +7,6 @@ import java.util.UUID
 class PathTest extends munit.FunSuite {
 
   test("path matching") {
-    if true then
-      throw RuntimeException("test")
     val uuidValue = UUID.randomUUID
     val paths = Seq(
       Path("users", "1"),
