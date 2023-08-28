@@ -24,7 +24,7 @@ jobs:
   
   publish:
     needs: test
-    if: ((branch = main AND type = push) OR (tag IS present)) AND NOT fork
+    if: github.repository == 'sake92/sharaf' && (github.ref == 'refs/heads/main' || github.ref_type == 'tag')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
