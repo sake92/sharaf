@@ -26,7 +26,7 @@ git push origin $VERSION
 # TODOs
 
 - cookies ?
-
+- adapt query params to requests lib
 - add Docker / Watchtower example
 
 

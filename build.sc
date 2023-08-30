@@ -118,7 +118,7 @@ object examples extends mill.Module {
       ivy"org.pac4j:pac4j-oauth:5.7.0"
     )
     object test extends ScalaTests with SharafTestModule {
-      def ivyDeps = Agg(
+      def ivyDeps = super.ivyDeps() ++ Agg(
         ivy"no.nav.security:mock-oauth2-server:0.5.10"
       )
     }
