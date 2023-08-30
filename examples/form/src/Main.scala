@@ -11,7 +11,7 @@ import ba.sake.validson.*
 
 @main def main: Unit = {
 
-  val server = FormApiServer(8181).server
+  val server = FormApiModule(8181).server
   server.start()
 
   val serverInfo = server.getListenerInfo().get(0)
@@ -20,7 +20,7 @@ import ba.sake.validson.*
 
 }
 
-class FormApiServer(port: Int) {
+class FormApiModule(port: Int) {
   private val routes: Routes = { case POST() -> Path("form") =>
     val req = Request.current.bodyForm[CreateCustomerForm].validateOrThrow
     val fileAsString = Files.readString(req.file)

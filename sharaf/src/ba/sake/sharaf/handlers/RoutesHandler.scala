@@ -14,16 +14,18 @@ final class RoutesHandler private (routes: Routes) extends HttpHandler {
     } else {
 
       val request = Request.create(exchange)
+
       given Request = request
 
       val reqParams = fillReqParams(exchange)
 
       val resOpt = routes.lift(reqParams)
 
-      // if no match, a 500 will be returned by Undertow
       resOpt match {
         case Some(res) => ResponseWritable.writeResponse(res, exchange)
-        case None      => throw NotFoundException("")
+        case None      =>
+          // will be catched by ErrorMapper
+          throw NotFoundException("route not found")
       }
     }
   }
@@ -33,7 +35,11 @@ final class RoutesHandler private (routes: Routes) extends HttpHandler {
       if exchange.getRelativePath.startsWith("/") then exchange.getRelativePath.drop(1)
       else exchange.getRelativePath
     val pathSegments = relPath.split("/")
-    val path = Path(pathSegments*)
+
+    val path =
+      if pathSegments.size == 1 && pathSegments.head == ""
+      then Path()
+      else Path(pathSegments*)
 
     (exchange.getRequestMethod, path)
   }

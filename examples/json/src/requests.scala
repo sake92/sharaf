@@ -2,6 +2,7 @@ package demo
 
 import ba.sake.tupson.JsonRW
 import ba.sake.validson.*
+import ba.sake.querson.QueryStringRW
 
 case class CreateCustomerReq private (name: String, address: CreateAddressReq) derives JsonRW
 
@@ -23,3 +24,5 @@ object CreateAddressReq:
     .derived[CreateAddressReq]
     .and(_.street, !_.isBlank, "must not be blank")
     .and(_.street, _.length >= 3, "must be >= 3")
+
+case class UserQuery(name: Set[String]) derives QueryStringRW

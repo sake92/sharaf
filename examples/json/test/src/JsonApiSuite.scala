@@ -1,19 +1,18 @@
 package demo
 
-import ba.sake.querson.*
-import ba.sake.tupson.*
-import scala.util.Random
-import io.undertow.Undertow
 import ba.sake.sharaf.handlers.ProblemDetails
 import ba.sake.sharaf.handlers.ArgumentProblem
+import ba.sake.sharaf.SharafUtils
+import ba.sake.querson.*
+import ba.sake.tupson.*
 
 class JsonApiSuite extends munit.FunSuite {
 
-  override def munitFixtures = List(serverFixture)
+  override def munitFixtures = List(moduleFixture)
 
   test("customers can be created and fetched") {
-    val server = serverFixture()
-    val serverInfo = server.getListenerInfo().get(0)
+    val module = moduleFixture()
+    val serverInfo = module.server.getListenerInfo().get(0)
     val baseUrl = s"${serverInfo.getProtcol}:/${serverInfo.getAddress}"
 
     // first GET -> empty
@@ -80,8 +79,8 @@ class JsonApiSuite extends munit.FunSuite {
   }
 
   test("400 BadRequest when body not valid") {
-    val server = serverFixture()
-    val serverInfo = server.getListenerInfo().get(0)
+    val module = moduleFixture()
+    val serverInfo = module.server.getListenerInfo().get(0)
     val baseUrl = s"${serverInfo.getProtcol}:/${serverInfo.getAddress}"
 
     // blank name not allowed
@@ -118,14 +117,17 @@ class JsonApiSuite extends munit.FunSuite {
 
   }
 
-  val serverFixture = new Fixture[Undertow]("JsonApiServer") {
-    private var underlyingServer: Undertow = _
-    def apply() = underlyingServer
+  val moduleFixture = new Fixture[JsonApiModule]("JsonApiModule") {
+    private var module: JsonApiModule = _
+
+    def apply() = module
+
     override def beforeEach(context: BeforeEach): Unit =
-      underlyingServer = JsonApiServer(Random.between(1_024, 65_535)).server
-      underlyingServer.start()
+      module = JsonApiModule(SharafUtils.getFreePort())
+      module.server.start()
+
     override def afterEach(context: AfterEach): Unit =
-      underlyingServer.stop
+      module.server.stop()
   }
 
 }
