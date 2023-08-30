@@ -8,7 +8,8 @@ import org.pac4j.oauth.client.Google2Client
 
   // configure your OAuth2 clients
   // from pac4j's huge list https://www.pac4j.org/docs/clients/oauth.html
-  val githubClient = new GitHubClient("fa86622667cd00a837dc", "6b8026295971dd8b208f6d77babac72ffde395b4")
+  // TODO fill your values here
+  val githubClient = new GitHubClient("KEY", "SECRET")
   githubClient.setScope("read:user, user:email")
   //val facebookClient = new FacebookClient(...)
 
