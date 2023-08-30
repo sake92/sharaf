@@ -41,7 +41,7 @@ object formson extends SharafPublishModule {
 
   def moduleDeps = Seq(validson)
 
-def pomSettings = super.pomSettings().copy(description = "Simple form binding library")
+  def pomSettings = super.pomSettings().copy(description = "Simple form binding library")
 
   object test extends ScalaTests with SharafTestModule
 
@@ -113,9 +113,14 @@ object examples extends mill.Module {
   object oauth2 extends SharafCommonModule {
     def moduleDeps = Seq(sharaf)
     def ivyDeps = Agg(
+      ivy"ch.qos.logback:logback-classic:1.4.6",
       ivy"org.pac4j:undertow-pac4j:5.0.1",
-      ivy"org.pac4j:pac4j-oauth:5.7.0",
+      ivy"org.pac4j:pac4j-oauth:5.7.0"
     )
-    object test extends ScalaTests with SharafTestModule
+    object test extends ScalaTests with SharafTestModule {
+      def ivyDeps = Agg(
+        ivy"no.nav.security:mock-oauth2-server:0.5.10"
+      )
+    }
   }
 }
