@@ -21,7 +21,6 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: ${{ matrix.java }}
-      - run: java HelloWorldApp.java
       - run: ./mill __.test
   
   publish:
