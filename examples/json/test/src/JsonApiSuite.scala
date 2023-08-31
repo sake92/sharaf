@@ -12,8 +12,7 @@ class JsonApiSuite extends munit.FunSuite {
 
   test("customers can be created and fetched") {
     val module = moduleFixture()
-    val serverInfo = module.server.getListenerInfo().get(0)
-    val baseUrl = s"${serverInfo.getProtcol}:/${serverInfo.getAddress}"
+    val baseUrl = module.baseUrl
 
     // first GET -> empty
     locally {
@@ -80,8 +79,7 @@ class JsonApiSuite extends munit.FunSuite {
 
   test("400 BadRequest when body not valid") {
     val module = moduleFixture()
-    val serverInfo = module.server.getListenerInfo().get(0)
-    val baseUrl = s"${serverInfo.getProtcol}:/${serverInfo.getAddress}"
+    val baseUrl = module.baseUrl
 
     // blank name not allowed
     val reqBody = """{

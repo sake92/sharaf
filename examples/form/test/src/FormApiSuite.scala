@@ -8,11 +8,9 @@ class FormApiSuite extends munit.FunSuite {
 
   override def munitFixtures = List(moduleFixture)
 
-  test("customer can be created") {
+  test("Customer can be created") {
 
     val module = moduleFixture()
-    val serverInfo = module.server.getListenerInfo().get(0)
-    val baseUrl = s"${serverInfo.getProtcol}:/${serverInfo.getAddress}"
 
     val exampleFile =
       Resource.fromClassPath("example.txt").get.asInstanceOf[Resource.ClasspathResource].underlying.getFile.toPath
@@ -20,7 +18,7 @@ class FormApiSuite extends munit.FunSuite {
     val reqBody =
       CreateCustomerForm("Meho", exampleFile, CreateAddressForm("street123ž"), List("hobby1", "hobby2"))
     val res = requests.post(
-      s"$baseUrl/form",
+      s"${module.baseUrl}/form",
       data = reqBody.toFormDataMap().toRequestsMultipart()
     )
 

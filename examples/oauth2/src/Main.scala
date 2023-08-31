@@ -17,10 +17,8 @@ import org.pac4j.oauth.client.*
 
   val clients = new Clients(s"http://localhost:8181/callback", githubClient)
 
-  val server = AppModule(8181, clients).server
-  server.start()
+  val module = AppModule(8181, clients)
+  module.server.start()
 
-  val serverInfo = server.getListenerInfo().get(0)
-  val url = s"${serverInfo.getProtcol}:/${serverInfo.getAddress}"
-  println(s"Started HTTP server at $url")
+  println(s"Started HTTP server at ${module.baseUrl}")
 }

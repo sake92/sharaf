@@ -11,15 +11,15 @@ import ba.sake.validson.*
 
 @main def main: Unit = {
 
-  val server = JsonApiModule(8181).server
-  server.start()
+  val module = JsonApiModule(8181)
+  module.server.start()
 
-  val serverInfo = server.getListenerInfo().get(0)
-  val url = s"${serverInfo.getProtcol}:/${serverInfo.getAddress}"
-  println(s"Started HTTP server at $url")
+  println(s"Started HTTP server at ${module.baseUrl}")
 }
 
 class JsonApiModule(port: Int) {
+
+  val baseUrl = s"http://localhost:${port}"
 
   private var db = Seq.empty[CustomerRes]
 

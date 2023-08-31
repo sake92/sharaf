@@ -16,6 +16,8 @@ import org.pac4j.undertow.handler.SecurityHandler
 
 class AppModule(port: Int, clients: Clients) {
 
+  val baseUrl = s"http://localhost:${port}"
+
   private val securityConfig = SecurityConfig(clients)
   private val securityService = new SecurityService(securityConfig.pac4jConfig)
   private val appRoutes = new AppRoutes(securityService)

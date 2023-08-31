@@ -71,13 +71,8 @@ trait IntegrationTest extends munit.FunSuite {
 
       // assign fixture
       module = AppModule(port, clients)
-
       module.server.start()
-
-      val serverInfo = module.server.getListenerInfo().get(0)
-      baseUrl = s"${serverInfo.getProtcol}:/${serverInfo.getAddress}"
-
-      println(s"BASE = $baseUrl")
+      baseUrl = s"http://localhost:${port}"
 
     override def afterEach(context: AfterEach): Unit =
       module.server.stop()

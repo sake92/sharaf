@@ -48,9 +48,11 @@ import ba.sake.validson.*
 
   }
 
+  val port = 8181
+
   val server = Undertow
     .builder()
-    .addHttpListener(8181, "localhost")
+    .addHttpListener(port, "localhost")
     .setHandler(
       ErrorHandler(
         CorsHandler(
@@ -60,12 +62,10 @@ import ba.sake.validson.*
       )
     )
     .build()
+
   server.start()
 
-  val serverInfo = server.getListenerInfo().get(0)
-  val url = s"${serverInfo.getProtcol}:/${serverInfo.getAddress}"
-  println(s"Started HTTP server at $url")
-
+  println(s"Started HTTP server at http://localhost:${port}")
 }
 
 case class CreateTodo(title: String, order: Option[Int]) derives JsonRW

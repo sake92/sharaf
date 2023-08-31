@@ -18,18 +18,17 @@ import scalatags.Text.all._
       Response.withBody(MyPage)
   }
 
+  val port = 8181
+
   val server = Undertow
     .builder()
-    .addHttpListener(8181, "localhost")
+    .addHttpListener(port, "localhost")
     .setHandler(ErrorHandler(RoutesHandler(routes)))
     .build()
 
   server.start()
 
-  val serverInfo = server.getListenerInfo().get(0)
-  val url = s"${serverInfo.getProtcol}:/${serverInfo.getAddress}"
-  println(s"Started HTTP server at $url")
-
+  println(s"Started HTTP server at http://localhost:${port}")
 }
 
 val MyPage = new HtmlPage {
