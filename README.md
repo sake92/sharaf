@@ -28,7 +28,7 @@ Simplicity and ease of use is the main focus of sharaf.
 
 It is built on top of [undertow](https://undertow.io/).  
 This means you can use awesome libraries built for undertow, like [pac4j](https://github.com/pac4j/undertow-pac4j) for security and similar.  
-Also, you can use undertow's lower level API, to use WebSockets for example.
+Also, you can leverage undertow's lower level API, e.g. for WebSockets.
 
 Sharaf bundles a set of libraries:
 - [querson](./querson) for query parameters
