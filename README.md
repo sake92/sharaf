@@ -20,7 +20,7 @@ def scalacOptions = Seq(
 - handling [json](examples/json)
 - handling [form data](examples/form)
 - rendering [html](examples/html) and serving static files
-- implementation of [todobackend.com](examples/todo) featuring CORS handling
+- [implementation](examples/todo) of todobackend.com spec, featuring CORS handling
 - [OAuth2 login](examples/oauth2) with [Pac4J library](https://www.pac4j.org/)
 
 
