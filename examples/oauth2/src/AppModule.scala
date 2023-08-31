@@ -2,7 +2,6 @@ package demo
 
 import ba.sake.sharaf.*
 import ba.sake.sharaf.handlers.*
-import ba.sake.sharaf.routing.*
 
 import io.undertow.Handlers
 import io.undertow.Undertow
@@ -15,7 +14,7 @@ import org.pac4j.undertow.handler.CallbackHandler
 import org.pac4j.undertow.handler.LogoutHandler
 import org.pac4j.undertow.handler.SecurityHandler
 
-class AppModule(clients: Clients) {
+class AppModule(port: Int, clients: Clients) {
 
   private val securityConfig = SecurityConfig(clients)
   private val securityService = new SecurityService(securityConfig.pac4jConfig)
@@ -52,6 +51,6 @@ class AppModule(clients: Clients) {
 
   val server = Undertow
     .builder()
-    .addHttpListener(8181, "0.0.0.0", httpHandler)
+    .addHttpListener(port, "0.0.0.0", httpHandler)
     .build()
 }
