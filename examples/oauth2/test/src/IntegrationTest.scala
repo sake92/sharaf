@@ -77,6 +77,8 @@ trait IntegrationTest extends munit.FunSuite {
       val serverInfo = module.server.getListenerInfo().get(0)
       baseUrl = s"${serverInfo.getProtcol}:/${serverInfo.getAddress}"
 
+      println(s"BASE = $baseUrl")
+
     override def afterEach(context: AfterEach): Unit =
       module.server.stop()
       mockOauth2server.shutdown()
