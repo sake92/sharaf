@@ -1,7 +1,7 @@
 
 # Sharaf
 
-Simple, intuitive, batteries-included HTTP library.
+Simple, intuitive, batteries-included HTTP server library.
 
 ## Usage
 Mill:
