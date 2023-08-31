@@ -3,6 +3,25 @@
 
 Simple, intuitive, batteries-included HTTP library.
 
+## Usage
+Mill:
+```scala
+def ivyDeps = Agg(
+  ivy"ba.sake::sharaf:0.0.5"
+)
+def scalacOptions = Seq(
+  "-Yretain-trees"
+)
+```
+
+## Examples
+- handling [json](examples/json)
+- handling [form data](examples/form)
+- rendering [html](examples/html) and serving static files
+- implementation of [todobackend.com](examples/todo) featuring CORS handling
+- [OAuth2 login](examples/oauth2) with [Pac4J library](https://www.pac4j.org/)
+
+
 ## Why sharaf?
 
 Simplicity and ease of use is the main focus of sharaf.  
@@ -19,12 +38,6 @@ Sharaf bundles a set of libraries:
 - [hepek-components](https://github.com/sake92/hepek) for HTML (with [scalatags](https://github.com/com-lihaoyi/scalatags))
 - [requests](https://github.com/com-lihaoyi/requests-scala) for firing HTTP requests
 
-## Examples
-- handling [json](examples/json)
-- handling [form data](examples/form)
-- rendering [html](examples/html) and serving static files
-- implementation of [todobackend.com](examples/todo) featuring CORS handling
-- [OAuth2 login](examples/oauth2) with [Pac4J library](https://www.pac4j.org/)
 
 ## Misc
 
