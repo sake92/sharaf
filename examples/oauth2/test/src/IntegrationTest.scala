@@ -25,14 +25,13 @@ trait IntegrationTest extends munit.FunSuite {
 
     session
 
-  protected val moduleFixture = new Fixture[(AppModule, String)]("AppModule") {
+  protected val moduleFixture = new Fixture[AppModule]("AppModule") {
 
     private var mockOauth2server: MockOAuth2Server = _
 
     private var module: AppModule = _
-    private var baseUrl: String = "TODO"
 
-    def apply() = (module, baseUrl)
+    def apply() = module
 
     override def beforeEach(context: BeforeEach): Unit =
 
@@ -72,7 +71,6 @@ trait IntegrationTest extends munit.FunSuite {
       // assign fixture
       module = AppModule(port, clients)
       module.server.start()
-      baseUrl = s"http://localhost:${port}"
 
     override def afterEach(context: AfterEach): Unit =
       module.server.stop()

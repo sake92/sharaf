@@ -78,7 +78,7 @@ trait SharafPublishModule extends SharafCommonModule with CiReleaseModule {
 }
 
 trait SharafCommonModule extends ScalaModule with ScalafmtModule {
-  def scalaVersion = "3.3.0"
+  def scalaVersion = "3.3.1"
   def scalacOptions = super.scalacOptions() ++ Seq(
     "-Yretain-trees", // needed for default parameters
     "-deprecation",

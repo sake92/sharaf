@@ -8,6 +8,7 @@ trait FromPathParam[T] {
   def extract(str: String): Option[T]
 }
 
+// TODO derive for simple enums
 object FromPathParam {
   given FromPathParam[Int] = new {
     def extract(str: String): Option[Int] = str.toIntOption
@@ -21,6 +22,7 @@ object FromPathParam {
 }
 
 // nice extractors
+// TODO redundant ???
 final class UrlParamBinder[T](using fp: FromPathParam[T]) {
   def unapply(str: String): Option[T] =
     fp.extract(str)

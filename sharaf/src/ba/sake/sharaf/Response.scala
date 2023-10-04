@@ -12,29 +12,41 @@ import ba.sake.hepek.html.HtmlPage
 import ba.sake.tupson.*
 
 case class Response[T] private (
-    body: T,
     status: Int = 200,
-    headers: Map[String, Seq[String]] = Map.empty
+    headers: Map[String, Seq[String]] = Map.empty,
+    body: Option[T] = None
 )(using val rw: ResponseWritable[T]) {
 
-  def withStatus(status: Int) = copy(status = status)
+  def withStatus(status: Int) =
+    copy(status = status)
 
   def withHeader(name: String, values: Seq[String]) =
     copy(headers = headers + (name -> values))
   def withHeader(name: String, value: String) =
     copy(headers = headers + (name -> Seq(value)))
+
+  def withBody[T: ResponseWritable](body: T): Response[T] =
+    copy(body = Some(body))
 }
 
 object Response {
 
+  def withStatus(status: Int) =
+    Response[String](status = status)
+
+  def withHeader(name: String, values: Seq[String]) =
+    Response[String](headers = Map(name -> values))
+  def withHeader(name: String, value: String) =
+    Response[String](headers = Map(name -> Seq(value)))
+
   def withBody[T: ResponseWritable](body: T): Response[T] =
-    Response(body)
+    Response(body = Some(body))
   def withBodyOpt[T: ResponseWritable](body: Option[T], name: String): Response[T] = body match
     case Some(value) => withBody(value)
     case None        => throw NotFoundException(name)
 
   def redirect(location: String): Response[String] =
-    withBody("").withStatus(301).withHeader("Location", location)
+    withStatus(301).withHeader("Location", location)
 
 }
 
@@ -47,14 +59,14 @@ object ResponseWritable {
 
   private[sharaf] def writeResponse(response: Response[?], exchange: HttpServerExchange): Unit = {
     // headers
-    val allHeaders = response.rw.headers(response.body) ++ response.headers
+    val allHeaders = response.body.flatMap(response.rw.headers) ++ response.headers
     allHeaders.foreach { case (name, values) =>
       exchange.getResponseHeaders.putAll(new HttpString(name), values.asJava)
     }
     // status code
     exchange.setStatusCode(response.status)
     // body
-    response.rw.write(response.body, exchange)
+    response.body.foreach(b => response.rw.write(b, exchange))
   }
 
   /* instances */
