@@ -1,7 +1,14 @@
-package ba.sake.sharaf.routing
+package ba.sake.sharaf
+package routing
 
 import java.util.UUID
 import scala.util.Try
+
+import io.undertow.util.HttpStringh
+
+type RequestParams = (HttpString, Path)
+
+type Routes = Request ?=> PartialFunction[RequestParams, Response[?]]
 
 // typeclass for converting a path parameter to T
 trait FromPathParam[T] {

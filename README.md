@@ -17,6 +17,18 @@ def scalacOptions = Seq(
 ```
 
 ## Examples
+
+A simple example in scala-cli:
+```scala
+
+```
+
+Then you can do a GET http://localhost:8080/hello/Bob  
+to try it out.
+
+---
+
+Full blown standalone projects:
 - handling [json](examples/json)
 - handling [form data](examples/form)
 - rendering [html](examples/html) and serving static files
