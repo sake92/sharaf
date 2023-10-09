@@ -6,7 +6,6 @@ import io.undertow.Undertow
 import ba.sake.sharaf.*
 import ba.sake.sharaf.routing.*
 import ba.sake.sharaf.handlers.*
-import ba.sake.tupson.*
 import ba.sake.validson.*
 
 @main def main: Unit = {
@@ -21,6 +20,7 @@ class JsonApiModule(port: Int) {
 
   val baseUrl = s"http://localhost:${port}"
 
+  // don't do this at home!
   private var db = Seq.empty[CustomerRes]
 
   private val routes: Routes = {

@@ -3,7 +3,7 @@ package demo
 import ba.sake.formson.*
 import ba.sake.tupson.*
 import ba.sake.sharaf.*
-import SharafUtils.*
+import ba.sake.sharaf.utils.*
 
 class FormApiSuite extends munit.FunSuite {
 

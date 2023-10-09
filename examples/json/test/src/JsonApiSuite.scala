@@ -1,10 +1,9 @@
 package demo
 
-import ba.sake.sharaf.handlers.ProblemDetails
-import ba.sake.sharaf.handlers.ArgumentProblem
-import ba.sake.sharaf.SharafUtils
 import ba.sake.querson.*
 import ba.sake.tupson.*
+import ba.sake.sharaf.handlers.*
+import ba.sake.sharaf.utils.*
 
 class JsonApiSuite extends munit.FunSuite {
 
@@ -56,7 +55,7 @@ class JsonApiSuite extends munit.FunSuite {
 
     // filtering GET
     locally {
-      val queryParams = UserQuery(Set("Meho")).toQueryStringMap().map { (k, vs) => k -> vs.head }
+      val queryParams = UserQuery(Set("Meho")).toQueryStringMap().toRequestsQuery()
       val res = requests.get(s"$baseUrl/customers", params = queryParams)
       assertEquals(res.statusCode, 200)
       assertEquals(res.headers("content-type"), Seq("application/json"))
@@ -121,7 +120,7 @@ class JsonApiSuite extends munit.FunSuite {
     def apply() = module
 
     override def beforeEach(context: BeforeEach): Unit =
-      module = JsonApiModule(SharafUtils.getFreePort())
+      module = JsonApiModule(getFreePort())
       module.server.start()
 
     override def afterEach(context: AfterEach): Unit =
