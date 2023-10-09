@@ -24,7 +24,7 @@ class JsonApiModule(port: Int) {
   private var db = Seq.empty[CustomerRes]
 
   private val routes: Routes = {
-    case GET() -> Path("customers", uuid(id)) =>
+    case GET() -> Path("customers", param[UUID](id)) =>
       val customerOpt = db.find(_.id == id)
       Response.withBodyOpt(customerOpt, s"Customer with id=$id")
 

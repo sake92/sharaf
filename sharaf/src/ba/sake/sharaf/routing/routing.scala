@@ -13,6 +13,7 @@ type Routes = Request ?=> PartialFunction[RequestParams, Response[?]]
 // typeclass for converting a path parameter to T
 trait FromPathParam[T] {
   def extract(str: String): Option[T]
+  def unapply(str: String): Option[T] = extract(str)
 }
 
 // TODO derive for simple enums
@@ -28,18 +29,6 @@ object FromPathParam {
   }
 }
 
-// nice extractors
-// TODO redundant ???
-final class UrlParamBinder[T](using fp: FromPathParam[T]) {
-  def unapply(str: String): Option[T] =
-    fp.extract(str)
-}
-
-val int = new UrlParamBinder[Int]
-val long = new UrlParamBinder[Long]
-val uuid = new UrlParamBinder[UUID]
-
-// for custom params with FromPathParam tc impl
 object param {
   def unapply[T](str: String)(using fp: FromPathParam[T]): Option[T] =
     fp.extract(str)

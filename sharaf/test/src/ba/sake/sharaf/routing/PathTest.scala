@@ -17,9 +17,9 @@ class PathTest extends munit.FunSuite {
     )
 
     paths.foreach {
-      case Path("users", int(id)) =>
+      case Path("users", param[Int](id)) =>
         assertEquals(id, 1)
-      case Path("users", uuid(id)) =>
+      case Path("users", param[UUID](id)) =>
         assertEquals(id, uuidValue)
       case Path("users", param[Sort](sort)) =>
         assertEquals(sort, Sort.email)

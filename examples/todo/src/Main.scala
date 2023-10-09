@@ -1,12 +1,12 @@
 package demo
 
+import java.util.UUID
 import io.undertow.Undertow
-
+import ba.sake.tupson.*
+import ba.sake.validson.*
 import ba.sake.sharaf.*
 import ba.sake.sharaf.routing.*
 import ba.sake.sharaf.handlers.*
-import ba.sake.tupson.*
-import ba.sake.validson.*
 
 @main def main: Unit = {
 
@@ -19,7 +19,7 @@ import ba.sake.validson.*
     case GET() -> Path("") =>
       Response.withBody(todosRepo.getTodos().map(todo2Resp))
 
-    case GET() -> Path("todos", uuid(id)) =>
+    case GET() -> Path("todos", param[UUID](id)) =>
       val todo = todosRepo.getTodo(id)
       Response.withBody(todo2Resp(todo))
 
@@ -32,11 +32,11 @@ import ba.sake.validson.*
       todosRepo.deleteAll()
       Response.withBody(List.empty[TodoResponse])
 
-    case DELETE() -> Path("todos", uuid(id)) =>
+    case DELETE() -> Path("todos", param[UUID](id)) =>
       todosRepo.delete(id)
       Response.withBody(todosRepo.getTodos().map(todo2Resp))
 
-    case PATCH() -> Path("todos", uuid(id)) =>
+    case PATCH() -> Path("todos", param[UUID](id)) =>
       val reqBody = Request.current.bodyJson[PatchTodo].validateOrThrow
       var todo = todosRepo.getTodo(id)
       reqBody.title.foreach(t => todo = todo.copy(title = t))
