@@ -3,6 +3,7 @@ package demo
 import ba.sake.formson.*
 import ba.sake.tupson.*
 import ba.sake.sharaf.*
+import SharafUtils.*
 
 class FormApiSuite extends munit.FunSuite {
 
@@ -35,7 +36,7 @@ class FormApiSuite extends munit.FunSuite {
     def apply() = module
 
     override def beforeEach(context: BeforeEach): Unit =
-      module = FormApiModule(SharafUtils.getFreePort())
+      module = FormApiModule(getFreePort())
       module.server.start()
     override def afterEach(context: AfterEach): Unit =
       module.server.stop()

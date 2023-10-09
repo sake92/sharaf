@@ -4,7 +4,7 @@ package routing
 import java.util.UUID
 import scala.util.Try
 
-import io.undertow.util.HttpStringh
+import io.undertow.util.HttpString
 
 type RequestParams = (HttpString, Path)
 
