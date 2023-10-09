@@ -8,13 +8,10 @@ import ba.sake.sharaf.routing.*
 import ba.sake.sharaf.handlers.*
 import ba.sake.validson.*
 
-@main def main: Unit = {
-
+@main def main: Unit =
   val module = JsonApiModule(8181)
   module.server.start()
-
   println(s"Started HTTP server at ${module.baseUrl}")
-}
 
 class JsonApiModule(port: Int) {
 

@@ -1,10 +1,9 @@
 package demo
 
 import scala.jdk.CollectionConverters.*
-
 import org.pac4j.core.client.Clients
-import org.pac4j.core.matching.matcher.*
 import org.pac4j.core.config.Config
+import org.pac4j.core.matching.matcher.*
 
 class SecurityConfig(clients: Clients) {
 

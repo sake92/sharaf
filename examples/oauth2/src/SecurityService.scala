@@ -1,11 +1,9 @@
 package demo
 
 import scala.jdk.OptionConverters.*
-
 import org.pac4j.core.config.Config
 import org.pac4j.core.util.FindBest
 import org.pac4j.undertow.context.{UndertowSessionStore, UndertowWebContext}
-
 import ba.sake.sharaf.Request
 
 class SecurityService(config: Config) {

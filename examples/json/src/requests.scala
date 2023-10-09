@@ -7,7 +7,7 @@ import ba.sake.validson.*
 case class CreateCustomerReq private (name: String, address: CreateAddressReq) derives JsonRW
 
 object CreateCustomerReq:
-  // smart constructor, hard to get invalid object constructed
+  // smart constructor
   def of(name: String, address: CreateAddressReq): CreateCustomerReq =
     val res = new CreateCustomerReq(name, address)
     res.validateOrThrow
@@ -25,4 +25,5 @@ object CreateAddressReq:
     .and(_.street, !_.isBlank, "must not be blank")
     .and(_.street, _.length >= 3, "must be >= 3")
 
+//////
 case class UserQuery(name: Set[String]) derives QueryStringRW

@@ -1,7 +1,6 @@
 package demo
 
 import scala.jdk.CollectionConverters.*
-
 import com.nimbusds.jose.JOSEObjectType
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import no.nav.security.mock.oauth2.token.DefaultOAuth2TokenCallback
@@ -18,11 +17,9 @@ trait IntegrationTest extends munit.FunSuite {
 
   def createSession(baseUrl: String) =
     val session = requests.Session()
-
     // this does OAuth2 ping-pong redirects etc,
     // and we get a JSESSSIONID cookie
     session.get(s"$baseUrl/login?provider=GenericOAuth20Client")
-
     session
 
   protected val moduleFixture = new Fixture[AppModule]("AppModule") {

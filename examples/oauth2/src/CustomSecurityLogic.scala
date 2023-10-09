@@ -1,10 +1,8 @@
 package demo
 
 import java.{util => ju}
-
 import scala.jdk.CollectionConverters.*
 import scala.jdk.OptionConverters.*
-
 import org.pac4j.core.client.Client
 import org.pac4j.core.context.WebContext
 import org.pac4j.core.context.session.SessionStore

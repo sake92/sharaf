@@ -1,7 +1,7 @@
 package demo
 
-import ba.sake.tupson.JsonRW
 import java.util.UUID
+import ba.sake.tupson.JsonRW
 
 case class CustomerRes(id: UUID, name: String, address: AddressRes) derives JsonRW
 

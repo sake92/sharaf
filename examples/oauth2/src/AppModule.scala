@@ -1,8 +1,5 @@
 package demo
 
-import ba.sake.sharaf.*
-import ba.sake.sharaf.handlers.*
-
 import io.undertow.Handlers
 import io.undertow.Undertow
 import io.undertow.server.HttpHandler
@@ -13,6 +10,8 @@ import org.pac4j.core.client.Clients
 import org.pac4j.undertow.handler.CallbackHandler
 import org.pac4j.undertow.handler.LogoutHandler
 import org.pac4j.undertow.handler.SecurityHandler
+import ba.sake.sharaf.*
+import ba.sake.sharaf.handlers.*
 
 class AppModule(port: Int, clients: Clients) {
 
