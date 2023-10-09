@@ -14,7 +14,7 @@ val routes: Routes = {
 val server = Undertow
   .builder()
   .addHttpListener(8080, "localhost")
-  .setHandler(ErrorHandler(RoutesHandler(routes), ErrorMapper.json))
+  .setHandler(ErrorHandler(RoutesHandler(routes)))
   .build()
 
 server.start()
