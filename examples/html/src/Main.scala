@@ -1,9 +1,7 @@
 package demo
 
 import io.undertow.Undertow
-import ba.sake.sharaf.*
-import ba.sake.sharaf.routing.*
-import ba.sake.sharaf.handlers.*
+import ba.sake.sharaf.*, handlers.*, routing.*
 import ba.sake.hepek.html.HtmlPage
 import scalatags.Text.all._
 

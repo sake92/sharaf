@@ -3,9 +3,7 @@ package demo
 import java.nio.file.Files
 import io.undertow.Undertow
 import ba.sake.validson.*
-import ba.sake.sharaf.*
-import ba.sake.sharaf.routing.*
-import ba.sake.sharaf.handlers.*
+import ba.sake.sharaf.*, handlers.*, routing.*
 
 @main def main: Unit =
   val module = FormApiModule(8181)

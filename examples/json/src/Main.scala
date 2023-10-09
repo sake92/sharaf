@@ -3,9 +3,7 @@ package demo
 import java.util.UUID
 import io.undertow.Undertow
 
-import ba.sake.sharaf.*
-import ba.sake.sharaf.routing.*
-import ba.sake.sharaf.handlers.*
+import ba.sake.sharaf.*, handlers.*, routing.*
 import ba.sake.validson.*
 
 @main def main: Unit =

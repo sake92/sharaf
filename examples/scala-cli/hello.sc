@@ -1,15 +1,11 @@
 //> using dep ba.sake::sharaf:0.0.5
 
 import io.undertow.Undertow
+import ba.sake.sharaf.*, handlers.*, routing.*
 
-import ba.sake.sharaf.*
-import ba.sake.sharaf.routing.*
-import ba.sake.sharaf.handlers.*
-
-val routes: Routes = {
+val routes: Routes =
   case GET() -> Path("hello", name) =>
     Response.withBody(s"Hello $name")
-}
 
 val server = Undertow
   .builder()
