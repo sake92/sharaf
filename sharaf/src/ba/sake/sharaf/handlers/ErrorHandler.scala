@@ -14,7 +14,6 @@ class ErrorHandler(next: HttpHandler, errorMapper: ErrorMapper) extends HttpHand
     if (exchange.isInIoThread) {
       exchange.dispatch(this)
     } else {
-
       try {
         next.handleRequest(exchange)
       } catch {

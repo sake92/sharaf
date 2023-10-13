@@ -26,7 +26,7 @@ final class RoutesHandler private (routes: Routes) extends HttpHandler {
         case Some(res) => ResponseWritable.writeResponse(res, exchange)
         case None      =>
           // will be catched by ErrorMapper
-          throw NotFoundException("route not found")
+          throw NotFoundException("route")
       }
     }
   }

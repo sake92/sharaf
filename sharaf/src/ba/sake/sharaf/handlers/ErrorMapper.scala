@@ -5,6 +5,7 @@ import scala.jdk.CollectionConverters.*
 import ba.sake.tupson
 import ba.sake.tupson.JsonRW
 import ba.sake.formson
+import ba.sake.querson
 import ba.sake.sharaf.*
 import java.net.URI
 import org.typelevel.jawn.ast.*
@@ -25,6 +26,9 @@ object ErrorMapper {
     case e: ValidationException =>
       val fieldValidationErrors = e.errors.mkString("[", "; ", "]")
       Response.withBody(s"Validation errors: $fieldValidationErrors").withStatus(400)
+    // query
+    case e: querson.ParsingException =>
+      Response.withBody(e.getMessage()).withStatus(400)
     // json
     case e: tupson.ParsingException =>
       Response.withBody(e.getMessage()).withStatus(400)
@@ -42,6 +46,11 @@ object ErrorMapper {
     case e: ValidationException =>
       val fieldValidationErrors = e.errors.map(err => ArgumentProblem(err.path, err.msg, Some(err.value.toString)))
       val problemDetails = ProblemDetails(400, "Validation errors", invalidArguments = fieldValidationErrors)
+      Response.withBody(problemDetails).withStatus(400)
+    // query
+    case e: querson.ParsingException =>
+      val parsingErrors = e.errors.map(err => ArgumentProblem(err.path, err.msg, err.value.map(_.toString)))
+      val problemDetails = ProblemDetails(400, "Invalid query parameters", invalidArguments = parsingErrors)
       Response.withBody(problemDetails).withStatus(400)
     // json
     case e: tupson.ParsingException =>

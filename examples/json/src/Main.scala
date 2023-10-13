@@ -16,21 +16,23 @@ class JsonApiModule(port: Int) {
   val baseUrl = s"http://localhost:${port}"
 
   // don't do this at home!
-  private var db = Seq.empty[CustomerRes]
+  private var db = Seq.empty[ProductRes]
 
   private val routes: Routes = {
-    case GET() -> Path("customers", param[UUID](id)) =>
-      val customerOpt = db.find(_.id == id)
-      Response.withBodyOpt(customerOpt, s"Customer with id=$id")
+    case GET() -> Path("products", param[UUID](id)) =>
+      val productOpt = db.find(_.id == id)
+      Response.withBodyOpt(productOpt, s"Product with id=$id")
 
-    case GET() -> Path("customers") =>
-      val query = Request.current.queryParams[UserQuery].validateOrThrow
-      val customers = if query.name.isEmpty then db else db.filter(c => query.name.contains(c.name))
-      Response.withBody(customers)
+    case GET() -> Path("products") =>
+      val query = Request.current.queryParams[ProductsQuery].validateOrThrow
+      val products =
+        if query.name.isEmpty then db
+        else db.filter(c => query.name.contains(c.name) && query.minQuantity.map(c.quantity >= _).getOrElse(true))
+      Response.withBody(products)
 
-    case POST() -> Path("customers") =>
-      val req = Request.current.bodyJson[CreateCustomerReq].validateOrThrow
-      val res = CustomerRes(UUID.randomUUID(), req.name, AddressRes(req.address.street))
+    case POST() -> Path("products") =>
+      val req = Request.current.bodyJson[CreateProductReq].validateOrThrow
+      val res = ProductRes(UUID.randomUUID(), req.name, req.quantity)
       db = db.appended(res)
       Response.withBody(res)
   }

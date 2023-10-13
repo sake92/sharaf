@@ -66,7 +66,6 @@ object Request {
   private[sharaf] def create(ex: HttpServerExchange): Request =
     Request(ex)
 
-  // TODO move to utils somewhere
   private[sharaf] def undertowFormData2Formson(uFormData: UFormData): FormData = {
     val map = scala.collection.mutable.Map.empty[String, Seq[FormValue]]
     uFormData.forEach { key =>

@@ -24,9 +24,13 @@ git push origin $VERSION
 
 # TODOs
 
-- cookies ?
-- adapt query params to requests lib
+- rethrow WRAPPED parsing exceptions from Request
+- config library
+
 - add Docker / Watchtower example
+- full-stack backend example with squery and flyway
+- cookies ?
+
 
 ---
 ---
