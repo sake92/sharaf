@@ -5,11 +5,8 @@ import org.pac4j.oauth.client.*
 
 @main def main: Unit = {
 
-  // configure your OAuth2 clients
+  // configure your OAuth2 clients with your values
   // from pac4j's huge list https://www.pac4j.org/docs/clients/oauth.html
-
-  // TODO fill your values here
-  // set callback to http://localhost:8181/callback
 
   val githubClient = new GitHubClient("KEY", "SECRET")
   githubClient.setScope("read:user, user:email")
