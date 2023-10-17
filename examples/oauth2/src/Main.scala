@@ -9,7 +9,7 @@ import org.pac4j.oauth.client.*
   // from pac4j's huge list https://www.pac4j.org/docs/clients/oauth.html
 
   // TODO fill your values here
-  // set callback to http://localhost:8080/callback
+  // set callback to http://localhost:8181/callback
 
   val githubClient = new GitHubClient("KEY", "SECRET")
   githubClient.setScope("read:user, user:email")

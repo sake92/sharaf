@@ -31,20 +31,20 @@ val routes: Routes =
 
 val server = Undertow
   .builder()
-  .addHttpListener(8080, "localhost")
+  .addHttpListener(8181, "localhost")
   .setHandler(ErrorHandler(RoutesHandler(routes)))
   .build()
 
 server.start()
 
-println(s"Server started at http://localhost:8080")
+println(s"Server started at http://localhost:8181")
 ```
 
 You can run it like this:
 ```sh
 scala-cli examples/scala-cli/hello.sc
 ```
-Then you can do a GET http://localhost:8080/hello/Bob  
+Then you can do a GET http://localhost:8181/hello/Bob  
 to try it out.
 
 ---
