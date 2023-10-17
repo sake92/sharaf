@@ -2,8 +2,11 @@ package ba.sake.sharaf.utils
 
 import java.net.ServerSocket
 import scala.util.Using
+import com.typesafe.config.Config
+import com.typesafe.config.ConfigRenderOptions
 
 import ba.sake.formson._
+import ba.sake.tupson._
 import ba.sake.querson.QueryStringMap
 
 def getFreePort(): Int =
@@ -13,7 +16,7 @@ def getFreePort(): Int =
 
 // requests integration
 extension (formDataMap: FormDataMap)
-  def toRequestsMultipart() = {
+  def toRequestsMultipart() =
     val multiItems = formDataMap.flatMap { case (key, values) =>
       values.map {
         case FormValue.Str(value)       => requests.MultiItem(key, value)
@@ -22,8 +25,19 @@ extension (formDataMap: FormDataMap)
       }
     }
     requests.MultiPart(multiItems.toSeq*)
-  }
 
 extension (queryStringMap: QueryStringMap)
   def toRequestsQuery(): Map[String, String] =
     queryStringMap.map { (k, vs) => k -> vs.head }
+
+// typesafe config easy parsing
+extension (config: Config) {
+  def parse[T: JsonRW]() =
+    val configJsonString = config
+      .root()
+      .render(
+        ConfigRenderOptions.concise().setJson(true)
+      )
+    configJsonString.parseJson[T]
+
+}
