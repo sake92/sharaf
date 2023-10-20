@@ -13,7 +13,7 @@ import fastparse.Parsed.Failure
   *   Form data AST
   */
 
-def parseFDMap(formDataMap: FormDataMap): FormData = {
+private[formson] def parseFDMap(formDataMap: FormDataMap): FormData = {
   val parser = new FormsonParser(formDataMap)
   val formDataInternal = parser.parse()
   fromInternal(formDataInternal)

@@ -4,7 +4,6 @@ import java.util.UUID
 import io.undertow.Undertow
 
 import ba.sake.sharaf.*, handlers.*, routing.*
-import ba.sake.validson.*
 
 @main def main: Unit =
   val module = JsonApiModule(8181)
@@ -24,14 +23,14 @@ class JsonApiModule(port: Int) {
       Response.withBodyOpt(productOpt, s"Product with id=$id")
 
     case GET() -> Path("products") =>
-      val query = Request.current.queryParams[ProductsQuery].validateOrThrow
+      val query = Request.current.queryParamsValidated[ProductsQuery]
       val products =
         if query.name.isEmpty then db
         else db.filter(c => query.name.contains(c.name) && query.minQuantity.map(c.quantity >= _).getOrElse(true))
       Response.withBody(products)
 
     case POST() -> Path("products") =>
-      val req = Request.current.bodyJson[CreateProductReq].validateOrThrow
+      val req = Request.current.bodyJsonValidated[CreateProductReq]
       val res = ProductRes(UUID.randomUUID(), req.name, req.quantity)
       db = db.appended(res)
       Response.withBody(res)

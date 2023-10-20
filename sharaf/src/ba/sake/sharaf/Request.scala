@@ -11,6 +11,7 @@ import io.undertow.util.HttpString
 import ba.sake.tupson.*
 import ba.sake.formson.*
 import ba.sake.querson.*
+import ba.sake.validson.*
 
 final class Request(
     private val ex: HttpServerExchange
@@ -25,8 +26,11 @@ final class Request(
       (k, v.asScala.toSeq)
     }
 
-  def queryParams[T <: Product](using rw: QueryStringRW[T]): T =
+  def queryParams[T <: Product: QueryStringRW]: T =
     queryParamsMap.parseQueryStringMap
+
+  def queryParamsValidated[T <: Product: QueryStringRW: Validator]: T =
+    queryParams[T].validateOrThrow
 
   /* BODY */
   private val formBodyParserFactory = locally {
@@ -38,18 +42,26 @@ final class Request(
   lazy val bodyString: String =
     new String(ex.getInputStream.readAllBytes(), StandardCharsets.UTF_8)
 
-  def bodyJson[T](using rw: JsonRW[T]): T =
+  // JSON
+  def bodyJson[T: JsonRW]: T =
     bodyString.parseJson[T]
 
-  def bodyForm[T <: Product](using rw: FormDataRW[T]): T =
-    // returns null if content-type is not suitable
+  def bodyJsonValidated[T: JsonRW: Validator]: T =
+    bodyJson[T].validateOrThrow
+
+  // FORM
+  def bodyForm[T <: Product: FormDataRW]: T =
+    // createParser returns null if content-type is not suitable
     val parser = formBodyParserFactory.createParser(ex)
     Option(parser) match
       case None => throw new SharafException("The specified content type is not supported")
       case Some(parser) =>
         val uFormData = parser.parseBlocking()
-        val formData = Request.undertowFormData2Formson(uFormData)
-        rw.parse("", formData)
+        val formDataMap = Request.undertowFormData2FormsonMap(uFormData)
+        formDataMap.parseFormDataMap[T]
+
+  def bodyFormValidated[T <: Product: FormDataRW: Validator]: T =
+    bodyForm[T].validateOrThrow
 
   /* HEADERS */
   def headers: Map[HttpString, Seq[String]] =
@@ -66,7 +78,7 @@ object Request {
   private[sharaf] def create(ex: HttpServerExchange): Request =
     Request(ex)
 
-  private[sharaf] def undertowFormData2Formson(uFormData: UFormData): FormData = {
+  private[sharaf] def undertowFormData2FormsonMap(uFormData: UFormData): FormDataMap = {
     val map = scala.collection.mutable.Map.empty[String, Seq[FormValue]]
     uFormData.forEach { key =>
       val values = uFormData.get(key).asScala
@@ -83,6 +95,6 @@ object Request {
       map += (key -> formValues.toSeq)
     }
 
-    parseFDMap(map.toMap)
+    map.toMap
   }
 }

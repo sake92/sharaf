@@ -22,7 +22,7 @@ import ba.sake.sharaf.*, handlers.*, routing.*
       Response.withBody(todo2Resp(todo))
 
     case POST() -> Path("") =>
-      val reqBody = Request.current.bodyJson[CreateTodo].validateOrThrow
+      val reqBody = Request.current.bodyJsonValidated[CreateTodo]
       val newTodo = todosRepo.add(reqBody)
       Response.withBody(todo2Resp(newTodo))
 
@@ -35,7 +35,7 @@ import ba.sake.sharaf.*, handlers.*, routing.*
       Response.withBody(todosRepo.getTodos().map(todo2Resp))
 
     case PATCH() -> Path("todos", param[UUID](id)) =>
-      val reqBody = Request.current.bodyJson[PatchTodo].validateOrThrow
+      val reqBody = Request.current.bodyJsonValidated[PatchTodo]
       var todo = todosRepo.getTodo(id)
       reqBody.title.foreach(t => todo = todo.copy(title = t))
       reqBody.completed.foreach(c => todo = todo.copy(completed = c))
