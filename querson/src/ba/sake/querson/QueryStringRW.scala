@@ -1,5 +1,6 @@
 package ba.sake.querson
 
+import java.net.URL
 import java.util.UUID
 
 import scala.deriving.*
@@ -63,6 +64,15 @@ object QueryStringRW {
     override def parse(path: String, qsData: QueryStringData): UUID =
       val str = QueryStringRW[String].parse(path, qsData)
       Try(UUID.fromString(str)).toOption.getOrElse(typeError(path, "UUID", str))
+  }
+
+  given QueryStringRW[URL] with {
+    override def write(path: String, value: URL): QueryStringData =
+      QueryStringRW[String].write(path, value.toString)
+
+    override def parse(path: String, qsData: QueryStringData): URL =
+      val str = QueryStringRW[String].parse(path, qsData)
+      Try(URL(str).toURI().toURL()).toOption.getOrElse(typeError(path, "URL", str))
   }
 
   given [T](using fqsp: QueryStringRW[T]): QueryStringRW[Option[T]] with {
