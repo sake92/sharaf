@@ -82,7 +82,6 @@ class JsonApiSuite extends munit.FunSuite {
       requests.get(s"$baseUrl/products?minQuantity=not_a_number")
     }
     val resProblem = ex.response.text().parseJson[ProblemDetails]
-    println(resProblem)
 
     assertEquals(ex.response.statusCode, 400)
     assert(

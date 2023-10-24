@@ -15,7 +15,6 @@ object CreateCustomerForm:
   given Validator[CreateCustomerForm] = Validator
     .derived[CreateCustomerForm]
     .and(_.name, !_.isBlank, "must not be blank")
+    .and(_.name, _.length >= 2, "must be >= 2")
 
-case class CreateAddressForm(
-    street: String
-) derives FormDataRW
+case class CreateAddressForm(street: String) derives FormDataRW
