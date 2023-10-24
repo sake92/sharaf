@@ -1,10 +1,16 @@
 package ba.sake.querson
 
+import java.net.URL
 import java.util.UUID
+import java.time.*
 
 class QueryStringParseSuite extends munit.FunSuite {
 
   val uuid = UUID.fromString("ef42f9e9-79b9-45eb-a938-95ac75aedf87")
+  val instant = Instant.parse("2007-12-03T10:15:30.00Z")
+  val ldt = LocalDateTime.parse("2007-12-03T10:15:30")
+  val period = Period.ofDays(1).plusMonths(4)
+  val duration = Duration.ofHours(5).plusSeconds(2)
 
   test("parseQueryStringMap should parse simple key/values") {
     Seq[(QueryStringMap, QuerySimple)](
@@ -12,9 +18,14 @@ class QueryStringParseSuite extends munit.FunSuite {
         Map(
           "str" -> Seq("text", "this_is_ignored"),
           "int" -> Seq("42"),
-          "uuid" -> Seq(uuid.toString)
+          "uuid" -> Seq(uuid.toString),
+          "url" -> Seq("http://example.com"),
+          "instant" -> Seq("2007-12-03T10:15:30Z"),
+          "ldt" -> Seq("2007-12-03T10:15:30"),
+          "duration" -> Seq("PT5H2S"),
+          "period" -> Seq("P4M1D")
         ),
-        QuerySimple("text", 42, uuid)
+        QuerySimple("text", 42, uuid, new URL("http://example.com"), instant, ldt, duration, period)
       )
     ).foreach { case (qsMap, expected) =>
       val res = qsMap.parseQueryStringMap[QuerySimple]
@@ -144,18 +155,25 @@ class QueryStringParseSuite extends munit.FunSuite {
     locally {
       val ex = intercept[ParsingException] { Map().parseQueryStringMap[QuerySimple] }
       assertEquals(
-        ex.errors,
-        Seq(
-          ParseError("str", "is missing", None),
-          ParseError("int", "is missing", None),
-          ParseError("uuid", "is missing", None)
-        )
+        ex.errors.toSet,
+        Seq("str", "int", "uuid", "url", "instant", "ldt", "duration", "period")
+          .map(ParseError(_, "is missing", None))
+          .toSet
       )
     }
 
     locally {
       val ex = intercept[ParsingException] {
-        Map("str" -> Seq(), "int" -> Seq("not_an_int"), "uuid" -> Seq("uuidddd_NOT"))
+        Map(
+          "str" -> Seq(),
+          "int" -> Seq("not_an_int"),
+          "uuid" -> Seq("uuidddd_NOT"),
+          "url" -> Seq("nope://example.com"),
+          "instant" -> Seq("2007-12-03T10:15:30"), // missing Z at end
+          "ldt" -> Seq("2007-12-03Hmm10:15:30"),
+          "duration" -> Seq("PT5H2S_"),
+          "period" -> Seq("P4_M1D")
+        )
           .parseQueryStringMap[QuerySimple]
       }
       assertEquals(
@@ -163,7 +181,12 @@ class QueryStringParseSuite extends munit.FunSuite {
         Seq(
           ParseError("str", "is missing", None),
           ParseError("int", "invalid Int", Some("not_an_int")),
-          ParseError("uuid", "invalid UUID", Some("uuidddd_NOT"))
+          ParseError("uuid", "invalid UUID", Some("uuidddd_NOT")),
+          ParseError("url", "invalid URL", Some("nope://example.com")),
+          ParseError("instant", "invalid Instant", Some("2007-12-03T10:15:30")),
+          ParseError("ldt", "invalid LocalDateTime", Some("2007-12-03Hmm10:15:30")),
+          ParseError("duration", "invalid Duration", Some("PT5H2S_")),
+          ParseError("period", "invalid Period", Some("P4_M1D")),
         )
       )
     }

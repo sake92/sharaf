@@ -1,12 +1,14 @@
 package ba.sake.querson
 
+import java.net.URL
+import java.time.*
 import java.util.UUID
 
 enum Color derives QueryStringRW:
   case Red
   case Blue
 
-case class QuerySimple(str: String, int: Int, uuid: UUID) derives QueryStringRW
+case class QuerySimple(str: String, int: Int, uuid: UUID, url: URL, instant: Instant, ldt: LocalDateTime, duration: Duration, period: Period) derives QueryStringRW
 case class QuerySimpleReservedChars(`what%the&stu$f?@[]`: String) derives QueryStringRW
 
 case class QueryEnum(color: Color) derives QueryStringRW

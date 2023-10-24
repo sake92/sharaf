@@ -2,14 +2,9 @@ package ba.sake.sharaf
 package routing
 
 import java.util.UUID
-import scala.util.Try
 import scala.deriving.*
 import scala.quoted.*
-
-object param {
-  def unapply[T](str: String)(using fp: FromPathParam[T]): Option[T] =
-    fp.parse(str)
-}
+import scala.util.Try
 
 // typeclass for converting a path parameter to T
 trait FromPathParam[T] {
@@ -27,6 +22,7 @@ object FromPathParam {
     def parse(str: String): Option[UUID] = Try(UUID.fromString(str)).toOption
   }
 
+  /* macro derivation */
   inline def derived[T]: FromPathParam[T] = ${ derivedMacro[T] }
 
   private def derivedMacro[T: Type](using Quotes): Expr[FromPathParam[T]] = {

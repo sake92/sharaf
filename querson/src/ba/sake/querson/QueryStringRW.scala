@@ -1,6 +1,11 @@
 package ba.sake.querson
 
 import java.net.URL
+import java.net.URI
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.Duration
+import java.time.Period
 import java.util.UUID
 
 import scala.deriving.*
@@ -66,15 +71,64 @@ object QueryStringRW {
       Try(UUID.fromString(str)).toOption.getOrElse(typeError(path, "UUID", str))
   }
 
+  // java.net
+  given QueryStringRW[URI] with {
+    override def write(path: String, value: URI): QueryStringData =
+      QueryStringRW[String].write(path, value.toString)
+
+    override def parse(path: String, qsData: QueryStringData): URI =
+      val str = QueryStringRW[String].parse(path, qsData)
+      Try(new URI(str)).toOption.getOrElse(typeError(path, "URI", str))
+  }
+
   given QueryStringRW[URL] with {
     override def write(path: String, value: URL): QueryStringData =
       QueryStringRW[String].write(path, value.toString)
 
     override def parse(path: String, qsData: QueryStringData): URL =
       val str = QueryStringRW[String].parse(path, qsData)
-      Try(URL(str).toURI().toURL()).toOption.getOrElse(typeError(path, "URL", str))
+      Try(new URI(str).toURL).toOption.getOrElse(typeError(path, "URL", str))
   }
 
+  // java.time
+  given QueryStringRW[Instant] with {
+    override def write(path: String, value: Instant): QueryStringData =
+      QueryStringRW[String].write(path, value.toString)
+
+    override def parse(path: String, qsData: QueryStringData): Instant =
+      val str = QueryStringRW[String].parse(path, qsData)
+      Try(Instant.parse(str)).toOption.getOrElse(typeError(path, "Instant", str))
+  }
+
+  given QueryStringRW[LocalDateTime] with {
+    override def write(path: String, value: LocalDateTime): QueryStringData =
+      QueryStringRW[String].write(path, value.toString)
+
+    override def parse(path: String, qsData: QueryStringData): LocalDateTime =
+      val str = QueryStringRW[String].parse(path, qsData)
+      Try(LocalDateTime.parse(str)).toOption.getOrElse(typeError(path, "LocalDateTime", str))
+  }
+  
+
+  given QueryStringRW[Duration] with {
+    override def write(path: String, value: Duration): QueryStringData =
+      QueryStringRW[String].write(path, value.toString)
+
+    override def parse(path: String, qsData: QueryStringData): Duration =
+      val str = QueryStringRW[String].parse(path, qsData)
+      Try(Duration.parse(str)).toOption.getOrElse(typeError(path, "Duration", str))
+  }
+
+  given QueryStringRW[Period] with {
+    override def write(path: String, value: Period): QueryStringData =
+      QueryStringRW[String].write(path, value.toString)
+
+    override def parse(path: String, qsData: QueryStringData): Period =
+      val str = QueryStringRW[String].parse(path, qsData)
+      Try(Period.parse(str)).toOption.getOrElse(typeError(path, "Period", str))
+  }
+
+  /* collections */
   given [T](using fqsp: QueryStringRW[T]): QueryStringRW[Option[T]] with {
     override def write(path: String, value: Option[T]): QueryStringData =
       QueryStringRW[Seq[T]].write(path, value.toSeq)
@@ -85,7 +139,6 @@ object QueryStringRW {
     override def default: Option[Option[T]] = Some(None)
   }
 
-  /* collections */
   given [T](using rw: QueryStringRW[T]): QueryStringRW[Seq[T]] with {
     override def write(path: String, values: Seq[T]): QueryStringData =
       val data = values.map(v => rw.write(path, v))

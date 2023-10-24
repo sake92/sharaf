@@ -37,7 +37,21 @@ class PathTest extends munit.FunSuite {
         assertEquals(parts, Seq("what", "the", "stuff"))
       case _ =>
         fail("Did not match route")
-    
+
+    val userIdRegex = "user_id_(\\d+)".r
+    Path("users", "user_id_456") match
+      case Path("users", userIdRegex(userId)) =>
+        assertEquals(userId, "456")
+      case _ =>
+        fail("Did not match route")
+
+    // nesting, noice
+    Path("users", "user_id_456") match
+      case Path("users", userIdRegex(param[Int](userId))) =>
+        assertEquals(userId, 456)
+      case _ =>
+        fail("Did not match route")
+
   }
 
 }

@@ -1,10 +1,16 @@
 package ba.sake.querson
 
+import java.net.URL
 import java.util.UUID
+import java.time.*
 
 class QueryStringWriteSuite extends munit.FunSuite {
 
   val uuid = UUID.fromString("ef42f9e9-79b9-45eb-a938-95ac75aedf87")
+  val instant = Instant.parse("2007-12-03T10:15:30.00Z")
+  val ldt = LocalDateTime.parse("2007-12-03T10:15:30")
+  val period = Period.ofDays(1).plusMonths(4)
+  val duration = Duration.ofHours(5).plusSeconds(2)
 
   val cfgSeqBrackets = DefaultQuersonConfig.withSeqBrackets.withObjBrackets
   val cfgSeqNoBrackets = DefaultQuersonConfig.withSeqNoBrackets.withObjBrackets
@@ -14,8 +20,8 @@ class QueryStringWriteSuite extends munit.FunSuite {
   val cfgObjDots = DefaultQuersonConfig.withSeqNoBrackets.withObjDots
 
   test("toQueryString should write simple query parameters to string") {
-    val res1 = QuerySimple("some text", 42, uuid).toQueryString()
-    assertEquals(res1, s"str=some+text&uuid=$uuid&int=42")
+    val res1 = QuerySimple("some text", 42, uuid, new URL("http://example.com"), instant, ldt, duration, period).toQueryString()
+    assertEquals(res1, s"duration=PT5H2S&url=http%3A%2F%2Fexample.com&uuid=$uuid&str=some+text&instant=2007-12-03T10%3A15%3A30Z&int=42&period=P4M1D&ldt=2007-12-03T10%3A15%3A30")
   }
 
   test("toQueryString should write encode query parameters properly") {

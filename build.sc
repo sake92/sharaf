@@ -11,7 +11,7 @@ object sharaf extends SharafPublishModule {
   def ivyDeps = Agg(
     ivy"io.undertow:undertow-core:2.3.7.Final",
     ivy"com.typesafe:config:1.4.2",
-    ivy"ba.sake::tupson:0.7.0",
+    ivy"ba.sake::tupson:0.8.0",
     ivy"ba.sake::hepek-components:0.13.0",
     ivy"com.lihaoyi::requests:0.8.0"
   )
