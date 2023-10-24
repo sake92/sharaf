@@ -30,7 +30,7 @@ import scalatags.Text.all._
 }
 
 val MyPage = new HtmlPage {
-  override def bodyContent: Frag = div(
+  override def pageContent: Frag = div(
     "Hello sharaf!",
     img(src := "images/scala.png")
   )

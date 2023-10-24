@@ -18,17 +18,18 @@ git diff
 git commit -am "msg"
 
 $VERSION="0.0.5"
-git tag -a $VERSION -m "Improve paths handling"
+git tag -a $VERSION -m "Release $VERSION"
 git push origin $VERSION
 ```
 
 # TODOs
 
 - rethrow WRAPPED parsing exceptions from Request
-- config library
+- config read with JsonRW example
 
 - add Docker / Watchtower example
 - full-stack backend example with squery and flyway
+- spring pet clinic implementation
 - cookies ?
 
 

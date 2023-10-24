@@ -1,11 +1,12 @@
 package demo
 
+import java.nio.file.Path
 import ba.sake.formson.*
 import ba.sake.validson.*
 
 case class CreateCustomerForm(
     name: String,
-    file: java.nio.file.Path,
+    file: Path,
     address: CreateAddressForm,
     hobbies: List[String]
 ) derives FormDataRW

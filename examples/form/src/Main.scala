@@ -1,8 +1,8 @@
 package demo
 
-import java.nio.file.Files
 import io.undertow.Undertow
 import ba.sake.sharaf.*, handlers.*, routing.*
+import views.*
 
 @main def main: Unit =
   val module = FormApiModule(8181)
@@ -13,10 +13,13 @@ class FormApiModule(port: Int) {
 
   val baseUrl = s"http://localhost:${port}"
 
-  private val routes: Routes = { case POST() -> Path("form") =>
-    val req = Request.current.bodyFormValidated[CreateCustomerForm]
-    val fileAsString = Files.readString(req.file)
-    Response.withBody(CreateCustomerResponse(req.address.street, fileAsString))
+  private val routes: Routes = {
+    case GET() -> Path() =>
+      Response.withBody(FormPage)
+
+    case POST() -> Path("form-submit") =>
+      val req = Request.current.bodyFormValidated[CreateCustomerForm]
+      Response.withBody(ResultPage(req))
   }
 
   val server = Undertow

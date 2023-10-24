@@ -1,7 +1,6 @@
 package demo
 
 import ba.sake.formson.*
-import ba.sake.tupson.*
 import ba.sake.sharaf.*
 import ba.sake.sharaf.utils.*
 
@@ -19,15 +18,15 @@ class FormApiSuite extends munit.FunSuite {
     val reqBody =
       CreateCustomerForm("Meho", exampleFile, CreateAddressForm("street123ž"), List("hobby1", "hobby2"))
     val res = requests.post(
-      s"${module.baseUrl}/form",
+      s"${module.baseUrl}/form-submit",
       data = reqBody.toFormDataMap().toRequestsMultipart()
     )
 
     assertEquals(res.statusCode, 200)
-    val resBody = res.text.parseJson[CreateCustomerResponse]
+    val resBody = res.text()
     // this tests utf-8 encoding too :)
-    assertEquals(resBody.street, "street123ž")
-    assertEquals(resBody.fileContents, "This is a text file :)")
+    assert(resBody.contains("street123ž"), "Result does not contain input street")
+    assert(resBody.contains("This is a text file :)"), "Result does not contain input file")
   }
 
   val moduleFixture = new Fixture[FormApiModule]("FormApiModule") {
