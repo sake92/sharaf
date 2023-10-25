@@ -9,7 +9,7 @@ object sharaf extends SharafPublishModule {
   def artifactName = "sharaf"
 
   def ivyDeps = Agg(
-    ivy"io.undertow:undertow-core:2.3.7.Final",
+    ivy"io.undertow:undertow-core:2.3.10.Final",
     ivy"com.typesafe:config:1.4.2",
     ivy"ba.sake::tupson:0.8.0",
     ivy"ba.sake::hepek-components:0.13.0",

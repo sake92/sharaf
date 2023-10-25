@@ -9,7 +9,7 @@ Still WIP  :construction: but very much usable. :construction_worker:
 Mill:
 ```scala
 def ivyDeps = Agg(
-  ivy"ba.sake::sharaf:0.0.5"
+  ivy"ba.sake::sharaf:0.0.6"
 )
 def scalacOptions = Seq(
   "-Yretain-trees"
@@ -20,7 +20,7 @@ def scalacOptions = Seq(
 
 A hello world example in scala-cli:
 ```scala
-//> using dep ba.sake::sharaf:0.0.5
+//> using dep ba.sake::sharaf:0.0.6
 
 import io.undertow.Undertow
 import ba.sake.sharaf.*, handlers.*, routing.*

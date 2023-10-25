@@ -1,4 +1,4 @@
-//> using dep ba.sake::sharaf:0.0.5
+//> using dep ba.sake::sharaf:0.0.6
 
 import io.undertow.Undertow
 import ba.sake.sharaf.*, handlers.*, routing.*
