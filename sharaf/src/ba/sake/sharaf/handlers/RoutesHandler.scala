@@ -6,7 +6,7 @@ import io.undertow.server.HttpServerExchange
 import ba.sake.sharaf.*
 import ba.sake.sharaf.routing.*
 
-final class RoutesHandler private (routes: Routes) extends HttpHandler {
+final class RoutesHandler private (routes: Routes, nextHandler: Option[HttpHandler]) extends HttpHandler {
 
   override def handleRequest(exchange: HttpServerExchange): Unit = {
     exchange.startBlocking()
@@ -24,9 +24,12 @@ final class RoutesHandler private (routes: Routes) extends HttpHandler {
 
       resOpt match {
         case Some(res) => ResponseWritable.writeResponse(res, exchange)
-        case None      =>
-          // will be catched by ErrorMapper
-          throw NotFoundException("route")
+        case None =>
+          nextHandler match
+            case Some(next) => next.handleRequest(exchange)
+            case None       =>
+              // will be catched by ErrorMapper
+              throw NotFoundException("route")
       }
     }
   }
@@ -49,5 +52,7 @@ final class RoutesHandler private (routes: Routes) extends HttpHandler {
 
 object RoutesHandler {
   def apply(routes: Routes): RoutesHandler =
-    new RoutesHandler(routes)
+    new RoutesHandler(routes, None)
+  def apply(routes: Routes, nextHandler: HttpHandler): RoutesHandler =
+    new RoutesHandler(routes, Some(nextHandler))
 }

@@ -6,11 +6,11 @@ import ba.sake.sharaf.*, handlers.*, routing.*
 import demo.views.*
 
 @main def main: Unit =
-  val module = FormApiModule(8181)
+  val module = FormModule(8181)
   module.server.start()
   println(s"Started HTTP server at ${module.baseUrl}")
 
-class FormApiModule(port: Int) {
+class FormModule(port: Int) {
 
   val baseUrl = s"http://localhost:${port}"
 

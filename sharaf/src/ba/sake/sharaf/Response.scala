@@ -2,11 +2,9 @@ package ba.sake.sharaf
 
 import scala.jdk.CollectionConverters.*
 
-import io.undertow.io.IoCallback
 import io.undertow.server.HttpServerExchange
 import io.undertow.util.Headers
 import io.undertow.util.HttpString
-import io.undertow.util.MimeMappings
 
 import ba.sake.hepek.html.HtmlPage
 import ba.sake.tupson.*
@@ -85,20 +83,6 @@ object ResponseWritable {
     override def headers(value: HtmlPage): Seq[(String, Seq[String])] = Seq(
       Headers.CONTENT_TYPE_STRING -> Seq("text/html; charset=utf-8")
     )
-  }
-
-  given ResponseWritable[Resource] = new {
-    override def write(value: Resource, exchange: HttpServerExchange): Unit = value match
-      case res: Resource.ClasspathResource =>
-        res.underlying.serve(exchange.getResponseSender(), exchange, IoCallback.END_EXCHANGE)
-
-    override def headers(value: Resource): Seq[(String, Seq[String])] = value match
-      case res: Resource.ClasspathResource => {
-        val contentType = res.underlying.getContentType(MimeMappings.DEFAULT)
-        Seq(
-          Headers.CONTENT_TYPE_STRING -> Seq(contentType)
-        )
-      }
   }
 
   given [T: JsonRW]: ResponseWritable[T] = new {
