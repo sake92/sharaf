@@ -1,9 +1,7 @@
 package demo
 
 import io.undertow.Undertow
-import io.undertow.server.handlers.resource.ResourceHandler
-import io.undertow.server.handlers.resource.ClassPathResourceManager
-import ba.sake.sharaf.*, handlers.*, routing.*
+import ba.sake.sharaf.*, routing.*
 import ba.sake.hepek.html.HtmlPage
 import scalatags.Text.all._
 
@@ -23,16 +21,7 @@ class HtmlModule(port: Int) {
   val server = Undertow
     .builder()
     .addHttpListener(port, "localhost")
-    .setHandler(
-      ErrorHandler(
-        RoutesHandler(
-          routes,
-          new ResourceHandler(
-            new ClassPathResourceManager(getClass.getClassLoader, "static")
-          )
-        )
-      )
-    )
+    .setHandler(SharafHandler(routes))
     .build()
 }
 

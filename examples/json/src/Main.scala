@@ -39,6 +39,6 @@ class JsonApiModule(port: Int) {
   val server = Undertow
     .builder()
     .addHttpListener(port, "localhost")
-    .setHandler(ErrorHandler(RoutesHandler(routes), ErrorMapper.json))
+    .setHandler(SharafHandler(routes).withErrorMapper(ErrorMapper.json))
     .build()
 }

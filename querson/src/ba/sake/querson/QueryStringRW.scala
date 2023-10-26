@@ -108,7 +108,6 @@ object QueryStringRW {
       val str = QueryStringRW[String].parse(path, qsData)
       Try(LocalDateTime.parse(str)).toOption.getOrElse(typeError(path, "LocalDateTime", str))
   }
-  
 
   given QueryStringRW[Duration] with {
     override def write(path: String, value: Duration): QueryStringData =

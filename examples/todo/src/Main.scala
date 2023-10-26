@@ -52,12 +52,8 @@ import ba.sake.sharaf.*, handlers.*, routing.*
     .builder()
     .addHttpListener(port, "localhost")
     .setHandler(
-      ErrorHandler(
-        CorsHandler(
-          RoutesHandler(routes),
-          CorsSettings(allowedOrigins = Set("https://todobackend.com"))
-        )
-      )
+      SharafHandler(routes)
+        .withCorsSettings(CorsSettings(allowedOrigins = Set("https://todobackend.com")))
     )
     .build()
 

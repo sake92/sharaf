@@ -2,7 +2,7 @@ package demo
 
 import io.undertow.Undertow
 import ba.sake.validson.*
-import ba.sake.sharaf.*, handlers.*, routing.*
+import ba.sake.sharaf.*, routing.*
 import demo.views.*
 
 @main def main: Unit =
@@ -28,6 +28,6 @@ class FormModule(port: Int) {
   val server = Undertow
     .builder()
     .addHttpListener(port, "localhost")
-    .setHandler(ErrorHandler(RoutesHandler(routes)))
+    .setHandler(SharafHandler(routes))
     .build()
 }

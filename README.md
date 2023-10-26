@@ -9,7 +9,7 @@ Still WIP  :construction: but very much usable. :construction_worker:
 Mill:
 ```scala
 def ivyDeps = Agg(
-  ivy"ba.sake::sharaf:0.0.6"
+  ivy"ba.sake::sharaf:0.0.7"
 )
 def scalacOptions = Seq(
   "-Yretain-trees"
@@ -20,10 +20,10 @@ def scalacOptions = Seq(
 
 A hello world example in scala-cli:
 ```scala
-//> using dep ba.sake::sharaf:0.0.6
+//> using dep ba.sake::sharaf:0.0.7
 
 import io.undertow.Undertow
-import ba.sake.sharaf.*, handlers.*, routing.*
+import ba.sake.sharaf.*, routing.*
 
 val routes: Routes = 
   case GET() -> Path("hello", name) =>
@@ -32,7 +32,7 @@ val routes: Routes =
 val server = Undertow
   .builder()
   .addHttpListener(8181, "localhost")
-  .setHandler(ErrorHandler(RoutesHandler(routes)))
+  .setHandler(SharafHandler(routes))
   .build()
 
 server.start()

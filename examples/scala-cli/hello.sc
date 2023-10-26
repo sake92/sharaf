@@ -1,7 +1,7 @@
-//> using dep ba.sake::sharaf:0.0.6
+//> using dep ba.sake::sharaf:0.0.7
 
 import io.undertow.Undertow
-import ba.sake.sharaf.*, handlers.*, routing.*
+import ba.sake.sharaf.*, routing.*
 
 val routes: Routes =
   case GET() -> Path("hello", name) =>
@@ -10,7 +10,7 @@ val routes: Routes =
 val server = Undertow
   .builder()
   .addHttpListener(8181, "localhost")
-  .setHandler(ErrorHandler(RoutesHandler(routes)))
+  .setHandler(SharafHandler(routes))
   .build()
 
 server.start()
