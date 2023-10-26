@@ -2,10 +2,10 @@ package demo
 package views
 
 import java.nio.file.Files
+import ba.sake.validson.ValidationError
 import scalatags.Text.all.*
-import ba.sake.hepek.html.*
-import ba.sake.validson.*
-import Bundle.{Classes, Form, Grid, Panel}
+import ba.sake.hepek.html.HtmlPage
+import Bundle._
 
 def FormPage(req: Option[CreateCustomerForm] = None, errors: Seq[ValidationError] = Seq.empty): HtmlPage = new MyPage {
 

@@ -1,5 +1,6 @@
 import mill._
 import mill.scalalib._, scalafmt._, publish._
+import coursier.maven.MavenRepository
 
 import $ivy.`io.chris-kipp::mill-ci-release::0.1.9`
 import io.kipp.mill.ci.release.CiReleaseModule
@@ -12,7 +13,7 @@ object sharaf extends SharafPublishModule {
     ivy"io.undertow:undertow-core:2.3.10.Final",
     ivy"com.typesafe:config:1.4.2",
     ivy"ba.sake::tupson:0.8.0",
-    ivy"ba.sake::hepek-components:0.13.0",
+    ivy"ba.sake::hepek-components:0.13.0+8-3aeb2ce3-SNAPSHOT",
     ivy"com.lihaoyi::requests:0.8.0"
   )
 
@@ -85,6 +86,11 @@ trait SharafCommonModule extends ScalaModule with ScalafmtModule {
     "-deprecation",
     "-Wunused:all"
   )
+  def repositoriesTask = T.task {
+    super.repositoriesTask() ++ 
+      Seq(MavenRepository("https://oss.sonatype.org/content/repositories/snapshots"))
+
+  }
 }
 
 trait SharafTestModule extends TestModule.Munit {
