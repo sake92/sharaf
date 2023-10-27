@@ -6,6 +6,11 @@ import scala.deriving.*
 import scala.quoted.*
 import scala.util.Try
 
+object param {
+  def unapply[T](str: String)(using fp: FromPathParam[T]): Option[T] =
+    fp.parse(str)
+}
+
 // typeclass for converting a path parameter to T
 trait FromPathParam[T] {
   def parse(str: String): Option[T]
