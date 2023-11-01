@@ -3,7 +3,7 @@ name: CI/CD
 
 on:
   push:
-    branches: [main]
+    branches: main
   pull_request:
 
 jobs:
@@ -16,6 +16,8 @@ jobs:
         java: [11, 17]
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-java@v3
         with:
           distribution: 'temurin'

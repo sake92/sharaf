@@ -87,7 +87,7 @@ trait SharafCommonModule extends ScalaModule with ScalafmtModule {
     "-Wunused:all"
   )
   def repositoriesTask = T.task {
-    super.repositoriesTask() ++ 
+    super.repositoriesTask() ++
       Seq(MavenRepository("https://oss.sonatype.org/content/repositories/snapshots"))
 
   }
@@ -99,28 +99,33 @@ trait SharafTestModule extends TestModule.Munit {
   )
 }
 
-////////////////////
+//////////////////// examples
+trait SharafExampleModule extends SharafCommonModule {
+  def ivyDeps = Agg(
+    ivy"ch.qos.logback:logback-classic:1.4.6"
+  )
+}
+
 object examples extends mill.Module {
-  object html extends SharafCommonModule {
+  object html extends SharafExampleModule {
     def moduleDeps = Seq(sharaf)
     object test extends ScalaTests with SharafTestModule
   }
-  object json extends SharafCommonModule {
+  object json extends SharafExampleModule {
     def moduleDeps = Seq(sharaf)
     object test extends ScalaTests with SharafTestModule
   }
-  object form extends SharafCommonModule {
+  object form extends SharafExampleModule {
     def moduleDeps = Seq(sharaf)
     object test extends ScalaTests with SharafTestModule
   }
-  object todo extends SharafCommonModule {
+  object todo extends SharafExampleModule {
     def moduleDeps = Seq(sharaf)
     object test extends ScalaTests with SharafTestModule
   }
-  object oauth2 extends SharafCommonModule {
+  object oauth2 extends SharafExampleModule {
     def moduleDeps = Seq(sharaf)
-    def ivyDeps = Agg(
-      ivy"ch.qos.logback:logback-classic:1.4.6",
+    def ivyDeps = super.ivyDeps() ++ Agg(
       ivy"org.pac4j:undertow-pac4j:5.0.1",
       ivy"org.pac4j:pac4j-oauth:5.7.0"
     )

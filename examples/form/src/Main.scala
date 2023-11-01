@@ -16,13 +16,13 @@ class FormModule(port: Int) {
 
   private val routes: Routes = {
     case GET() -> Path() =>
-      Response.withBody(FormPage())
+      Response.withBody(ShowFormPage())
 
     case POST() -> Path("form-submit") =>
-      val req = Request.current.bodyForm[CreateCustomerForm]
-      req.validate match
-        case Seq()  => Response.withBody(SucessPage(req))
-        case errors => Response.withBody(FormPage(Some(req), errors)).withStatus(400)
+      val formData = Request.current.bodyForm[CreateCustomerForm]
+      formData.validate match
+        case Seq()  => Response.withBody(SucessPage(formData))
+        case errors => Response.withBody(ShowFormPage(Some(formData), errors)).withStatus(400)
   }
 
   val server = Undertow
