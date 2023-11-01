@@ -119,10 +119,6 @@ object examples extends mill.Module {
     def moduleDeps = Seq(sharaf)
     object test extends ScalaTests with SharafTestModule
   }
-  object todo extends SharafExampleModule {
-    def moduleDeps = Seq(sharaf)
-    object test extends ScalaTests with SharafTestModule
-  }
   object oauth2 extends SharafExampleModule {
     def moduleDeps = Seq(sharaf)
     def ivyDeps = super.ivyDeps() ++ Agg(
