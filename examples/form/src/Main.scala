@@ -14,7 +14,7 @@ class FormModule(port: Int) {
 
   val baseUrl = s"http://localhost:${port}"
 
-  private val routes = Routes {
+  private val routes = Routes:
     case GET() -> Path() =>
       Response.withBody(ShowFormPage())
 
@@ -23,7 +23,6 @@ class FormModule(port: Int) {
       formData.validate match
         case Seq()  => Response.withBody(SucessPage(formData))
         case errors => Response.withBody(ShowFormPage(Some(formData), errors)).withStatus(400)
-  }
 
   val server = Undertow
     .builder()

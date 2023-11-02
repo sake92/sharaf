@@ -17,7 +17,7 @@ class JsonApiModule(port: Int) {
   // don't do this at home!
   private var db = Seq.empty[ProductRes]
 
-  private val routes = Routes {
+  private val routes = Routes:
     case GET() -> Path("products", param[UUID](id)) =>
       val productOpt = db.find(_.id == id)
       Response.withBodyOpt(productOpt, s"Product with id=$id")
@@ -34,7 +34,6 @@ class JsonApiModule(port: Int) {
       val res = ProductRes(UUID.randomUUID(), req.name, req.quantity)
       db = db.appended(res)
       Response.withBody(res)
-  }
 
   val server = Undertow
     .builder()

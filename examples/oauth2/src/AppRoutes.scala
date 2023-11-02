@@ -7,8 +7,7 @@ import scalatags.Text.all
 
 class AppRoutes(securityService: SecurityService) {
 
-  val routes = Routes {
-
+  val routes = Routes:
     case GET() -> Path("protected") =>
       Response.withBody(Views.ProtectedPage)
 
@@ -20,7 +19,6 @@ class AppRoutes(securityService: SecurityService) {
 
     case _ =>
       Response.withBody("Not found. ¯\\_(ツ)_/¯")
-  }
 
 }
 
