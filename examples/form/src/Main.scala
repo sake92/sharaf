@@ -14,7 +14,7 @@ class FormModule(port: Int) {
 
   val baseUrl = s"http://localhost:${port}"
 
-  private val routes: Routes = {
+  private val routes = Routes {
     case GET() -> Path() =>
       Response.withBody(ShowFormPage())
 

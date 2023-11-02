@@ -3,11 +3,16 @@ package ba.sake.sharaf.routing
 import ba.sake.sharaf.Request
 import ba.sake.sharaf.Response
 
-type Routes = Request ?=> PartialFunction[RequestParams, Response[?]]
+type RoutesDefinition = Request ?=> PartialFunction[RequestParams, Response[?]]
+
+class Routes(routesDef: RoutesDefinition) {
+  private[sharaf] def definition: RoutesDefinition = routesDef
+}
 
 object Routes {
   def merge(routess: Seq[Routes]): Routes =
-    routess.reduceLeft { case (acc, next) =>
+    val routesDef: RoutesDefinition = routess.map(_.definition).reduceLeft { case (acc, next) =>
       acc.orElse(next)
     }
+    Routes(routesDef)
 }

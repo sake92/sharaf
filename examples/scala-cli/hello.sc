@@ -1,9 +1,9 @@
-//> using dep ba.sake::sharaf:0.0.11
+//> using dep ba.sake::sharaf:0.0.12
 
 import io.undertow.Undertow
 import ba.sake.sharaf.*, routing.*
 
-val routes: Routes =
+val routes = Routes:
   case GET() -> Path("hello", name) =>
     Response.withBody(s"Hello $name")
 

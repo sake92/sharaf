@@ -1,10 +1,10 @@
 package ba.sake.sharaf.handlers
 
 import io.undertow.server.HttpHandler
+import io.undertow.server.HttpServerExchange
 import io.undertow.server.handlers.resource.ResourceHandler
 import io.undertow.server.handlers.resource.ClassPathResourceManager
 import ba.sake.sharaf.routing.Routes
-import io.undertow.server.HttpServerExchange
 
 class SharafHandler(
     routes: Routes,

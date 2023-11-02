@@ -22,7 +22,7 @@ A hello world example in scala-cli:
 import io.undertow.Undertow
 import ba.sake.sharaf.*, routing.*
 
-val routes: Routes = 
+val routes = Routes:
   case GET() -> Path("hello", name) =>
     Response.withBody(s"Hello $name")
 

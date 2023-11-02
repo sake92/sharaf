@@ -20,7 +20,7 @@ final class RoutesHandler private (routes: Routes, nextHandler: Option[HttpHandl
 
       val reqParams = fillReqParams(exchange)
 
-      val resOpt = routes.lift(reqParams)
+      val resOpt = routes.definition.lift(reqParams)
 
       resOpt match {
         case Some(res) => ResponseWritable.writeResponse(res, exchange)
