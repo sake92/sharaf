@@ -13,11 +13,10 @@ import fastparse.Parsed.Failure
   *   Form data AST
   */
 
-private[formson] def parseFDMap(formDataMap: FormDataMap): FormData = {
-  val parser = new FormsonParser(formDataMap)
+private[formson] def parseFDMap(formDataMap: FormDataMap): FormData =
+  val parser = FormsonParser(formDataMap)
   val formDataInternal = parser.parse()
   fromInternal(formDataInternal)
-}
 
 private def fromInternal(fdi: FormDataInternal): FormData = fdi match
   case FormDataInternal.Simple(value)       => FormData.Simple(value)
@@ -34,17 +33,14 @@ private[formson] enum FormDataInternal(val tpe: String):
 private[formson] class FormsonParser(formDataMap: FormDataMap) {
   import FormDataInternal.*
 
-  def parse(): Obj = {
-
+  def parse(): Obj =
     // for every key we get an AST (object) with possibly recursive values
     val objects = formDataMap.map { case (key, values) =>
       val keyParts = KeyParser(key).parse()
       parseInternal(keyParts, values).asInstanceOf[Obj]
     }.toSeq
-
     // then we merge all of them to one object
     mergeObjects(objects)
-  }
 
   private def merge(acc: FormDataInternal, second: FormDataInternal): FormDataInternal = (acc, second) match {
 
@@ -76,16 +72,15 @@ private[formson] class FormsonParser(formDataMap: FormDataMap) {
       Sequence(seqAcc.to(SortedMap))
 
     case (first, second) =>
-      throw new FormsonException(s"Unmergeable objects: ${first.tpe} and ${second.tpe}")
+      throw FormsonException(s"Unmergeable objects: ${first.tpe} and ${second.tpe}")
   }
 
-  private def mergeObjects(flatObjects: Seq[Obj]): Obj = {
+  private def mergeObjects(flatObjects: Seq[Obj]): Obj =
     flatObjects
       .foldLeft(Obj(Map.empty)) { case (acc, next) =>
         merge(acc, next)
       }
       .asInstanceOf[Obj]
-  }
 
   private def parseInternal(keyParts: Seq[String], values: Seq[FormValue]): FormDataInternal = {
 
@@ -112,13 +107,11 @@ private[formson] class KeyParser(key: String) {
 
   private val ForbiddenKeyChars = Set('[', ']', '.')
 
-  def parse(): Seq[String] = {
-
+  def parse(): Seq[String] =
     val res = fastparse.parse(key, parseFinal(_))
     res match
       case Success((firstKey, subKeys), index) => subKeys.prepended(firstKey)
-      case f: Failure                          => throw new FormsonException(f.msg)
-  }
+      case f: Failure                          => throw FormsonException(f.msg)
 
   private def parseFinal[$: P] = P(
     Start ~ parseKey ~ (parseBracketedSubKey | parseDottedSubKey | parseIndex).rep(min = 0) ~ End

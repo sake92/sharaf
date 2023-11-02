@@ -10,7 +10,7 @@ import ba.sake.tupson._
 import ba.sake.querson.QueryStringMap
 
 def getFreePort(): Int =
-  Using.resource(new ServerSocket(0)) { ss =>
+  Using.resource(ServerSocket(0)) { ss =>
     ss.getLocalPort()
   }
 

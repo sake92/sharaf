@@ -59,7 +59,7 @@ object ResponseWritable {
     // headers
     val allHeaders = response.body.flatMap(response.rw.headers) ++ response.headers
     allHeaders.foreach { case (name, values) =>
-      exchange.getResponseHeaders.putAll(new HttpString(name), values.asJava)
+      exchange.getResponseHeaders.putAll(HttpString(name), values.asJava)
     }
     // status code
     exchange.setStatusCode(response.status)

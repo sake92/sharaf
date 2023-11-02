@@ -67,23 +67,20 @@ class ValidsonSuite extends munit.FunSuite {
 case class NotValidatedData(x: Int, str: String, vals: Seq[String])
 
 case class SimpleData(num: Int, str: String, seq: Seq[String])
-object SimpleData {
+object SimpleData:
   given Validator[SimpleData] = Validator
     .derived[SimpleData]
     .and(_.num, _ > 0, "must be positive")
     .and(_.str, !_.isBlank, "must not be blank")
     .and(_.seq, _.nonEmpty, "must not be empty")
     .and(_.seq, _.forall(_.size == 2), "must have elements of size 2")
-}
 
 case class ComplexData(password: String, datas: Seq[SimpleData], matrix: Seq[Seq[SimpleData]])
 
-object ComplexData {
+object ComplexData:
 
   given Validator[ComplexData] = Validator
     .derived[ComplexData]
     .and(_.password, _.contains("A"), "must contain A")
     .and(_.password, _.contains("5"), "must contain 5")
     .and(_.matrix, _.nonEmpty, "must not be empty")
-
-}

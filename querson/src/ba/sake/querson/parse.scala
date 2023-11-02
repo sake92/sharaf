@@ -13,11 +13,10 @@ import fastparse.Parsed.Failure
   *   Query string AST
   */
 
-def parseQSMap(queryStringMap: QueryStringMap): QueryStringData = {
-  val parser = new QuersonParser(queryStringMap)
+def parseQSMap(queryStringMap: QueryStringMap): QueryStringData =
+  val parser = QuersonParser(queryStringMap)
   val qsInternal = parser.parse()
   fromInternal(qsInternal)
-}
 
 private def fromInternal(qsi: QueryStringInternal): QueryStringData = qsi match
   case QueryStringInternal.Simple(value)       => QueryStringData.Simple(value)
@@ -119,7 +118,7 @@ private[querson] class KeyParser(key: String) {
     val res = fastparse.parse(key, parseFinal(_))
     res match
       case Success((firstKey, subKeys), index) => subKeys.prepended(firstKey)
-      case f: Failure                          => throw new QuersonException(f.msg)
+      case f: Failure                          => throw QuersonException(f.msg)
   }
 
   private def parseFinal[$: P] = P(

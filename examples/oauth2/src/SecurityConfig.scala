@@ -16,13 +16,13 @@ class SecurityConfig(clients: Clients) {
 
   val pac4jConfig = {
 
-    val publicRoutesMatcher = new PathMatcher()
+    val publicRoutesMatcher = PathMatcher()
     // exclude fixed paths
     publicRoutesMatcher.excludePaths("/")
     // exclude glob stuff* paths
     Seq("/js", "/images").foreach(publicRoutesMatcher.excludeBranch)
 
-    val config = new Config()
+    val config = Config()
     config.setClients(clients)
     config.addMatcher(publicRoutesMatcherName, publicRoutesMatcher)
     config

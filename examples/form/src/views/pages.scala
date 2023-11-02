@@ -17,11 +17,11 @@ def ShowFormPage(formData: Option[CreateCustomerForm] = None, errors: Seq[Valida
         Panel.Companion.Type.Info,
         body =
           if errors.isEmpty then """
-          Hello there!  
-          Please fill in the following form:
+            Hello there!  
+            Please fill in the following form:
           """.md
           else """
-          There were some errors in the form, please fix them:
+            There were some errors in the form, please fix them:
           """.md
       ),
       Form.form(action := "/form-submit", method := "POST", enctype := "multipart/form-data")(

@@ -25,7 +25,7 @@ class QueryStringParseSuite extends munit.FunSuite {
           "duration" -> Seq("PT5H2S"),
           "period" -> Seq("P4M1D")
         ),
-        QuerySimple("text", 42, uuid, new URL("http://example.com"), instant, ldt, duration, period)
+        QuerySimple("text", 42, uuid, URL("http://example.com"), instant, ldt, duration, period)
       )
     ).foreach { case (qsMap, expected) =>
       val res = qsMap.parseQueryStringMap[QuerySimple]
@@ -186,7 +186,7 @@ class QueryStringParseSuite extends munit.FunSuite {
           ParseError("instant", "invalid Instant", Some("2007-12-03T10:15:30")),
           ParseError("ldt", "invalid LocalDateTime", Some("2007-12-03Hmm10:15:30")),
           ParseError("duration", "invalid Duration", Some("PT5H2S_")),
-          ParseError("period", "invalid Period", Some("P4_M1D")),
+          ParseError("period", "invalid Period", Some("P4_M1D"))
         )
       )
     }

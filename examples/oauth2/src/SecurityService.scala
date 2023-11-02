@@ -12,9 +12,9 @@ class SecurityService(config: Config) {
     val exchange = req.underlyingHttpServerExchange
 
     @annotation.nowarn
-    val sessionStore = FindBest.sessionStore(null, config, new UndertowSessionStore(exchange))
+    val sessionStore = FindBest.sessionStore(null, config, UndertowSessionStore(exchange))
 
-    val profileManager = config.getProfileManagerFactory().apply(new UndertowWebContext(exchange), sessionStore)
+    val profileManager = config.getProfileManagerFactory().apply(UndertowWebContext(exchange), sessionStore)
 
     profileManager.getProfile().toScala.map { profile =>
       // val identityProvider = profile match ..

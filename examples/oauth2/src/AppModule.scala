@@ -17,8 +17,8 @@ class AppModule(port: Int, clients: Clients) {
   val baseUrl = s"http://localhost:${port}"
 
   private val securityConfig = SecurityConfig(clients)
-  private val securityService = new SecurityService(securityConfig.pac4jConfig)
-  private val appRoutes = new AppRoutes(securityService)
+  private val securityService = SecurityService(securityConfig.pac4jConfig)
+  private val appRoutes = AppRoutes(securityService)
 
   private val httpHandler: HttpHandler = locally {
     val securityHandler =
@@ -28,22 +28,22 @@ class AppModule(port: Int, clients: Clients) {
         securityConfig.clientNames.mkString(","),
         null,
         securityConfig.matchers,
-        new CustomSecurityLogic()
+        CustomSecurityLogic()
       )
 
     val pathHandler = Handlers
       .path()
       .addExactPath(
         "/callback",
-        CallbackHandler.build(securityConfig.pac4jConfig, null, new CustomCallbackLogic())
+        CallbackHandler.build(securityConfig.pac4jConfig, null, CustomCallbackLogic())
       )
-      .addExactPath("/logout", new LogoutHandler(securityConfig.pac4jConfig, "/"))
+      .addExactPath("/logout", LogoutHandler(securityConfig.pac4jConfig, "/"))
       .addPrefixPath("/", securityHandler)
 
-    new SessionAttachmentHandler(
+    SessionAttachmentHandler(
       pathHandler,
-      new InMemorySessionManager("SessionManager"),
-      new SessionCookieConfig()
+      InMemorySessionManager("SessionManager"),
+      SessionCookieConfig()
     )
   }
 

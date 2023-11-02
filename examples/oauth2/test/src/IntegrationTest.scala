@@ -40,7 +40,7 @@ trait IntegrationTest extends munit.FunSuite {
 
       // set user that gets logged in
       mockOauth2server.enqueueCallback(
-        new DefaultOAuth2TokenCallback(
+        DefaultOAuth2TokenCallback(
           issuerId,
           TestData.username,
           JOSEObjectType.JWT.getType(),
@@ -54,7 +54,7 @@ trait IntegrationTest extends munit.FunSuite {
       )
 
       // start real server
-      val client = new GenericOAuth20Client()
+      val client = GenericOAuth20Client()
       client.setKey("fakeKey")
       client.setSecret("fakeSecret")
       client.setAuthUrl(mockOauth2server.authorizationEndpointUrl(issuerId).toString())
@@ -63,7 +63,7 @@ trait IntegrationTest extends munit.FunSuite {
       client.setProfileUrl(mockOauth2server.userInfoUrl(issuerId).toString())
 
       val port = getFreePort()
-      val clients = new Clients(s"http://localhost:${port}/callback", client)
+      val clients = Clients(s"http://localhost:${port}/callback", client)
 
       // assign fixture
       module = AppModule(port, clients)

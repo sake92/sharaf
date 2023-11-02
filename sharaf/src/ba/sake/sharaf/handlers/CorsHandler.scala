@@ -13,13 +13,12 @@ import ba.sake.sharaf.*
 // TODO write some tests
 final class CorsHandler private (next: HttpHandler, corsSettings: CorsSettings) extends HttpHandler {
 
-  private val accessControlAllowOrigin = new HttpString("Access-Control-Allow-Origin")
-
-  private val accessControlAllowCredentials = new HttpString("Access-Control-Allow-Credentials")
+  private val accessControlAllowOrigin = HttpString("Access-Control-Allow-Origin")
+  private val accessControlAllowCredentials = HttpString("Access-Control-Allow-Credentials")
 
   // only for OPTIONS / preflight
-  private val accessControlAllowMethods = new HttpString("Access-Control-Allow-Methods")
-  private val acccessControlAllowHeaders = new HttpString("Access-Control-Allow-Headers")
+  private val accessControlAllowMethods = HttpString("Access-Control-Allow-Methods")
+  private val acccessControlAllowHeaders = HttpString("Access-Control-Allow-Headers")
 
   override def handleRequest(exchange: HttpServerExchange): Unit = {
     exchange.startBlocking()

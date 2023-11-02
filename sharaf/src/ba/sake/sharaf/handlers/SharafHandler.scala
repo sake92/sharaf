@@ -15,7 +15,7 @@ class SharafHandler(
     CorsHandler(
       RoutesHandler(
         routes,
-        new ResourceHandler(new ClassPathResourceManager(getClass.getClassLoader, "static"))
+        ResourceHandler(ClassPathResourceManager(getClass.getClassLoader, "static"))
       ),
       corsSettings
     ),

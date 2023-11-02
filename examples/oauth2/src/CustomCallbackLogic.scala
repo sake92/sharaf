@@ -29,7 +29,7 @@ class CustomCallbackLogic() extends DefaultCallbackLogic {
         // this should probably be a different CallbackLogic for tests..
         println(s"Saving TEST profile to database: $profile")
       case other =>
-        throw new RuntimeException(s"Cant handle Pac4jUserProfile: $other")
+        throw RuntimeException(s"Cant handle Pac4jUserProfile: $other")
 
   }
 }

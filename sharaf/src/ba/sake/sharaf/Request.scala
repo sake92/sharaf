@@ -40,7 +40,7 @@ final class Request(
   }
 
   lazy val bodyString: String =
-    new String(ex.getInputStream.readAllBytes(), StandardCharsets.UTF_8)
+    String(ex.getInputStream.readAllBytes(), StandardCharsets.UTF_8)
 
   // JSON
   def bodyJson[T: JsonRW]: T =
@@ -54,7 +54,7 @@ final class Request(
     // createParser returns null if content-type is not suitable
     val parser = formBodyParserFactory.createParser(ex)
     Option(parser) match
-      case None => throw new SharafException("The specified content type is not supported")
+      case None => throw SharafException("The specified content type is not supported")
       case Some(parser) =>
         val uFormData = parser.parseBlocking()
         val formDataMap = Request.undertowFormData2FormsonMap(uFormData)

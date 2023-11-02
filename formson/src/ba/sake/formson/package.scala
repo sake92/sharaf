@@ -52,12 +52,12 @@ final class ParsingException(val errors: Seq[ParseError])
         .map(_.text)
         .mkString("; ")
     )
-object ParsingException {
+
+object ParsingException:
   def apply(errors: Seq[ParseError]): ParsingException =
     new ParsingException(errors)
   def apply(pe: ParseError): ParsingException =
     new ParsingException(Seq(pe))
-}
 
 case class ParseError(
     path: String,

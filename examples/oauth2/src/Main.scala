@@ -7,11 +7,11 @@ import org.pac4j.oauth.client.*
 
   // configure your OAuth2 clients with your values
   // from pac4j's huge list https://www.pac4j.org/docs/clients/oauth.html
-  val githubClient = new GitHubClient("KEY", "SECRET")
+  val githubClient = GitHubClient("KEY", "SECRET")
   githubClient.setScope("read:user, user:email")
-  // val facebookClient = new FacebookClient(...)
+  // val facebookClient = FacebookClient(...)
 
-  val clients = new Clients(s"http://localhost:8181/callback", githubClient)
+  val clients = Clients(s"http://localhost:8181/callback", githubClient)
 
   val module = AppModule(8181, clients)
   module.server.start()
