@@ -47,9 +47,8 @@ to try it out.
 ---
 
 Full blown standalone examples:
-- handling [json](examples/json)
-- rendering [html](examples/html) and serving static files
-- handling [form data](examples/form) and [Bootstrap](https://getbootstrap.com/) usage
+- [API](examples/api) featuring JSON and validation
+- [full-stack](examples/fullstack) featuring HTML, static files and forms
 - [sharaf-todo-backend](https://github.com/sake92/sharaf-todo-backend), implementation of the [todobackend.com](http://todobackend.com/) spec, featuring CORS handling
 - [OAuth2 login](examples/oauth2) with [Pac4J library](https://www.pac4j.org/)
 

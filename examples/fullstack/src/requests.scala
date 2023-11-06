@@ -1,4 +1,4 @@
-package demo
+package fullstack
 
 import java.nio.file.Path
 import ba.sake.formson.*

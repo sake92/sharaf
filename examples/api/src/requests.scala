@@ -1,4 +1,4 @@
-package demo
+package api
 
 import ba.sake.tupson.JsonRW
 import ba.sake.querson.QueryStringRW

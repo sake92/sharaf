@@ -13,7 +13,7 @@ object sharaf extends SharafPublishModule {
     ivy"io.undertow:undertow-core:2.3.10.Final",
     ivy"com.typesafe:config:1.4.3",
     ivy"ba.sake::tupson:0.8.0",
-    ivy"ba.sake::hepek-components:0.14.0",
+    ivy"ba.sake::hepek-components:0.15.0",
     ivy"com.lihaoyi::requests:0.8.0"
   )
 
@@ -107,15 +107,11 @@ trait SharafExampleModule extends SharafCommonModule {
 }
 
 object examples extends mill.Module {
-  object html extends SharafExampleModule {
+  object api extends SharafExampleModule {
     def moduleDeps = Seq(sharaf)
     object test extends ScalaTests with SharafTestModule
   }
-  object json extends SharafExampleModule {
-    def moduleDeps = Seq(sharaf)
-    object test extends ScalaTests with SharafTestModule
-  }
-  object form extends SharafExampleModule {
+  object fullstack extends SharafExampleModule {
     def moduleDeps = Seq(sharaf)
     object test extends ScalaTests with SharafTestModule
   }

@@ -1,4 +1,4 @@
-package demo.views
+package fullstack.views
 
 import ba.sake.hepek.bootstrap3.BootstrapBundle
 
