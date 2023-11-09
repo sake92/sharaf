@@ -55,7 +55,7 @@ class JsonApiSuite extends munit.FunSuite {
 
     // filtering GET
     locally {
-      val queryParams = ProductsQuery(Set("Chocolate"), Option(1)).toQueryStringMap().toRequestsQuery()
+      val queryParams = ProductsQuery(Set("Chocolate"), Option(1)).toRequestsQuery()
       val res = requests.get(s"$baseUrl/products", params = queryParams)
       assertEquals(res.statusCode, 200)
       assertEquals(res.headers("content-type"), Seq("application/json"))

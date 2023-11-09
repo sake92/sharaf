@@ -19,7 +19,7 @@ class FullstackSuite extends munit.FunSuite {
       CreateCustomerForm("Meho", exampleFile, CreateAddressForm("street123ž"), List("hobby1", "hobby2"))
     val res = requests.post(
       s"${module.baseUrl}/form-submit",
-      data = reqBody.toFormDataMap().toRequestsMultipart()
+      data = reqBody.toRequestsMultipart()
     )
 
     assertEquals(res.statusCode, 200)

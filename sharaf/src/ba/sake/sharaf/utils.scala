@@ -5,9 +5,9 @@ import scala.util.Using
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigRenderOptions
 
-import ba.sake.formson._
-import ba.sake.tupson._
-import ba.sake.querson.QueryStringMap
+import ba.sake.formson
+import ba.sake.tupson.*
+import ba.sake.querson
 
 def getFreePort(): Int =
   Using.resource(ServerSocket(0)) { ss =>
@@ -15,9 +15,10 @@ def getFreePort(): Int =
   }
 
 // requests integration
-extension (formDataMap: FormDataMap)
-  def toRequestsMultipart() =
-    val multiItems = formDataMap.flatMap { case (key, values) =>
+extension [T](value: T)(using rw: formson.FormDataRW[T])
+  def toRequestsMultipart(config: formson.Config = formson.DefaultFormsonConfig): requests.MultiPart =
+    import formson.*
+    val multiItems = value.toFormDataMap().flatMap { case (key, values) =>
       values.map {
         case FormValue.Str(value)       => requests.MultiItem(key, value)
         case FormValue.File(value)      => requests.MultiItem(key, value, value.getFileName.toString)
@@ -26,9 +27,10 @@ extension (formDataMap: FormDataMap)
     }
     requests.MultiPart(multiItems.toSeq*)
 
-extension (queryStringMap: QueryStringMap)
-  def toRequestsQuery(): Map[String, String] =
-    queryStringMap.map { (k, vs) => k -> vs.head }
+extension [T](value: T)(using rw: querson.QueryStringRW[T])
+  def toRequestsQuery(config: querson.Config = querson.DefaultQuersonConfig): Map[String, String] =
+    import querson.*
+    value.toQueryStringMap().map { (k, vs) => k -> vs.head }
 
 // typesafe config easy parsing
 extension (config: Config) {
