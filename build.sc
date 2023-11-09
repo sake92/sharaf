@@ -19,7 +19,11 @@ object sharaf extends SharafPublishModule {
 
   def moduleDeps = Seq(querson, formson)
 
-  object test extends ScalaTests with SharafTestModule
+  object test extends ScalaTests with SharafTestModule {
+    
+    def forkArgs = Seq("-Dconfig.override_with_env_vars=true")
+    def forkEnv = Map("CONFIG_FORCE_envvar_port" -> "1234")
+  }
 }
 
 object querson extends SharafPublishModule {
