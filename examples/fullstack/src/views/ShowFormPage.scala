@@ -4,6 +4,7 @@ import ba.sake.validson.ValidationError
 import Bundle._, Tags.*
 import fullstack.CreateCustomerForm
 
+// TODO make formData nbn-optional
 class ShowFormPage(formData: Option[CreateCustomerForm] = None, errors: Seq[ValidationError] = Seq.empty)
     extends MyPage {
 

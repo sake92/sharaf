@@ -1,7 +1,8 @@
 package ba.sake.formson
 
+import java.net.*
+import java.time.*
 import java.util.UUID
-
 import scala.deriving.*
 import scala.quoted.*
 import scala.reflect.ClassTag
@@ -64,6 +65,71 @@ object FormDataRW {
     override def parse(path: String, formData: FormData): UUID =
       val str = FormDataRW[String].parse(path, formData)
       Try(UUID.fromString(str)).toOption.getOrElse(typeError(path, "UUID", str))
+  }
+
+  // java.net
+  given FormDataRW[URI] with {
+    override def write(path: String, value: URI): FormData =
+      FormDataRW[String].write(path, value.toString)
+
+    override def parse(path: String, formData: FormData): URI =
+      val str = FormDataRW[String].parse(path, formData)
+      Try(URI(str)).toOption.getOrElse(typeError(path, "URI", str))
+  }
+
+  given FormDataRW[URL] with {
+    override def write(path: String, value: URL): FormData =
+      FormDataRW[String].write(path, value.toString)
+
+    override def parse(path: String, formData: FormData): URL =
+      val str = FormDataRW[String].parse(path, formData)
+      Try(URI(str).toURL).toOption.getOrElse(typeError(path, "URL", str))
+  }
+
+  // java.time
+  given FormDataRW[Instant] with {
+    override def write(path: String, value: Instant): FormData =
+      FormDataRW[String].write(path, value.toString)
+
+    override def parse(path: String, formData: FormData): Instant =
+      val str = FormDataRW[String].parse(path, formData)
+      Try(Instant.parse(str)).toOption.getOrElse(typeError(path, "Instant", str))
+  }
+
+  given FormDataRW[LocalDate] with {
+    override def write(path: String, value: LocalDate): FormData =
+      FormDataRW[String].write(path, value.toString)
+
+    override def parse(path: String, formData: FormData): LocalDate =
+      val str = FormDataRW[String].parse(path, formData)
+      Try(LocalDate.parse(str)).toOption.getOrElse(typeError(path, "LocalDate", str))
+  }
+
+  given FormDataRW[LocalDateTime] with {
+    override def write(path: String, value: LocalDateTime): FormData =
+      FormDataRW[String].write(path, value.toString)
+
+    override def parse(path: String, formData: FormData): LocalDateTime =
+      val str = FormDataRW[String].parse(path, formData)
+      Try(LocalDateTime.parse(str)).toOption.getOrElse(typeError(path, "LocalDateTime", str))
+  }
+
+  given FormDataRW[Duration] with {
+    override def write(path: String, value: Duration): FormData =
+      FormDataRW[String].write(path, value.toString)
+
+    override def parse(path: String, formData: FormData): Duration =
+      val str = FormDataRW[String].parse(path, formData)
+      Try(Duration.parse(str)).toOption.getOrElse(typeError(path, "Duration", str))
+  }
+
+  given FormDataRW[Period] with {
+    override def write(path: String, value: Period): FormData =
+      FormDataRW[String].write(path, value.toString)
+
+    override def parse(path: String, formData: FormData): Period =
+      val str = FormDataRW[String].parse(path, formData)
+      Try(Period.parse(str)).toOption.getOrElse(typeError(path, "Period", str))
   }
 
   given FormDataRW[Path] with {

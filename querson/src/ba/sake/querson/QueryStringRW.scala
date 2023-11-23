@@ -1,11 +1,7 @@
 package ba.sake.querson
 
-import java.net.URL
-import java.net.URI
-import java.time.Instant
-import java.time.LocalDateTime
-import java.time.Duration
-import java.time.Period
+import java.net.*
+import java.time.*
 import java.util.UUID
 
 import scala.deriving.*
@@ -98,6 +94,15 @@ object QueryStringRW {
     override def parse(path: String, qsData: QueryStringData): Instant =
       val str = QueryStringRW[String].parse(path, qsData)
       Try(Instant.parse(str)).toOption.getOrElse(typeError(path, "Instant", str))
+  }
+
+  given QueryStringRW[LocalDate] with {
+    override def write(path: String, value: LocalDate): QueryStringData =
+      QueryStringRW[String].write(path, value.toString)
+
+    override def parse(path: String, qsData: QueryStringData): LocalDate =
+      val str = QueryStringRW[String].parse(path, qsData)
+      Try(LocalDate.parse(str)).toOption.getOrElse(typeError(path, "LocalDate", str))
   }
 
   given QueryStringRW[LocalDateTime] with {

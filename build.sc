@@ -13,7 +13,7 @@ object sharaf extends SharafPublishModule {
     ivy"io.undertow:undertow-core:2.3.10.Final",
     ivy"com.typesafe:config:1.4.3",
     ivy"ba.sake::tupson:0.8.0",
-    ivy"ba.sake::hepek-components:0.15.0",
+    ivy"ba.sake::hepek-components:0.17.0",
     ivy"com.lihaoyi::requests:0.8.0"
   )
 
