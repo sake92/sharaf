@@ -1,8 +1,8 @@
 package fullstack.views
 
 import java.nio.file.Files
-import Bundle._, Tags.*
 import fullstack.CreateCustomerForm
+import Bundle._, Tags.*
 
 class SucessPage(formData: CreateCustomerForm) extends MyPage {
 
@@ -16,7 +16,6 @@ class SucessPage(formData: CreateCustomerForm) extends MyPage {
       body = s"""
         You have successfully submitted these values:
         - name: ${formData.name}  
-        - street: ${formData.address.street}  
         - hobbies: ${formData.hobbies.mkString(",")}  
         - file: ${fileAsString}  
       """.md

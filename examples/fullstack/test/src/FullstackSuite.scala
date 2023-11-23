@@ -16,7 +16,7 @@ class FullstackSuite extends munit.FunSuite {
     val exampleFile = Path.of(getClass.getClassLoader.getResource("example.txt").toURI())
 
     val reqBody =
-      CreateCustomerForm("Meho", exampleFile, CreateAddressForm("street123ž"), List("hobby1", "hobby2"))
+      CreateCustomerForm("Džemal", exampleFile, List("hobby1", "hobby2"))
     val res = requests.post(
       s"${module.baseUrl}/form-submit",
       data = reqBody.toRequestsMultipart()
@@ -25,7 +25,7 @@ class FullstackSuite extends munit.FunSuite {
     assertEquals(res.statusCode, 200)
     val resBody = res.text()
     // this tests utf-8 encoding too :)
-    assert(resBody.contains("street123ž"), "Result does not contain input street")
+    assert(resBody.contains("Džemal"), "Result does not contain input name")
     assert(resBody.contains("This is a text file :)"), "Result does not contain input file")
   }
 

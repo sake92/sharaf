@@ -17,13 +17,18 @@ class FullstackModule(port: Int) {
 
   private val routes = Routes:
     case GET() -> Path() =>
-      Response.withBody(ShowFormPage(): HtmlPage)
+      val htmlPage: HtmlPage = ShowFormPage(CreateCustomerForm.empty)
+      Response.withBody(htmlPage)
 
     case POST() -> Path("form-submit") =>
       val formData = Request.current.bodyForm[CreateCustomerForm]
       formData.validate match
-        case Seq()  => Response.withBody(SucessPage(formData): HtmlPage)
-        case errors => Response.withBody(ShowFormPage(Some(formData), errors): HtmlPage).withStatus(400)
+        case Seq() =>
+          val htmlPage: HtmlPage = SucessPage(formData)
+          Response.withBody(htmlPage)
+        case errors =>
+          val htmlPage: HtmlPage = ShowFormPage(formData, errors)
+          Response.withBody(htmlPage).withStatus(400)
 
   val server = Undertow
     .builder()

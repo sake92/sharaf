@@ -4,9 +4,7 @@ import ba.sake.validson.ValidationError
 import Bundle._, Tags.*
 import fullstack.CreateCustomerForm
 
-// TODO make formData nbn-optional
-class ShowFormPage(formData: Option[CreateCustomerForm] = None, errors: Seq[ValidationError] = Seq.empty)
-    extends MyPage {
+class ShowFormPage(formData: CreateCustomerForm, errors: Seq[ValidationError] = Seq.empty) extends MyPage {
 
   override def pageSettings = super.pageSettings.withTitle("Home")
 
@@ -35,15 +33,7 @@ class ShowFormPage(formData: Option[CreateCustomerForm] = None, errors: Seq[Vali
           _messages = messages
         )
       },
-      withValueAndValidation("address.street", _.address.street) { case (fieldName, fieldValue, state, messages) =>
-        Form.inputText(required, value := fieldValue)(
-          fieldName,
-          "Street",
-          _validationState = state,
-          _messages = messages
-        )
-      },
-      formData.map(_.hobbies).getOrElse(List("")).zipWithIndex.map { case (hobby, idx) =>
+      formData.hobbies.zipWithIndex.map { case (hobby, idx) =>
         withValueAndValidation(s"hobbies[${idx}]", _.hobbies.applyOrElse(idx, _ => "")) {
           case (fieldName, fieldValue, state, messages) =>
             Form.inputText(required, value := fieldValue)(
@@ -67,6 +57,6 @@ class ShowFormPage(formData: Option[CreateCustomerForm] = None, errors: Seq[Vali
     val (state, errMsgs) =
       if fieldErrors.isEmpty then None -> Seq.empty
       else Some(Form.ValidationState.Error) -> fieldErrors.map(_.msg)
-    f(fieldName, formData.map(extract).getOrElse(""), state, errMsgs)
+    f(fieldName, extract(formData), state, errMsgs)
 
 }
