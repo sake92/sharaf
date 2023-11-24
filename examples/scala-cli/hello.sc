@@ -1,3 +1,4 @@
+//> using scala "3.3.1"
 //> using dep ba.sake::sharaf:0.0.15
 
 import io.undertow.Undertow

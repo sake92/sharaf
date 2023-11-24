@@ -6,12 +6,27 @@ Simple, intuitive, batteries-included HTTP server framework.
 Still WIP  :construction: but very much usable. :construction_worker:
 
 ## Usage
-Mill:
+mill:
 ```scala
 def ivyDeps = Agg(ivy"ba.sake::sharaf:0.0.15")
 
 def scalacOptions = Seq("-Yretain-trees")
 ```
+
+sbt:
+```scala
+libraryDependencies ++= Seq("ba.sake" %% "sharaf" % "0.0.15")
+
+scalacOptions ++= Seq("-Yretain-trees")
+```
+
+scala-cli:
+```scala
+//> using dep ba.sake::sharaf:0.0.15
+
+scala-cli  --scalac-option -Yretain-trees  my_script.sc
+```
+
 
 ## Examples
 
@@ -39,9 +54,9 @@ println(s"Server started at http://localhost:8181")
 
 You can run it like this:
 ```sh
-scala-cli examples/scala-cli/hello.sc
+scala-cli  --scalac-option -Yretain-trees  examples/scala-cli/hello.sc 
 ```
-Then you can do a GET http://localhost:8181/hello/Bob  
+Then you can go to http://localhost:8181/hello/Bob  
 to try it out.
 
 ---
