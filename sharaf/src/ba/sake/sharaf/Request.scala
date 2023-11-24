@@ -8,10 +8,10 @@ import io.undertow.server.handlers.form.FormData as UFormData
 import io.undertow.server.handlers.form.FormParserFactory
 import io.undertow.util.HttpString
 
-import ba.sake.tupson.*
-import ba.sake.formson.*
-import ba.sake.querson.*
-import ba.sake.validson.*
+import ba.sake.tupson, tupson.*
+import ba.sake.formson, formson.*
+import ba.sake.querson, querson.*
+import ba.sake.validson, validson.*
 
 final class Request(
     private val ex: HttpServerExchange
@@ -27,10 +27,12 @@ final class Request(
     }
 
   def queryParams[T <: Product: QueryStringRW]: T =
-    queryParamsMap.parseQueryStringMap
+    try queryParamsMap.parseQueryStringMap
+    catch case e: querson.ParsingException => throw RequestHandlingException(e)
 
   def queryParamsValidated[T <: Product: QueryStringRW: Validator]: T =
-    queryParams[T].validateOrThrow
+    try queryParams[T].validateOrThrow
+    catch case e: validson.ValidationException => throw RequestHandlingException(e)
 
   /* BODY */
   private val formBodyParserFactory = locally {
@@ -44,10 +46,12 @@ final class Request(
 
   // JSON
   def bodyJson[T: JsonRW]: T =
-    bodyString.parseJson[T]
+    try bodyString.parseJson[T]
+    catch case e: tupson.ParsingException => throw RequestHandlingException(e)
 
   def bodyJsonValidated[T: JsonRW: Validator]: T =
-    bodyJson[T].validateOrThrow
+    try bodyJson[T].validateOrThrow
+    catch case e: validson.ValidationException => throw RequestHandlingException(e)
 
   // FORM
   def bodyForm[T <: Product: FormDataRW]: T =
@@ -58,10 +62,12 @@ final class Request(
       case Some(parser) =>
         val uFormData = parser.parseBlocking()
         val formDataMap = Request.undertowFormData2FormsonMap(uFormData)
-        formDataMap.parseFormDataMap[T]
+        try formDataMap.parseFormDataMap[T]
+        catch case e: formson.ParsingException => throw RequestHandlingException(e)
 
   def bodyFormValidated[T <: Product: FormDataRW: Validator]: T =
-    bodyForm[T].validateOrThrow
+    try bodyForm[T].validateOrThrow
+    catch case e: validson.ValidationException => throw RequestHandlingException(e)
 
   /* HEADERS */
   def headers: Map[HttpString, Seq[String]] =
@@ -94,7 +100,6 @@ object Request {
       }
       map += (key -> formValues.toSeq)
     }
-
     map.toMap
   }
 }
