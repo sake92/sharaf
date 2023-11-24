@@ -1,7 +1,7 @@
 
 # Sharaf :nut_and_bolt:
 
-Simple, intuitive, batteries-included HTTP server library.
+Simple, intuitive, batteries-included HTTP server framework.
 
 Still WIP  :construction: but very much usable. :construction_worker:
 
