@@ -51,6 +51,7 @@ Full blown standalone examples:
 - [full-stack](examples/fullstack) featuring HTML, static files and forms
 - [sharaf-todo-backend](https://github.com/sake92/sharaf-todo-backend), implementation of the [todobackend.com](http://todobackend.com/) spec, featuring CORS handling
 - [OAuth2 login](examples/oauth2) with [Pac4J library](https://www.pac4j.org/)
+- [PetClinic](https://github.com/sake92/sharaf-petclinic) implementation, featuring full-stack app with Postgres db, config, integration tests etc.
 
 
 ## Why sharaf?
