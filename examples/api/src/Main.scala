@@ -2,7 +2,6 @@ package api
 
 import java.util.UUID
 import io.undertow.Undertow
-
 import ba.sake.sharaf.*, handlers.*, routing.*
 
 @main def main: Unit =

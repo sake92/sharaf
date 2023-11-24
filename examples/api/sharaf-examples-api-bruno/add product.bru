@@ -1,0 +1,27 @@
+meta {
+  name: add product
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/products
+  body: json
+  auth: none
+}
+
+auth:basic {
+  username: 
+  password: 
+}
+
+auth:bearer {
+  token: 
+}
+
+body:json {
+  {
+    "name": "milk",
+    "quantity": 5
+  }
+}

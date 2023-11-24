@@ -26,12 +26,7 @@ git push  --atomic origin main $VERSION
 # TODOs
 
 - rethrow WRAPPED parsing exceptions from Request
-
-- config read with JsonRW example
-- add Docker / Watchtower example
-- full-stack backend example with squery , flyway, Docker / Watchtower
-- spring pet clinic implementation
-
+- handle not found
 - cookies ?
 
 
