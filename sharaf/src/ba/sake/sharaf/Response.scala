@@ -48,7 +48,7 @@ object Response {
 
 }
 
-trait ResponseWritable[T] {
+trait ResponseWritable[-T] {
   def write(value: T, exchange: HttpServerExchange): Unit
   def headers(value: T): Seq[(String, Seq[String])]
 }

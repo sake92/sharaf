@@ -103,7 +103,7 @@ private[formson] class FormsonParser(formDataMap: FormDataMap) {
 }
 
 private[formson] class KeyParser(key: String) {
-  import fastparse._, NoWhitespace._
+  import fastparse.*, NoWhitespace.*
 
   private val ForbiddenKeyChars = Set('[', ']', '.')
 

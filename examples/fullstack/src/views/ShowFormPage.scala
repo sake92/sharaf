@@ -1,7 +1,7 @@
 package fullstack.views
 
 import ba.sake.validson.ValidationError
-import Bundle._, Tags.*
+import Bundle.*, Tags.*
 import fullstack.CreateCustomerForm
 
 class ShowFormPage(formData: CreateCustomerForm, errors: Seq[ValidationError] = Seq.empty) extends MyPage {

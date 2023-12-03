@@ -373,7 +373,7 @@ object FormDataRW {
     ts.flags.is(Flags.Enum) && ts.companionClass.methodMember("values").nonEmpty
 
   private def defaultValuesExpr[T: Type](using Quotes): Expr[List[(String, Option[() => Any])]] =
-    import quotes.reflect._
+    import quotes.reflect.*
     def exprOfOption(
         oet: (Expr[String], Option[Expr[Any]])
     ): Expr[(String, Option[() => Any])] = oet match {

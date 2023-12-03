@@ -109,7 +109,7 @@ private[querson] class QuersonParser(qsMap: QueryStringMap) {
 }
 
 private[querson] class KeyParser(key: String) {
-  import fastparse._, NoWhitespace._
+  import fastparse.*, NoWhitespace.*
 
   private val ForbiddenKeyChars = Set('[', ']', '.')
 

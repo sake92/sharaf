@@ -1,9 +1,11 @@
+import $ivy.`io.chris-kipp::mill-ci-release::0.1.9`
+import $ivy.`ba.sake::mill-hepek::0.0.1`
+
 import mill._
 import mill.scalalib._, scalafmt._, publish._
 import coursier.maven.MavenRepository
-
-import $ivy.`io.chris-kipp::mill-ci-release::0.1.9`
 import io.kipp.mill.ci.release.CiReleaseModule
+import ba.sake.millhepek.MillHepekModule
 
 object sharaf extends SharafPublishModule {
 
@@ -131,4 +133,11 @@ object examples extends mill.Module {
       )
     }
   }
+}
+
+//////////////////// docs
+object docs extends MillHepekModule with SharafCommonModule {
+  def ivyDeps = Agg(
+    ivy"ba.sake::hepek:0.17.0+0-47f5caea+20231129-1832-SNAPSHOT"
+  )
 }

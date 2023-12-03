@@ -1,7 +1,6 @@
 package fullstack
 
 import io.undertow.Undertow
-import ba.sake.hepek.html.HtmlPage
 import ba.sake.validson.*
 import ba.sake.sharaf.*, routing.*
 import fullstack.views.*
@@ -17,18 +16,15 @@ class FullstackModule(port: Int) {
 
   private val routes = Routes:
     case GET() -> Path() =>
-      val htmlPage: HtmlPage = ShowFormPage(CreateCustomerForm.empty)
-      Response.withBody(htmlPage)
+      Response.withBody(ShowFormPage(CreateCustomerForm.empty))
 
     case POST() -> Path("form-submit") =>
       val formData = Request.current.bodyForm[CreateCustomerForm]
       formData.validate match
         case Seq() =>
-          val htmlPage: HtmlPage = SucessPage(formData)
-          Response.withBody(htmlPage)
+          Response.withBody(SucessPage(formData))
         case errors =>
-          val htmlPage: HtmlPage = ShowFormPage(formData, errors)
-          Response.withBody(htmlPage).withStatus(400)
+          Response.withBody(ShowFormPage(formData, errors)).withStatus(400)
 
   val server = Undertow
     .builder()
