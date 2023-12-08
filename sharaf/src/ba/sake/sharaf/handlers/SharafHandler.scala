@@ -25,7 +25,7 @@ class SharafHandler(
       RoutesHandler(
         routes,
         ResourceHandler(
-          ClassPathResourceManager(getClass.getClassLoader, "static"),
+          ClassPathResourceManager(getClass.getClassLoader, "public"),
           RoutesHandler(notFoundRoutes) // handle 404s at the end
         )
       ),

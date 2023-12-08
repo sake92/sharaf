@@ -1,8 +1,8 @@
 package fullstack.views
 
 import java.nio.file.Files
-import fullstack.CreateCustomerForm
 import Bundle.*, Tags.*
+import fullstack.CreateCustomerForm
 
 class SucessPage(formData: CreateCustomerForm) extends MyPage {
 

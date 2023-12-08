@@ -32,6 +32,7 @@ extension [T](value: T)(using rw: querson.QueryStringRW[T])
     import querson.*
     value.toQueryStringMap().map { (k, vs) => k -> vs.head }
 
+// TODO move to tupson-config
 // typesafe config easy parsing
 extension (config: Config) {
   def parse[T: JsonRW]() =
