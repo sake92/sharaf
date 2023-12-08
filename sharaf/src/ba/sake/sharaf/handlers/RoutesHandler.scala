@@ -50,9 +50,9 @@ final class RoutesHandler private (routes: Routes, nextHandler: Option[HttpHandl
 
 }
 
-object RoutesHandler {
+object RoutesHandler:
   def apply(routes: Routes): RoutesHandler =
     new RoutesHandler(routes, None)
+
   def apply(routes: Routes, nextHandler: HttpHandler): RoutesHandler =
     new RoutesHandler(routes, Some(nextHandler))
-}

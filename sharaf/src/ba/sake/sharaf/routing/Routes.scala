@@ -5,14 +5,14 @@ import ba.sake.sharaf.Response
 
 type RoutesDefinition = Request ?=> PartialFunction[RequestParams, Response[?]]
 
-class Routes(routesDef: RoutesDefinition) {
+// compiler complains when def apply.. :/
+final class Routes(routesDef: RoutesDefinition):
   private[sharaf] def definition: RoutesDefinition = routesDef
-}
 
-object Routes {
+object Routes:
+
   def merge(routess: Seq[Routes]): Routes =
     val routesDef: RoutesDefinition = routess.map(_.definition).reduceLeft { case (acc, next) =>
       acc.orElse(next)
     }
     Routes(routesDef)
-}

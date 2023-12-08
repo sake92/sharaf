@@ -6,15 +6,13 @@ import scala.deriving.*
 import scala.quoted.*
 import scala.util.Try
 
-object param {
+object param:
   def unapply[T](str: String)(using fp: FromPathParam[T]): Option[T] =
     fp.parse(str)
-}
 
 // typeclass for converting a path parameter to T
-trait FromPathParam[T] {
+trait FromPathParam[T]:
   def parse(str: String): Option[T]
-}
 
 object FromPathParam {
   given FromPathParam[Int] = new {

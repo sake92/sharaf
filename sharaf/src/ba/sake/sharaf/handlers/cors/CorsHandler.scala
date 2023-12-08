@@ -1,6 +1,5 @@
-package ba.sake.sharaf.handlers
+package ba.sake.sharaf.handlers.cors
 
-import java.time.Duration
 import scala.jdk.CollectionConverters.*
 import io.undertow.server.HttpHandler
 import io.undertow.server.HttpServerExchange
@@ -60,22 +59,6 @@ final class CorsHandler private (next: HttpHandler, corsSettings: CorsSettings) 
   }
 }
 
-object CorsHandler {
-  def apply(next: HttpHandler, corsSettings: CorsSettings): CorsHandler = {
+object CorsHandler:
+  def apply(next: HttpHandler, corsSettings: CorsSettings): CorsHandler =
     new CorsHandler(next, corsSettings)
-  }
-}
-
-// stolen from Play
-// https://www.playframework.com/documentation/2.8.x/CorsFilter#Configuring-the-CORS-filter
-// https://developer.mozilla.org/en-US/docs/Glossary/CORS-safelisted_request_header
-case class CorsSettings(
-    pathPrefixes: Set[String] = Set("/"),
-    allowedOrigins: Set[String] = Set.empty,
-    allowedHttpMethods: Set[HttpString] =
-      Set(Methods.GET, Methods.HEAD, Methods.OPTIONS, Methods.POST, Methods.PUT, Methods.PATCH, Methods.DELETE),
-    allowedHttpHeaders: Set[HttpString] =
-      Set(Headers.ACCEPT, Headers.ACCEPT_LANGUAGE, Headers.CONTENT_LANGUAGE, Headers.CONTENT_TYPE),
-    allowCredentials: Boolean = false,
-    preflightMaxAge: Duration = Duration.ofDays(3)
-)

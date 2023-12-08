@@ -1,13 +1,11 @@
 package ba.sake.sharaf.handlers
 
 import scala.util.control.NonFatal
-
 import io.undertow.server.HttpHandler
 import io.undertow.server.HttpServerExchange
-
 import ba.sake.sharaf.*
 
-class ErrorHandler(next: HttpHandler, errorMapper: ErrorMapper) extends HttpHandler {
+final class ErrorHandler private (next: HttpHandler, errorMapper: ErrorMapper) extends HttpHandler {
 
   override def handleRequest(exchange: HttpServerExchange): Unit = {
     exchange.startBlocking()

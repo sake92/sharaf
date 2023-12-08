@@ -8,8 +8,7 @@ final class Path(
     s"Path($p)"
 }
 
-object Path {
+object Path:
   def apply(segments: String*): Path = new Path(segments.toSeq)
 
   def unapplySeq(path: Path): Option[Seq[String]] = Some(path.segments)
-}

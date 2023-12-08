@@ -4,16 +4,17 @@ import io.undertow.server.HttpHandler
 import io.undertow.server.HttpServerExchange
 import io.undertow.server.handlers.resource.ResourceHandler
 import io.undertow.server.handlers.resource.ClassPathResourceManager
+import io.undertow.util.StatusCodes
 import ba.sake.sharaf.routing.Routes
 import ba.sake.sharaf.Request
 import ba.sake.sharaf.Response
-import io.undertow.util.StatusCodes
+import ba.sake.sharaf.handlers.cors.*
 
-class SharafHandler(
+final class SharafHandler private (
     routes: Routes,
-    corsSettings: CorsSettings = CorsSettings(),
-    errorMapper: ErrorMapper = ErrorMapper.default,
-    notFoundHandler: Request => Response[?] = _ => SharafHandler.defaultNotFoundResponse
+    corsSettings: CorsSettings,
+    errorMapper: ErrorMapper,
+    notFoundHandler: Request => Response[?]
 ) extends HttpHandler {
 
   private val notFoundRoutes = Routes { case _ =>
@@ -34,25 +35,32 @@ class SharafHandler(
     errorMapper
   )
 
-  def withRoutes(routes: Routes): SharafHandler =
-    new SharafHandler(routes, corsSettings, errorMapper)
-
-  def withCorsSettings(corsSettings: CorsSettings): SharafHandler =
-    new SharafHandler(routes, corsSettings, errorMapper)
-
-  def withErrorMapper(errorMapper: ErrorMapper): SharafHandler =
-    new SharafHandler(routes, corsSettings, errorMapper)
-
-  def withNotFoundHandler(notFoundHandler: Request => Response[?]): SharafHandler =
-    new SharafHandler(routes, corsSettings, errorMapper, notFoundHandler)
-
   override def handleRequest(exchange: HttpServerExchange): Unit =
     finalHandler.handleRequest(exchange)
+
+  def withRoutes(routes: Routes): SharafHandler =
+    copy(routes)
+
+  def withCorsSettings(corsSettings: CorsSettings): SharafHandler =
+    copy(corsSettings = corsSettings)
+
+  def withErrorMapper(errorMapper: ErrorMapper): SharafHandler =
+    copy(errorMapper = errorMapper)
+
+  def withNotFoundHandler(notFoundHandler: Request => Response[?]): SharafHandler =
+    copy(notFoundHandler = notFoundHandler)
+
+  private def copy(
+      routes: Routes = routes,
+      corsSettings: CorsSettings = corsSettings,
+      errorMapper: ErrorMapper = errorMapper,
+      notFoundHandler: Request => Response[?] = notFoundHandler
+  ) = new SharafHandler(routes, corsSettings, errorMapper, notFoundHandler)
 }
 
 object SharafHandler:
 
-  private[sharaf] val defaultNotFoundResponse = Response.withBody("Not Found").withStatus(StatusCodes.NOT_FOUND)
+  private val defaultNotFoundResponse = Response.withBody("Not Found").withStatus(StatusCodes.NOT_FOUND)
 
   def apply(routes: Routes): SharafHandler =
-    new SharafHandler(routes, CorsSettings(), ErrorMapper.default)
+    new SharafHandler(routes, CorsSettings.default, ErrorMapper.default, _ => SharafHandler.defaultNotFoundResponse)

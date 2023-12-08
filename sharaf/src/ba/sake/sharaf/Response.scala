@@ -5,14 +5,14 @@ import scala.jdk.CollectionConverters.*
 import io.undertow.server.HttpServerExchange
 import io.undertow.util.Headers
 import io.undertow.util.HttpString
-
+import io.undertow.util.StatusCodes
 import ba.sake.hepek.html.HtmlPage
 import ba.sake.tupson.*
 
-case class Response[T] private (
-    status: Int = 200,
-    headers: Map[String, Seq[String]] = Map.empty,
-    body: Option[T] = None
+final class Response[T] private (
+    val status: Int,
+    val headers: Map[String, Seq[String]],
+    val body: Option[T]
 )(using val rw: ResponseWritable[T]) {
 
   def withStatus(status: Int) =
@@ -23,35 +23,44 @@ case class Response[T] private (
   def withHeader(name: String, value: String) =
     copy(headers = headers + (name -> Seq(value)))
 
-  def withBody[T: ResponseWritable](body: T): Response[T] =
+  def withBody[T2: ResponseWritable](body: T2): Response[T2] =
     copy(body = Some(body))
+
+  private def copy[T2](
+      status: Int = status,
+      headers: Map[String, Seq[String]] = headers,
+      body: Option[T2] = body
+  )(using ResponseWritable[T2]) = new Response(status, headers, body)
 }
 
 object Response {
 
+  def apply[T: ResponseWritable] = new Response(StatusCodes.OK, Map.empty, None)
+
   def withStatus(status: Int) =
-    Response[String](status = status)
+    Response[String].withStatus(status)
 
   def withHeader(name: String, values: Seq[String]) =
-    Response[String](headers = Map(name -> values))
+    Response[String].withHeader(name, values)
+
   def withHeader(name: String, value: String) =
-    Response[String](headers = Map(name -> Seq(value)))
+    Response[String].withHeader(name, Seq(value))
 
   def withBody[T: ResponseWritable](body: T): Response[T] =
-    Response(body = Some(body))
+    Response[String].withBody(body)
+
   def withBodyOpt[T: ResponseWritable](body: Option[T], name: String): Response[T] = body match
     case Some(value) => withBody(value)
     case None        => throw NotFoundException(name)
 
   def redirect(location: String): Response[String] =
-    withStatus(301).withHeader("Location", location)
+    withStatus(StatusCodes.MOVED_PERMANENTLY).withHeader("Location", location)
 
 }
 
-trait ResponseWritable[-T] {
+trait ResponseWritable[-T]:
   def write(value: T, exchange: HttpServerExchange): Unit
   def headers(value: T): Seq[(String, Seq[String])]
-}
 
 object ResponseWritable {
 
