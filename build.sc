@@ -1,5 +1,5 @@
 import $ivy.`io.chris-kipp::mill-ci-release::0.1.9`
-import $ivy.`ba.sake::mill-hepek::0.0.1`
+import $ivy.`ba.sake::mill-hepek::0.0.2`
 
 import mill._
 import mill.scalalib._, scalafmt._, publish._
@@ -138,6 +138,6 @@ object examples extends mill.Module {
 //////////////////// docs
 object docs extends MillHepekModule with SharafCommonModule {
   def ivyDeps = Agg(
-    ivy"ba.sake::hepek:0.17.0+0-47f5caea+20231129-1832-SNAPSHOT"
+    ivy"ba.sake::hepek:0.22.0"
   )
 }

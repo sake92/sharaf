@@ -1,6 +1,6 @@
 package ba.sake.sharaf
 
-final class Path(
+final class Path private(
     val segments: Seq[String]
 ) {
   override def toString(): String =

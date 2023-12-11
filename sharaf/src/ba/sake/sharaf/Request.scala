@@ -13,7 +13,7 @@ import ba.sake.formson, formson.*
 import ba.sake.querson, querson.*
 import ba.sake.validson, validson.*
 
-final class Request(
+final class Request private (
     private val ex: HttpServerExchange
 ) {
 
