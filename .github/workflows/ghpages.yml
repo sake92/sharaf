@@ -1,11 +1,11 @@
 
-name: Deploy GhPages docs
-
+name: Deploy GhPages
 on:
   push:
     branches:
       - main
-
+permissions:
+  contents: write
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -15,10 +15,8 @@ jobs:
         with:
           distribution: temurin
           java-version: 11
-
       - name: Build
         run: ./mill docs.hepek
-
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
         with:
