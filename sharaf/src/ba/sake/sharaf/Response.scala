@@ -28,19 +28,21 @@ final class Response[T] private (
 
 object Response {
 
-  def apply[T: ResponseWritable] = new Response(StatusCodes.OK, Map.empty, None)
+  private val defaultRes = new Response[String](StatusCodes.OK, Map.empty, None)
+
+  def apply[T: ResponseWritable] = defaultRes
 
   def withStatus(status: Int) =
-    Response[String].withStatus(status)
+    defaultRes.withStatus(status)
 
   def withHeader(name: String, values: Seq[String]) =
-    Response[String].withHeader(name, values)
+    defaultRes.withHeader(name, values)
 
   def withHeader(name: String, value: String) =
-    Response[String].withHeader(name, Seq(value))
+    defaultRes.withHeader(name, Seq(value))
 
   def withBody[T: ResponseWritable](body: T): Response[T] =
-    Response[String].withBody(body)
+    defaultRes.withBody(body)
 
   def withBodyOpt[T: ResponseWritable](body: Option[T], name: String): Response[T] = body match
     case Some(value) => withBody(value)

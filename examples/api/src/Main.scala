@@ -27,7 +27,7 @@ class JsonApiModule(port: Int) {
       val products =
         if query.name.isEmpty then db
         else db.filter(c => query.name.contains(c.name) && query.minQuantity.map(c.quantity >= _).getOrElse(true))
-      Response.withBody(products)
+      Response.withBody(products.toList)
 
     case POST() -> Path("products") =>
       val req = Request.current.bodyJsonValidated[CreateProductReq]

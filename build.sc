@@ -13,18 +13,15 @@ object sharaf extends SharafPublishModule {
 
   def ivyDeps = Agg(
     ivy"io.undertow:undertow-core:2.3.10.Final",
-    ivy"com.typesafe:config:1.4.3",
-    ivy"ba.sake::tupson:0.8.0",
-    ivy"ba.sake::hepek-components:0.17.0",
-    ivy"com.lihaoyi::requests:0.8.0"
+    ivy"com.lihaoyi::requests:0.8.0",
+    ivy"ba.sake::tupson:0.10.0",
+    ivy"ba.sake::tupson-config:0.10.0",
+    ivy"ba.sake::hepek-components:0.22.0"
   )
 
   def moduleDeps = Seq(querson, formson)
 
   object test extends ScalaTests with SharafTestModule {
-    
-    def forkArgs = Seq("-Dconfig.override_with_env_vars=true")
-    def forkEnv = Map("CONFIG_FORCE_envvar_port" -> "1234")
   }
 }
 

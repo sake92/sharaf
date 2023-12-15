@@ -77,7 +77,7 @@ It is built on top of [Undertow](https://undertow.io/).
 This means you can use awesome libraries built for Undertow, like [pac4j](https://github.com/pac4j/undertow-pac4j) for security and similar.  
 Also, you can leverage Undertow's lower level API, e.g. for WebSockets.
 
-Sharaf bundles a set of libraries:
+Sharaf bundles a set of standalone libraries:
 - [querson](querson) for query parameters
 - [tupson](https://github.com/sake92/tupson) for JSON
 - [formson](formson) for forms
@@ -86,6 +86,7 @@ Sharaf bundles a set of libraries:
 - [requests](https://github.com/com-lihaoyi/requests-scala) for firing HTTP requests
 - [typesafe-config](https://github.com/lightbend/config) for configuration
 
+You can use any of above separately in your projects.
 
 ## Misc
 
