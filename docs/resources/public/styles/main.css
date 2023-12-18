@@ -4,3 +4,7 @@ body {
   padding-top: 6rem; /* coz navbar */
   margin-bottom: 55px;
 }
+
+.affix {
+  width: 100%;
+}
