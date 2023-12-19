@@ -11,3 +11,4 @@ object Consts:
   val GhHandle = "sake92"
   val GhProjectName = "sharaf"
   val GhUrl = s"https://github.com/${GhHandle}/${GhProjectName}"
+  val GhSourcesUrl = s"https://github.com/${GhHandle}/${GhProjectName}/tree/main"

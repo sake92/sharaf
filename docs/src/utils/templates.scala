@@ -1,6 +1,5 @@
 package utils
 
-import ba.sake.hepek.html.ComponentSettings
 import ba.sake.hepek.prismjs.PrismDependencies
 import ba.sake.hepek.theme.bootstrap5.*
 import ba.sake.hepek.anchorjs.AnchorjsDependencies
@@ -19,8 +18,8 @@ trait DocStaticPage extends StaticPage with AnchorjsDependencies with FADependen
 
   override def siteSettings = super.siteSettings
     .withName(Consts.ProjectName)
-    .withFaviconNormal(files.images.`favicon.ico`.ref)
-    .withFaviconInverted(files.images.`favicon.ico`.ref)
+    .withFaviconNormal(files.images.`favicon.svg`.ref)
+    .withFaviconInverted(files.images.`favicon.svg`.ref)
 
   override def bodyContent = frag(
     super.bodyContent,

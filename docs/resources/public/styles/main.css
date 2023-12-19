@@ -8,3 +8,13 @@ body {
 .affix {
   width: 100%;
 }
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.navbar-brand img {
+  width: 24px;
+}

@@ -1,7 +1,6 @@
 package utils
 
 import ba.sake.hepek.bootstrap5.statik.BootstrapStaticBundle
-import ba.sake.hepek.prismjs.PrismCodeHighlightComponents
 
 val Bundle = locally {
   val b = BootstrapStaticBundle.default
@@ -13,7 +12,5 @@ val Bundle = locally {
   )
   b.withGrid(grid)
 }
-
-val chl = PrismCodeHighlightComponents.default
 
 val FA = ba.sake.hepek.fontawesome5.FA
