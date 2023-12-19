@@ -4,3 +4,17 @@ body {
   padding-top: 6rem; /* coz navbar */
   margin-bottom: 55px;
 }
+
+.affix {
+  width: 100%;
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.navbar-brand img {
+  width: 24px;
+}
