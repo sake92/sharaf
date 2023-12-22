@@ -8,10 +8,10 @@ import io.undertow.server.handlers.form.FormData as UFormData
 import io.undertow.server.handlers.form.FormParserFactory
 import io.undertow.util.HttpString
 
-import ba.sake.tupson, tupson.*
-import ba.sake.formson, formson.*
-import ba.sake.querson, querson.*
-import ba.sake.validson, validson.*
+import ba.sake.tupson.*
+import ba.sake.formson.*
+import ba.sake.querson.*
+import ba.sake.validson.*
 
 final class Request private (
     private val ex: HttpServerExchange
@@ -28,11 +28,11 @@ final class Request private (
 
   def queryParams[T <: Product: QueryStringRW]: T =
     try queryParamsMap.parseQueryStringMap
-    catch case e: querson.ParsingException => throw RequestHandlingException(e)
+    catch case e: QuersonException => throw RequestHandlingException(e)
 
   def queryParamsValidated[T <: Product: QueryStringRW: Validator]: T =
     try queryParams[T].validateOrThrow
-    catch case e: validson.ValidationException => throw RequestHandlingException(e)
+    catch case e: ValidationException => throw RequestHandlingException(e)
 
   /* BODY */
   private val formBodyParserFactory = locally {
@@ -47,11 +47,11 @@ final class Request private (
   // JSON
   def bodyJson[T: JsonRW]: T =
     try bodyString.parseJson[T]
-    catch case e: tupson.ParsingException => throw RequestHandlingException(e)
+    catch case e: TupsonException => throw RequestHandlingException(e)
 
   def bodyJsonValidated[T: JsonRW: Validator]: T =
     try bodyJson[T].validateOrThrow
-    catch case e: validson.ValidationException => throw RequestHandlingException(e)
+    catch case e: ValidationException => throw RequestHandlingException(e)
 
   // FORM
   def bodyForm[T <: Product: FormDataRW]: T =
@@ -63,11 +63,11 @@ final class Request private (
         val uFormData = parser.parseBlocking()
         val formDataMap = Request.undertowFormData2FormsonMap(uFormData)
         try formDataMap.parseFormDataMap[T]
-        catch case e: formson.ParsingException => throw RequestHandlingException(e)
+        catch case e: FormsonException => throw RequestHandlingException(e)
 
   def bodyFormValidated[T <: Product: FormDataRW: Validator]: T =
     try bodyForm[T].validateOrThrow
-    catch case e: validson.ValidationException => throw RequestHandlingException(e)
+    catch case e: ValidationException => throw RequestHandlingException(e)
 
   /* HEADERS */
   def headers: Map[HttpString, Seq[String]] =

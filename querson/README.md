@@ -32,7 +32,7 @@ Singleton-cases enums are supported, nesting etc:
 enum SortOrderQS derives QueryStringRW:
   case asc, desc
 
-case class PageQS() derives QueryStringRW
+case class PageQS(num: Int, size: Int) derives QueryStringRW
 
 // these are specific for users for example
 enum SortByQS derives QueryStringRW:
