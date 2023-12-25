@@ -14,7 +14,6 @@ object HandlingForms extends TutorialPage {
   val firstSection = Section(
     "Handling Form data",
     s"""
-    Sharaf is using the `formson` library for handling form data.  
     All you have to do is make a `case class MyFormData() derives FormDataRW`  
     and then use it like this: `Request.current.bodyForm[MyFormData]`
 

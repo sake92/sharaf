@@ -9,10 +9,10 @@ case class Car(brand: String, model: String, quantity: Int) derives JsonRW
 
 var db: Seq[Car] = Seq()
 
-val routes = Routes {
+val routes = Routes:
   case GET() -> Path("cars") =>
     Response.withBody(db)
-    
+
   case GET() -> Path("cars", brand) =>
     val res = db.filter(_.brand == brand)
     Response.withBody(res)
@@ -21,11 +21,12 @@ val routes = Routes {
     val qp = Request.current.bodyJson[Car]
     db = db.appended(qp)
     Response.withBody(db)
-}
 
 Undertow.builder
   .addHttpListener(8181, "localhost")
-  .setHandler(SharafHandler(routes))
+  .setHandler(
+    SharafHandler(routes).withErrorMapper(ErrorMapper.json)
+  )
   .build
   .start()
 

@@ -12,7 +12,8 @@ trait TutorialPage extends DocPage {
     HTML,
     StaticFiles,
     HandlingForms,
-    JsonAPI
+    JsonAPI,
+    Validation
   )
 
   override def pageCategory = Some("Tutorials")

@@ -45,7 +45,7 @@ object JsonAPI extends TutorialPage {
     s"""
     Next step is to define a few routes for getting and adding cars:
     ```scala
-    val routes = Routes {
+    val routes = Routes:
       case GET() -> Path("cars") =>
         Response.withBody(db)
 
@@ -57,7 +57,6 @@ object JsonAPI extends TutorialPage {
         val qp = Request.current.bodyJson[Car]
         db = db.appended(qp)
         Response.withBody(db)
-    }
     ```
     The first route just returns all data in the "database".  
     
@@ -76,7 +75,9 @@ object JsonAPI extends TutorialPage {
     Undertow
       .builder
       .addHttpListener(8181, "localhost")
-      .setHandler(SharafHandler(routes))
+      .setHandler(
+        SharafHandler(routes).withErrorMapper(ErrorMapper.json)
+      )
       .build
       .start()
 

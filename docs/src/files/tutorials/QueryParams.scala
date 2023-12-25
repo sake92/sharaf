@@ -18,7 +18,7 @@ object QueryParams extends TutorialPage {
     This is a `Map[String, Seq[String]]` which you can use to extract query parameters.
 
     The `queryParamsMap` approach is useful for simple cases and dynamic query parameters.  
-    For more type safety you can use sharaf's `querson` library.  
+    For more type safety you can use `QueryStringRW` typeclass.  
     All you have to do is make a `case class MyParams() derives QueryStringRW`  
     and then use it like this: `Request.current.queryParams[MyParams]`
 

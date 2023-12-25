@@ -52,8 +52,7 @@ object StaticFiles extends TutorialPage {
     scala-cli static_files.sc  --resource-dir resources
     ```
 
-    Go to [http://localhost:8181/example.js](http://localhost:8181/example.js)  
-      to try it out.  
+    Go to [http://localhost:8181/example.js](http://localhost:8181/example.js).  
     You will see the `example.js` contents served.
 
     """.md
