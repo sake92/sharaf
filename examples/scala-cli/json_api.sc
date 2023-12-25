@@ -1,5 +1,5 @@
 //> using scala "3.3.1"
-//> using dep ba.sake::sharaf:0.0.17
+//> using dep ba.sake::sharaf:0.0.18
 
 import io.undertow.Undertow
 import ba.sake.tupson.JsonRW
