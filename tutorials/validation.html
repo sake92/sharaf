@@ -35,10 +35,9 @@ case class ValidatedData(num: Int, str: String, seq: Seq[String])
 object ValidatedData:
   given Validator[ValidatedData] = Validator
     .derived[ValidatedData]
-    .and(_.num, _ &gt; 0, &quot;must be positive&quot;)
-    .and(_.str, !_.isBlank, &quot;must not be blank&quot;)
-    .and(_.seq, _.nonEmpty, &quot;must not be empty&quot;)
-    .and(_.seq, _.forall(_.size == 2), &quot;must have elements of size 2&quot;)
+    .positive(_.num)
+    .notBlank(_.str)
+    .notEmptySeq(_.seq)
 </code></pre>
 <p>The <code>ValidatedData</code> can be any <code>case class</code>: json data, form data, query params..</p>
 <hr />
@@ -56,15 +55,15 @@ case class Car(brand: String, model: String, quantity: Int) derives JsonRW
 object Car:
   given Validator[Car] = Validator
     .derived[Car]
-    .and(_.brand, !_.isBlank, &quot;must not be blank&quot;)
-    .and(_.model, !_.isBlank, &quot;must not be blank&quot;)
-    .and(_.quantity, _ &gt;= 0, &quot;must not be negative&quot;)
+    .notBlank(_.brand)
+    .notBlank(_.model)
+    .nonnegative(_.quantity)
 
 case class CarQuery(brand: String) derives QueryStringRW
 object CarQuery:
   given Validator[CarQuery] = Validator
     .derived[CarQuery]
-    .and(_.brand, !_.isBlank, &quot;must not be blank&quot;)
+    .notBlank(_.brand)
 
 case class CarApiResult(message: String) derives JsonRW
 
