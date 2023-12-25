@@ -17,5 +17,5 @@ object CreateCustomerForm:
 
   given Validator[CreateCustomerForm] = Validator
     .derived[CreateCustomerForm]
-    .and(_.name, !_.isBlank, "must not be blank")
-    .and(_.name, _.length >= 2, "must be >= 2")
+    .notBlank(_.name)
+    .minLength(_.name, 2)

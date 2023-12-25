@@ -2,10 +2,55 @@ package ba.sake.validson
 
 import scala.deriving.*
 import scala.quoted.*
+import scala.math.Ordered.*
 
 trait Validator[T] {
+
   def validate(value: T): Seq[ValidationError]
+
   def and[F](getter: T => sourcecode.Text[F], predicate: F => Boolean, msg: String): Validator[T] =
+    validatorImpl(getter, predicate, msg)
+
+  // numbers
+  def min[F: Numeric](getter: T => sourcecode.Text[F], value: F): Validator[T] =
+    validatorImpl(getter, _ >= value, s"must be >= $value")
+
+  def max[F: Numeric](getter: T => sourcecode.Text[F], value: F): Validator[T] =
+    validatorImpl(getter, _ <= value, s"must be <= $value")
+
+  def between[F: Numeric](getter: T => sourcecode.Text[F], min: F, max: F): Validator[T] =
+    validatorImpl(getter, x => x >= min && x <= max, s"must be between [$min, $max]")
+
+  def negative[F: Numeric](getter: T => sourcecode.Text[F]): Validator[T] =
+    validatorImpl(getter, _ < summon[Numeric[F]].zero, s"must be negative")
+
+  def nonpositive[F: Numeric](getter: T => sourcecode.Text[F]): Validator[T] =
+    validatorImpl(getter, _ <= summon[Numeric[F]].zero, s"must be nonpositive")
+
+  def positive[F: Numeric](getter: T => sourcecode.Text[F]): Validator[T] =
+    validatorImpl(getter, _ > summon[Numeric[F]].zero, s"must be positive")
+
+  def nonnegative[F: Numeric](getter: T => sourcecode.Text[F]): Validator[T] =
+    validatorImpl(getter, _ >= summon[Numeric[F]].zero, s"must be nonnegative")
+
+  // strings
+  def notEmpty(getter: T => sourcecode.Text[String]): Validator[T] =
+    validatorImpl(getter, !_.isEmpty, "must not be empty")
+
+  def notBlank(getter: T => sourcecode.Text[String]): Validator[T] =
+    validatorImpl(getter, !_.isBlank, "must not be blank")
+
+  def minLength(getter: T => sourcecode.Text[String], value: Long): Validator[T] =
+    validatorImpl(getter, _.length >= value, s"must be >= $value")
+
+  def contains(getter: T => sourcecode.Text[String], value: String): Validator[T] =
+    validatorImpl(getter, _.contains(value), s"must contain $value")
+
+  // seqs
+  def notEmptySeq(getter: T => sourcecode.Text[Seq[?]]): Validator[T] =
+    validatorImpl(getter, !_.isEmpty, "must not be empty")
+
+  private def validatorImpl[F](getter: T => sourcecode.Text[F], predicate: F => Boolean, msg: String): Validator[T] =
     (value: T) => {
       val fieldText = getter(value)
       val fieldLabel = fieldText.source.split("\\.").last // bit hacky but worky

@@ -12,8 +12,8 @@ object CreateProductReq:
 
   given Validator[CreateProductReq] = Validator
     .derived[CreateProductReq]
-    .and(_.name, !_.isBlank, "must not be blank")
-    .and(_.quantity, _ >= 0, "must not be negative")
+    .notBlank(_.name)
+    .nonnegative(_.quantity)
 
 // query params
 case class ProductsQuery(name: Set[String], minQuantity: Option[Int]) derives QueryStringRW

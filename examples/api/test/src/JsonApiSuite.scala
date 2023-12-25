@@ -110,6 +110,7 @@ class JsonApiSuite extends munit.FunSuite {
     val resProblem = ex.response.text().parseJson[ProblemDetails]
 
     assertEquals(ex.response.statusCode, 400)
+    println(resProblem.invalidArguments)
     assert(
       resProblem.invalidArguments.contains(
         ArgumentProblem(

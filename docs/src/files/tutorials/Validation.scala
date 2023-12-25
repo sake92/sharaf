@@ -25,10 +25,9 @@ object Validation extends TutorialPage {
     object ValidatedData:
       given Validator[ValidatedData] = Validator
         .derived[ValidatedData]
-        .and(_.num, _ > 0, "must be positive")
-        .and(_.str, !_.isBlank, "must not be blank")
-        .and(_.seq, _.nonEmpty, "must not be empty")
-        .and(_.seq, _.forall(_.size == 2), "must have elements of size 2")
+        .positive(_.num)
+        .notBlank(_.str)
+        .notEmptySeq(_.seq)
     ```
 
     The `ValidatedData` can be any `case class`: json data, form data, query params..  
@@ -51,15 +50,15 @@ object Validation extends TutorialPage {
     object Car:
       given Validator[Car] = Validator
         .derived[Car]
-        .and(_.brand, !_.isBlank, "must not be blank")
-        .and(_.model, !_.isBlank, "must not be blank")
-        .and(_.quantity, _ >= 0, "must not be negative")
+        .notBlank(_.brand)
+        .notBlank(_.model)
+        .nonnegative(_.quantity)
 
     case class CarQuery(brand: String) derives QueryStringRW
     object CarQuery:
       given Validator[CarQuery] = Validator
         .derived[CarQuery]
-        .and(_.brand, !_.isBlank, "must not be blank")
+        .notBlank(_.brand)
 
     case class CarApiResult(message: String) derives JsonRW
 

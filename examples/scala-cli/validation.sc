@@ -1,5 +1,5 @@
 //> using scala "3.3.1"
-//> using dep ba.sake::sharaf:0.0.17
+//> using dep ba.sake::sharaf:0.0.18
 
 import io.undertow.Undertow
 import ba.sake.querson.QueryStringRW
@@ -11,15 +11,15 @@ case class Car(brand: String, model: String, quantity: Int) derives JsonRW
 object Car:
   given Validator[Car] = Validator
     .derived[Car]
-    .and(_.brand, !_.isBlank, "must not be blank")
-    .and(_.model, !_.isBlank, "must not be blank")
-    .and(_.quantity, _ >= 0, "must not be negative")
+    .notBlank(_.brand)
+    .notBlank(_.model)
+    .nonnegative(_.quantity)
 
 case class CarQuery(brand: String) derives QueryStringRW
 object CarQuery:
   given Validator[CarQuery] = Validator
     .derived[CarQuery]
-    .and(_.brand, !_.isBlank, "must not be blank")
+    .notBlank(_.brand)
 
 case class CarApiResult(message: String) derives JsonRW
 

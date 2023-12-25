@@ -70,9 +70,9 @@ case class SimpleData(num: Int, str: String, seq: Seq[String])
 object SimpleData:
   given Validator[SimpleData] = Validator
     .derived[SimpleData]
-    .and(_.num, _ > 0, "must be positive")
-    .and(_.str, !_.isBlank, "must not be blank")
-    .and(_.seq, _.nonEmpty, "must not be empty")
+    .positive(_.num)
+    .notBlank(_.str)
+    .notEmptySeq(_.seq)
     .and(_.seq, _.forall(_.size == 2), "must have elements of size 2")
 
 case class ComplexData(password: String, datas: Seq[SimpleData], matrix: Seq[Seq[SimpleData]])
@@ -81,6 +81,6 @@ object ComplexData:
 
   given Validator[ComplexData] = Validator
     .derived[ComplexData]
-    .and(_.password, _.contains("A"), "must contain A")
-    .and(_.password, _.contains("5"), "must contain 5")
-    .and(_.matrix, _.nonEmpty, "must not be empty")
+    .contains(_.password, "A")
+    .contains(_.password, "5")
+    .notEmptySeq(_.matrix)

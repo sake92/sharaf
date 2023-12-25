@@ -32,7 +32,7 @@ object ErrorMapper {
       Option(se.getCause()) match
         case Some(cause) =>
           cause match
-            case e: validson.ValidationException =>
+            case e: validson.ValidsonException =>
               val fieldValidationErrors = e.errors.mkString("[", "; ", "]")
               Response.withBody(s"Validation errors: $fieldValidationErrors").withStatus(StatusCodes.BAD_REQUEST)
             case e: querson.ParsingException =>
@@ -59,7 +59,7 @@ object ErrorMapper {
       Option(se.getCause()) match
         case Some(cause) =>
           cause match
-            case e: validson.ValidationException =>
+            case e: validson.ValidsonException =>
               val fieldValidationErrors =
                 e.errors.map(err => ArgumentProblem(err.path, err.msg, Some(err.value.toString)))
               val problemDetails =

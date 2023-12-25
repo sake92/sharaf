@@ -32,7 +32,7 @@ final class Request private (
 
   def queryParamsValidated[T <: Product: QueryStringRW: Validator]: T =
     try queryParams[T].validateOrThrow
-    catch case e: ValidationException => throw RequestHandlingException(e)
+    catch case e: ValidsonException => throw RequestHandlingException(e)
 
   /* BODY */
   private val formBodyParserFactory = locally {
@@ -51,7 +51,7 @@ final class Request private (
 
   def bodyJsonValidated[T: JsonRW: Validator]: T =
     try bodyJson[T].validateOrThrow
-    catch case e: ValidationException => throw RequestHandlingException(e)
+    catch case e: ValidsonException => throw RequestHandlingException(e)
 
   // FORM
   def bodyForm[T <: Product: FormDataRW]: T =
@@ -67,7 +67,7 @@ final class Request private (
 
   def bodyFormValidated[T <: Product: FormDataRW: Validator]: T =
     try bodyForm[T].validateOrThrow
-    catch case e: ValidationException => throw RequestHandlingException(e)
+    catch case e: ValidsonException => throw RequestHandlingException(e)
 
   /* HEADERS */
   def headers: Map[HttpString, Seq[String]] =
