@@ -1,7 +1,7 @@
 package files.tutorials
 
 import utils.*
-import Bundle.*, Tags.*
+import Bundle.*
 
 object Index extends TutorialPage {
 
@@ -14,9 +14,7 @@ object Index extends TutorialPage {
 
   val firstSection = Section(
     "Quickstart",
-    s"""
-      Hello world!
-    """.md,
+    s"""Get started quickly with Sharaf framework.""".md,
     List(
       Section(
         "Mill",

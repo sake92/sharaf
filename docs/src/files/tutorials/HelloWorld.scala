@@ -15,7 +15,7 @@ object HelloWorld extends TutorialPage {
     "Hello World",
     div(
       s"""
-      Let's make a quick Hello World example in scala-cli.  
+      Let's make a Hello World example in scala-cli.  
       Create a file `hello_sharaf.sc` and paste this code into it:
       ```scala
       //> using scala "3.3.1"
@@ -28,13 +28,12 @@ object HelloWorld extends TutorialPage {
         case GET() -> Path("hello", name) =>
           Response.withBody(s"Hello $$name")
 
-      val server = Undertow
+      Undertow
         .builder
         .addHttpListener(8181, "localhost")
         .setHandler(SharafHandler(routes))
         .build
-
-      server.start()
+        .start()
 
       println(s"Server started at http://localhost:8181")
       ```
@@ -43,14 +42,14 @@ object HelloWorld extends TutorialPage {
       ```sh
       scala-cli hello_sharaf.sc 
       ```
-      Then you can go to [http://localhost:8181/hello/Bob](http://localhost:8181/hello/Bob)  
-      to try it out.
+      Go to [http://localhost:8181/hello/Bob](http://localhost:8181/hello/Bob).  
+      You will see a "Hello Bob" text response.
 
       ---
       The most interesting part is the `Routes` definition.  
       Here we pattern match on `(HttpMethod, Path)`.  
       The `Path` contains a `Seq[String]`, which are the parts of the URL you can match on.
-      """.md,
+      """.md
     )
   )
 }

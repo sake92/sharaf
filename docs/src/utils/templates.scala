@@ -34,18 +34,6 @@ trait DocStaticPage extends StaticPage with AnchorjsDependencies with FADependen
   override def scriptURLs = super.scriptURLs
     .appended(files.scripts.`main.js`.ref)
 
-  // you can set a custom Bootstrap theme..
-  /*
-  override def bootstrapSettings = super.bootstrapSettings.withDepsProvider(DependencyProvider.unpkg)
-
-  override def bootstrapDependencies = super.bootstrapDependencies
-    .withCssDependencies(
-      Dependencies.default.withDeps(
-        Dependency("dist/flatly/bootstrap.min.css", bootstrapSettings.version, "bootswatch")
-      )
-    )
-   */
-
 }
 
 trait DocPage extends DocStaticPage with HepekBootstrap5BlogPage with PrismDependencies {

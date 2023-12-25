@@ -7,7 +7,6 @@ import io.undertow.util.Headers
 import ba.sake.hepek.html.HtmlPage
 import ba.sake.tupson.*
 
-
 trait ResponseWritable[-T]:
   def write(value: T, exchange: HttpServerExchange): Unit
   def headers(value: T): Seq[(String, Seq[String])]
@@ -53,4 +52,3 @@ object ResponseWritable {
   }
 
 }
-

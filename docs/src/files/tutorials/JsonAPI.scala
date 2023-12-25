@@ -1,7 +1,7 @@
 package files.tutorials
 
 import utils.*
-import Bundle.*, Tags.*
+import Bundle.*
 
 object JsonAPI extends TutorialPage {
 
@@ -24,7 +24,11 @@ object JsonAPI extends TutorialPage {
     import ba.sake.tupson.JsonRW
     import ba.sake.sharaf.*, routing.*
 
-    case class Car(brand: String, model: String, quantity: Int) derives JsonRW
+    case class Car(
+      brand: String, 
+      model: String, 
+      quantity: Int
+    ) derives JsonRW
 
     var db: Seq[Car] = Seq()
     ```
@@ -69,13 +73,12 @@ object JsonAPI extends TutorialPage {
     s"""
     Finally, we need to start up the server:
     ```scala
-    val server = Undertow
+    Undertow
       .builder
       .addHttpListener(8181, "localhost")
       .setHandler(SharafHandler(routes))
       .build
-
-    server.start()
+      .start()
 
     println(s"Server started at http://localhost:8181")
     ```

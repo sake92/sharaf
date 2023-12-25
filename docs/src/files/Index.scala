@@ -13,7 +13,7 @@ object Index extends DocStaticPage {
   override def pageContent = Grid.row(
     h1(Consts.ProjectName),
     s"""
-    ${Consts.ProjectName} is a cool library.
+    ${Consts.ProjectName} is a minimalistic Scala 3 web framework.
 
     Jump right into:
     - [Tutorials](${files.tutorials.Index.ref}) to get you started

@@ -5,11 +5,10 @@ import io.undertow.Undertow
 import ba.sake.sharaf.*, routing.*
 
 val routes = Routes:
-  case GET() -> Path("hello", name) =>
-    Response.withBody(s"Hello $name")
+  case GET() -> Path() =>
+    Response.withBody("Try /example.js")
 
-Undertow
-  .builder
+Undertow.builder
   .addHttpListener(8181, "localhost")
   .setHandler(SharafHandler(routes))
   .build

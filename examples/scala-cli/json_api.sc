@@ -23,11 +23,10 @@ val routes = Routes {
     Response.withBody(db)
 }
 
-val server = Undertow.builder
+Undertow.builder
   .addHttpListener(8181, "localhost")
   .setHandler(SharafHandler(routes))
   .build
-
-server.start()
+  .start()
 
 println(s"Server started at http://localhost:8181")
