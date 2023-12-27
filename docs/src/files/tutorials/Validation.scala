@@ -34,7 +34,7 @@ object Validation extends TutorialPage {
 
     ---
   
-    Let's see a full-blown example with validation:
+    Create a file `validation.sc` and paste this code into it:
 
     ```scala
     //> using scala "3.3.1"
@@ -80,6 +80,11 @@ object Validation extends TutorialPage {
       .start()
 
     println(s"Server started at http://localhost:8181")
+    ```
+
+    Then run it like this:
+    ```sh
+    scala-cli validation.sc 
     ```
 
     Notice above that we used `queryParamsValidated` and not plain `queryParams` (does not validate query params).  

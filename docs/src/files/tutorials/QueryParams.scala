@@ -19,13 +19,12 @@ object QueryParams extends TutorialPage {
 
     The `queryParamsMap` approach is useful for simple cases and dynamic query parameters.  
     For more type safety you can use `QueryStringRW` typeclass.  
-    All you have to do is make a `case class MyParams() derives QueryStringRW`  
+    All you have to do is make a `case class MyParams(..) derives QueryStringRW`  
     and then use it like this: `Request.current.queryParams[MyParams]`
 
     ---
 
-    Let's see an example in action:
-    
+    Create a file `query_params.sc` and paste this code into it:
     ```scala
     //> using scala "3.3.1"
     //> using dep ba.sake::sharaf:${Consts.ArtifactVersion}
@@ -52,6 +51,11 @@ object QueryParams extends TutorialPage {
       .start()
 
     println(s"Server started at http://localhost:8181")
+    ```
+
+    Then run it like this:
+    ```sh
+    scala-cli query_params.sc 
     ```
 
     Now go to [http://localhost:8181/raw?q=what&perPage=10](http://localhost:8181/raw?q=what&perPage=10)

@@ -24,7 +24,8 @@ trait DocStaticPage extends StaticPage with AnchorjsDependencies with FADependen
   override def bodyContent = frag(
     super.bodyContent,
     footer(Classes.txtAlignCenter, Classes.bgInfo, cls := "fixed-bottom")(
-      a(href := Consts.GhUrl, Classes.btnClass)(FA.github())
+      a(href := Consts.GhUrl, Classes.btnClass)(FA.github()),
+      a(href := "https://discord.gg/g9KVY3WkMG", Classes.btnClass)(FA.discord())
     )
   )
 
@@ -33,6 +34,16 @@ trait DocStaticPage extends StaticPage with AnchorjsDependencies with FADependen
 
   override def scriptURLs = super.scriptURLs
     .appended(files.scripts.`main.js`.ref)
+
+  override def stylesInline: List[String] = super.stylesInline ++ List(
+    """
+    @media (min-width: 991px) {
+      .affix {
+        width: 15%;
+      }
+    }
+    """
+  )
 
 }
 

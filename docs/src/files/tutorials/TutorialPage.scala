@@ -8,12 +8,15 @@ trait TutorialPage extends DocPage {
   override def categoryPosts = List(
     Index,
     HelloWorld,
+    PathParams,
     QueryParams,
-    HTML,
     StaticFiles,
+    HTML,
     HandlingForms,
     JsonAPI,
-    Validation
+    Validation,
+    DB,
+    Tests
   )
 
   override def pageCategory = Some("Tutorials")

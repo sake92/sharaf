@@ -27,6 +27,9 @@ git push  --atomic origin main $VERSION
 
 # TODOs
 
+- giter8 templates for: REST and fullstack
+- add more validators https://javaee.github.io/javaee-spec/javadocs/javax/validation/constraints/package-summary.html
+- webjars
 - add Docker example
 - add Watchtower example
 - cookies ?

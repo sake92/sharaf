@@ -14,13 +14,12 @@ object HandlingForms extends TutorialPage {
   val firstSection = Section(
     "Handling Form data",
     s"""
-    All you have to do is make a `case class MyFormData() derives FormDataRW`  
+    All you have to do is make a `case class MyFormData(..) derives FormDataRW`  
     and then use it like this: `Request.current.bodyForm[MyFormData]`
 
     ---
 
-    Let's see an example in action:
-    
+    Create a file `form_handling.sc` and paste this code into it:
     ```scala
     //> using scala "3.3.1"
     //> using dep ba.sake::sharaf:${Consts.ArtifactVersion}
@@ -60,6 +59,11 @@ object HandlingForms extends TutorialPage {
       .start()
 
     println(s"Server started at http://localhost:8181")
+    ```
+
+    Then run it like this:
+    ```sh
+    scala-cli form_handling.sc 
     ```
 
     Now go to [http://localhost:8181](http://localhost:8181)
