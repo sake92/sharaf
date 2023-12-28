@@ -19,6 +19,7 @@ class FullstackModule(port: Int) {
       Response.withBody(ShowFormPage(CreateCustomerForm.empty))
 
     case POST() -> Path("form-submit") =>
+      // note that here we do the validation *manually* !!
       val formData = Request.current.bodyForm[CreateCustomerForm]
       formData.validate match
         case Seq() =>

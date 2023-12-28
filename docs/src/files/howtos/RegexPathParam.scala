@@ -7,7 +7,7 @@ object RegexPathParam extends HowToPage {
 
   override def pageSettings = super.pageSettings
     .withTitle("How To Bind Regex Path Parameter")
-    .withLabel("Bind Regex Path Parameter")
+    .withLabel("Regex Path Parameter")
 
   override def blogSettings =
     super.blogSettings.withSections(firstSection)

@@ -43,6 +43,7 @@ object Index extends TutorialPage {
         s"""
         ```scala
         //> using dep ${Consts.ArtifactOrg}::${Consts.ArtifactName}:${Consts.ArtifactVersion}
+        scala-cli my_script.sc --scala-option -Yretain-trees
         ```
         """.md
       ),

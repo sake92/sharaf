@@ -1,6 +1,7 @@
 package ba.sake.formson
 
 import java.net.*
+import java.nio.file.Path
 import java.time.*
 import java.util.UUID
 import scala.deriving.*
@@ -10,7 +11,6 @@ import scala.collection.mutable.ArrayDeque
 import scala.util.Try
 
 import ba.sake.formson.FormData.*
-import java.nio.file.Path
 
 /** Maps a `T` to/from form data map
   */

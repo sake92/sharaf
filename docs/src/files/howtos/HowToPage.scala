@@ -5,7 +5,7 @@ import Bundle.*
 
 trait HowToPage extends DocPage {
 
-  override def categoryPosts = List(Index, EnumPathParam, RegexPathParam)
+  override def categoryPosts = List(Index, EnumPathParam, RegexPathParam, OptionalQueryParam, SeqQueryParam, CompositeQueryParam, UploadFile)
 
   override def pageCategory = Some("How-Tos")
 

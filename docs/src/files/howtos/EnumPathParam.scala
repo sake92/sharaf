@@ -6,7 +6,7 @@ object EnumPathParam extends HowToPage {
 
   override def pageSettings = super.pageSettings
     .withTitle("How To Bind Enum Path Parameter")
-    .withLabel("Bind Enum Path Parameter")
+    .withLabel("Enum Path Parameter")
 
   override def blogSettings =
     super.blogSettings.withSections(firstSection)
