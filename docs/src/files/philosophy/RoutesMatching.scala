@@ -14,7 +14,7 @@ object RoutesMatching extends PhilosophyPage {
     "Routes matching design",
     s"""
     Web frameworks do their routes matching with various mechanisms:
-    - annotations: [Spring](https://spring.io/guides/tutorials/rest/) and most other popular Java frameworks, [Cask](https://com-lihaoyi.github.io/cask/) etc
+    - annotation + method param: [Spring](https://spring.io/guides/tutorials/rest/) and most other popular Java frameworks, [Cask](https://com-lihaoyi.github.io/cask/) etc
     - special route file DSL: [PlayFramework](https://www.playframework.com/documentation/2.9.x/ScalaRouting#The-routes-file-syntax), Ruby on Rails
     - in-language DSL: zio-http
     - pattern matching: Sharaf, http4s

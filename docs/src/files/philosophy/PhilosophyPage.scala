@@ -8,6 +8,7 @@ trait PhilosophyPage extends DocPage {
   override def categoryPosts = List(
     Index,
     RoutesMatching,
+    QueryParamsHandling,
     DependencyInjection
   )
 

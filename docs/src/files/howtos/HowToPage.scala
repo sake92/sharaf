@@ -3,6 +3,8 @@ package files.howtos
 import utils.*
 import Bundle.*
 
+// match multiple methods GET | POST
+// match segments*
 // TODO CORS
 // TODO custom path param matcher
 // TODO custom query param matcher
