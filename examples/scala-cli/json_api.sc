@@ -18,9 +18,9 @@ val routes = Routes:
     Response.withBody(res)
 
   case POST() -> Path("cars") =>
-    val qp = Request.current.bodyJson[Car]
-    db = db.appended(qp)
-    Response.withBody(db)
+    val reqBody = Request.current.bodyJson[Car]
+    db = db.appended(reqBody)
+    Response.withBody(reqBody)
 
 Undertow.builder
   .addHttpListener(8181, "localhost")

@@ -21,7 +21,6 @@ object PathParams extends TutorialPage {
     //> using scala "3.3.1"
     //> using dep ba.sake::sharaf:${Consts.ArtifactVersion}
 
-    import java.util.UUID
     import io.undertow.Undertow
     import ba.sake.sharaf.*, routing.*
 
@@ -31,9 +30,6 @@ object PathParams extends TutorialPage {
 
       case GET() -> Path("int", param[Int](p)) =>
         Response.withBody(s"int = $${p}")
-
-      case GET() -> Path("uuid", param[UUID](p)) =>
-        Response.withBody(s"uuid = $${p}")
 
     Undertow.builder
       .addHttpListener(8181, "localhost")

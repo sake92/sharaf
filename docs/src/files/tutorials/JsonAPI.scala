@@ -54,23 +54,24 @@ object JsonAPI extends TutorialPage {
         Response.withBody(res)
 
       case POST() -> Path("cars") =>
-        val qp = Request.current.bodyJson[Car]
-        db = db.appended(qp)
-        Response.withBody(db)
+        val reqBody = Request.current.bodyJson[Car]
+        db = db.appended(reqBody)
+        Response.withBody(reqBody)
     ```
-    The first route just returns all data in the "database".  
+
+    The first route returns all data in the database.  
     
     The second route does some filtering on the database.  
     
     The third route binds the JSON body from the HTTP request.  
-    And then we add it to the database.
+    Then we add it to the database.
     """.md
   )
 
   val runSection = Section(
     "Running the server",
     s"""
-    Finally, we need to start up the server:
+    Finally, start up the server:
     ```scala
     Undertow
       .builder
@@ -89,7 +90,7 @@ object JsonAPI extends TutorialPage {
     scala-cli json_api.sc 
     ```
 
-    Then you can try the following requests:
+    Then try the following requests:
     ```sh
     # get all cars
     curl http://localhost:8181/cars

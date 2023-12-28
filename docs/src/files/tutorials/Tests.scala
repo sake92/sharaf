@@ -18,7 +18,8 @@ object Tests extends TutorialPage {
       Tests are essential to any serious software component.  
       Writing integration tests with Munit and Requests is straightforward.
 
-      Here we are testing the API from the [JSON API tutorial](${JsonAPI.routesSection.ref}):
+      Here we are testing the API from the [JSON API tutorial](${JsonAPI.routesSection.ref}).  
+      Create a file `json_api.test.scala` and paste this code into it:
       ```scala
       //> using scala "3.3.1"
       //> using dep ba.sake::sharaf:0.0.18
