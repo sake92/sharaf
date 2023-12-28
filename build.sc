@@ -21,8 +21,7 @@ object sharaf extends SharafPublishModule {
 
   def moduleDeps = Seq(querson, formson)
 
-  object test extends ScalaTests with SharafTestModule {
-  }
+  object test extends ScalaTests with SharafTestModule
 }
 
 object querson extends SharafPublishModule {
@@ -87,7 +86,8 @@ trait SharafCommonModule extends ScalaModule with ScalafmtModule {
   def scalacOptions = super.scalacOptions() ++ Seq(
     "-Yretain-trees", // needed for default parameters
     "-deprecation",
-    "-Wunused:all"
+    "-Wunused:all",
+    "-explain"
   )
   def repositoriesTask = T.task {
     super.repositoriesTask() ++

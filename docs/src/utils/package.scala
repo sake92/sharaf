@@ -17,12 +17,13 @@ val Bundle = locally {
 
 val FA = ba.sake.hepek.fontawesome5.FA
 
-import Bundle.Tags.*
-
 def pager(thisSp: BlogPostPage)(using caller: RelativePath) = {
+  import Bundle.Tags.*
+
   def bsNavigation(navLinks: Frag*) = tag("nav")(
     ul(cls := "pagination justify-content-center")(navLinks)
   )
+
   val posts = thisSp.categoryPosts
   if posts.length > 1 then {
     val indexOfThis = posts.indexOf(thisSp)
