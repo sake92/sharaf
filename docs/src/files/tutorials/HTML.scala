@@ -16,8 +16,8 @@ object HTML extends TutorialPage {
     s"""
 
     Sharaf is using the [hepek-components](https://sake92.github.io/hepek/hepek/components/reference/bundle-reference.html)
-    as its "template engine".  
-    It is a bit different than other template engines, in the sense that it is *plain scala code*.  
+    as its template engine.  
+    Hepek is a bit different than other template engines, in the sense that it is *plain scala code*.  
     There is no separate language you need to learn.  
     It has useful utilities like Bootstrap 5 templates, form helpers etc. so you can focus on the important stuff.
 
@@ -29,16 +29,19 @@ object HTML extends TutorialPage {
     //> using scala "3.3.1"
     //> using dep ba.sake::sharaf:${Consts.ArtifactVersion}
 
-    import io.undertow.Undertow
-    import ba.sake.hepek.html.HtmlPage
-    import ba.sake.hepek.scalatags.all.*
-    import ba.sake.sharaf.*, routing.*
+    object IndexView extends HtmlPage:
+      override def bodyContent = div(
+        p("Welcome!"),
+        a(href := "/hello/Bob")("Hello world")
+      )
 
     class HelloView(name: String) extends HtmlPage:
       override def bodyContent =
         div("Hello ", b(name), "!")
 
     val routes = Routes:
+      case GET() -> Path() =>
+        Response.withBody(IndexView)
       case GET() -> Path("hello", name) =>
         Response.withBody(HelloView(name))
 
@@ -56,8 +59,8 @@ object HTML extends TutorialPage {
     scala-cli html.sc 
     ```
 
-    Go to [http://localhost:8181/hello/Bob](http://localhost:8181/hello/Bob).  
-    You will see a simple HTML page that greets the user.
+    Go to [http://localhost:8181](http://localhost:8181)  
+    to see how it works.
 
     """.md
   )

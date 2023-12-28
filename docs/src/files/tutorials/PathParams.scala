@@ -14,7 +14,7 @@ object PathParams extends TutorialPage {
   val firstSection = Section(
     "Path Parameters",
     s"""
-    Path parameters can be matched and extracted from the `Path(segments: Seq[String])` value.
+    Path parameters can be extracted from the `Path(segments: Seq[String])` argument.
 
     Create a file `path_params.sc` and paste this code into it:
     ```scala
@@ -45,6 +45,7 @@ object PathParams extends TutorialPage {
     scala-cli path_params.sc 
     ```
 
+    ---
     Now go to [http://localhost:8181/str/abc](http://localhost:8181/str/abc)
     and you will get the param returned: `str = abc`.
     

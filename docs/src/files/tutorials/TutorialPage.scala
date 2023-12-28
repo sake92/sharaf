@@ -15,7 +15,7 @@ trait TutorialPage extends DocPage {
     HandlingForms,
     JsonAPI,
     Validation,
-    DB,
+    SqlDb,
     Tests
   )
 

@@ -24,11 +24,7 @@ object JsonAPI extends TutorialPage {
     import ba.sake.tupson.JsonRW
     import ba.sake.sharaf.*, routing.*
 
-    case class Car(
-      brand: String, 
-      model: String, 
-      quantity: Int
-    ) derives JsonRW
+    case class Car(brand: String, model: String, quantity: Int) derives JsonRW
 
     var db: Seq[Car] = Seq()
     ```

@@ -14,10 +14,8 @@ object HandlingForms extends TutorialPage {
   val firstSection = Section(
     "Handling Form data",
     s"""
-    All you have to do is make a `case class MyFormData(..) derives FormDataRW`  
-    and then use it like this: `Request.current.bodyForm[MyFormData]`
-
-    ---
+    Form data can be extracted with `Request.current.bodyForm[MyData]`.  
+    The `MyData` needs to have a `FormDataRW` given instance.
 
     Create a file `form_handling.sc` and paste this code into it:
     ```scala

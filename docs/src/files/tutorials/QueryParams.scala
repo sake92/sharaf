@@ -58,6 +58,7 @@ object QueryParams extends TutorialPage {
     scala-cli query_params.sc 
     ```
 
+    ---
     Now go to [http://localhost:8181/raw?q=what&perPage=10](http://localhost:8181/raw?q=what&perPage=10)
     and you will get the raw query params map:
     ```

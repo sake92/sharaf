@@ -3,10 +3,10 @@ package files.tutorials
 import utils.*
 import Bundle.*
 
-object DB extends TutorialPage {
+object SqlDb extends TutorialPage {
 
   override def pageSettings = super.pageSettings
-    .withTitle("SQL db")
+    .withTitle("SQL DB")
 
   override def blogSettings =
     super.blogSettings.withSections(dbSetup, squerySetup, routesSetup, runSection)
