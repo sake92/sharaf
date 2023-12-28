@@ -18,3 +18,7 @@ body {
 .navbar-brand img {
   width: 24px;
 }
+
+.site-map p {
+  margin-bottom: 0;
+}
