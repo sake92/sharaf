@@ -35,7 +35,7 @@ trait DocStaticPage extends StaticPage with AnchorjsDependencies with FADependen
   override def scriptURLs = super.scriptURLs
     .appended(files.scripts.`main.js`.ref)
 
-  override def stylesInline: List[String] = super.stylesInline ++ List(
+  override def stylesInline = super.stylesInline ++ List(
     """
     @media (min-width: 991px) {
       .affix {
@@ -51,6 +51,6 @@ trait DocPage extends DocStaticPage with HepekBootstrap5BlogPage with PrismDepen
 
   override def tocSettings = Some(TocSettings(tocType = TocType.Scrollspy(offset = 60)))
 
-  override def pageHeader = None
+  override def pageHeader = Some(pager(this))
 
 }
