@@ -6,7 +6,9 @@ import Bundle.*
 trait PhilosophyPage extends DocPage {
 
   override def categoryPosts = List(
-    Index
+    Index,
+    RoutesMatching,
+    DependencyInjection
   )
 
   override def pageCategory = Some("Philosophy")

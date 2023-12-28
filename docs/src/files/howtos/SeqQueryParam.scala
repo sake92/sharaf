@@ -12,7 +12,7 @@ object SeqQueryParam extends HowToPage {
     super.blogSettings.withSections(firstSection)
 
   val firstSection = Section(
-    "How to bind sequeance query parameter?",
+    "How to bind sequence query parameter?",
     s"""
 
     Set the parameter to `Seq[T]`:

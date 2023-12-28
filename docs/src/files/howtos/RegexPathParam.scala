@@ -1,7 +1,6 @@
 package files.howtos
 
 import utils.Bundle.*
-import utils.Consts
 
 object RegexPathParam extends HowToPage {
 

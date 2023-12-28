@@ -25,8 +25,9 @@ def pager(thisSp: BlogPostPage)(using caller: RelativePath) = {
   )
 
   val posts = thisSp.categoryPosts
-  if posts.length > 1 then {
-    val indexOfThis = posts.indexOf(thisSp)
+  val indexOfThis = posts.indexOf(thisSp)
+  if posts.length > 1 && indexOfThis >= 0 then {
+
     if indexOfThis == 0 then
       bsNavigation(
         li(cls := "disabled page-item")(
