@@ -15,13 +15,13 @@ trait FromPathParam[T]:
   def parse(str: String): Option[T]
 
 object FromPathParam {
-  given FromPathParam[Int] = new {
+  given FromPathParam[Int] with {
     def parse(str: String): Option[Int] = str.toIntOption
   }
-  given FromPathParam[Long] = new {
+  given FromPathParam[Long] with {
     def parse(str: String): Option[Long] = str.toLongOption
   }
-  given FromPathParam[UUID] = new {
+  given FromPathParam[UUID] with {
     def parse(str: String): Option[UUID] = Try(UUID.fromString(str)).toOption
   }
 

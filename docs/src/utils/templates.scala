@@ -40,6 +40,8 @@ trait DocStaticPage extends StaticPage with AnchorjsDependencies with FADependen
     @media (min-width: 991px) {
       .affix {
         width: 15%;
+        height: 80vh;
+        overflow: auto;
       }
     }
     """

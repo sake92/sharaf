@@ -3,23 +3,23 @@ package files.howtos
 import utils.*
 import Bundle.*
 
-// match multiple methods GET | POST
-// match segments*
 // TODO CORS
-// TODO custom path param matcher
-// TODO custom query param matcher
-
 
 trait HowToPage extends DocPage {
 
   override def categoryPosts =
     List(
       Index,
+      MatchMultipleMethods,
+      MatchMultiplePaths,
       EnumPathParam,
       RegexPathParam,
+      CustomPathParam,
+      EnumQueryParam,
       OptionalQueryParam,
       SeqQueryParam,
       CompositeQueryParam,
+      CustomQueryParam,
       UploadFile,
       NotFound,
       ErrorHandler,

@@ -5,8 +5,8 @@ import io.undertow.Undertow
 import ba.sake.sharaf.*, routing.*
 
 val routes = Routes:
-  case GET() -> Path("hello", name) =>
-    Response.withBody(s"Hello $name")
+  case GET() ->  Path("my-prefix", segments*) =>
+    Response.withBody(s"Hello there $segments")
 
 Undertow
   .builder
