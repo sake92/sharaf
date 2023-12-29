@@ -23,17 +23,16 @@ object MatchMultiplePaths extends HowToPage {
     for more help.
 
     ---
-    If you want to handle a certain prefix:
+    If you want to handle all paths that start with "my-prefix/":
     ```scala
-    case method -> Path("my-prefix", segments*) =>
+    case GET() -> Path("my-prefix", segments*) =>
       ...
     ```
-    This will handle all paths that start with "my-prefix/"
 
     ---
-    If you want to handle all possible paths, just don't use any extractors:
+    If you want to handle all possible paths:
     ```scala
-    case method -> Path(segments*) =>
+    case GET() -> Path(segments*) =>
       ...
     ```
 

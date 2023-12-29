@@ -10,6 +10,7 @@ trait HowToPage extends DocPage {
   override def categoryPosts =
     List(
       Index,
+      Redirect,
       MatchMultipleMethods,
       MatchMultiplePaths,
       EnumPathParam,
@@ -23,7 +24,7 @@ trait HowToPage extends DocPage {
       UploadFile,
       NotFound,
       ErrorHandler,
-      ChainRoutes,
+      SplitRoutes,
       ExternalConfig
     )
 

@@ -26,6 +26,7 @@ final class Request private (
       (k, v.asScala.toSeq)
     }
 
+  // must be a Product (case class)
   def queryParams[T <: Product: QueryStringRW]: T =
     try queryParamsMap.parseQueryStringMap
     catch case e: QuersonException => throw RequestHandlingException(e)
@@ -54,6 +55,7 @@ final class Request private (
     catch case e: ValidsonException => throw RequestHandlingException(e)
 
   // FORM
+  // must be a Product (case class)
   def bodyForm[T <: Product: FormDataRW]: T =
     // createParser returns null if content-type is not suitable
     val parser = formBodyParserFactory.createParser(ex)
