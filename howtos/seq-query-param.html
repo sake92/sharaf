@@ -3,22 +3,20 @@
       display: none;
     }
 
+    .affix {
+      width: 100%;
+    }
+
     @media (min-width: 991px) {
       .affix {
-          position: fixed;
-          width: 10%;
+        position: fixed;
+        width: 15%;
+        height: 80vh;
+        overflow: auto;
       }
 
       nav#tocScrollspy {
         display: block;
-      }
-    }
-    </style><style>
-    @media (min-width: 991px) {
-      .affix {
-        width: 15%;
-        height: 80vh;
-        overflow: auto;
       }
     }
     </style><style>
@@ -34,7 +32,7 @@
           padding-left: 3em;
           font-size: .8em;
       }
-    </style></head><body><div class="hidden-print"><nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top"><div class="container-fluid"><a class="navbar-brand" href="../index.html"><span><img src="../images/favicon.svg" alt="logo" width="32" height="32" /></span> Sharaf</a><button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#main-navbar"><span class="navbar-toggler-icon"></span></button><div class="collapse navbar-collapse" id="main-navbar"><ul class="navbar-nav"></ul><ul class="navbar-nav ms-auto"><li class="nav-item"><a href="../tutorials/index.html" class="nav-link">Tutorials</a></li><li class="nav-item"><a href="index.html" class="active nav-link">How-Tos</a></li><li class="nav-item"><a href="../reference/index.html" class="nav-link">Reference</a></li><li class="nav-item"><a href="../philosophy/index.html" class="nav-link">Philosophy</a></li></ul></div></div></nav></div><div class="container-fluid"><div class="row"><div class="col-md-3 d-flex justify-content-end hidden-print"><nav class="affix"><ul class="nav nav-pills flex-column"><li><a href="index.html" class="nav-link ">How-Tos</a></li><li><a href="redirect.html" class="nav-link ">Redirect</a></li><li><a href="match-multiple-methods.html" class="nav-link ">Match Multiple Methods</a></li><li><a href="match-multiple-paths.html" class="nav-link ">Match Multiple Paths</a></li><li><a href="enum-path-param.html" class="nav-link ">Enum Path Parameter</a></li><li><a href="regex-path-param.html" class="nav-link ">Regex Path Parameter</a></li><li><a href="custom-path-param.html" class="nav-link ">Custom Path Parameter</a></li><li><a href="enum-query-param.html" class="nav-link ">Enum Query Parameter</a></li><li><a href="optional-query-param.html" class="nav-link ">Optional Query Parameter</a></li><li><a href="seq-query-param.html" class="nav-link active">Sequence Query Parameter</a></li><li><a href="composite-query-param.html" class="nav-link ">Composite Query Parameter</a></li><li><a href="custom-query-param.html" class="nav-link ">Custom Query Parameter</a></li><li><a href="upload-file.html" class="nav-link ">Upload a File</a></li><li><a href="not-found.html" class="nav-link ">Custom NotFound Handler</a></li><li><a href="error-handler.html" class="nav-link ">Custom Error Handler</a></li><li><a href="split-routes.html" class="nav-link ">Split Routes</a></li><li><a href="external-config.html" class="nav-link ">External Config</a></li></ul></nav></div><div data-bs-spy="scroll" data-bs-target="#tocScrollspy" class="col-md-6"><div class="hidden-print"></div><nav><ul class="pagination justify-content-center"><li title="Optional Query Parameter" class="page-item"><a href="optional-query-param.html" class="page-link">Previous</a></li><li title="Composite Query Parameter" class="page-item"><a href="composite-query-param.html" class="page-link">Next</a></li></ul></nav><div><section id="how-to-bind-sequence-query-parameter"><h2>How to bind sequence query parameter?</h2><p>Set the parameter to <code>Seq[T]</code>:</p>
+    </style></head><body><div class="hidden-print"><nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top"><div class="container-fluid"><a class="navbar-brand" href="../index.html"><span><img src="../images/favicon.svg" alt="logo" width="32" height="32" /></span> Sharaf</a><button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#main-navbar"><span class="navbar-toggler-icon"></span></button><div class="collapse navbar-collapse" id="main-navbar"><ul class="navbar-nav"></ul><ul class="navbar-nav ms-auto"><li class="nav-item"><a href="../tutorials/index.html" class="nav-link">Tutorials</a></li><li class="nav-item"><a href="index.html" class="active nav-link">How-Tos</a></li><li class="nav-item"><a href="../reference/index.html" class="nav-link">Reference</a></li><li class="nav-item"><a href="../philosophy/index.html" class="nav-link">Philosophy</a></li></ul></div></div></nav></div><div class="container-fluid"><div class="row"><div class="col-md-3 d-flex justify-content-end hidden-print"><nav class="affix"><ul class="nav nav-pills flex-column"><li><a href="index.html" class="nav-link ">How-Tos</a></li><li><a href="redirect.html" class="nav-link ">Redirect</a></li><li><a href="match-multiple-methods.html" class="nav-link ">Match Multiple Methods</a></li><li><a href="match-multiple-paths.html" class="nav-link ">Match Multiple Paths</a></li><li><a href="enum-path-param.html" class="nav-link ">Enum Path Parameter</a></li><li><a href="regex-path-param.html" class="nav-link ">Regex Path Parameter</a></li><li><a href="custom-path-param.html" class="nav-link ">Custom Path Parameter</a></li><li><a href="enum-query-param.html" class="nav-link ">Enum Query Parameter</a></li><li><a href="optional-query-param.html" class="nav-link ">Optional Query Parameter</a></li><li><a href="seq-query-param.html" class="nav-link active">Sequence Query Parameter</a></li><li><a href="composite-query-param.html" class="nav-link ">Composite Query Parameter</a></li><li><a href="custom-query-param.html" class="nav-link ">Custom Query Parameter</a></li><li><a href="upload-file.html" class="nav-link ">Upload a File</a></li><li><a href="not-found.html" class="nav-link ">Custom NotFound Handler</a></li><li><a href="error-handler.html" class="nav-link ">Custom Error Handler</a></li><li><a href="split-routes.html" class="nav-link ">Split Routes</a></li><li><a href="external-config.html" class="nav-link ">External Config</a></li><li><a href="cors.html" class="nav-link ">CORS</a></li></ul></nav></div><div data-bs-spy="scroll" data-bs-target="#tocScrollspy" class="col-md-6"><div class="hidden-print"></div><nav><ul class="pagination justify-content-center"><li title="Optional Query Parameter" class="page-item"><a href="optional-query-param.html" class="page-link">Previous</a></li><li title="Composite Query Parameter" class="page-item"><a href="composite-query-param.html" class="page-link">Next</a></li></ul></nav><div><section id="how-to-bind-sequence-query-parameter"><h2>How to bind sequence query parameter?</h2><p>Set the parameter to <code>Seq[T]</code>:</p>
 <pre><code class="language-scala">case class MyQP(seq: Seq[Int]) derives QueryStringRW
 </code></pre>
 <p>Let's consider a few possible requests with these query params:</p>

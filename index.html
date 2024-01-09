@@ -3,22 +3,20 @@
       display: none;
     }
 
+    .affix {
+      width: 100%;
+    }
+
     @media (min-width: 991px) {
       .affix {
-          position: fixed;
-          width: 10%;
+        position: fixed;
+        width: 15%;
+        height: 80vh;
+        overflow: auto;
       }
 
       nav#tocScrollspy {
         display: block;
-      }
-    }
-    </style><style>
-    @media (min-width: 991px) {
-      .affix {
-        width: 15%;
-        height: 80vh;
-        overflow: auto;
       }
     }
     </style></head><body><div class="hidden-print"><nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top"><div class="container-fluid"><a class="navbar-brand" href="index.html"><span><img src="images/favicon.svg" alt="logo" width="32" height="32" /></span> Sharaf</a><button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#main-navbar"><span class="navbar-toggler-icon"></span></button><div class="collapse navbar-collapse" id="main-navbar"><ul class="navbar-nav"></ul><ul class="navbar-nav ms-auto"><li class="nav-item"><a href="tutorials/index.html" class="nav-link">Tutorials</a></li><li class="nav-item"><a href="howtos/index.html" class="nav-link">How-Tos</a></li><li class="nav-item"><a href="reference/index.html" class="nav-link">Reference</a></li><li class="nav-item"><a href="philosophy/index.html" class="nav-link">Philosophy</a></li></ul></div></div></nav></div><div class="container-fluid"><div class="row"><div class="col-lg-3 col-md-3 invisible"></div><div class="col-lg-6 col-md-6"><h1>Sharaf</h1><p>Sharaf is a minimalistic Scala 3 web framework.</p>
@@ -66,6 +64,7 @@
 <li><a href="howtos/error-handler.html">Custom Error Handler</a></li>
 <li><a href="howtos/split-routes.html">Split Routes</a></li>
 <li><a href="howtos/external-config.html">External Config</a></li>
+<li><a href="howtos/cors.html">CORS</a></li>
 </ul>
 </li>
 <li>

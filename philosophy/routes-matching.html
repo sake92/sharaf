@@ -3,22 +3,20 @@
       display: none;
     }
 
+    .affix {
+      width: 100%;
+    }
+
     @media (min-width: 991px) {
       .affix {
-          position: fixed;
-          width: 10%;
+        position: fixed;
+        width: 15%;
+        height: 80vh;
+        overflow: auto;
       }
 
       nav#tocScrollspy {
         display: block;
-      }
-    }
-    </style><style>
-    @media (min-width: 991px) {
-      .affix {
-        width: 15%;
-        height: 80vh;
-        overflow: auto;
       }
     }
     </style><style>
@@ -38,7 +36,7 @@
 <ul>
 <li>annotation + method param: <a href="https://spring.io/guides/tutorials/rest/">Spring</a> and most other popular Java frameworks, <a href="https://com-lihaoyi.github.io/cask/">Cask</a> etc</li>
 <li>special route file DSL: <a href="https://www.playframework.com/documentation/2.9.x/ScalaRouting#The-routes-file-syntax">PlayFramework</a>, Ruby on Rails</li>
-<li>in-language DSL: zio-http</li>
+<li>in-language DSL: zio-http, akka-http</li>
 <li>pattern matching: Sharaf, http4s</li>
 </ul>
 </section><section id="why-not-annotations"><h2>Why not annotations?</h2><p>Let's see an example:</p>
