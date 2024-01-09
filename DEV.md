@@ -27,6 +27,8 @@ git push  --atomic origin main $VERSION
 
 # TODOs
 
+- refactor scala-cli examples, no requests
+- refactor docs
 - giter8 templates for: REST and fullstack
 - add more validators https://javaee.github.io/javaee-spec/javadocs/javax/validation/constraints/package-summary.html
 - webjars

@@ -23,9 +23,8 @@ object CORS extends HowToPage {
     import ba.sake.sharaf.handlers.cors.CorsSettings
     import ba.sake.sharaf.*, routing.*
 
-    SharafHandler(routes).withCorsSettings(
-      CorsSettings.default.withAllowedOrigins(Set("https://example.com"))
-    )
+    val corsSettings = CorsSettings.default.withAllowedOrigins(Set("https://example.com"))
+    SharafHandler(routes).withCorsSettings(corsSettings)...
     ```
     """.md
   )

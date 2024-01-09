@@ -16,8 +16,7 @@ object sharaf extends SharafPublishModule {
     ivy"com.lihaoyi::requests:0.8.0",
     ivy"ba.sake::tupson:0.11.0",
     ivy"ba.sake::tupson-config:0.11.0",
-    ivy"ba.sake::hepek-components:0.23.0",
-    ivy"com.lihaoyi::os-watch:0.9.3"
+    ivy"ba.sake::hepek-components:0.23.0"
   )
 
   def moduleDeps = Seq(querson, formson)
