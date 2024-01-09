@@ -35,18 +35,6 @@ trait DocStaticPage extends StaticPage with AnchorjsDependencies with FADependen
   override def scriptURLs = super.scriptURLs
     .appended(files.scripts.`main.js`.ref)
 
-  override def stylesInline = super.stylesInline ++ List(
-    """
-    @media (min-width: 991px) {
-      .affix {
-        width: 15%;
-        height: 80vh;
-        overflow: auto;
-      }
-    }
-    """
-  )
-
 }
 
 trait DocPage extends DocStaticPage with HepekBootstrap5BlogPage with PrismDependencies {

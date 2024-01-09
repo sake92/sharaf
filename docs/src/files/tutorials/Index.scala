@@ -33,7 +33,7 @@ object Index extends TutorialPage {
         ```scala
         libraryDependencies ++= Seq(
           "${Consts.ArtifactOrg}" %% "${Consts.ArtifactName}" % "${Consts.ArtifactVersion}"
-        )
+        ),
         scalacOptions ++= Seq("-Yretain-trees")
         ```
         """.md

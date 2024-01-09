@@ -10,6 +10,7 @@ import io.undertow.util.Methods
 import ba.sake.sharaf.*
 
 // TODO write some tests
+// https://www.moesif.com/blog/technical/cors/Authoritative-Guide-to-CORS-Cross-Origin-Resource-Sharing-for-REST-APIs/
 final class CorsHandler private (next: HttpHandler, corsSettings: CorsSettings) extends HttpHandler {
 
   private val accessControlAllowOrigin = HttpString("Access-Control-Allow-Origin")

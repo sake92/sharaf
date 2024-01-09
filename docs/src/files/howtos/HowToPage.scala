@@ -3,7 +3,7 @@ package files.howtos
 import utils.*
 import Bundle.*
 
-// TODO CORS
+// TODO custom response body
 
 trait HowToPage extends DocPage {
 
@@ -25,7 +25,8 @@ trait HowToPage extends DocPage {
       NotFound,
       ErrorHandler,
       SplitRoutes,
-      ExternalConfig
+      ExternalConfig,
+      CORS
     )
 
   override def pageCategory = Some("How-Tos")

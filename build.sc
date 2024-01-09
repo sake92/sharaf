@@ -16,7 +16,8 @@ object sharaf extends SharafPublishModule {
     ivy"com.lihaoyi::requests:0.8.0",
     ivy"ba.sake::tupson:0.11.0",
     ivy"ba.sake::tupson-config:0.11.0",
-    ivy"ba.sake::hepek-components:0.23.0"
+    ivy"ba.sake::hepek-components:0.23.0",
+    ivy"com.lihaoyi::os-watch:0.9.3"
   )
 
   def moduleDeps = Seq(querson, formson)
@@ -135,6 +136,6 @@ object examples extends mill.Module {
 //////////////////// docs
 object docs extends MillHepekModule with SharafCommonModule {
   def ivyDeps = Agg(
-    ivy"ba.sake::hepek:0.22.0"
+    ivy"ba.sake::hepek:0.24.1"
   )
 }

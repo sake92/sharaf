@@ -22,7 +22,7 @@ class JsonApiModule(port: Int) {
       val productOpt = db.find(_.id == id)
       Response.withBodyOpt(productOpt, s"Product with id=$id")
 
-    case GET() -> Path("products") =>
+    case GET() -> Path("products2") =>
       val query = Request.current.queryParamsValidated[ProductsQuery]
       val products =
         if query.name.isEmpty then db
