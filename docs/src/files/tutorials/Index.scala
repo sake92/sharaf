@@ -25,6 +25,10 @@ object Index extends TutorialPage {
         )
         def scalacOptions = super.scalacOptions() ++ Seq("-Yretain-trees")
         ```
+
+        There are Giter8 templates available:
+        - [fullstack](https://github.com/sake92/sharaf-fullstack.g8)
+
         """.md
       ),
       Section(
