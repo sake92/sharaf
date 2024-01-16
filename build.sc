@@ -3,7 +3,6 @@ import $ivy.`ba.sake::mill-hepek::0.0.2`
 
 import mill._
 import mill.scalalib._, scalafmt._, publish._
-import coursier.maven.MavenRepository
 import io.kipp.mill.ci.release.CiReleaseModule
 import ba.sake.millhepek.MillHepekModule
 
@@ -89,11 +88,6 @@ trait SharafCommonModule extends ScalaModule with ScalafmtModule {
     "-Wunused:all",
     "-explain"
   )
-  def repositoriesTask = T.task {
-    super.repositoriesTask() ++
-      Seq(MavenRepository("https://oss.sonatype.org/content/repositories/snapshots"))
-
-  }
 }
 
 trait SharafTestModule extends TestModule.Munit {

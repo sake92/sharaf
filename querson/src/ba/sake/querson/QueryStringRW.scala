@@ -337,6 +337,8 @@ object QueryStringRW {
     val ts = TypeRepr.of[T].typeSymbol
     ts.flags.is(Flags.Enum) && ts.companionClass.methodMember("values").nonEmpty
 
+  // adapted from https://github.com/lampepfl/dotty-macro-examples/blob/main/defaultParamsInference/src/macro.scala
+  // and magnolia
   private def defaultValuesExpr[T: Type](using Quotes): Expr[List[(String, Option[() => Any])]] =
     import quotes.reflect.*
     def exprOfOption(
@@ -345,19 +347,22 @@ object QueryStringRW {
       case (label, None)     => Expr(label.valueOrAbort -> None)
       case (label, Some(et)) => '{ $label -> Some(() => $et) }
     }
-    val tpe = TypeRepr.of[T].typeSymbol
-    val terms = tpe.primaryConstructor.paramSymss.flatten
-      .filter(_.isValDef)
-      .zipWithIndex
+    val tpe = TypeTree.of[T].symbol
+    val terms = tpe.caseFields.zipWithIndex
       .map { case (field, i) =>
-        exprOfOption {
-          Expr(field.name) -> tpe.companionClass
-            .declaredMethod(s"$$lessinit$$greater$$default$$${i + 1}")
-            .headOption
-            .flatMap(_.tree.asInstanceOf[DefDef].rhs)
-            .map(_.asExprOf[Any])
+        val res = exprOfOption {
+          Expr(field.name) -> tpe.companionClass.tree
+            .asInstanceOf[ClassDef]
+            .body
+            .collectFirst {
+              case deff @ DefDef(name, _, _, _) if name == s"$$lessinit$$greater$$default$$${i + 1}" =>
+                deff.rhs.map(_.asExprOf[Any])
+            }
+            .flatten
         }
+        res
       }
+
     Expr.ofList(terms)
 
   /* utils */

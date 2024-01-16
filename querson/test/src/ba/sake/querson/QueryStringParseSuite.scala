@@ -229,4 +229,17 @@ class QueryStringParseSuite extends munit.FunSuite {
       )
     }
   }
+
+  test("parse data derived from another package") {
+    import other_package_givens.given
+    val res = Map().parseQueryStringMap[other_package.PageReq]
+    assertEquals(res, other_package.PageReq(42))
+  }
+
+}
+
+
+
+package other_package_givens {
+  given QueryStringRW[other_package.PageReq] = QueryStringRW.derived
 }

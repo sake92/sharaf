@@ -13,6 +13,7 @@ import ba.sake.formson.*
 import ba.sake.querson.*
 import ba.sake.validson.*
 
+// TODO rename ex (not exception..)
 final class Request private (
     private val ex: HttpServerExchange
 ) {
