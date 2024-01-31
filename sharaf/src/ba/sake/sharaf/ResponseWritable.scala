@@ -4,6 +4,7 @@ import scala.jdk.CollectionConverters.*
 import io.undertow.server.HttpServerExchange
 import io.undertow.util.HttpString
 import io.undertow.util.Headers
+import scalatags.Text.TypedTag
 import ba.sake.hepek.html.HtmlPage
 import ba.sake.tupson.*
 
@@ -26,7 +27,7 @@ object ResponseWritable {
   }
 
   /* instances */
-  given ResponseWritable[String] = new {
+  given ResponseWritable[String] with {
     override def write(value: String, exchange: HttpServerExchange): Unit =
       exchange.getResponseSender.send(value)
     override def headers(value: String): Seq[(String, Seq[String])] = Seq(
@@ -34,7 +35,17 @@ object ResponseWritable {
     )
   }
 
-  given ResponseWritable[HtmlPage] = new {
+  // really handy when working with HTMX !
+  given ResponseWritable[TypedTag[?]] with {
+    override def write(value: TypedTag[?], exchange: HttpServerExchange): Unit =
+      val htmlText = value.render
+      exchange.getResponseSender.send(htmlText)
+    override def headers(value: TypedTag[?]): Seq[(String, Seq[String])] = Seq(
+      Headers.CONTENT_TYPE_STRING -> Seq("text/html; charset=utf-8")
+    )
+  }
+
+  given ResponseWritable[HtmlPage] with {
     override def write(value: HtmlPage, exchange: HttpServerExchange): Unit =
       val htmlText = "<!DOCTYPE html>" + value.contents
       exchange.getResponseSender.send(htmlText)
@@ -43,7 +54,7 @@ object ResponseWritable {
     )
   }
 
-  given [T: JsonRW]: ResponseWritable[T] = new {
+  given [T: JsonRW]: ResponseWritable[T] with {
     override def write(value: T, exchange: HttpServerExchange): Unit =
       exchange.getResponseSender.send(value.toJson)
     override def headers(value: T): Seq[(String, Seq[String])] = Seq(
