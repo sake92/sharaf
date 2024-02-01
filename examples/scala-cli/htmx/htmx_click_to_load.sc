@@ -9,16 +9,6 @@ import ba.sake.hepek.htmx.*
 import ba.sake.querson.QueryStringRW
 import ba.sake.sharaf.*, routing.*
 
-/*
-<tr id="replaceMe">
-  <td colspan="3">
-    <button class='btn' hx-get="/contacts/?page=2"
-                        hx-target="#replaceMe"
-                        hx-swap="outerHTML">
-         Load More Agents... <img class="htmx-indicator" src="/img/bars.svg">
-    </button>
-  </td>
-</tr>*/
 object views {
   import scalatags.Text.all.*
   import ba.sake.hepek.html.HtmlPage
