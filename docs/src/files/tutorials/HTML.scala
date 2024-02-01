@@ -26,7 +26,7 @@ object HTML extends TutorialPage {
     Let's make a simple HTML page that greets the user.  
     Create a file `html.sc` and paste this code into it:
     ```scala
-    ${ScalaCliFiles.html}
+    ${ScalaCliFiles.html.indent(4)}
     ```
 
     and run it like this:

@@ -18,7 +18,7 @@ object PathParams extends TutorialPage {
 
     Create a file `path_params.sc` and paste this code into it:
     ```scala
-    ${ScalaCliFiles.path_params}
+    ${ScalaCliFiles.path_params.indent(4)}
     ```
     
     Then run it like this:

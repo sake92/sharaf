@@ -37,7 +37,7 @@ object Validation extends TutorialPage {
     Create a file `validation.sc` and paste this code into it:
 
     ```scala
-    ${ScalaCliFiles.validation}
+    ${ScalaCliFiles.validation.indent(4)}
     ```
 
     Then run it like this:

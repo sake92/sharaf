@@ -26,7 +26,7 @@ object QueryParams extends TutorialPage {
 
     Create a file `query_params.sc` and paste this code into it:
     ```scala
-    ${ScalaCliFiles.query_params}
+    ${ScalaCliFiles.query_params.indent(4)}
     ```
 
     Then run it like this:

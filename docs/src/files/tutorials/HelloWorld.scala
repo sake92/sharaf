@@ -18,7 +18,7 @@ object HelloWorld extends TutorialPage {
       Let's make a Hello World example in scala-cli.  
       Create a file `hello_sharaf.sc` and paste this code into it:
       ```scala
-      ${ScalaCliFiles.hello}
+      ${ScalaCliFiles.hello.indent(6)}
       ```
 
       Then run it like this:

@@ -28,7 +28,7 @@ object StaticFiles extends TutorialPage {
 
     Now create a file `static_files.sc` and paste this code into it:
     ```scala
-    ${ScalaCliFiles.static_files}
+    ${ScalaCliFiles.static_files.indent(4)}
     ```
 
     and run it like this:

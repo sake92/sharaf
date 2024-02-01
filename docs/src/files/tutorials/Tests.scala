@@ -21,7 +21,7 @@ object Tests extends TutorialPage {
       Here we are testing the API from the [JSON API tutorial](${JsonAPI.routesSection.ref}).  
       Create a file `json_api.test.scala` and paste this code into it:
       ```scala
-      ${ScalaCliFiles.json_api_test}
+      ${ScalaCliFiles.json_api_test.indent(6)}
       ```
 
       First run the API server in one shell:

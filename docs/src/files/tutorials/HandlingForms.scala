@@ -19,7 +19,7 @@ object HandlingForms extends TutorialPage {
 
     Create a file `form_handling.sc` and paste this code into it:
     ```scala
-    ${ScalaCliFiles.form_handling}
+    ${ScalaCliFiles.form_handling.indent(4)}
     ```
 
     Then run it like this:
