@@ -4,7 +4,7 @@ import scala.jdk.CollectionConverters.*
 import io.undertow.server.HttpServerExchange
 import io.undertow.util.HttpString
 import io.undertow.util.Headers
-import scalatags.Text.TypedTag
+import scalatags.Text.Frag
 import ba.sake.hepek.html.HtmlPage
 import ba.sake.tupson.*
 
@@ -36,11 +36,11 @@ object ResponseWritable {
   }
 
   // really handy when working with HTMX !
-  given ResponseWritable[TypedTag[?]] with {
-    override def write(value: TypedTag[?], exchange: HttpServerExchange): Unit =
+  given ResponseWritable[Frag] with {
+    override def write(value: Frag, exchange: HttpServerExchange): Unit =
       val htmlText = value.render
       exchange.getResponseSender.send(htmlText)
-    override def headers(value: TypedTag[?]): Seq[(String, Seq[String])] = Seq(
+    override def headers(value: Frag): Seq[(String, Seq[String])] = Seq(
       Headers.CONTENT_TYPE_STRING -> Seq("text/html; charset=utf-8")
     )
   }
