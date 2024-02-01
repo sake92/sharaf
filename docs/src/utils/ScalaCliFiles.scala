@@ -23,6 +23,7 @@ object ScalaCliFiles:
   val query_params = get("query_params.sc")
   val static_files = get("static_files.sc")
   val html = get("html.sc")
+  val htmx_load_snippet = get(os.RelPath("htmx") / "htmx_load_snippet.sc")
   val form_handling = get("form_handling.sc")
   val json_api = get("json_api.sc")
   val json_api_test = get("json_api.test.scala")
@@ -31,5 +32,5 @@ object ScalaCliFiles:
 
   val validation = get("validation.sc")
 
-  private def get(fileName: String) =
-    os.read(os.pwd / "examples" / "scala-cli" / fileName)
+  private def get(chunk: os.PathChunk) =
+    os.read(os.pwd / "examples" / "scala-cli" / chunk)

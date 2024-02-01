@@ -28,7 +28,8 @@ trait TutorialPage extends DocPage {
     JsonAPI,
     Validation,
     SqlDb,
-    Tests
+    Tests,
+    HTMX
   )
 
   override def pageCategory = Some("Tutorials")
