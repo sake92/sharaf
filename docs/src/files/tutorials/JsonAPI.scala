@@ -11,22 +11,20 @@ object JsonAPI extends TutorialPage {
   override def blogSettings =
     super.blogSettings.withSections(modelSection, routesSection, runSection)
 
+  private val snip1 = ScalaCliFiles.json_api.snippet(until = "val routes").indent(4)
+  private val snip2 = ScalaCliFiles.json_api
+    .snippet(from = "val routes", until = "Undertow.builder")
+    .indent(4)
+    .trim
+  private val snip3 = ScalaCliFiles.json_api.snippet(from = "Undertow.builder").indent(4)
+
   val modelSection = Section(
     "Model definition",
     s"""
     Let's make a simple JSON API in scala-cli.  
     Create a file `json_api.sc` and paste this code into it:
     ```scala
-    //> using scala "3.3.1"
-    //> using dep ba.sake::sharaf:${Consts.ArtifactVersion}
-
-    import io.undertow.Undertow
-    import ba.sake.tupson.JsonRW
-    import ba.sake.sharaf.*, routing.*
-
-    case class Car(brand: String, model: String, quantity: Int) derives JsonRW
-
-    var db: Seq[Car] = Seq()
+    ${snip1}
     ```
 
     Here we defined a `Car` model, which `derives JsonRW`, so we can use the JSON support from Sharaf.
@@ -41,18 +39,7 @@ object JsonAPI extends TutorialPage {
     s"""
     Next step is to define a few routes for getting and adding cars:
     ```scala
-    val routes = Routes:
-      case GET() -> Path("cars") =>
-        Response.withBody(db)
-
-      case GET() -> Path("cars", brand) =>
-        val res = db.filter(_.brand == brand)
-        Response.withBody(res)
-
-      case POST() -> Path("cars") =>
-        val reqBody = Request.current.bodyJson[Car]
-        db = db.appended(reqBody)
-        Response.withBody(reqBody)
+    ${snip2}
     ```
 
     The first route returns all data in the database.  
@@ -69,16 +56,7 @@ object JsonAPI extends TutorialPage {
     s"""
     Finally, start up the server:
     ```scala
-    Undertow
-      .builder
-      .addHttpListener(8181, "localhost")
-      .setHandler(
-        SharafHandler(routes).withErrorMapper(ErrorMapper.json)
-      )
-      .build
-      .start()
-
-    println(s"Server started at http://localhost:8181")
+    ${snip3}
     ```
 
     and run it like this:

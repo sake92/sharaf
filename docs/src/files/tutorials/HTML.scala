@@ -26,32 +26,7 @@ object HTML extends TutorialPage {
     Let's make a simple HTML page that greets the user.  
     Create a file `html.sc` and paste this code into it:
     ```scala
-    //> using scala "3.3.1"
-    //> using dep ba.sake::sharaf:${Consts.ArtifactVersion}
-
-    object IndexView extends HtmlPage:
-      override def bodyContent = div(
-        p("Welcome!"),
-        a(href := "/hello/Bob")("Hello world")
-      )
-
-    class HelloView(name: String) extends HtmlPage:
-      override def bodyContent =
-        div("Hello ", b(name), "!")
-
-    val routes = Routes:
-      case GET() -> Path() =>
-        Response.withBody(IndexView)
-      case GET() -> Path("hello", name) =>
-        Response.withBody(HelloView(name))
-
-    Undertow.builder
-      .addHttpListener(8181, "localhost")
-      .setHandler(SharafHandler(routes))
-      .build
-      .start()
-
-    println(s"Server started at http://localhost:8181")
+    ${ScalaCliFiles.html}
     ```
 
     and run it like this:

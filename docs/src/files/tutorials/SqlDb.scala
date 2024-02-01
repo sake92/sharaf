@@ -33,6 +33,13 @@ object SqlDb extends TutorialPage {
     """.md
   )
 
+  private val snip1 = ScalaCliFiles.sql_db.snippet(until = "case class Customer").indent(4)
+  private val snip2 = ScalaCliFiles.sql_db
+    .snippet(from = "case class Customer", until = "Undertow.builder")
+    .indent(4)
+    .trim
+  private val snip3 = ScalaCliFiles.sql_db.snippet(from = "Undertow.builder").indent(4)
+
   val squerySetup = Section(
     "Squery setup",
     s"""
@@ -40,23 +47,7 @@ object SqlDb extends TutorialPage {
 
     Create a file `sql_db.sc` and paste this code into it:
     ```scala
-    //> using scala "3.3.1"
-    //> using dep org.postgresql:postgresql:42.7.1
-    //> using dep com.zaxxer:HikariCP:5.1.0
-    //> using dep ba.sake::sharaf:${Consts.ArtifactVersion}
-    //> using dep ba.sake::squery:0.0.16
-
-    import io.undertow.Undertow
-    import ba.sake.tupson.JsonRW
-    import ba.sake.squery.*
-    import ba.sake.sharaf.*, routing.*
-
-    val ds = com.zaxxer.hikari.HikariDataSource()
-    ds.setJdbcUrl("jdbc:postgresql://localhost:5432/postgres")
-    ds.setUsername("postgres")
-    ds.setPassword("mysecretpassword")
-
-    val ctx = new SqueryContext(ds)
+    ${snip1}
     ```
 
     Here we set up the `SqueryContext` which we can use for accessing the database.
@@ -68,24 +59,7 @@ object SqlDb extends TutorialPage {
     s"""
     Now we can do some querying on the db:
     ```scala
-    case class Customer(name: String) derives JsonRW
-
-    val routes = Routes:
-      case GET() -> Path("customers") =>
-        val customerNames = ctx.run {
-          sql"SELECT name FROM customers".readValues[String]()
-        }
-        Response.withBody(customerNames)
-
-      case POST() -> Path("customers") =>
-        val customer = Request.current.bodyJson[Customer]
-        ctx.run {
-          sql${Consts.tq}
-          INSERT INTO customers(name) 
-          VALUES ($${customer.name})
-          ${Consts.tq}.insert()
-        }
-        Response.withBody(customer)
+    ${snip2}
     ```
     """.md
   )
@@ -95,16 +69,7 @@ object SqlDb extends TutorialPage {
     s"""
     Finally, we need to start up the server:
     ```scala
-    Undertow
-      .builder
-      .addHttpListener(8181, "localhost")
-      .setHandler(
-        SharafHandler(routes).withErrorMapper(ErrorMapper.json)
-      )
-      .build
-      .start()
-
-    println(s"Server started at http://localhost:8181")
+    ${snip3}
     ```
 
     and run it like this:

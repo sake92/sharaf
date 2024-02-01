@@ -1,5 +1,5 @@
 //> using scala "3.3.1"
-//> using dep ba.sake::sharaf:0.0.18
+//> using dep ba.sake::sharaf:0.0.21
 
 import io.undertow.Undertow
 import ba.sake.tupson.JsonRW
@@ -9,7 +9,7 @@ case class Car(brand: String, model: String, quantity: Int) derives JsonRW
 
 var db: Seq[Car] = Seq()
 
-val routes = Routes:
+val routes = Routes:  
   case GET() -> Path("cars") =>
     Response.withBody(db)
 

@@ -1,5 +1,5 @@
 //> using scala "3.3.1"
-//> using dep ba.sake::sharaf:0.0.18
+//> using dep ba.sake::sharaf:0.0.21
 
 import io.undertow.Undertow
 import scalatags.Text.all.*

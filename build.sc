@@ -129,6 +129,7 @@ object examples extends mill.Module {
 //////////////////// docs
 object docs extends MillHepekModule with SharafCommonModule {
   def ivyDeps = Agg(
-    ivy"ba.sake::hepek:0.24.1"
+    ivy"ba.sake::hepek:0.25.0",
+    ivy"com.lihaoyi::os-lib:0.9.3"
   )
 }

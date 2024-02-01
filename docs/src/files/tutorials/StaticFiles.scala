@@ -28,23 +28,7 @@ object StaticFiles extends TutorialPage {
 
     Now create a file `static_files.sc` and paste this code into it:
     ```scala
-    //> using scala "3.3.1"
-    //> using dep ba.sake::sharaf:${Consts.ArtifactVersion}
-
-    import io.undertow.Undertow
-    import ba.sake.sharaf.*, routing.*
-
-    val routes = Routes:
-      case GET() -> Path() =>
-        Response.withBody("Try /example.js")
-
-    Undertow.builder
-      .addHttpListener(8181, "localhost")
-      .setHandler(SharafHandler(routes))
-      .build
-      .start()
-
-    println(s"Server started at http://localhost:8181")
+    ${ScalaCliFiles.static_files}
     ```
 
     and run it like this:

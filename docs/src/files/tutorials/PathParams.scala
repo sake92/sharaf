@@ -18,26 +18,7 @@ object PathParams extends TutorialPage {
 
     Create a file `path_params.sc` and paste this code into it:
     ```scala
-    //> using scala "3.3.1"
-    //> using dep ba.sake::sharaf:${Consts.ArtifactVersion}
-
-    import io.undertow.Undertow
-    import ba.sake.sharaf.*, routing.*
-
-    val routes = Routes:
-      case GET() -> Path("str", p) =>
-        Response.withBody(s"str = $${p}")
-
-      case GET() -> Path("int", param[Int](p)) =>
-        Response.withBody(s"int = $${p}")
-
-    Undertow.builder
-      .addHttpListener(8181, "localhost")
-      .setHandler(SharafHandler(routes))
-      .build
-      .start()
-
-    println(s"Server started at http://localhost:8181")
+    ${ScalaCliFiles.path_params}
     ```
     
     Then run it like this:
@@ -46,8 +27,8 @@ object PathParams extends TutorialPage {
     ```
 
     ---
-    Now go to [http://localhost:8181/str/abc](http://localhost:8181/str/abc)
-    and you will get the param returned: `str = abc`.
+    Now go to [http://localhost:8181/string/abc](http://localhost:8181/string/abc)
+    and you will get the param returned: `string = abc`.
     
     When you go to [http://localhost:8181/int/123](http://localhost:8181/int/123),  
     Sharaf will *try to extract* an `Int` from the path parameter.  
