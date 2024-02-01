@@ -37,6 +37,9 @@ object HTMX extends TutorialPage {
     Go to [http://localhost:8181](http://localhost:8181)  
     to see how it works.
 
+    ---
+    You can find even more examples in [examples/scala-cli/htmx](${Consts.GhSourcesUrl}/examples/scala-cli/htmx) folder.
+
     """.md
   )
 }
