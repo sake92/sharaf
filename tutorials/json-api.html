@@ -32,10 +32,10 @@
           padding-left: 3em;
           font-size: .8em;
       }
-    </style></head><body><div class="hidden-print"><nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top"><div class="container-fluid"><a class="navbar-brand" href="../index.html"><span><img src="../images/favicon.svg" alt="logo" width="32" height="32" /></span> Sharaf</a><button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#main-navbar"><span class="navbar-toggler-icon"></span></button><div class="collapse navbar-collapse" id="main-navbar"><ul class="navbar-nav"></ul><ul class="navbar-nav ms-auto"><li class="nav-item"><a href="index.html" class="active nav-link">Tutorials</a></li><li class="nav-item"><a href="../howtos/index.html" class="nav-link">How-Tos</a></li><li class="nav-item"><a href="../reference/index.html" class="nav-link">Reference</a></li><li class="nav-item"><a href="../philosophy/index.html" class="nav-link">Philosophy</a></li></ul></div></div></nav></div><div class="container-fluid"><div class="row"><div class="col-md-3 d-flex justify-content-end hidden-print"><nav class="affix"><ul class="nav nav-pills flex-column"><li><a href="index.html" class="nav-link ">Tutorials</a></li><li><a href="hello-world.html" class="nav-link ">Hello World</a></li><li><a href="path-params.html" class="nav-link ">Path Params</a></li><li><a href="query-params.html" class="nav-link ">Query Params</a></li><li><a href="static-files.html" class="nav-link ">Static Files</a></li><li><a href="html.html" class="nav-link ">HTML</a></li><li><a href="handling-forms.html" class="nav-link ">Handling Forms</a></li><li><a href="json-api.html" class="nav-link active">JSON API</a></li><li><a href="validation.html" class="nav-link ">Validation</a></li><li><a href="sql-db.html" class="nav-link ">SQL DB</a></li><li><a href="tests.html" class="nav-link ">Tests</a></li></ul></nav></div><div data-bs-spy="scroll" data-bs-target="#tocScrollspy" class="col-md-6"><div class="hidden-print"></div><nav><ul class="pagination justify-content-center"><li title="Handling Forms" class="page-item"><a href="handling-forms.html" class="page-link">Previous</a></li><li title="Validation" class="page-item"><a href="validation.html" class="page-link">Next</a></li></ul></nav><div><section id="model-definition"><h2>Model definition</h2><p>Let's make a simple JSON API in scala-cli.<br />
+    </style></head><body><div class="hidden-print"><nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top"><div class="container-fluid"><a class="navbar-brand" href="../index.html"><span><img src="../images/favicon.svg" alt="logo" width="32" height="32" /></span> Sharaf</a><button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#main-navbar"><span class="navbar-toggler-icon"></span></button><div class="collapse navbar-collapse" id="main-navbar"><ul class="navbar-nav"></ul><ul class="navbar-nav ms-auto"><li class="nav-item"><a href="index.html" class="active nav-link">Tutorials</a></li><li class="nav-item"><a href="../howtos/index.html" class="nav-link">How-Tos</a></li><li class="nav-item"><a href="../reference/index.html" class="nav-link">Reference</a></li><li class="nav-item"><a href="../philosophy/index.html" class="nav-link">Philosophy</a></li></ul></div></div></nav></div><div class="container-fluid"><div class="row"><div class="col-md-3 d-flex justify-content-end hidden-print"><nav class="affix"><ul class="nav nav-pills flex-column"><li><a href="index.html" class="nav-link ">Tutorials</a></li><li><a href="hello-world.html" class="nav-link ">Hello World</a></li><li><a href="path-params.html" class="nav-link ">Path Params</a></li><li><a href="query-params.html" class="nav-link ">Query Params</a></li><li><a href="static-files.html" class="nav-link ">Static Files</a></li><li><a href="html.html" class="nav-link ">HTML</a></li><li><a href="handling-forms.html" class="nav-link ">Handling Forms</a></li><li><a href="json-api.html" class="nav-link active">JSON API</a></li><li><a href="validation.html" class="nav-link ">Validation</a></li><li><a href="sql-db.html" class="nav-link ">SQL DB</a></li><li><a href="tests.html" class="nav-link ">Tests</a></li><li><a href="htmx.html" class="nav-link ">HTMX</a></li></ul></nav></div><div data-bs-spy="scroll" data-bs-target="#tocScrollspy" class="col-md-6"><div class="hidden-print"></div><nav><ul class="pagination justify-content-center"><li title="Handling Forms" class="page-item"><a href="handling-forms.html" class="page-link">Previous</a></li><li title="Validation" class="page-item"><a href="validation.html" class="page-link">Next</a></li></ul></nav><div><section id="model-definition"><h2>Model definition</h2><p>Let's make a simple JSON API in scala-cli.<br />
 Create a file <code>json_api.sc</code> and paste this code into it:</p>
-<pre><code class="language-scala">//&gt; using scala &quot;3.3.1&quot;
-//&gt; using dep ba.sake::sharaf:0.0.18
+<pre><code class="language-scala">    //&gt; using scala &quot;3.3.1&quot;
+//&gt; using dep ba.sake::sharaf:0.0.21
 
 import io.undertow.Undertow
 import ba.sake.tupson.JsonRW
@@ -44,12 +44,14 @@ import ba.sake.sharaf.*, routing.*
 case class Car(brand: String, model: String, quantity: Int) derives JsonRW
 
 var db: Seq[Car] = Seq()
+
+
 </code></pre>
 <p>Here we defined a <code>Car</code> model, which <code>derives JsonRW</code>, so we can use the JSON support from Sharaf.</p>
 <p>We also use a <code>var db: Seq[Car]</code> to store our data.<br />
 (don't do this for real projects)</p>
 </section><section id="routes-definition"><h2>Routes definition</h2><p>Next step is to define a few routes for getting and adding cars:</p>
-<pre><code class="language-scala">val routes = Routes:
+<pre><code class="language-scala">val routes = Routes:  
   case GET() -&gt; Path(&quot;cars&quot;) =&gt;
     Response.withBody(db)
 
@@ -67,8 +69,7 @@ var db: Seq[Car] = Seq()
 <p>The third route binds the JSON body from the HTTP request.<br />
 Then we add it to the database.</p>
 </section><section id="running-the-server"><h2>Running the server</h2><p>Finally, start up the server:</p>
-<pre><code class="language-scala">Undertow
-  .builder
+<pre><code class="language-scala">    Undertow.builder
   .addHttpListener(8181, &quot;localhost&quot;)
   .setHandler(
     SharafHandler(routes).withErrorMapper(ErrorMapper.json)
@@ -77,6 +78,7 @@ Then we add it to the database.</p>
   .start()
 
 println(s&quot;Server started at http://localhost:8181&quot;)
+
 </code></pre>
 <p>and run it like this:</p>
 <pre><code class="language-sh">scala-cli json_api.sc 
