@@ -21,6 +21,8 @@ object HTMX extends TutorialPage {
     Sharaf is using the [hepek-components](https://sake92.github.io/hepek/hepek/components/reference/bundle-reference.html)
     as its template engine, which has support for HTMX attributes.
 
+    You can lots of examples in [examples/scala-cli/htmx](${Consts.GhSourcesUrl}/examples/scala-cli/htmx) folder.
+
     ---
     
     Let's make a simple page that triggers a POST request to fetch a HTML snippet.  
@@ -36,9 +38,6 @@ object HTMX extends TutorialPage {
 
     Go to [http://localhost:8181](http://localhost:8181)  
     to see how it works.
-
-    ---
-    You can find even more examples in [examples/scala-cli/htmx](${Consts.GhSourcesUrl}/examples/scala-cli/htmx) folder.
 
     """.md
   )
