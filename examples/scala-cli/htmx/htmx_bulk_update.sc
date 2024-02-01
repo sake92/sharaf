@@ -13,7 +13,7 @@ object views {
 
   trait BasePage extends HtmlPage with HtmxDependencies
 
-  class ContactsViewPage(contacts: List[Contact]) extends BasePage {
+  class ContactsViewPage(contacts: Seq[Contact]) extends BasePage {
     override def bodyContent = div(
       h1("Bulk Updating example"),
       div(hx.include := "#checked-contacts", hx.target := "#tbody")(
@@ -30,7 +30,7 @@ object views {
       )
     )
 
-    override def stylesInline: List[String] = List("""
+    override def stylesInline = List("""
      .htmx-settling tr.deactivate td {
         background: lightcoral;
       }
@@ -43,7 +43,7 @@ object views {
     """)
   }
 
-  def contactsRows(contacts: List[Contact], affectedContacts: AffectedContacts): Frag = contacts.map { contact =>
+  def contactsRows(contacts: Seq[Contact], affectedContacts: AffectedContacts): Frag = contacts.map { contact =>
     val affectedClass = if affectedContacts.activated then "activate" else "deactivate"
     tr(
       Option.when(affectedContacts.ids(contact.id))(cls := affectedClass)
@@ -59,7 +59,7 @@ object views {
 
 case class Contact(id: Int, name: String, email: String, active: Boolean)
 
-var currentContacts = List(
+var currentContacts = Seq(
   Contact(1, "Joe Smith", "joe@smith.org", true),
   Contact(2, "Angie MacDowell", "angie@macdowell.org", true),
   Contact(3, "Fuqua Tarkenton", "fuqua@tarkenton.org", true),
