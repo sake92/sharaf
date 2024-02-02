@@ -17,8 +17,8 @@ object views {
     override def bodyContent = div(
       h1("Bulk Updating example"),
       div(hx.include := "#checked-contacts", hx.target := "#tbody")(
-        button(hx.put := "/activate", cls := "btn")("Activate"),
-        button(hx.put := "/deactivate", cls := "btn")("Deactivate")
+        button(hx.put := "/activate")("Activate"),
+        button(hx.put := "/deactivate")("Deactivate")
       ),
       form(id := "checked-contacts")(
         table(

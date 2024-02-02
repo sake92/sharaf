@@ -36,8 +36,7 @@ object views {
         button(
           hx.get := s"/contacts/?page=${page + 1}",
           hx.target := "#replaceMe",
-          hx.swap := "outerHTML",
-          cls := "btn"
+          hx.swap := "outerHTML"
         )(
           "Load More Agents...",
           img(src := "/img/bars.svg", cls := "htmx-indicator")

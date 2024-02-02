@@ -11,7 +11,7 @@ For examples that use images and static resources:
 scala-cli htmx_click_to_load.sc  --resource-dir resources
 ```
 
-If you want to restart the server when files change, just add flag `--restart˙:
+If you want to restart the server when files change, just add the `--restart` flag:
 ```sh
 scala-cli htmx_click_to_load.sc  --resource-dir resources --restart
 ```

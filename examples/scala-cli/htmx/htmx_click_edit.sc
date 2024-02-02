@@ -23,15 +23,15 @@ object views {
     div(label("First Name"), s": ${formData.firstName}"),
     div(label("Last Name"), s": ${formData.lastName}"),
     div(label("Email"), s": ${formData.email}"),
-    button(hx.get := "/contact/1/edit", cls := "btn btn-primary")("Click To Edit")
+    button(hx.get := "/contact/1/edit")("Click To Edit")
   )
 
   def contactEdit(formData: ContactForm) = form(hx.put := "/contact/1", hx.target := "this", hx.swap := "outerHTML")(
     div(label("First Name"), input(tpe := "text", name := "firstName", value := formData.firstName)),
     div(label("Last Name"), input(tpe := "text", name := "lastName", value := formData.lastName)),
     div(label("Email"), input(tpe := "email", name := "email", value := formData.email)),
-    button(cls := "btn")("Submit"),
-    button(hx.get := "/contact/1", cls := "btn")("Cancel")
+    button("Submit"),
+    button(hx.get := "/contact/1")("Cancel")
   )
 }
 
