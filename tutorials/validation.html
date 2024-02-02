@@ -76,11 +76,11 @@ case class CarApiResult(message: String) derives JsonRW
 val routes = Routes:
   case GET() -&gt; Path(&quot;cars&quot;) =&gt;
     val qp = Request.current.queryParamsValidated[CarQuery]
-    Response.withBody(CarApiResult(&quot;Query OK&quot;))
+    Response.withBody(CarApiResult(s&quot;Query OK: ${qp}&quot;))
 
   case POST() -&gt; Path(&quot;cars&quot;) =&gt;
-    val qp = Request.current.bodyJsonValidated[Car]
-    Response.withBody(CarApiResult(&quot;JSON body OK&quot;))
+    val json = Request.current.bodyJsonValidated[Car]
+    Response.withBody(CarApiResult(s&quot;JSON body OK: ${json}&quot;))
 
 Undertow.builder
   .addHttpListener(8181, &quot;localhost&quot;)

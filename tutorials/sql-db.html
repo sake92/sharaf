@@ -50,11 +50,11 @@
 //&gt; using dep org.postgresql:postgresql:42.7.1
 //&gt; using dep com.zaxxer:HikariCP:5.1.0
 //&gt; using dep ba.sake::sharaf:0.0.22
-//&gt; using dep ba.sake::squery:0.0.16
+//&gt; using dep ba.sake::squery:0.3.0
 
 import io.undertow.Undertow
 import ba.sake.tupson.JsonRW
-import ba.sake.squery.*
+import ba.sake.squery.{*, given}
 import ba.sake.sharaf.*, routing.*
 
 val ds = com.zaxxer.hikari.HikariDataSource()
