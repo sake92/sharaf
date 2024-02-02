@@ -92,7 +92,7 @@ trait SharafCommonModule extends ScalaModule with ScalafmtModule {
 
 trait SharafTestModule extends TestModule.Munit {
   def ivyDeps = Agg(
-    ivy"org.scalameta::munit::0.7.29"
+    ivy"org.scalameta::munit::1.0.0-M10"
   )
 }
 

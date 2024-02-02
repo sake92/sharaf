@@ -4,8 +4,6 @@
 import java.util.UUID
 import io.undertow.Undertow
 import scalatags.Text.all.*
-import ba.sake.hepek.html.HtmlPage
-import ba.sake.hepek.htmx.*
 import ba.sake.querson.QueryStringRW
 import ba.sake.sharaf.*, routing.*
 

@@ -1,6 +1,6 @@
 //> using scala "3.3.1"
 //> using dep ba.sake::sharaf:0.0.22
-//> using test.dep org.scalameta::munit::0.7.29
+//> using test.dep org.scalameta::munit::1.0.0-M10
 
 import io.undertow.Undertow
 import ba.sake.tupson.*

@@ -1,12 +1,8 @@
 //> using scala "3.3.1"
 //> using dep ba.sake::sharaf:0.0.22
 
-import java.util.UUID
 import io.undertow.Undertow
 import scalatags.Text.all.*
-import ba.sake.hepek.html.HtmlPage
-import ba.sake.hepek.htmx.*
-import ba.sake.querson.QueryStringRW
 import ba.sake.sharaf.*, routing.*
 
 object views {
