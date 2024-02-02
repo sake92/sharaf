@@ -2,9 +2,9 @@
 //> using dep ba.sake::sharaf:0.0.22
 
 import io.undertow.Undertow
+import scalatags.Text.all.*
 import ba.sake.formson.FormDataRW
 import ba.sake.hepek.html.HtmlPage
-import ba.sake.hepek.scalatags.all.*
 import ba.sake.sharaf.*, routing.*
 
 object ContacUsView extends HtmlPage:

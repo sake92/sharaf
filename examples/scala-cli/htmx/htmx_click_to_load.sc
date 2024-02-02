@@ -1,6 +1,7 @@
 //> using scala "3.3.1"
 //> using dep ba.sake::sharaf:0.0.22
 
+// https://htmx.org/examples/click-to-load/
 import java.util.UUID
 import io.undertow.Undertow
 import scalatags.Text.all.*

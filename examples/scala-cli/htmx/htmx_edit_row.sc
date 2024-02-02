@@ -1,6 +1,8 @@
 //> using scala "3.3.1"
 //> using dep ba.sake::sharaf:0.0.22
 
+// https://htmx.org/examples/edit-row/
+
 import io.undertow.Undertow
 import scalatags.Text.all.*
 import ba.sake.formson.FormDataRW
