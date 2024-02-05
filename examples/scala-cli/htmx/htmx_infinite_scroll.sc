@@ -4,7 +4,6 @@
 // https://htmx.org/examples/click-to-load/
 import java.util.UUID
 import io.undertow.Undertow
-import scalatags.Text.all.*
 import ba.sake.querson.QueryStringRW
 import ba.sake.sharaf.*, routing.*
 

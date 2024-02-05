@@ -4,7 +4,6 @@
 // https://htmx.org/examples/delete-row/
 
 import io.undertow.Undertow
-import scalatags.Text.all.*
 import ba.sake.sharaf.*, routing.*
 
 object views {

@@ -4,7 +4,6 @@
 // https://htmx.org/examples/edit-row/
 
 import io.undertow.Undertow
-import scalatags.Text.all.*
 import ba.sake.formson.FormDataRW
 import ba.sake.sharaf.*, routing.*
 

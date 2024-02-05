@@ -1,9 +1,9 @@
 package demo
 
+import scalatags.Text.all.*
 import ba.sake.sharaf.*
 import ba.sake.sharaf.routing.*
 import ba.sake.hepek.html.HtmlPage
-import scalatags.Text.all
 
 class AppRoutes(securityService: SecurityService) {
 
@@ -22,10 +22,8 @@ class AppRoutes(securityService: SecurityService) {
 
 }
 
-import scalatags.Text.all.*
-
 class IndexPage(userOpt: Option[CustomUserProfile]) extends HtmlPage {
-  override def pageContent: all.Frag = frag(
+  override def pageContent = frag(
     userOpt match {
       case None =>
         frag(
@@ -53,7 +51,7 @@ class IndexPage(userOpt: Option[CustomUserProfile]) extends HtmlPage {
 }
 
 object ProtectedPage extends HtmlPage {
-  override def pageContent: all.Frag = frag(
+  override def pageContent = frag(
     div("This is a protected page"),
     div(
       a(href := "/")("Home")
