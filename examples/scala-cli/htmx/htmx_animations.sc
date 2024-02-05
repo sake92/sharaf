@@ -9,7 +9,9 @@ import ba.sake.hepek.html.HtmlPage
 import ba.sake.hepek.htmx.*
 import ba.sake.sharaf.*, routing.*
 
-object ColorThrobView extends HtmlPage with HtmxDependencies:
+trait ExamplePage extends HtmlPage with HtmxDependencies
+
+object ColorThrobView extends ExamplePage:
   override def bodyContent = snippet("red")
 
   def snippet(color: String) = div(
@@ -22,16 +24,31 @@ object ColorThrobView extends HtmlPage with HtmxDependencies:
   )("Color Swap Demo")
 
   override def stylesInline = List("""
-  .smooth {
-    transition: all 1s ease-in;
-  }
+    .smooth {
+      transition: all 1s ease-in;
+    }
+  """)
+
+object FadeOutOnSwapView extends ExamplePage:
+  override def bodyContent = button(
+    cls := "fade-me-out",
+    hx.delete := "/fade_out_demo",
+    hx.swap := "outerHTML swap:1s"
+  )("Fade Me Out")
+
+  override def stylesInline = List("""
+    .fade-me-out.htmx-swapping {
+      opacity: 0;
+      transition: opacity 1s ease-out;
+    }
   """)
 
 val routes = Routes:
   case GET() -> Path() =>
     Response.withBody(new HtmlPage {
-      override def bodyContent = div(
-        a(href := "color-throb")("Color throb")
+      override def bodyContent = ul(
+        li(a(href := "color-throb")("Color throb")),
+        li(a(href := "fade-out-on-swap")("Fade Out On Swap"))
       )
     })
 
@@ -43,6 +60,10 @@ val routes = Routes:
     val x = scala.util.Random.nextInt(256)
     val randomColor = String.format("#%03X", x)
     Response.withBody(ColorThrobView.snippet(randomColor))
+  case GET() -> Path("fade-out-on-swap") =>
+    Response.withBody(FadeOutOnSwapView)
+  case DELETE() -> Path("fade_out_demo") =>
+    Response.withBody("")
 
 Undertow.builder
   .addHttpListener(8181, "localhost")

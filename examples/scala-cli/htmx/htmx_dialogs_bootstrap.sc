@@ -1,6 +1,8 @@
 //> using scala "3.3.1"
 //> using dep ba.sake::sharaf:0.0.22
 
+// https://htmx.org/examples/modal-bootstrap/
+
 import io.undertow.util.HttpString
 import io.undertow.Undertow
 import scalatags.Text.all.*
