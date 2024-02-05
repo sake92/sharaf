@@ -1,6 +1,8 @@
 //> using scala "3.3.1"
 //> using dep ba.sake::sharaf:0.0.22
 
+// https://htmx.org/examples/inline-validation/
+
 import io.undertow.Undertow
 import ba.sake.sharaf.*, routing.*
 import ba.sake.formson.FormDataRW
@@ -12,7 +14,8 @@ object views {
 
   class IndexView(formData: ContactForm) extends HtmlPage with HtmxDependencies:
     override def bodyContent = div(
-      h3("Signup Form"),
+      h3("Inline Validation example"),
+      p("Only valid email is test@test.com"),
       contactForm(formData)
     )
 
