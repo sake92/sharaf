@@ -40,6 +40,15 @@ object QueryStringRW {
       case other                            => parseError(path, s"has invalid type: ${other.tpe}")
   }
 
+  given QueryStringRW[Boolean] with {
+    override def write(path: String, value: Boolean): QueryStringData =
+      QueryStringRW[String].write(path, value.toString)
+
+    override def parse(path: String, qsData: QueryStringData): Boolean =
+      val str = QueryStringRW[String].parse(path, qsData)
+      str.toBooleanOption.getOrElse(typeError(path, "Boolean", str))
+  }
+
   given QueryStringRW[Int] with {
     override def write(path: String, value: Int): QueryStringData =
       QueryStringRW[String].write(path, value.toString)
