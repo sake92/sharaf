@@ -11,6 +11,13 @@ import ba.sake.sharaf.*, routing.*
 
 trait ExamplePage extends HtmlPage with HtmxDependencies
 
+object IndexView extends ExamplePage:
+  override def bodyContent = ul(
+    li(a(href := "color-throb")("Color throb")),
+    li(a(href := "fade-out-on-swap")("Fade Out On Swap")),
+    li(a(href := "fade-in-on-addition")("Fade In On Addition"))
+  )
+
 object ColorThrobView extends ExamplePage:
   override def bodyContent = snippet("red")
 
@@ -43,14 +50,28 @@ object FadeOutOnSwapView extends ExamplePage:
     }
   """)
 
+object FadeInOnAdditionView extends ExamplePage:
+  override def bodyContent = theButton
+
+  val theButton = button(
+    id := "fade-me-in",
+    hx.post := "/fade_in_demo",
+    hx.swap := "outerHTML settle:1s"
+  )("Fade Me In")
+
+  override def stylesInline = List("""
+    #fade-me-in.htmx-added {
+      opacity: 0;
+    }
+    #fade-me-in {
+      opacity: 1;
+      transition: opacity 1s ease-out;
+    }
+  """)
+
 val routes = Routes:
   case GET() -> Path() =>
-    Response.withBody(new HtmlPage {
-      override def bodyContent = ul(
-        li(a(href := "color-throb")("Color throb")),
-        li(a(href := "fade-out-on-swap")("Fade Out On Swap"))
-      )
-    })
+    Response.withBody(IndexView)
 
   case GET() -> Path("color-throb") =>
     Response.withBody(ColorThrobView)
@@ -60,10 +81,16 @@ val routes = Routes:
     val x = scala.util.Random.nextInt(256)
     val randomColor = String.format("#%03X", x)
     Response.withBody(ColorThrobView.snippet(randomColor))
+
   case GET() -> Path("fade-out-on-swap") =>
     Response.withBody(FadeOutOnSwapView)
   case DELETE() -> Path("fade_out_demo") =>
     Response.withBody("")
+
+  case GET() -> Path("fade-in-on-addition") =>
+    Response.withBody(FadeInOnAdditionView)
+  case POST() -> Path("fade_in_demo") =>
+    Response.withBody(FadeInOnAdditionView.theButton)
 
 Undertow.builder
   .addHttpListener(8181, "localhost")
