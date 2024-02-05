@@ -15,7 +15,8 @@ object IndexView extends ExamplePage:
   override def bodyContent = ul(
     li(a(href := "color-throb")("Color throb")),
     li(a(href := "fade-out-on-swap")("Fade Out On Swap")),
-    li(a(href := "fade-in-on-addition")("Fade In On Addition"))
+    li(a(href := "fade-in-on-addition")("Fade In On Addition")),
+    li(a(href := "request-in-flight")("Request In Flight"))
   )
 
 object ColorThrobView extends ExamplePage:
@@ -69,6 +70,22 @@ object FadeInOnAdditionView extends ExamplePage:
     }
   """)
 
+object RequestInFlightView extends ExamplePage:
+  override def bodyContent = form(
+    hx.post := "/request-in-flight-name",
+    hx.swap := "outerHTML"
+  )(
+    label("Name: ", input(name := "name")),
+    button("Submit")
+  )
+
+  override def stylesInline = List("""
+    form.htmx-request {
+      opacity: .5;
+      transition: opacity 300ms linear;
+    }
+  """)
+
 val routes = Routes:
   case GET() -> Path() =>
     Response.withBody(IndexView)
@@ -91,6 +108,12 @@ val routes = Routes:
     Response.withBody(FadeInOnAdditionView)
   case POST() -> Path("fade_in_demo") =>
     Response.withBody(FadeInOnAdditionView.theButton)
+
+  case GET() -> Path("request-in-flight") =>
+    Response.withBody(RequestInFlightView)
+  case POST() -> Path("request-in-flight-name")=>
+    Thread.sleep(1000) // simulate sloww
+    Response.withBody("Submitted!")
 
 Undertow.builder
   .addHttpListener(8181, "localhost")
