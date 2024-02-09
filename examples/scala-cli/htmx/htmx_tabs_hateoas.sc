@@ -11,16 +11,15 @@ object IndexView extends HtmlPage with HtmxDependencies:
   override def bodyContent =
     div(id := "tabs", hx.get := "/tab1", hx.trigger := "load delay:100ms", hx.target := "#tabs", hx.swap := "innerHTML")
 
-def tabSnippet(tabNum: Int) =  div(
-    div(
-      cls := "tab-list",
-      role := "tablist",
-      button(hx.get := "/tab1", Option.when(tabNum == 1)(cls := "selected"), role := "tab", "Tab 1"),
-      button(hx.get := "/tab2", Option.when(tabNum == 2)(cls := "selected"), role := "tab", "Tab 2"),
-      button(hx.get := "/tab3", Option.when(tabNum == 3)(cls := "selected"), role := "tab", "Tab 3")
-    ),
-    div(id := "tab-content", role := "tabpanel", cls := "tab-content")(s"TAB ${tabNum} content ....")
-  )
+def tabSnippet(tabNum: Int) = div(
+  div(
+    cls := "tab-list",
+    button(hx.get := "/tab1", Option.when(tabNum == 1)(cls := "selected"), "Tab 1"),
+    button(hx.get := "/tab2", Option.when(tabNum == 2)(cls := "selected"), "Tab 2"),
+    button(hx.get := "/tab3", Option.when(tabNum == 3)(cls := "selected"), "Tab 3")
+  ),
+  div(id := "tab-content", cls := "tab-content")(s"TAB ${tabNum} content ....")
+)
 
 val routes = Routes:
   case GET() -> Path() =>

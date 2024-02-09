@@ -25,6 +25,8 @@ git push  --atomic origin main $VERSION
 
 # TODOs
 
+- HTMX headers consts
+
 - giter8 template for REST
 - add more validators https://javaee.github.io/javaee-spec/javadocs/javax/validation/constraints/package-summary.html
 - webjars
