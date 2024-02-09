@@ -34,11 +34,10 @@
       }
     </style></head><body><div class="hidden-print"><nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top"><div class="container-fluid"><a class="navbar-brand" href="../index.html"><span><img src="../images/favicon.svg" alt="logo" width="32" height="32" /></span> Sharaf</a><button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#main-navbar"><span class="navbar-toggler-icon"></span></button><div class="collapse navbar-collapse" id="main-navbar"><ul class="navbar-nav"></ul><ul class="navbar-nav ms-auto"><li class="nav-item"><a href="../tutorials/index.html" class="nav-link">Tutorials</a></li><li class="nav-item"><a href="../howtos/index.html" class="nav-link">How-Tos</a></li><li class="nav-item"><a href="../reference/index.html" class="nav-link">Reference</a></li><li class="nav-item"><a href="index.html" class="active nav-link">Philosophy</a></li></ul></div></div></nav></div><div class="container-fluid"><div class="row"><div class="col-md-3 d-flex justify-content-end hidden-print"><nav class="affix"><ul class="nav nav-pills flex-column"><li><a href="index.html" class="nav-link ">Philosophy</a></li><li><a href="alternatives.html" class="nav-link ">Alternatives</a></li><li><a href="routes-matching.html" class="nav-link ">Routes Matching</a></li><li><a href="query-params-handling.html" class="nav-link ">Query Params</a></li><li><a href="dependency-injection.html" class="nav-link active">Dependency Injection</a></li></ul></nav></div><div data-bs-spy="scroll" data-bs-target="#tocScrollspy" class="col-md-6"><div class="hidden-print"></div><nav><ul class="pagination justify-content-center"><li title="Query Params" class="page-item"><a href="query-params-handling.html" class="page-link">Previous</a></li><li class="disabled page-item"><a href="#" class="page-link">Next</a></li></ul></nav><div><section id="do-you-even-dependency-injection"><h2>Do you even Dependency Injection?</h2><p>Not in a classical / &quot;dependency container&quot; / Spring / JEE style.</p>
 <p>Not in a purely-functional-monadic style.</p>
-<p>Yes in a direct style.
-For singletons:</p>
+<p>Yes in a direct style:</p>
 <ul>
-<li>just instantiate a class and pass the object around</li>
-<li>for request/session-scoped instances use scala 3 context functions (implicit functions)</li>
+<li>for singletons: just <em>instantiate a class</em> and pass the object around.</li>
+<li>for request/session-scoped instances: use scala 3 <em>context functions</em> (implicit functions).</li>
 </ul>
 <p>If you ever used PlayFramework, Slick 2 and similar, you might have used this pattern:</p>
 <pre><code class="language-scala">someFunction { implicit ctx =&gt;
