@@ -17,10 +17,9 @@ object DependencyInjection extends PhilosophyPage {
     
     Not in a purely-functional-monadic style.
 
-    Yes in a direct style.
-    For singletons:
-      - just instantiate a class and pass the object around
-      - for request/session-scoped instances use scala 3 context functions (implicit functions)
+    Yes in a direct style:
+    - for singletons: just *instantiate a class* and pass the object around.
+    - for request/session-scoped instances: use scala 3 *context functions* (implicit functions).
 
     If you ever used PlayFramework, Slick 2 and similar, you might have used this pattern:
     ```scala

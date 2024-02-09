@@ -15,7 +15,7 @@
 git diff
 git commit -am "msg"
 
-$VERSION="0.0.22"
+$VERSION="0.0.23"
 git commit --allow-empty -m "Release $VERSION"
 git tag -a $VERSION -m "Release $VERSION"
 git push  --atomic origin main $VERSION
@@ -26,6 +26,8 @@ git push  --atomic origin main $VERSION
 # TODOs
 
 - HTMX headers consts
+
+- MiMa bin compat
 
 - giter8 template for REST
 - add more validators https://javaee.github.io/javaee-spec/javadocs/javax/validation/constraints/package-summary.html
