@@ -1,4 +1,4 @@
-//> using scala "3.3.1"
+//> using scala "3.4.0"
 //> using dep ba.sake::sharaf:0.1.0
 
 // https://htmx.org/examples/delete-row/
