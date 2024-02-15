@@ -1,5 +1,5 @@
 //> using scala "3.3.1"
-//> using dep ba.sake::sharaf:0.0.22
+//> using dep ba.sake::sharaf:0.1.0
 
 // https://htmx.org/examples/dialogs/
 
@@ -8,7 +8,6 @@ import io.undertow.Undertow
 import scalatags.Text.all.*
 import ba.sake.hepek.html.HtmlPage
 import ba.sake.hepek.htmx.*
-import ba.sake.formson.FormDataRW
 import ba.sake.sharaf.*, routing.*
 
 object IndexView extends HtmlPage with HtmxDependencies:

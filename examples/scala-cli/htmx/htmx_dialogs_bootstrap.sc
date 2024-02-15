@@ -1,14 +1,12 @@
 //> using scala "3.3.1"
-//> using dep ba.sake::sharaf:0.0.22
+//> using dep ba.sake::sharaf:0.1.0
 
 // https://htmx.org/examples/modal-bootstrap/
 
-import io.undertow.util.HttpString
 import io.undertow.Undertow
 import scalatags.Text.all.*
 import ba.sake.hepek.bootstrap5.BootstrapPage
 import ba.sake.hepek.htmx.*
-import ba.sake.formson.FormDataRW
 import ba.sake.sharaf.*, routing.*
 
 object IndexView extends BootstrapPage with HtmxDependencies:

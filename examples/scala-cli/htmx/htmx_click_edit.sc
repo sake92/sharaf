@@ -1,5 +1,5 @@
 //> using scala "3.3.1"
-//> using dep ba.sake::sharaf:0.0.22
+//> using dep ba.sake::sharaf:0.1.0
 
 // https://htmx.org/examples/click-to-edit/
 import io.undertow.Undertow

@@ -1,5 +1,5 @@
 //> using scala "3.3.1"
-//> using dep ba.sake::sharaf:0.0.22
+//> using dep ba.sake::sharaf:0.1.0
 import java.util.concurrent.TimeUnit
 
 // https://htmx.org/examples/progress-bar/
@@ -10,6 +10,7 @@ import scalatags.Text.all.*
 import ba.sake.hepek.html.HtmlPage
 import ba.sake.hepek.htmx.*
 import ba.sake.sharaf.*, routing.*
+import ba.sake.sharaf.htmx.ResponseHeaders
 
 object IndexView extends HtmlPage with HtmxDependencies:
   override def bodyContent =
@@ -99,7 +100,7 @@ val routes = Routes:
   case GET() -> Path("job", "progress") =>
     val bar = progressBar(percentage)
     if percentage >= 100
-    then Response.withBody(bar).withHeader("HX-Trigger", "done")
+    then Response.withBody(bar).withHeader(ResponseHeaders.Trigger, "done")
     else Response.withBody(bar)
 
 Undertow.builder
