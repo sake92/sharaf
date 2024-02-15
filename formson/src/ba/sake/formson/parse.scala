@@ -85,7 +85,7 @@ private[formson] class FormsonParser(formDataMap: FormDataMap) {
   private def parseInternal(keyParts: Seq[String], values: Seq[FormValue]): FormDataInternal = {
 
     keyParts match
-      case Seq(key, rest: _*) =>
+      case Seq(key, rest*) =>
         val adaptedKey = if key.isBlank then "0" else key
         adaptedKey.toIntOption match
           case Some(index) =>

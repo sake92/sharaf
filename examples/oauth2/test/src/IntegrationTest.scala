@@ -1,5 +1,6 @@
 package demo
 
+import scala.compiletime.uninitialized
 import scala.jdk.CollectionConverters.*
 import com.nimbusds.jose.JOSEObjectType
 import no.nav.security.mock.oauth2.MockOAuth2Server
@@ -24,9 +25,9 @@ trait IntegrationTest extends munit.FunSuite {
 
   protected val moduleFixture = new Fixture[AppModule]("AppModule") {
 
-    private var mockOauth2server: MockOAuth2Server = _
+    private var mockOauth2server: MockOAuth2Server = uninitialized
 
-    private var module: AppModule = _
+    private var module: AppModule = uninitialized
 
     def apply() = module
 

@@ -1,5 +1,6 @@
 package fullstack
 
+import scala.compiletime.uninitialized
 import ba.sake.formson.*
 import ba.sake.sharaf.*
 import ba.sake.sharaf.utils.*
@@ -30,7 +31,7 @@ class FullstackSuite extends munit.FunSuite {
   }
 
   val moduleFixture = new Fixture[FullstackModule]("FullstackModule") {
-    private var module: FullstackModule = _
+    private var module: FullstackModule = uninitialized
 
     def apply() = module
 

@@ -91,7 +91,7 @@ private[querson] class QuersonParser(qsMap: QueryStringMap) {
   private def parseInternal(keyParts: Seq[String], values: Seq[String]): QueryStringInternal = {
 
     keyParts match
-      case Seq(key, rest: _*) =>
+      case Seq(key, rest*) =>
         val adaptedKey = if key.isBlank then "0" else key
         adaptedKey.toIntOption match
           case Some(index) =>

@@ -1,5 +1,6 @@
 package api
 
+import scala.compiletime.uninitialized
 import ba.sake.querson.*
 import ba.sake.tupson.*
 import ba.sake.sharaf.handlers.*
@@ -123,7 +124,7 @@ class JsonApiSuite extends munit.FunSuite {
   }
 
   val moduleFixture = new Fixture[JsonApiModule]("JsonApiModule") {
-    private var module: JsonApiModule = _
+    private var module: JsonApiModule = uninitialized
 
     def apply() = module
 
