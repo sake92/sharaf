@@ -21,14 +21,14 @@ final class Request private (
   val underlyingHttpServerExchange: HttpServerExchange = undertowExchange
 
   /* QUERY */
-  lazy val queryParamsMap: QueryStringMap =
+  lazy val queryParamsRaw: QueryStringMap =
     undertowExchange.getQueryParameters.asScala.toMap.map { (k, v) =>
       (k, v.asScala.toSeq)
     }
 
   // must be a Product (case class)
   def queryParams[T <: Product: QueryStringRW]: T =
-    try queryParamsMap.parseQueryStringMap
+    try queryParamsRaw.parseQueryStringMap
     catch case e: QuersonException => throw RequestHandlingException(e)
 
   def queryParamsValidated[T <: Product: QueryStringRW: Validator]: T =
@@ -55,17 +55,19 @@ final class Request private (
     catch case e: ValidsonException => throw RequestHandlingException(e)
 
   // FORM
-  // must be a Product (case class)
-  def bodyForm[T <: Product: FormDataRW]: T =
+  def bodyFormRaw: FormDataMap =
     // createParser returns null if content-type is not suitable
     val parser = formBodyParserFactory.createParser(undertowExchange)
     Option(parser) match
       case None => throw SharafException("The specified content type is not supported")
       case Some(parser) =>
         val uFormData = parser.parseBlocking()
-        val formDataMap = Request.undertowFormData2FormsonMap(uFormData)
-        try formDataMap.parseFormDataMap[T]
-        catch case e: FormsonException => throw RequestHandlingException(e)
+        Request.undertowFormData2FormsonMap(uFormData)
+
+  // must be a Product (case class)
+  def bodyForm[T <: Product: FormDataRW]: T =
+    try bodyFormRaw.parseFormDataMap[T]
+    catch case e: FormsonException => throw RequestHandlingException(e)
 
   def bodyFormValidated[T <: Product: FormDataRW: Validator]: T =
     try bodyForm[T].validateOrThrow

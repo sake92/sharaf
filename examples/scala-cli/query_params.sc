@@ -9,7 +9,7 @@ case class SearchParams(q: String, perPage: Int) derives QueryStringRW
 
 val routes = Routes:
   case GET() -> Path("raw") =>
-    val qp = Request.current.queryParamsMap
+    val qp = Request.current.queryParamsRaw
     Response.withBody(s"params = ${qp}")
 
   case GET() -> Path("typed") =>
