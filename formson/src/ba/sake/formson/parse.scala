@@ -1,6 +1,7 @@
 package ba.sake.formson
 
 import scala.collection.mutable
+import scala.collection.immutable.SeqMap
 import scala.collection.immutable.SortedMap
 import fastparse.Parsed.Success
 import fastparse.Parsed.Failure
@@ -20,14 +21,14 @@ private[formson] def parseFDMap(formDataMap: FormDataMap): FormData =
 
 private def fromInternal(fdi: FormDataInternal): FormData = fdi match
   case FormDataInternal.Simple(value)       => FormData.Simple(value)
-  case FormDataInternal.Obj(values)         => FormData.Obj(values.view.mapValues(fromInternal).toMap)
+  case FormDataInternal.Obj(values)         => FormData.Obj(values.map((k, v) => k -> fromInternal(v)))
   case FormDataInternal.Sequence(valuesMap) => FormData.Sequence(valuesMap.values.toSeq.flatten.map(fromInternal))
 
 // internal, temporary representation
 private[formson] enum FormDataInternal(val tpe: String):
   case Simple(value: FormValue) extends FormDataInternal("simple value")
   case Sequence(values: SortedMap[Int, Seq[FormDataInternal]]) extends FormDataInternal("sequence")
-  case Obj(values: Map[String, FormDataInternal]) extends FormDataInternal("object")
+  case Obj(values: SeqMap[String, FormDataInternal]) extends FormDataInternal("object")
 
 ////////////////// INTERNAL parsing..
 private[formson] class FormsonParser(formDataMap: FormDataMap) {
@@ -51,7 +52,7 @@ private[formson] class FormsonParser(formDataMap: FormDataMap) {
       Sequence(SortedMap(0 -> Seq(acc, second)))
 
     case (Obj(existingValuesMap), Obj(valuesMap)) =>
-      val objAcc = existingValuesMap.to(mutable.SortedMap)
+      val objAcc = mutable.LinkedHashMap.from(existingValuesMap)
       valuesMap.foreach { case (key, value) =>
         objAcc.get(key) match
           case None =>
@@ -59,7 +60,7 @@ private[formson] class FormsonParser(formDataMap: FormDataMap) {
           case Some(existingValue) =>
             objAcc(key) = merge(existingValue, value)
       }
-      Obj(objAcc.toMap)
+      Obj(SeqMap.from(objAcc))
 
     case (Sequence(existingValuesMap), Sequence(valuesMap)) =>
       val seqAcc = existingValuesMap.to(mutable.SortedMap)
@@ -77,7 +78,7 @@ private[formson] class FormsonParser(formDataMap: FormDataMap) {
 
   private def mergeObjects(flatObjects: Seq[Obj]): Obj =
     flatObjects
-      .foldLeft(Obj(Map.empty)) { case (acc, next) =>
+      .foldLeft(Obj(SeqMap.empty)) { case (acc, next) =>
         merge(acc, next)
       }
       .asInstanceOf[Obj]
@@ -94,8 +95,8 @@ private[formson] class FormsonParser(formDataMap: FormDataMap) {
             else Sequence(SortedMap(index -> Seq(parseInternal(rest, values))))
 
           case None =>
-            if rest.isEmpty then Obj(Map(key -> Sequence(SortedMap(0 -> values.map(Simple.apply)))))
-            else Obj(Map(key -> parseInternal(rest, values)))
+            if rest.isEmpty then Obj(SeqMap(key -> Sequence(SortedMap(0 -> values.map(Simple.apply)))))
+            else Obj(SeqMap(key -> parseInternal(rest, values)))
 
       case Seq() => throw FormsonException("Empty key parts")
   }

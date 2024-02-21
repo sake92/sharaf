@@ -7,10 +7,11 @@ import java.util.UUID
 import scala.deriving.*
 import scala.quoted.*
 import scala.reflect.ClassTag
-import scala.collection.mutable.ArrayDeque
+import scala.collection.immutable.SeqMap
+import scala.collection.mutable
 import scala.util.Try
-
 import ba.sake.formson.FormData.*
+
 
 /** Maps a `T` to/from form data map
   */
@@ -204,8 +205,8 @@ object FormDataRW {
   private def parseRethrowingErrors[T](path: String, values: Seq[FormData])(using
       rw: FormDataRW[T]
   ): Seq[T] = {
-    val parsedValues = ArrayDeque.empty[T]
-    val keyErrors = ArrayDeque.empty[ParseError]
+    val parsedValues = mutable.ArrayDeque.empty[T]
+    val keyErrors = mutable.ArrayDeque.empty[ParseError]
     values.zipWithIndex.foreach { case (v, i) =>
       val subPath = s"$path[$i]"
       try {
@@ -246,13 +247,13 @@ object FormDataRW {
         '{
           new FormDataRW[T] {
             override def write(path: String, value: T): FormData = {
-              val formDataMap = scala.collection.mutable.Map.empty[String, FormData]
+              val formDataMap = mutable.LinkedHashMap.empty[String, FormData]
               val valueAsProd = ${ 'value.asExprOf[Product] }
               $labels.zip(valueAsProd.productIterator).zip($rwInstances).foreach { case ((k, v), rw) =>
                 val res = rw.asInstanceOf[FormDataRW[Any]].write(k, v)
                 formDataMap += (k -> res)
               }
-              Obj(formDataMap.toMap)
+              Obj(SeqMap.from(formDataMap))
             }
 
             override def parse(path: String, formData: FormData): T = {
@@ -260,8 +261,8 @@ object FormDataRW {
                 if formData.isInstanceOf[Obj] then formData.asInstanceOf[Obj].values
                 else typeMismatchError(path, "Object", formData, None)
 
-              val arguments = ArrayDeque.empty[Any]
-              val keyErrors = ArrayDeque.empty[ParseError]
+              val arguments = mutable.ArrayDeque.empty[Any]
+              val keyErrors = mutable.ArrayDeque.empty[ParseError]
               val defaultValuesMap = $defaultValues.toMap
 
               $labels.zip($rwInstances).foreach { case (label, rw) =>

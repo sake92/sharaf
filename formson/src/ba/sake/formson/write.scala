@@ -1,14 +1,16 @@
 package ba.sake.formson
 
 import FormData.*
+import scala.collection.mutable
+import scala.collection.immutable.SeqMap
 
 private[formson] def writeToFDMap(path: String, formData: FormData, config: Config): FormDataMap = formData match
-  case simple: Simple => Map(path -> Seq(simple.value))
+  case simple: Simple => SeqMap(path -> Seq(simple.value))
   case seq: Sequence  => writeSeq(path, seq, config)
   case obj: Obj       => writeObj(path, obj, config)
 
 private def writeObj(path: String, formDataObj: Obj, config: Config): FormDataMap = {
-  val acc = scala.collection.mutable.Map.empty[String, Seq[FormValue]]
+  val acc = mutable.LinkedHashMap.empty[String, Seq[FormValue]]
 
   formDataObj.values.foreach { case (key, v) =>
     val subPath =
@@ -21,11 +23,11 @@ private def writeObj(path: String, formDataObj: Obj, config: Config): FormDataMa
     acc ++= writeToFDMap(subPath, v, config)
   }
 
-  acc.toMap
+  SeqMap.from(acc)
 }
 
 private def writeSeq(path: String, formDataSeq: Sequence, config: Config): FormDataMap = {
-  val acc = scala.collection.mutable.Map.empty[String, Seq[FormValue]].withDefaultValue(Seq.empty)
+  val acc = mutable.LinkedHashMap.empty[String, Seq[FormValue]].withDefaultValue(Seq.empty)
 
   formDataSeq.values.zipWithIndex.foreach { case (v, i) =>
     val subPath = config.seqWriteMode match
@@ -39,5 +41,5 @@ private def writeSeq(path: String, formDataSeq: Sequence, config: Config): FormD
     }
   }
 
-  acc.toMap
+  SeqMap.from(acc)
 }

@@ -2,12 +2,12 @@ package ba.sake.sharaf
 
 import java.nio.charset.StandardCharsets
 import scala.jdk.CollectionConverters.*
-
+import scala.collection.mutable
+import scala.collection.immutable.SeqMap
 import io.undertow.server.HttpServerExchange
 import io.undertow.server.handlers.form.FormData as UFormData
 import io.undertow.server.handlers.form.FormParserFactory
 import io.undertow.util.HttpString
-
 import ba.sake.tupson.*
 import ba.sake.formson.*
 import ba.sake.querson.*
@@ -89,7 +89,7 @@ object Request {
     Request(undertowExchange)
 
   private[sharaf] def undertowFormData2FormsonMap(uFormData: UFormData): FormDataMap = {
-    val map = scala.collection.mutable.Map.empty[String, Seq[FormValue]]
+    val map = mutable.LinkedHashMap.empty[String, Seq[FormValue]]
     uFormData.forEach { key =>
       val values = uFormData.get(key).asScala
       val formValues = values.map { value =>
@@ -104,6 +104,6 @@ object Request {
       }
       map += (key -> formValues.toSeq)
     }
-    map.toMap
+    SeqMap.from(map)
   }
 }
