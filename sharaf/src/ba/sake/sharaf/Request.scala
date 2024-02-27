@@ -12,6 +12,7 @@ import ba.sake.tupson.*
 import ba.sake.formson.*
 import ba.sake.querson.*
 import ba.sake.validson.*
+import org.typelevel.jawn.ast.JValue
 
 final class Request private (
     private val undertowExchange: HttpServerExchange
@@ -46,6 +47,8 @@ final class Request private (
     String(undertowExchange.getInputStream.readAllBytes(), StandardCharsets.UTF_8)
 
   // JSON
+  def bodyJsonRaw: JValue = bodyJson[JValue]
+
   def bodyJson[T: JsonRW]: T =
     try bodyString.parseJson[T]
     catch case e: TupsonException => throw RequestHandlingException(e)
