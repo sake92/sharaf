@@ -1,5 +1,5 @@
 //> using scala "3.4.0"
-//> using dep ba.sake::sharaf:0.3.0
+//> using dep ba.sake::sharaf:0.4.0
 import java.util.concurrent.TimeUnit
 
 // https://htmx.org/examples/progress-bar/
@@ -100,7 +100,7 @@ val routes = Routes:
   case GET() -> Path("job", "progress") =>
     val bar = progressBar(percentage)
     if percentage >= 100
-    then Response.withBody(bar).withHeader(ResponseHeaders.Trigger, "done")
+    then Response.withBody(bar).settingHeader(ResponseHeaders.Trigger, "done")
     else Response.withBody(bar)
 
 Undertow.builder

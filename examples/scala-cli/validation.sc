@@ -1,5 +1,5 @@
 //> using scala "3.4.0"
-//> using dep ba.sake::sharaf:0.3.0
+//> using dep ba.sake::sharaf:0.4.0
 
 import io.undertow.Undertow
 import ba.sake.querson.QueryStringRW
@@ -35,7 +35,7 @@ val routes = Routes:
 Undertow.builder
   .addHttpListener(8181, "localhost")
   .setHandler(
-    SharafHandler(routes).withErrorMapper(ErrorMapper.json)
+    SharafHandler(routes).withExceptionMapper(ExceptionMapper.json)
   )
   .build
   .start()

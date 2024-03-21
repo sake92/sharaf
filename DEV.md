@@ -7,6 +7,8 @@
 
 ./mill __.test
 
+scala-cli compile examples\scala-cli
+
 ./mill examples.runMain bla
 
 # for local dev/test
@@ -15,7 +17,7 @@
 git diff
 git commit -am "msg"
 
-$VERSION="0.3.0"
+$VERSION="0.4.0"
 git commit --allow-empty -m "Release $VERSION"
 git tag -a $VERSION -m "Release $VERSION"
 git push  --atomic origin main $VERSION

@@ -12,7 +12,7 @@ object ExceptionHandler extends HowToPage {
     super.blogSettings.withSections(firstSection)
 
   val firstSection = Section(
-    "How to customize Exception handler?",
+    "How to customize the Exception handler?",
     s"""
 
     Use the `withExceptionMapper` on `SharafHandler`:
@@ -29,7 +29,7 @@ object ExceptionHandler extends HowToPage {
     ```
 
     The `ExceptionMapper` is a partial function from an exception to `Response`.  
-    Here we need to chain our custom error mapper before the default one.
+    Here we need to chain our custom exception mapper before the default one.
     """.md
   )
 }
