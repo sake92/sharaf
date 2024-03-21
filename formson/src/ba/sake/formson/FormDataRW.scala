@@ -12,7 +12,6 @@ import scala.collection.mutable
 import scala.util.Try
 import ba.sake.formson.FormData.*
 
-
 /** Maps a `T` to/from form data map
   */
 trait FormDataRW[T] {

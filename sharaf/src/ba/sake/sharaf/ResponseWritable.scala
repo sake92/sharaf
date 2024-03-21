@@ -16,10 +16,19 @@ object ResponseWritable {
 
   private[sharaf] def writeResponse(response: Response[?], exchange: HttpServerExchange): Unit = {
     // headers
-    val allHeaders = response.body.flatMap(response.rw.headers) ++ response.headers
-    allHeaders.foreach { case (name, values) =>
+    val bodyContentHeaders = response.body.flatMap(response.rw.headers)
+    bodyContentHeaders.foreach { case (name, values) =>
       exchange.getResponseHeaders.putAll(name, values.asJava)
     }
+
+    response.headerUpdates.updates.foreach {
+      case HeaderUpdate.Set(name, values) =>
+        exchange.getResponseHeaders.remove(name)
+        exchange.getResponseHeaders.addAll(name, values.asJava)
+      case HeaderUpdate.Remove(name) =>
+        exchange.getResponseHeaders.remove(name)
+    }
+
     // status code
     exchange.setStatusCode(response.status)
     // body

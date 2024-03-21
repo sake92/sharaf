@@ -2,7 +2,7 @@ package api
 
 import java.util.UUID
 import io.undertow.Undertow
-import ba.sake.sharaf.*,  routing.*
+import ba.sake.sharaf.*, routing.*
 
 @main def main: Unit =
   val module = JsonApiModule(8181)
