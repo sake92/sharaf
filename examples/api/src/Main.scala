@@ -2,8 +2,7 @@ package api
 
 import java.util.UUID
 import io.undertow.Undertow
-import ba.sake.sharaf.*, handlers.*, routing.*
-import io.undertow.util.StatusCodes
+import ba.sake.sharaf.*,  routing.*
 
 @main def main: Unit =
   val module = JsonApiModule(8181)
@@ -36,11 +35,7 @@ class JsonApiModule(port: Int) {
       Response.withBody(res)
 
   private val handler = SharafHandler(routes)
-    .withErrorMapper(ErrorMapper.json)
-    .withNotFoundHandler { _ =>
-      val problemDetails = ProblemDetails(StatusCodes.NOT_FOUND, "Not Found")
-      Response.withBody(problemDetails).withStatus(StatusCodes.NOT_FOUND)
-    }
+    .withExceptionMapper(ExceptionMapper.json)
 
   val server = Undertow
     .builder()

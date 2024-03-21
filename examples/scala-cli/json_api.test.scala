@@ -2,7 +2,6 @@
 //> using dep ba.sake::sharaf:0.3.0
 //> using test.dep org.scalameta::munit::1.0.0-M10
 
-import io.undertow.Undertow
 import ba.sake.tupson.*
 
 case class Car(brand: String, model: String, quantity: Int) derives JsonRW

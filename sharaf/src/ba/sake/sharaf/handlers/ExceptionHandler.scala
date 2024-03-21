@@ -5,7 +5,7 @@ import io.undertow.server.HttpHandler
 import io.undertow.server.HttpServerExchange
 import ba.sake.sharaf.*
 
-final class ErrorHandler private (next: HttpHandler, errorMapper: ErrorMapper) extends HttpHandler {
+final class ExceptionHandler private (next: HttpHandler, exceptionMapper: ExceptionMapper) extends HttpHandler {
 
   override def handleRequest(exchange: HttpServerExchange): Unit = {
     exchange.startBlocking()
@@ -16,7 +16,7 @@ final class ErrorHandler private (next: HttpHandler, errorMapper: ErrorMapper) e
         next.handleRequest(exchange)
       } catch {
         case NonFatal(e) if exchange.isResponseChannelAvailable =>
-          val responseOpt = errorMapper.lift(e)
+          val responseOpt = exceptionMapper.lift(e)
           responseOpt match {
             case Some(response) =>
               ResponseWritable.writeResponse(response, exchange)
@@ -32,7 +32,7 @@ final class ErrorHandler private (next: HttpHandler, errorMapper: ErrorMapper) e
 
 }
 
-object ErrorHandler {
-  def apply(next: HttpHandler, errorMapper: ErrorMapper = ErrorMapper.default): ErrorHandler =
-    new ErrorHandler(next, errorMapper)
+object ExceptionHandler {
+  def apply(next: HttpHandler, exceptionMapper: ExceptionMapper = ExceptionMapper.default): ExceptionHandler =
+    new ExceptionHandler(next, exceptionMapper)
 }

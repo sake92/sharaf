@@ -23,7 +23,7 @@ trait HowToPage extends DocPage {
       CustomQueryParam,
       UploadFile,
       NotFound,
-      ErrorHandler,
+      ExceptionHandler,
       SplitRoutes,
       ExternalConfig,
       CORS

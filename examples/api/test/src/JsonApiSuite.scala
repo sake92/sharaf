@@ -3,7 +3,7 @@ package api
 import scala.compiletime.uninitialized
 import ba.sake.querson.*
 import ba.sake.tupson.*
-import ba.sake.sharaf.handlers.*
+import ba.sake.sharaf.exceptions.*
 import ba.sake.sharaf.utils.*
 
 class JsonApiSuite extends munit.FunSuite {

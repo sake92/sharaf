@@ -47,7 +47,7 @@ object Response {
 
   def withBodyOpt[T: ResponseWritable](body: Option[T], name: String): Response[T] = body match
     case Some(value) => withBody(value)
-    case None        => throw NotFoundException(name)
+    case None        => throw exceptions.NotFoundException(name)
 
   def redirect(location: String): Response[String] =
     withStatus(StatusCodes.MOVED_PERMANENTLY).withHeader(HttpString("Location"), location)

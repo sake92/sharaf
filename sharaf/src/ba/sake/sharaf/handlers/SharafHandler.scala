@@ -8,12 +8,13 @@ import io.undertow.util.StatusCodes
 import ba.sake.sharaf.routing.Routes
 import ba.sake.sharaf.Request
 import ba.sake.sharaf.Response
+import ba.sake.sharaf.exceptions.ExceptionMapper
 import ba.sake.sharaf.handlers.cors.*
 
 final class SharafHandler private (
     routes: Routes,
     corsSettings: CorsSettings,
-    errorMapper: ErrorMapper,
+    exceptionMapper: ExceptionMapper,
     notFoundHandler: Request => Response[?]
 ) extends HttpHandler {
 
@@ -21,7 +22,7 @@ final class SharafHandler private (
     notFoundHandler(Request.current)
   }
 
-  private val finalHandler = ErrorHandler(
+  private val finalHandler = ExceptionHandler(
     CorsHandler(
       RoutesHandler(
         routes,
@@ -32,7 +33,7 @@ final class SharafHandler private (
       ),
       corsSettings
     ),
-    errorMapper
+    exceptionMapper
   )
 
   override def handleRequest(exchange: HttpServerExchange): Unit =
@@ -44,8 +45,8 @@ final class SharafHandler private (
   def withCorsSettings(corsSettings: CorsSettings): SharafHandler =
     copy(corsSettings = corsSettings)
 
-  def withErrorMapper(errorMapper: ErrorMapper): SharafHandler =
-    copy(errorMapper = errorMapper)
+  def withExceptionMapper(exceptionMapper: ExceptionMapper): SharafHandler =
+    copy(exceptionMapper = exceptionMapper)
 
   def withNotFoundHandler(notFoundHandler: Request => Response[?]): SharafHandler =
     copy(notFoundHandler = notFoundHandler)
@@ -53,9 +54,9 @@ final class SharafHandler private (
   private def copy(
       routes: Routes = routes,
       corsSettings: CorsSettings = corsSettings,
-      errorMapper: ErrorMapper = errorMapper,
+      exceptionMapper: ExceptionMapper = exceptionMapper,
       notFoundHandler: Request => Response[?] = notFoundHandler
-  ) = new SharafHandler(routes, corsSettings, errorMapper, notFoundHandler)
+  ) = new SharafHandler(routes, corsSettings, exceptionMapper, notFoundHandler)
 }
 
 object SharafHandler:
@@ -63,4 +64,4 @@ object SharafHandler:
   private val defaultNotFoundResponse = Response.withBody("Not Found").withStatus(StatusCodes.NOT_FOUND)
 
   def apply(routes: Routes): SharafHandler =
-    new SharafHandler(routes, CorsSettings.default, ErrorMapper.default, _ => SharafHandler.defaultNotFoundResponse)
+    new SharafHandler(routes, CorsSettings.default, ExceptionMapper.default, _ => SharafHandler.defaultNotFoundResponse)

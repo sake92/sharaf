@@ -1,4 +1,4 @@
-package ba.sake.sharaf
+package ba.sake.sharaf.exceptions
 
 sealed class SharafException(msg: String, cause: Exception = null) extends Exception(msg, cause)
 

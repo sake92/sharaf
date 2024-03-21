@@ -28,8 +28,8 @@ final class RoutesHandler private (routes: Routes, nextHandler: Option[HttpHandl
           nextHandler match
             case Some(next) => next.handleRequest(exchange)
             case None       =>
-              // will be catched by ErrorMapper
-              throw NotFoundException("route")
+              // will be catched by ExceptionHandler
+              throw exceptions.NotFoundException("route")
       }
     }
   }

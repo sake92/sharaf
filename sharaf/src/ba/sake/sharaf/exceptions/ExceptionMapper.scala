@@ -1,11 +1,9 @@
-package ba.sake.sharaf.handlers
+package ba.sake.sharaf.exceptions
 
 import java.net.URI
 import scala.jdk.CollectionConverters.*
-import org.typelevel.jawn.ast.*
 import io.undertow.util.StatusCodes
 import ba.sake.tupson
-import ba.sake.tupson.{given, *}
 import ba.sake.formson
 import ba.sake.querson
 import ba.sake.validson
@@ -16,16 +14,16 @@ Why not HTTP content negotiation?
 https://wiki.whatwg.org/wiki/Why_not_conneg
  */
 
-type ErrorMapper = PartialFunction[Throwable, Response[?]]
+type ExceptionMapper = PartialFunction[Throwable, Response[?]]
 
-object ErrorMapper {
+object ExceptionMapper {
 
   /*
   Only the exceptions **caused by sharaf internals** (e.g. parsing/validating request) are exposed.
   For example, if you parser JSON in your handler, that error WILL NOT BE EXPOSED/LEAKED to the user! :)
    */
 
-  val default: ErrorMapper = {
+  val default: ExceptionMapper = {
     case e: NotFoundException =>
       Response.withBody(e.getMessage).withStatus(StatusCodes.NOT_FOUND)
     case se: SharafException =>
@@ -51,7 +49,7 @@ object ErrorMapper {
           Response.withBody("Server error").withStatus(StatusCodes.INTERNAL_SERVER_ERROR)
   }
 
-  val json: ErrorMapper = {
+  val json: ExceptionMapper = {
     case e: NotFoundException =>
       val problemDetails = ProblemDetails(StatusCodes.NOT_FOUND, "Not Found", e.getMessage)
       Response.withBody(problemDetails).withStatus(StatusCodes.NOT_FOUND)
@@ -96,19 +94,3 @@ object ErrorMapper {
   }
 
 }
-
-// https://www.rfc-editor.org/rfc/rfc7807#section-3.1
-case class ProblemDetails(
-    status: Int, // http status code
-    title: String, // short summary
-    detail: String = "",
-    `type`: Option[URI] = None, // general error description URL
-    instance: Option[URI] = None, // this particular error URL
-    invalidArguments: Seq[ArgumentProblem] = Seq.empty
-) derives JsonRW
-
-case class ArgumentProblem(
-    path: String,
-    reason: String,
-    value: Option[String]
-) derives JsonRW

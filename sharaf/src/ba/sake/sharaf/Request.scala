@@ -13,6 +13,7 @@ import ba.sake.formson.*
 import ba.sake.querson.*
 import ba.sake.validson.*
 import org.typelevel.jawn.ast.JValue
+import ba.sake.sharaf.exceptions.*
 
 final class Request private (
     private val undertowExchange: HttpServerExchange
