@@ -87,7 +87,7 @@ class JsonApiSuite extends munit.FunSuite {
     assertEquals(ex.response.statusCode, 400)
     assert(
       resProblem.invalidArguments.contains(
-        ArgumentProblem(
+        ProblemDetails.ArgumentProblem(
           "minQuantity[0]",
           "invalid Int",
           Some("not_a_number")
@@ -114,7 +114,7 @@ class JsonApiSuite extends munit.FunSuite {
     println(resProblem.invalidArguments)
     assert(
       resProblem.invalidArguments.contains(
-        ArgumentProblem(
+        ProblemDetails.ArgumentProblem(
           "$.name",
           "must not be blank",
           Some("  ")
