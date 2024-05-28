@@ -1,8 +1,10 @@
 package api
 
+import java.nio.file.Files
 import java.util.UUID
 import io.undertow.Undertow
 import ba.sake.sharaf.*, routing.*
+import ba.sake.tupson.toJson
 
 @main def main: Unit =
   val module = JsonApiModule(8181)
@@ -33,6 +35,12 @@ class JsonApiModule(port: Int) {
       val res = ProductRes(UUID.randomUUID(), req.name, req.quantity)
       db = db.appended(res)
       Response.withBody(res)
+
+    case GET() -> Path("products.json") =>
+      val tmpFile = Files.createTempFile("product", ".json")
+      tmpFile.toFile().deleteOnExit()
+      Files.writeString(tmpFile, db.toJson)
+      Response.withBody(tmpFile)
 
   private val handler = SharafHandler(routes)
     .withExceptionMapper(ExceptionMapper.json)

@@ -45,10 +45,10 @@ object Response {
   def withStatus(status: Int) =
     defaultRes.withStatus(status)
 
-  def withHeader(name: HttpString, values: Seq[String]) =
+  def settingHeader(name: HttpString, values: Seq[String]) =
     defaultRes.settingHeader(name, values)
 
-  def withHeader(name: HttpString, value: String) =
+  def settingHeader(name: HttpString, value: String) =
     defaultRes.settingHeader(name, Seq(value))
 
   def withBody[T: ResponseWritable](body: T): Response[T] =

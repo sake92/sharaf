@@ -1,5 +1,7 @@
 package ba.sake.sharaf
 
+import java.io.File
+import java.nio.file.Path
 import scala.jdk.CollectionConverters.*
 import io.undertow.server.HttpServerExchange
 import io.undertow.util.HttpString
@@ -7,6 +9,8 @@ import io.undertow.util.Headers
 import scalatags.Text.Frag
 import ba.sake.hepek.html.HtmlPage
 import ba.sake.tupson.*
+import java.io.FileInputStream
+import scala.util.Using
 
 trait ResponseWritable[-T]:
   def write(value: T, exchange: HttpServerExchange): Unit
@@ -41,6 +45,26 @@ object ResponseWritable {
       exchange.getResponseSender.send(value)
     override def headers(value: String): Seq[(HttpString, Seq[String])] = Seq(
       Headers.CONTENT_TYPE -> Seq("text/plain")
+    )
+  }
+
+  given ResponseWritable[Path] with {
+    override def write(value: Path, exchange: HttpServerExchange): Unit = {
+      val file = value.toFile()
+      Using.resources(FileInputStream(file), exchange.getOutputStream()) { (inputStream, outputStream) =>
+        val buf = Array.ofDim[Byte](8192)
+        var c = 0
+        while ({ c = inputStream.read(buf, 0, buf.length); c > 0 }) {
+          outputStream.write(buf, 0, c)
+          outputStream.flush()
+        }
+      }
+    }
+
+    // https://stackoverflow.com/questions/20508788/do-i-need-content-type-application-octet-stream-for-file-download
+    override def headers(value: Path): Seq[(HttpString, Seq[String])] = Seq(
+      Headers.CONTENT_TYPE -> Seq("application/octet-stream"),
+      Headers.CONTENT_DISPOSITION -> Seq(s""" attachment; filename="${value.getFileName()}" """.trim)
     )
   }
 
