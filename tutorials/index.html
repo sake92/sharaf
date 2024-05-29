@@ -34,7 +34,7 @@
       }
     </style></head><body><div class="hidden-print"><nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top"><div class="container-fluid"><a class="navbar-brand" href="../index.html"><span><img src="../images/favicon.svg" alt="logo" width="32" height="32" /></span> Sharaf</a><button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#main-navbar"><span class="navbar-toggler-icon"></span></button><div class="collapse navbar-collapse" id="main-navbar"><ul class="navbar-nav"></ul><ul class="navbar-nav ms-auto"><li class="nav-item"><a href="index.html" class="active nav-link">Tutorials</a></li><li class="nav-item"><a href="../howtos/index.html" class="nav-link">How-Tos</a></li><li class="nav-item"><a href="../reference/index.html" class="nav-link">Reference</a></li><li class="nav-item"><a href="../philosophy/index.html" class="nav-link">Philosophy</a></li></ul></div></div></nav></div><div class="container-fluid"><div class="row"><div class="col-md-3 d-flex justify-content-end hidden-print"><nav class="affix"><ul class="nav nav-pills flex-column"><li><a href="index.html" class="nav-link active">Tutorials</a></li><li><a href="hello-world.html" class="nav-link ">Hello World</a></li><li><a href="path-params.html" class="nav-link ">Path Params</a></li><li><a href="query-params.html" class="nav-link ">Query Params</a></li><li><a href="static-files.html" class="nav-link ">Static Files</a></li><li><a href="html.html" class="nav-link ">HTML</a></li><li><a href="handling-forms.html" class="nav-link ">Handling Forms</a></li><li><a href="json-api.html" class="nav-link ">JSON API</a></li><li><a href="validation.html" class="nav-link ">Validation</a></li><li><a href="sql-db.html" class="nav-link ">SQL DB</a></li><li><a href="tests.html" class="nav-link ">Tests</a></li><li><a href="htmx.html" class="nav-link ">HTMX</a></li></ul></nav></div><div data-bs-spy="scroll" data-bs-target="#tocScrollspy" class="col-md-6"><div class="hidden-print"></div><nav><ul class="pagination justify-content-center"><li class="disabled page-item"><a href="#" class="page-link">Previous</a></li><li title="Hello World" class="page-item"><a href="hello-world.html" class="page-link">Next</a></li></ul></nav><div><section id="quickstart"><h2>Quickstart</h2><p>Get started quickly with Sharaf framework.</p>
 <section id="mill"><h3>Mill</h3><pre><code class="language-scala">def ivyDeps = super.ivyDeps() ++ Agg(
-  ivy&quot;ba.sake::sharaf:0.4.0&quot;
+  ivy&quot;ba.sake::sharaf:0.6.0&quot;
 )
 def scalacOptions = super.scalacOptions() ++ Seq(&quot;-Yretain-trees&quot;)
 </code></pre>
@@ -43,11 +43,11 @@ def scalacOptions = super.scalacOptions() ++ Seq(&quot;-Yretain-trees&quot;)
 <li><a href="https://github.com/sake92/sharaf-fullstack.g8">fullstack</a></li>
 </ul>
 </section><section id="sbt"><h3>Sbt</h3><pre><code class="language-scala">libraryDependencies ++= Seq(
-  &quot;ba.sake&quot; %% &quot;sharaf&quot; % &quot;0.4.0&quot;
+  &quot;ba.sake&quot; %% &quot;sharaf&quot; % &quot;0.6.0&quot;
 ),
 scalacOptions ++= Seq(&quot;-Yretain-trees&quot;)
 </code></pre>
-</section><section id="scala-cli"><h3>Scala CLI</h3><pre><code class="language-scala">//&gt; using dep ba.sake::sharaf:0.4.0
+</section><section id="scala-cli"><h3>Scala CLI</h3><pre><code class="language-scala">//&gt; using dep ba.sake::sharaf:0.6.0
 scala-cli my_script.sc --scala-option -Yretain-trees
 </code></pre>
 </section><section id="examples"><h3>Examples</h3><ul>
