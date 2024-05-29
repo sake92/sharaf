@@ -17,7 +17,7 @@ scala-cli compile examples\scala-cli
 git diff
 git commit -am "msg"
 
-$VERSION="0.5.1"
+$VERSION="0.6.0"
 git commit --allow-empty -m "Release $VERSION"
 git tag -a $VERSION -m "Release $VERSION"
 git push  --atomic origin main $VERSION

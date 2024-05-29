@@ -1,5 +1,5 @@
-//> using scala "3.4.0"
-//> using dep ba.sake::sharaf:0.4.0
+//> using scala "3.4.2"
+//> using dep ba.sake::sharaf:0.6.0
 
 // example of BS5 modal with a form
 
