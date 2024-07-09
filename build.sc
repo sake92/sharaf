@@ -3,7 +3,7 @@ import $ivy.`ba.sake::mill-hepek::0.0.2`
 
 import mill._
 import mill.scalalib._, scalafmt._, publish._
-import io.kipp.mill.ci.release._
+import io.kipp.mill.ci.release.CiReleaseModule
 import ba.sake.millhepek.MillHepekModule
 
 object sharaf extends SharafPublishModule {
@@ -78,7 +78,6 @@ trait SharafPublishModule extends SharafCommonModule with CiReleaseModule {
       Developer("sake92", "Sakib Hadžiavdić", "https://sake.ba")
     )
   )
-  def sonatypeHost = Some(SonatypeHost.s01)
 }
 
 trait SharafCommonModule extends ScalaModule with ScalafmtModule {
