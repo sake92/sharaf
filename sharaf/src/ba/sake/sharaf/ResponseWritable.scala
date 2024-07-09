@@ -27,8 +27,7 @@ object ResponseWritable {
 
     response.headerUpdates.updates.foreach {
       case HeaderUpdate.Set(name, values) =>
-        exchange.getResponseHeaders.remove(name)
-        exchange.getResponseHeaders.addAll(name, values.asJava)
+        exchange.getResponseHeaders.putAll(name, values.asJava)
       case HeaderUpdate.Remove(name) =>
         exchange.getResponseHeaders.remove(name)
     }
