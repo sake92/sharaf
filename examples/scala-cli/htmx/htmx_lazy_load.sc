@@ -10,7 +10,7 @@ import ba.sake.hepek.htmx.*
 import ba.sake.sharaf.*, routing.*
 
 object IndexView extends HtmlPage with HtmxDependencies:
-  override def bodyContent = div(hx.get := "/graph", hx.trigger := "load")(
+  override def pageContent = div(hx.get := "/graph", hx.trigger := "load")(
     img(src := "/img/bars.svg", alt := "Result loading...", cls := "htmx-indicator")
   )
 

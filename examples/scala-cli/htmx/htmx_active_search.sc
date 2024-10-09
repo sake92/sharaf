@@ -15,7 +15,7 @@ object views {
   trait BasePage extends HtmlPage with HtmxDependencies
 
   class ContactsViewPage(contacts: Seq[Contact]) extends BasePage:
-    override def bodyContent = div(
+    override def pageContent = div(
       h1("Active Search example"),
       span(cls := "htmx-indicator")(
         img(src := "/img/bars.svg"),

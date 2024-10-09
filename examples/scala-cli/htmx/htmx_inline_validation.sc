@@ -13,7 +13,7 @@ object views {
   import ba.sake.hepek.htmx.*
 
   class IndexView(formData: ContactForm) extends HtmlPage with HtmxDependencies:
-    override def bodyContent = div(
+    override def pageContent = div(
       h3("Inline Validation example"),
       p("Only valid email is test@test.com"),
       contactForm(formData)

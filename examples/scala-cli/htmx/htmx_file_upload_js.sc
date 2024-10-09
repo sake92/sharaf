@@ -11,7 +11,7 @@ import ba.sake.sharaf.*, routing.*
 // https://htmx.org/examples/file-upload/
 
 object IndexView extends HtmlPage with HtmxDependencies:
-  override def bodyContent = form(
+  override def pageContent = form(
     id := "form",
     hx.encoding := "multipart/form-data",
     hx.post := "/upload",

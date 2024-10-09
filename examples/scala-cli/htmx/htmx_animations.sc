@@ -12,7 +12,7 @@ import ba.sake.sharaf.*, routing.*
 trait ExamplePage extends HtmlPage with HtmxDependencies
 
 object IndexView extends ExamplePage:
-  override def bodyContent = ul(
+  override def pageContent = ul(
     li(a(href := "color-throb")("Color throb")),
     li(a(href := "fade-out-on-swap")("Fade Out On Swap")),
     li(a(href := "fade-in-on-addition")("Fade In On Addition")),
@@ -20,7 +20,7 @@ object IndexView extends ExamplePage:
   )
 
 object ColorThrobView extends ExamplePage:
-  override def bodyContent = snippet("red")
+  override def pageContent = snippet("red")
 
   def snippet(color: String) = div(
     id := "color-demo", // must stay same!
@@ -38,7 +38,7 @@ object ColorThrobView extends ExamplePage:
   """)
 
 object FadeOutOnSwapView extends ExamplePage:
-  override def bodyContent = button(
+  override def pageContent = button(
     cls := "fade-me-out",
     hx.delete := "/fade_out_demo",
     hx.swap := "outerHTML swap:1s"
@@ -52,7 +52,7 @@ object FadeOutOnSwapView extends ExamplePage:
   """)
 
 object FadeInOnAdditionView extends ExamplePage:
-  override def bodyContent = theButton
+  override def pageContent = theButton
 
   val theButton = button(
     id := "fade-me-in",
@@ -71,7 +71,7 @@ object FadeInOnAdditionView extends ExamplePage:
   """)
 
 object RequestInFlightView extends ExamplePage:
-  override def bodyContent = form(
+  override def pageContent = form(
     hx.post := "/request-in-flight-name",
     hx.swap := "outerHTML"
   )(

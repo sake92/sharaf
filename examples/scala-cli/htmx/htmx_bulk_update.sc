@@ -14,7 +14,7 @@ object views {
   trait BasePage extends HtmlPage with HtmxDependencies
 
   class ContactsViewPage(contacts: Seq[Contact]) extends BasePage {
-    override def bodyContent = div(
+    override def pageContent = div(
       h1("Bulk Updating example"),
       div(hx.include := "#checked-contacts", hx.target := "#tbody")(
         button(hx.put := "/activate")("Activate"),

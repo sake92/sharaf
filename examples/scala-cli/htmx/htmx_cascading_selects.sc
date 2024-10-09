@@ -11,7 +11,7 @@ import ba.sake.querson.QueryStringRW
 import ba.sake.sharaf.*, routing.*
 
 class IndexView(make: CarMake) extends HtmlPage with HtmxDependencies:
-  override def bodyContent = div(
+  override def pageContent = div(
     div(
       label("Make"),
       select(

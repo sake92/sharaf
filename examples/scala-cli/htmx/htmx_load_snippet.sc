@@ -8,7 +8,7 @@ import ba.sake.hepek.htmx.*
 import ba.sake.sharaf.*, routing.*
 
 object IndexView extends HtmlPage with HtmxDependencies:
-  override def bodyContent =
+  override def pageContent =
     button(hx.post := "/html-snippet", hx.swap := "outerHTML")("Click here!")
 
 val routes = Routes:

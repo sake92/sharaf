@@ -14,7 +14,7 @@ object views {
   trait BasePage extends HtmlPage with HtmxDependencies
 
   class ContactViewPage(formData: ContactForm) extends BasePage:
-    override def bodyContent = div(
+    override def pageContent = div(
       h1("Click to Edit example"),
       contactView(formData)
     )

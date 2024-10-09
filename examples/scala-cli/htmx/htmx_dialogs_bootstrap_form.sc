@@ -11,7 +11,7 @@ import ba.sake.formson.FormDataRW
 import ba.sake.sharaf.*, routing.*
 
 object IndexView extends BootstrapPage with HtmxDependencies:
-  override def bodyContent = div(
+  override def pageContent = div(
     button(
       hx.get := "/modal",
       hx.trigger := "click",

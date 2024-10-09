@@ -13,7 +13,7 @@ import ba.sake.sharaf.*, routing.*
 import ba.sake.sharaf.htmx.ResponseHeaders
 
 object IndexView extends HtmlPage with HtmxDependencies:
-  override def bodyContent =
+  override def pageContent =
     div(hx.target := "this", hx.swap := "outerHTML")(
       h3("Start Progress"),
       button(hx.post := "/start")("Start Job")

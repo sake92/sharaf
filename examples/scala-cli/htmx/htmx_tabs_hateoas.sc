@@ -8,7 +8,7 @@ import ba.sake.hepek.htmx.*
 import ba.sake.sharaf.*, routing.*
 
 object IndexView extends HtmlPage with HtmxDependencies:
-  override def bodyContent =
+  override def pageContent =
     div(id := "tabs", hx.get := "/tab1", hx.trigger := "load delay:100ms", hx.target := "#tabs", hx.swap := "innerHTML")
 
 def tabSnippet(tabNum: Int) = div(

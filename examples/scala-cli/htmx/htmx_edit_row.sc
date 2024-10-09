@@ -15,7 +15,7 @@ object views {
   trait BasePage extends HtmlPage with HtmxDependencies
 
   class ContactsViewPage(contacts: Seq[Contact]) extends BasePage:
-    override def bodyContent = div(
+    override def pageContent = div(
       h1("Click to Edit example"),
       table(
         thead(tr(th("Name"), th("Email"), th())),
