@@ -45,7 +45,7 @@ import ba.sake.hepek.html.HtmlPage
 import ba.sake.sharaf.*, routing.*
 
 object ContacUsView extends HtmlPage:
-  override def bodyContent =
+  override def pageContent =
     form(action := &quot;/handle-form&quot;, method := &quot;POST&quot;)(
       div(
         label(&quot;Full Name: &quot;, input(name := &quot;fullName&quot;, autofocus))

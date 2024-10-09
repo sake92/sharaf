@@ -49,13 +49,13 @@ import ba.sake.hepek.html.HtmlPage
 import ba.sake.sharaf.*, routing.*
 
 object IndexView extends HtmlPage:
-  override def bodyContent = div(
+  override def pageContent = div(
     p(&quot;Welcome!&quot;),
     a(href := &quot;/hello/Bob&quot;)(&quot;Hello world&quot;)
   )
 
 class HelloView(name: String) extends HtmlPage:
-  override def bodyContent =
+  override def pageContent =
     div(&quot;Hello &quot;, b(name), &quot;!&quot;)
 
 val routes = Routes:
