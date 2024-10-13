@@ -10,6 +10,7 @@ enum Color derives QueryStringRW:
 
 case class QuerySimple(
     str: String,
+    strOpt: Option[String],
     int: Int,
     uuid: UUID,
     url: URL,

@@ -17,6 +17,7 @@ class QueryStringParseSuite extends munit.FunSuite {
       (
         Map(
           "str" -> Seq("text", "this_is_ignored"),
+          "strOpt" -> Seq(""), // empty string is considered None !
           "int" -> Seq("42"),
           "uuid" -> Seq(uuid.toString),
           "url" -> Seq("http://example.com"),
@@ -25,7 +26,7 @@ class QueryStringParseSuite extends munit.FunSuite {
           "duration" -> Seq("PT5H2S"),
           "period" -> Seq("P4M1D")
         ),
-        QuerySimple("text", 42, uuid, URL("http://example.com"), instant, ldt, duration, period)
+        QuerySimple("text", None, 42, uuid, URL("http://example.com"), instant, ldt, duration, period)
       )
     ).foreach { case (qsMap, expected) =>
       val res = qsMap.parseQueryStringMap[QuerySimple]

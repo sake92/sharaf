@@ -147,7 +147,10 @@ object QueryStringRW {
       QueryStringRW[Seq[T]].write(path, value.toSeq)
 
     override def parse(path: String, qsData: QueryStringData): Option[T] =
-      QueryStringRW[Seq[T]].parse(path, qsData).headOption
+      val firstNonEmptyIndex = QueryStringRW[Seq[String]].parse(path, qsData).indexWhere(_.nonEmpty)
+      Option.when(firstNonEmptyIndex >= 0) {
+        QueryStringRW[Seq[T]].parse(path, qsData)(firstNonEmptyIndex)
+      }
 
     override def default: Option[Option[T]] = Some(None)
   }

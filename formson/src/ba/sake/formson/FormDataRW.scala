@@ -160,7 +160,10 @@ object FormDataRW {
       FormDataRW[Seq[T]].write(path, value.toSeq)
 
     override def parse(path: String, formData: FormData): Option[T] =
-      FormDataRW[Seq[T]].parse(path, formData).headOption
+      val firstNonEmptyIndex = FormDataRW[Seq[String]].parse(path, formData).indexWhere(_.nonEmpty)
+      Option.when(firstNonEmptyIndex >= 0) {
+        FormDataRW[Seq[T]].parse(path, formData)(firstNonEmptyIndex)
+      }
 
     override def default: Option[Option[T]] = Some(None)
   }

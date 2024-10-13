@@ -1,6 +1,5 @@
 package ba.sake.sharaf
 
-import java.io.File
 import java.nio.file.Path
 import scala.jdk.CollectionConverters.*
 import io.undertow.server.HttpServerExchange

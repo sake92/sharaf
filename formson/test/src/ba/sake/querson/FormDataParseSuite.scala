@@ -16,12 +16,13 @@ class FormDataParseSuite extends munit.FunSuite {
       (
         SeqMap(
           "str" -> Seq("text", "this_is_ignored").map(FormValue.Str.apply),
+          "strOpt" -> Seq("").map(FormValue.Str.apply), // empty string is considered None !
           "int" -> Seq("42").map(FormValue.Str.apply),
           "uuid" -> Seq(uuid.toString).map(FormValue.Str.apply),
           "file" -> Seq(FormValue.File(file)),
           "bytes" -> Seq(FormValue.ByteArray(byteArray))
         ),
-        FormSimple("text", 42, uuid, file, byteArray)
+        FormSimple("text", None, 42, uuid, file, byteArray)
       )
     ).foreach { case (fdMap, expected) =>
       val res = fdMap.parseFormDataMap[FormSimple]

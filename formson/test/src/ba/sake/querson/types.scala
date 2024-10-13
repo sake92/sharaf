@@ -7,7 +7,7 @@ enum Color derives FormDataRW:
   case Red
   case Blue
 
-case class FormSimple(str: String, int: Int, uuid: UUID, file: Path, bytes: Array[Byte]) derives FormDataRW
+case class FormSimple(str: String,     strOpt: Option[String], int: Int, uuid: UUID, file: Path, bytes: Array[Byte]) derives FormDataRW
 case class FormSimpleReservedChars(`what%the&stu$f?@[]`: String) derives FormDataRW
 
 case class FormEnum(color: Color) derives FormDataRW
