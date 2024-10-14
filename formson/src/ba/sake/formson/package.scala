@@ -72,3 +72,5 @@ case class ParseError(
     case None    => s"Key '$path' $msg"
   }
 }
+
+case class discriminator(name: String) extends scala.annotation.StaticAnnotation

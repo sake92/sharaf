@@ -99,6 +99,15 @@ class FormDataWriteSuite extends munit.FunSuite {
         "nest.@type" -> Seq(FormValue.Str("Case1"))
       )
     )
+    // custom discriminator
+    val annot = Annot1.B("bla")
+    assertEquals(
+      annot.toFormDataMap(cfgObjDots),
+      SeqMap(
+        "tip" -> Seq(FormValue.Str("B")),
+        "x" -> Seq(FormValue.Str("bla"))
+      )
+    )
   }
 
 }

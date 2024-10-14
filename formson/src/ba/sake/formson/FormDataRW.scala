@@ -230,6 +230,10 @@ object FormDataRW {
   private def derivedMacro[T: Type](using Quotes): Expr[FormDataRW[T]] = {
     import quotes.reflect.*
 
+    def isAnnotation(a: quotes.reflect.Term): Boolean =
+      a.tpe.typeSymbol.maybeOwner.isNoSymbol ||
+        a.tpe.typeSymbol.owner.fullName != "scala.annotation.internal"
+
     // only summon ProductOf ??
     val mirror: Expr[Mirror.Of[T]] = Expr.summon[Mirror.Of[T]].getOrElse {
       report.errorAndAbort(
@@ -351,28 +355,33 @@ object FormDataRW {
         } else {
           val rwInstancesExpr = summonInstances[T, elementTypes]
           val rwInstances = Expr.ofList(rwInstancesExpr)
+          val annotations = Expr.ofList(TypeRepr.of[T].typeSymbol.annotations.filter(isAnnotation).map(_.asExpr))
+
           '{
+            val discrOpt = $annotations.find(_.isInstanceOf[discriminator]).map(_.asInstanceOf[discriminator])
+                val discrName = discrOpt.map(_.name).getOrElse("@type")
             new FormDataRW[T] {
               override def write(path: String, value: T): FormData =
                 val index = $m.ordinal(value)
                 val typeName = $labels(index)
                 val rw = $rwInstances(index)
                 val res = rw.asInstanceOf[FormDataRW[Any]].write(path, value).asInstanceOf[FormData.Obj]
-                val newValues = res.values + ("@type" -> FormData.Simple(FormValue.Str(typeName)))
+                val newValues = res.values + (discrName -> FormData.Simple(FormValue.Str(typeName)))
                 res.copy(values = newValues)
 
               override def parse(path: String, formData: FormData): T =
+                
                 val tpeNameOpt = formData
                   .asInstanceOf[FormData.Obj]
                   .values
-                  .get("@type")
+                  .get(discrName)
                   .map {
                     case FormData.Simple(FormValue.Str(value)) => value
                     case FormData.Sequence(Seq(FormData.Simple(FormValue.Str(value)), _*)) => value
                     case other => throw ParsingException(
                         ParseError(
                           path,
-                          s"@type has wrong type: '$other'."
+                          s"${discrName} has wrong type: '$other'."
                         )
                       )
                   }
@@ -388,7 +397,7 @@ object FormDataRW {
                       )
                     val rw = $rwInstances(idx)
                     rw.parse(path, formData).asInstanceOf[T]
-                  case None => throw ParsingException(ParseError(path, "@type not present"))
+                  case None => throw ParsingException(ParseError(path, s"${discrName} not present"))
             }
           }
         }

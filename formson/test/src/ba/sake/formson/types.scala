@@ -15,7 +15,7 @@ object Sealed1 {
 
 case class NestedSealed1(nest: Sealed1) derives FormDataRW
 
-// @ TODO
+@discriminator("tip")
 enum Annot1 derives FormDataRW:
   case A
   case B(x: String)

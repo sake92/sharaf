@@ -150,6 +150,14 @@ class FormDataParseSuite extends munit.FunSuite {
         Sealed1.Case1("bla", 42)
       )
     )
+    // custom discriminator
+    assertEquals(
+      SeqMap(
+        "tip" -> Seq(FormValue.Str("B")),
+        "x" -> Seq(FormValue.Str("bla"))
+      ).parseFormDataMap[Annot1],
+      Annot1.B("bla")
+    )
   }
 
   test("parseFormDataMap should throw nice errors") {
