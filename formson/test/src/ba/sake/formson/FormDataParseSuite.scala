@@ -130,6 +130,28 @@ class FormDataParseSuite extends munit.FunSuite {
     }
   }
 
+  test("parseFormDataMap should parse sealed trait") {
+    assertEquals(
+      SeqMap(
+        "str" -> Seq(FormValue.Str("bla")),
+        "integer" -> Seq(FormValue.Str("42")),
+        "@type" -> Seq(FormValue.Str("Case1"))
+      ).parseFormDataMap[Sealed1],
+      Sealed1.Case1("bla", 42)
+    )
+    // nested inside
+    assertEquals(
+      SeqMap(
+        "nest.str" -> Seq(FormValue.Str("bla")),
+        "nest.integer" -> Seq(FormValue.Str("42")),
+        "nest.@type" -> Seq(FormValue.Str("Case1"))
+      ).parseFormDataMap[NestedSealed1],
+      NestedSealed1(
+        Sealed1.Case1("bla", 42)
+      )
+    )
+  }
+
   test("parseFormDataMap should throw nice errors") {
 
     locally {

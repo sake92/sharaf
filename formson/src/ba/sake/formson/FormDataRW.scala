@@ -5,6 +5,7 @@ import java.nio.file.Path
 import java.time.*
 import java.util.UUID
 import scala.deriving.*
+import scala.compiletime.*
 import scala.quoted.*
 import scala.reflect.ClassTag
 import scala.collection.immutable.SeqMap
@@ -241,7 +242,7 @@ object FormDataRW {
             type label <: Tuple;
             $m: Mirror.ProductOf[T] { type MirroredElemTypes = elementTypes; type MirroredElemLabels = `label` }
           } =>
-        val rwInstancesExpr = summonInstances[elementTypes]
+        val rwInstancesExpr = summonInstances[T, elementTypes]
         val rwInstances = Expr.ofList(rwInstancesExpr)
         val labels = Expr(Type.valueOfTuple[label].map(_.toList.map(_.toString)).getOrElse(List.empty))
         val defaultValues = defaultValuesExpr[T]
@@ -310,46 +311,85 @@ object FormDataRW {
 
       case '{
             type label <: Tuple;
-            $m: Mirror.SumOf[T] { type MirroredElemLabels = `label` }
+            $m: Mirror.SumOf[T] { type MirroredElemTypes = elementTypes; type MirroredElemLabels = `label` }
           } =>
         val labels = Expr(Type.valueOfTuple[label].map(_.toList.map(_.toString)).getOrElse(List.empty))
 
         val isSingleCasesEnum = isSingletonCasesEnum[T]
-        if !isSingleCasesEnum then
-          report.errorAndAbort(
-            s"Cannot derive FormDataRW[${Type.show[T]}] automatically because ${Type.show[T]} is not a singleton-cases enum"
-          )
+        if isSingleCasesEnum then {
+          val companion = TypeRepr.of[T].typeSymbol.companionModule.termRef
+          val valueOfSelect = Select.unique(Ident(companion), "valueOf").symbol
+          '{
+            new FormDataRW[T] {
+              override def write(path: String, value: T): FormData =
+                val index = $m.ordinal(value)
+                val label = $labels(index)
+                FormDataRW[String].write(path, label)
 
-        val companion = TypeRepr.of[T].typeSymbol.companionModule.termRef
-        val valueOfSelect = Select.unique(Ident(companion), "valueOf").symbol
-        '{
-          new FormDataRW[T] {
-            override def write(path: String, value: T): FormData =
-              val index = $m.ordinal(value)
-              val label = $labels(index)
-              FormDataRW[String].write(path, label)
+              override def parse(path: String, formData: FormData): T =
+                ${
+                  val labelQuote = '{ FormDataRW[String].parse(path, formData) }
+                  val tryBlock =
+                    Block(Nil, Apply(Select(Ident(companion), valueOfSelect), List(labelQuote.asTerm))).asExprOf[T]
+                  '{
+                    try {
+                      $tryBlock
+                    } catch {
+                      case e: IllegalArgumentException =>
+                        throw ParsingException(
+                          ParseError(
+                            path,
+                            s"Enum value not found: '${$labelQuote}'. Possible values: ${$labels.map(l => s"'$l'").mkString(", ")}",
+                            Some($labelQuote)
+                          )
+                        )
+                    }
+                  }
+                }
+            }
+          }
+        } else {
+          val rwInstancesExpr = summonInstances[T, elementTypes]
+          val rwInstances = Expr.ofList(rwInstancesExpr)
+          '{
+            new FormDataRW[T] {
+              override def write(path: String, value: T): FormData =
+                val index = $m.ordinal(value)
+                val typeName = $labels(index)
+                val rw = $rwInstances(index)
+                val res = rw.asInstanceOf[FormDataRW[Any]].write(path, value).asInstanceOf[FormData.Obj]
+                val newValues = res.values + ("@type" -> FormData.Simple(FormValue.Str(typeName)))
+                res.copy(values = newValues)
 
-            override def parse(path: String, formData: FormData): T =
-              ${
-                val labelQuote = '{ FormDataRW[String].parse(path, formData) }
-                val tryBlock =
-                  Block(Nil, Apply(Select(Ident(companion), valueOfSelect), List(labelQuote.asTerm))).asExprOf[T]
-                '{
-                  try {
-                    $tryBlock
-                  } catch {
-                    case e: IllegalArgumentException =>
-                      throw ParsingException(
+              override def parse(path: String, formData: FormData): T =
+                val tpeNameOpt = formData
+                  .asInstanceOf[FormData.Obj]
+                  .values
+                  .get("@type")
+                  .map {
+                    case FormData.Simple(FormValue.Str(value)) => value
+                    case FormData.Sequence(Seq(FormData.Simple(FormValue.Str(value)), _*)) => value
+                    case other => throw ParsingException(
                         ParseError(
                           path,
-                          s"Enum value not found: '${$labelQuote}'. Possible values: ${$labels.map(l => s"'$l'").mkString(", ")}",
-                          Some($labelQuote)
+                          s"@type has wrong type: '$other'."
                         )
                       )
                   }
-                }
-
-              }
+                tpeNameOpt match
+                  case Some(typeName) =>
+                    val idx = $labels.indexWhere(_ == typeName)
+                    if idx < 0 then
+                      throw ParsingException(
+                        ParseError(
+                          path,
+                          s"Subtype not found: '$typeName'. Possible values: ${$labels.map(l => s"'$l'").mkString(", ")}"
+                        )
+                      )
+                    val rw = $rwInstances(idx)
+                    rw.parse(path, formData).asInstanceOf[T]
+                  case None => throw ParsingException(ParseError(path, "@type not present"))
+            }
           }
         }
 
@@ -357,18 +397,20 @@ object FormDataRW {
   }
 
   /* macro utils */
-  private def summonInstances[Elems: Type](using Quotes): List[Expr[FormDataRW[?]]] =
+  private def summonInstances[T: Type, Elems: Type](using Quotes): List[Expr[FormDataRW[?]]] =
     Type.of[Elems] match
-      case '[elem *: elems] => summonInstance[elem] :: summonInstances[elems]
+      case '[elem *: elems] => deriveOrSummon[T, elem] :: summonInstances[T, elems]
       case '[EmptyTuple]    => Nil
 
-  private def summonInstance[Elem: Type](using Quotes): Expr[FormDataRW[Elem]] =
-    import quotes.reflect.*
-    Expr.summon[FormDataRW[Elem]].getOrElse {
-      report.errorAndAbort(
-        s"There is no instance of FormDataRW[${Type.show[Elem]}] available"
-      )
-    }
+  private def deriveOrSummon[T: Type, Elem: Type](using Quotes): Expr[FormDataRW[Elem]] =
+    Type.of[Elem] match
+      case '[T] => deriveRec[T, Elem]
+      case _    => '{ summonInline[FormDataRW[Elem]] }
+
+  private def deriveRec[T: Type, Elem: Type](using Quotes): Expr[FormDataRW[Elem]] =
+    Type.of[T] match
+      case '[Elem] => '{ error("infinite recursive derivation") }
+      case _       => derivedMacro[Elem] // recursive derivation
 
   private def isSingletonCasesEnum[T: Type](using Quotes): Boolean =
     import quotes.reflect.*
