@@ -23,7 +23,7 @@ object Alternatives extends PhilosophyPage {
 
     ### Pure FP libs like http4s, zio-http etc
 
-    Too much focus on purely functional programming and (mostly unnecessarry) math concepts.  
+    Too much focus on purely functional programming and (mostly unnecessary) math concepts.  
     Easy to get lost in that and overcomplicate your code.
 
     ### Enterprise frameworks like Spring Framework, Quarkus etc
