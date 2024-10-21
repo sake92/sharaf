@@ -11,10 +11,10 @@ object sharaf extends SharafPublishModule {
   def artifactName = "sharaf"
 
   def ivyDeps = Agg(
-    ivy"io.undertow:undertow-core:2.3.12.Final",
+    ivy"io.undertow:undertow-core:2.3.18.Final",
     ivy"com.lihaoyi::requests:0.9.0",
-    ivy"ba.sake::tupson:0.11.0",
-    ivy"ba.sake::tupson-config:0.11.0",
+    ivy"ba.sake::tupson:0.12.2",
+    ivy"ba.sake::tupson-config:0.12.2",
     ivy"ba.sake::hepek-components:0.29.1"
   )
 
@@ -92,7 +92,7 @@ trait SharafCommonModule extends ScalaModule with ScalafmtModule {
 
 trait SharafTestModule extends TestModule.Munit {
   def ivyDeps = Agg(
-    ivy"org.scalameta::munit::1.0.0-M10"
+    ivy"org.scalameta::munit::1.0.2"
   )
 }
 
