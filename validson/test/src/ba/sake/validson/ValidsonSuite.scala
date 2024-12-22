@@ -28,7 +28,7 @@ class ValidsonSuite extends munit.FunSuite {
       Seq(
         ValidationError("$.num", "must be positive", 0),
         ValidationError("$.str", "must not be blank", " "),
-        ValidationError("$.seq", "must not be empty", Seq.empty)
+        ValidationError("$.seq", "must be >= 1", Seq.empty)
       )
     )
   }
@@ -45,7 +45,7 @@ class ValidsonSuite extends munit.FunSuite {
       Seq(
         ValidationError("$.password", "must contain A", ""),
         ValidationError("$.password", "must contain 5", ""),
-        ValidationError("$.matrix", "must not be empty", Seq.empty)
+        ValidationError("$.matrix", "must be >= 1", Seq.empty)
       )
     )
 
@@ -54,10 +54,10 @@ class ValidsonSuite extends munit.FunSuite {
       Seq(
         ValidationError("$.datas[0].num", "must be positive", 0),
         ValidationError("$.datas[0].str", "must not be blank", " "),
-        ValidationError("$.datas[0].seq", "must not be empty", Seq.empty),
+        ValidationError("$.datas[0].seq", "must be >= 1", Seq.empty),
         ValidationError("$.matrix[0][0].num", "must be positive", -55),
         ValidationError("$.matrix[0][0].str", "must not be blank", "   "),
-        ValidationError("$.matrix[0][0].seq", "must not be empty", Seq.empty)
+        ValidationError("$.matrix[0][0].seq", "must be >= 1", Seq.empty)
       )
     )
   }
