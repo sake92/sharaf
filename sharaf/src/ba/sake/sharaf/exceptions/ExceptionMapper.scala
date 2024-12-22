@@ -33,7 +33,7 @@ object ExceptionMapper {
           cause match
             case e: validson.ValidsonException =>
               val fieldValidationErrors = e.errors.mkString("[", "; ", "]")
-              Response.withBody(s"Validation errors: $fieldValidationErrors").withStatus(StatusCodes.BAD_REQUEST)
+              Response.withBody(s"Validation errors: $fieldValidationErrors").withStatus(StatusCodes.UNPROCESSABLE_ENTITY)
             case e: querson.ParsingException =>
               Response.withBody(e.getMessage()).withStatus(StatusCodes.BAD_REQUEST)
             case e: tupson.ParsingException =>
@@ -63,7 +63,7 @@ object ExceptionMapper {
                 e.errors.map(err => ArgumentProblem(err.path, err.msg, Some(err.value.toString)))
               val problemDetails =
                 ProblemDetails(StatusCodes.BAD_REQUEST, "Validation errors", invalidArguments = fieldValidationErrors)
-              Response.withBody(problemDetails).withStatus(StatusCodes.BAD_REQUEST)
+              Response.withBody(problemDetails).withStatus(StatusCodes.UNPROCESSABLE_ENTITY)
             case e: querson.ParsingException =>
               val parsingErrors = e.errors.map(err => ArgumentProblem(err.path, err.msg, err.value.map(_.toString)))
               val problemDetails =
