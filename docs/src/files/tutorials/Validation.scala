@@ -27,7 +27,7 @@ object Validation extends TutorialPage {
         .derived[ValidatedData]
         .positive(_.num)
         .notBlank(_.str)
-        .notEmptySeq(_.seq)
+        .minItems(_.seq, 1)
     ```
 
     The `ValidatedData` can be any `case class`: json data, form data, query params..  

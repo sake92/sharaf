@@ -1,5 +1,5 @@
 //> using scala "3.4.2"
-//> using dep ba.sake::sharaf:0.7.0
+//> using dep ba.sake::sharaf:0.7.6
 
 import io.undertow.Undertow
 import ba.sake.querson.QueryStringRW
@@ -13,7 +13,7 @@ object Car:
     .derived[Car]
     .notBlank(_.brand)
     .notBlank(_.model)
-    .nonnegative(_.quantity)
+    .nonNegative(_.quantity)
 
 case class CarQuery(brand: String) derives QueryStringRW
 object CarQuery:

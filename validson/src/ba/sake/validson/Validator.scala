@@ -24,19 +24,16 @@ trait Validator[T] {
   def negative[F: Numeric](getter: T => sourcecode.Text[F]): Validator[T] =
     validatorImpl(getter, _ < summon[Numeric[F]].zero, s"must be negative")
 
-  def nonpositive[F: Numeric](getter: T => sourcecode.Text[F]): Validator[T] =
+  def nonPositive[F: Numeric](getter: T => sourcecode.Text[F]): Validator[T] =
     validatorImpl(getter, _ <= summon[Numeric[F]].zero, s"must be nonpositive")
 
   def positive[F: Numeric](getter: T => sourcecode.Text[F]): Validator[T] =
     validatorImpl(getter, _ > summon[Numeric[F]].zero, s"must be positive")
 
-  def nonnegative[F: Numeric](getter: T => sourcecode.Text[F]): Validator[T] =
+  def nonNegative[F: Numeric](getter: T => sourcecode.Text[F]): Validator[T] =
     validatorImpl(getter, _ >= summon[Numeric[F]].zero, s"must be nonnegative")
 
   // strings
-  def notEmpty(getter: T => sourcecode.Text[String]): Validator[T] =
-    validatorImpl(getter, !_.isEmpty, "must not be empty")
-
   def notBlank(getter: T => sourcecode.Text[String]): Validator[T] =
     validatorImpl(getter, !_.isBlank, "must not be blank")
 
@@ -53,25 +50,11 @@ trait Validator[T] {
     validatorImpl(getter, _.matches(value), s"must contain $value")
 
   // seqs
-  def notEmpty(getter: T => sourcecode.Text[Seq[?]]): Validator[T] =
-    validatorImpl(getter, !_.isEmpty, "must not be empty")
-
-  def minItems(getter: T => sourcecode.Text[Seq[?]], value: String): Validator[T] =
+  def minItems(getter: T => sourcecode.Text[Iterable[?]], value: Int): Validator[T] =
     validatorImpl(getter, _.size >= value, s"must be >= $value")
   
-  def maxItems(getter: T => sourcecode.Text[Seq[?]], value: String): Validator[T] =
+  def maxItems(getter: T => sourcecode.Text[Iterable[?]], value: Int): Validator[T] =
     validatorImpl(getter, _.size <= value, s"must be <= $value")
-
-  // sets
-  def notEmpty(getter: T => sourcecode.Text[Set[?]]): Validator[T] =
-    validatorImpl(getter, !_.isEmpty, "must not be empty")
-
-  def minItems(getter: T => sourcecode.Text[Set[?]], value: String): Validator[T] =
-    validatorImpl(getter, _.size >= value, s"must be >= $value")
-  
-  def maxItems(getter: T => sourcecode.Text[Set[?]], value: String): Validator[T] =
-    validatorImpl(getter, _.size <= value, s"must be <= $value")
-  
 
   private def validatorImpl[F](getter: T => sourcecode.Text[F], predicate: F => Boolean, msg: String): Validator[T] =
     (value: T) => {

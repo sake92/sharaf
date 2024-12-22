@@ -72,7 +72,7 @@ object SimpleData:
     .derived[SimpleData]
     .positive(_.num)
     .notBlank(_.str)
-    .notEmptySeq(_.seq)
+    .minItems(_.seq, 1)
     .and(_.seq, _.forall(_.size == 2), "must have elements of size 2")
 
 case class ComplexData(password: String, datas: Seq[SimpleData], matrix: Seq[Seq[SimpleData]])
@@ -83,4 +83,4 @@ object ComplexData:
     .derived[ComplexData]
     .contains(_.password, "A")
     .contains(_.password, "5")
-    .notEmptySeq(_.matrix)
+    .minItems(_.matrix, 1)
