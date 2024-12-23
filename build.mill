@@ -8,6 +8,8 @@ import mill.scalalib._, scalafmt._, publish._
 import mill.contrib.sonatypecentral.SonatypeCentralPublishModule
 import ba.sake.millhepek.MillHepekModule
 
+val sharafVersion = "0.8.0"
+
 object sharaf extends SharafPublishModule {
 
   def artifactName = "sharaf"
@@ -70,7 +72,7 @@ object validson extends SharafPublishModule {
 
 trait SharafPublishModule extends SharafCommonModule with SonatypeCentralPublishModule {
 
-  def publishVersion = "0.8.0-SNAPSHOT"
+  def publishVersion = sharafVersion
 
   def pomSettings = PomSettings(
     organization = "ba.sake",

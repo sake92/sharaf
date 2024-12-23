@@ -1,5 +1,5 @@
 //> using scala "3.4.2"
-//> using dep ba.sake::sharaf:0.7.6
+//> using dep ba.sake::sharaf:0.8.0
 
 import io.undertow.Undertow
 import ba.sake.querson.QueryStringRW
