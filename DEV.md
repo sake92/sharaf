@@ -13,15 +13,21 @@ scala-cli compile examples\scala-cli
 
 # for local dev/test
 ./mill __.publishLocal
+```
 
-git diff
-git commit -am "msg"
+```sh
 
-$VERSION="0.7.5"
-git commit --allow-empty -m "Release $VERSION"
+# RELEASE
+$VERSION="x.y.z"
+git commit --allow-empty -am "Release $VERSION"
 git tag -a $VERSION -m "Release $VERSION"
-git push  --atomic origin main $VERSION
+git push --atomic origin main --tags
 
+
+# prepare for NEXT version
+# bump publishVersion to x.y.z-SNAPSHOT
+$VERSION="x.y.z-SNAPSHOT"
+git commit -am"Bump version to $VERSION"
 
 ```
 

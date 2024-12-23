@@ -1,9 +1,11 @@
-import $ivy.`io.chris-kipp::mill-ci-release::0.1.10`
-import $ivy.`ba.sake::mill-hepek::0.0.2`
+package build
+
+import $ivy.`com.lihaoyi::mill-contrib-sonatypecentral:`
+import $ivy.`ba.sake::mill-hepek::0.1.0`
 
 import mill._
 import mill.scalalib._, scalafmt._, publish._
-import io.kipp.mill.ci.release.CiReleaseModule
+import mill.contrib.sonatypecentral.SonatypeCentralPublishModule
 import ba.sake.millhepek.MillHepekModule
 
 object sharaf extends SharafPublishModule {
@@ -66,7 +68,9 @@ object validson extends SharafPublishModule {
   object test extends ScalaTests with SharafTestModule
 }
 
-trait SharafPublishModule extends SharafCommonModule with CiReleaseModule {
+trait SharafPublishModule extends SharafCommonModule with SonatypeCentralPublishModule {
+
+  def publishVersion = "0.8.0-SNAPSHOT"
 
   def pomSettings = PomSettings(
     organization = "ba.sake",

@@ -33,4 +33,6 @@ object ScalaCliFiles:
   val validation = get("validation.sc")
 
   private def get(chunk: os.PathChunk) =
-    os.read(os.pwd / "examples" / "scala-cli" / chunk)
+    // os.pwd is sandboxed, this is called from plugin !
+    val wd = os.Path(System.getenv("MILL_WORKSPACE_ROOT"))
+    os.read(wd / "examples" / "scala-cli" / chunk)
