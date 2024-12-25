@@ -4,6 +4,7 @@ import scala.deriving.*
 import scala.quoted.*
 import scala.math.Ordered.*
 
+// TODO Option-al fields cannot validate easily
 trait Validator[T] {
 
   def validate(value: T): Seq[ValidationError]
@@ -52,7 +53,7 @@ trait Validator[T] {
   // seqs
   def minItems(getter: T => sourcecode.Text[Iterable[?]], value: Int): Validator[T] =
     validatorImpl(getter, _.size >= value, s"must be >= $value")
-  
+
   def maxItems(getter: T => sourcecode.Text[Iterable[?]], value: Int): Validator[T] =
     validatorImpl(getter, _.size <= value, s"must be <= $value")
 
@@ -75,6 +76,11 @@ object Validator extends LowPriValidators {
       }
       subErrors
     }
+  }
+
+  given optValidator[T](using validator: Validator[T]): Validator[Option[T]] with {
+    override def validate(valueOpt: Option[T]): Seq[ValidationError] =
+      valueOpt.map(value => validator.validate(value)).getOrElse(Seq.empty)
   }
 
   /* macro derived instances */

@@ -58,6 +58,15 @@ object QueryStringRW {
       str.toIntOption.getOrElse(typeError(path, "Int", str))
   }
 
+  given QueryStringRW[Long] with {
+    override def write(path: String, value: Long): QueryStringData =
+      QueryStringRW[String].write(path, value.toString)
+
+    override def parse(path: String, qsData: QueryStringData): Long =
+      val str = QueryStringRW[String].parse(path, qsData)
+      str.toLongOption.getOrElse(typeError(path, "Long", str))
+  }
+
   given QueryStringRW[Double] with {
     override def write(path: String, value: Double): QueryStringData =
       QueryStringRW[String].write(path, value.toString)
