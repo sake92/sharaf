@@ -8,7 +8,7 @@ import mill.scalalib._, scalafmt._, publish._
 import mill.contrib.sonatypecentral.SonatypeCentralPublishModule
 import ba.sake.millhepek.MillHepekModule
 
-val sharafVersion = "0.8.1-SNAPSHOT"
+val sharafVersion = "0.8.1"
 
 object sharaf extends SharafPublishModule {
 
