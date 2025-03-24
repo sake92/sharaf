@@ -1,6 +1,7 @@
 package build
 
 import $ivy.`com.lihaoyi::mill-contrib-sonatypecentral:`
+import $ivy.`de.tototec::de.tobiasroeser.mill.vcs.version::0.4.1`
 import $ivy.`ba.sake::mill-hepek::0.1.0`
 
 import mill._
@@ -8,9 +9,13 @@ import mill.scalalib._
 import mill.scalalib.scalafmt._
 import mill.scalalib.publish._
 import mill.contrib.sonatypecentral.SonatypeCentralPublishModule
+import de.tobiasroeser.mill.vcs.version.VcsVersion
 import ba.sake.millhepek.MillHepekModule
 
-val sharafVersion = "0.8.2-SNAPSHOT"
+object V {
+  val hepek = "0.30.0"
+  val tupson = "0.13.0"
+}
 
 object sharaf extends SharafPublishModule {
 
@@ -19,9 +24,9 @@ object sharaf extends SharafPublishModule {
   def ivyDeps = Agg(
     ivy"io.undertow:undertow-core:2.3.18.Final",
     ivy"com.lihaoyi::requests:0.9.0",
-    ivy"ba.sake::tupson:0.13.0",
-    ivy"ba.sake::tupson-config:0.13.0",
-    ivy"ba.sake::hepek-components:0.29.1"
+    ivy"ba.sake::tupson:${V.tupson}",
+    ivy"ba.sake::tupson-config:${V.tupson}",
+    ivy"ba.sake::hepek-components:${V.hepek}"
   )
 
   def moduleDeps = Seq(querson, formson)
@@ -74,7 +79,7 @@ object validson extends SharafPublishModule {
 
 trait SharafPublishModule extends SharafCommonModule with SonatypeCentralPublishModule {
 
-  def publishVersion = sharafVersion
+  def publishVersion = VcsVersion.vcsState().format()
 
   def pomSettings = PomSettings(
     organization = "ba.sake",
@@ -137,7 +142,7 @@ object examples extends mill.Module {
 //////////////////// docs
 object docs extends MillHepekModule with SharafCommonModule {
   def ivyDeps = Agg(
-    ivy"ba.sake::hepek:0.25.0",
+    ivy"ba.sake::hepek:${V.hepek}",
     ivy"com.lihaoyi::os-lib:0.9.3"
   )
 }
