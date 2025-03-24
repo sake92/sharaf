@@ -18,17 +18,10 @@ scala-cli compile examples\scala-cli
 ```sh
 
 # RELEASE
-# bump publishVersion to x.y.z !!!
-$VERSION="0.8.1"
+$VERSION="0.8.2"
 git commit --allow-empty -m "Release $VERSION"
 git tag -a $VERSION -m "Release $VERSION"
 git push --atomic origin main --tags
-
-
-# prepare for NEXT version
-# bump publishVersion to x.y.z-SNAPSHOT
-$VERSION="0.8.2-SNAPSHOT"
-git commit -m"Bump version to $VERSION"
 
 ```
 
@@ -37,9 +30,8 @@ git commit -m"Bump version to $VERSION"
 - MiMa bin compat
 
 - giter8 template for REST
-- add more validators https://javaee.github.io/javaee-spec/javadocs/javax/validation/constraints/package-summary.html
-- webjars
 
+- add more validators https://javaee.github.io/javaee-spec/javadocs/javax/validation/constraints/package-summary.html
 
 README DEMO:
 
