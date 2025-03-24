@@ -20,15 +20,15 @@ scala-cli compile examples\scala-cli
 # RELEASE
 # bump publishVersion to x.y.z !!!
 $VERSION="0.8.1"
-git commit --allow-empty -am "Release $VERSION"
+git commit --allow-empty -m "Release $VERSION"
 git tag -a $VERSION -m "Release $VERSION"
 git push --atomic origin main --tags
 
 
 # prepare for NEXT version
 # bump publishVersion to x.y.z-SNAPSHOT
-$VERSION="x.y.z-SNAPSHOT"
-git commit -am"Bump version to $VERSION"
+$VERSION="0.8.2-SNAPSHOT"
+git commit -m"Bump version to $VERSION"
 
 ```
 

@@ -4,7 +4,9 @@ import $ivy.`com.lihaoyi::mill-contrib-sonatypecentral:`
 import $ivy.`ba.sake::mill-hepek::0.1.0`
 
 import mill._
-import mill.scalalib._, scalafmt._, publish._
+import mill.scalalib._
+import mill.scalalib.scalafmt._
+import mill.scalalib.publish._
 import mill.contrib.sonatypecentral.SonatypeCentralPublishModule
 import ba.sake.millhepek.MillHepekModule
 
@@ -17,8 +19,8 @@ object sharaf extends SharafPublishModule {
   def ivyDeps = Agg(
     ivy"io.undertow:undertow-core:2.3.18.Final",
     ivy"com.lihaoyi::requests:0.9.0",
-    ivy"ba.sake::tupson:0.12.2",
-    ivy"ba.sake::tupson-config:0.12.2",
+    ivy"ba.sake::tupson:0.13.0",
+    ivy"ba.sake::tupson-config:0.13.0",
     ivy"ba.sake::hepek-components:0.29.1"
   )
 

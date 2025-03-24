@@ -28,7 +28,10 @@ final class SharafHandler private (
         routes,
         ResourceHandler(
           ClassPathResourceManager(getClass.getClassLoader, "public"),
-          RoutesHandler(notFoundRoutes) // handle 404s at the end
+          ResourceHandler(
+            ClassPathResourceManager(getClass.getClassLoader, "META-INF/resources/webjars"),
+            RoutesHandler(notFoundRoutes) // handle 404s at the end
+          )
         )
       ),
       corsSettings
