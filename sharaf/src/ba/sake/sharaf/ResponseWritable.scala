@@ -5,10 +5,13 @@ import scala.jdk.CollectionConverters.*
 import io.undertow.server.HttpServerExchange
 import io.undertow.util.HttpString
 import io.undertow.util.Headers
+import scalatags.Text.all.doctype
 import scalatags.Text.Frag
 import ba.sake.hepek.html.HtmlPage
 import ba.sake.tupson.*
 import java.io.FileInputStream
+import java.nio.ByteBuffer
+import java.nio.charset.StandardCharsets
 import scala.util.Using
 
 trait ResponseWritable[-T]:
@@ -72,6 +75,16 @@ object ResponseWritable {
       val htmlText = value.render
       exchange.getResponseSender.send(htmlText)
     override def headers(value: Frag): Seq[(HttpString, Seq[String])] = Seq(
+      Headers.CONTENT_TYPE -> Seq("text/html; charset=utf-8")
+    )
+  }
+
+  given ResponseWritable[doctype] with {
+    override def write(value: doctype, exchange: HttpServerExchange): Unit =
+      exchange.getResponseSender.send(
+        Array(StandardCharsets.UTF_8.encode(s"<!DOCTYPE ${value.s}>"), StandardCharsets.UTF_8.encode(value.render))
+      )
+    override def headers(value: doctype): Seq[(HttpString, Seq[String])] = Seq(
       Headers.CONTENT_TYPE -> Seq("text/html; charset=utf-8")
     )
   }
