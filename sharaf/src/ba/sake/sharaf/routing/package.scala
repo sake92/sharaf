@@ -1,6 +1,6 @@
 package ba.sake.sharaf
 package routing
 
-import io.undertow.util.HttpString
+type RequestParams = (HttpMethod, Path)
 
-type RequestParams = (HttpString, Path)
+export HttpMethod.*

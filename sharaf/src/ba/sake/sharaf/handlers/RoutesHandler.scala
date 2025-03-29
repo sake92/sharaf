@@ -35,17 +35,16 @@ final class RoutesHandler private (routes: Routes, nextHandler: Option[HttpHandl
   }
 
   private def fillReqParams(exchange: HttpServerExchange): RequestParams = {
+    val method = HttpMethod.valueOf(exchange.getRequestMethod.toString)
     val relPath =
       if exchange.getRelativePath.startsWith("/") then exchange.getRelativePath.drop(1)
       else exchange.getRelativePath
     val pathSegments = relPath.split("/")
-
     val path =
       if pathSegments.size == 1 && pathSegments.head == ""
       then Path()
       else Path(pathSegments*)
-
-    (exchange.getRequestMethod, path)
+    (method, path)
   }
 
 }
