@@ -25,10 +25,6 @@ object Index extends TutorialPage {
         )
         def scalacOptions = super.scalacOptions() ++ Seq("-Yretain-trees")
         ```
-
-        There are Giter8 templates available:
-        - [fullstack](https://github.com/sake92/sharaf-fullstack.g8)
-
         """.md
       ),
       Section(
@@ -45,8 +41,12 @@ object Index extends TutorialPage {
       Section(
         "Scala CLI",
         s"""
+        Create a file `my_script.sc` with the following content:
         ```scala
         //> using dep ${Consts.ArtifactOrg}::${Consts.ArtifactName}:${Consts.ArtifactVersion}
+        ```
+        and then run it with:
+        ```bash
         scala-cli my_script.sc --scala-option -Yretain-trees
         ```
         """.md
@@ -54,12 +54,14 @@ object Index extends TutorialPage {
       Section(
         "Examples",
         s"""
-        - [scala-cli examples](${Consts.GhSourcesUrl}/examples/scala-cli), a bunch of standalone examples
+        - [scala-cli examples](${Consts.GhSourcesUrl}/examples/scala-cli), standalone examples using scala-cli
+        - [scala-cli HTMX examples](${Consts.GhSourcesUrl}/examples/scala-cli/htmx), standalone examples featuring HTMX
         - [API example](${Consts.GhSourcesUrl}/examples/api) featuring JSON and validation
         - [full-stack example](${Consts.GhSourcesUrl}/examples/fullstack) featuring HTML, static files and forms
         - [sharaf-todo-backend](https://github.com/sake92/sharaf-todo-backend), implementation of the [todobackend.com](http://todobackend.com/) spec, featuring CORS handling
         - [OAuth2 login](${Consts.GhSourcesUrl}/examples/oauth2) with [Pac4J library](https://www.pac4j.org/)
         - [PetClinic](https://github.com/sake92/sharaf-petclinic) implementation, featuring full-stack app with Postgres db, config, integration tests etc.
+        - [Giter8 template for fullstack app](https://github.com/sake92/sharaf-fullstack.g8)
 
         """.md
       )

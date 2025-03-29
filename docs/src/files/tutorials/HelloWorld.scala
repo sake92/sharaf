@@ -15,7 +15,7 @@ object HelloWorld extends TutorialPage {
     "Hello World",
     div(
       s"""
-      Let's make a Hello World example in scala-cli.  
+      Let's make a Hello World example with scala-cli.  
       Create a file `hello_sharaf.sc` and paste this code into it:
       ```scala
       ${ScalaCliFiles.hello.indent(6)}

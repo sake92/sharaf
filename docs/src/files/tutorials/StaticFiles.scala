@@ -15,10 +15,10 @@ object StaticFiles extends TutorialPage {
     "Serving Static Files",
     s"""
 
-    The static files are automatically served from the `resources/public` folder.  
-    If using Mill, those are under `my_project/resources/public`.  
-    In Sbt those are under `src/main/resources/public`.  
-    In scala-cli you need to manually tell it where to look for with `--resource-dir resources`.
+    The static files are automatically served from the `resources/public` folder (on the classpath):
+    - in Mill those are under `my_project/resources/public`
+    - in sbt those are under `src/main/resources/public`
+    - in scala-cli you need to manually tell it where to look for with `--resource-dir resources`
     
     ---
     
