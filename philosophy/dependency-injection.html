@@ -52,11 +52,13 @@
   // some code that needs an implicit Ctx
 }
 </code></pre>
-<p>and compiler will fill it in for us.</p>
+<p>and compiler will fill it in for us.<br />
+The <code>Ctx</code> parameter is implicitly/contextually available (only) in the function body.<br />
+You can get it with <code>summon[Ctx]</code> or <code>using ctx: Ctx</code> (which is a bit more readable).</p>
 <hr />
 <p>Sharaf has the <code>Routes</code> type that is defined as <code>Request ?=&gt; PartialFunction[RequestParams, Response[?]]</code>.<br />
-This means that you can call <code>Request.current</code> only in a <code>Routes</code> definition body (because it requires a <code>given Request</code>).</p>
-<p>If you need a request-scoped instance (<code>@RequestScoped @Bean</code> in Spring),<br />
+This means that you can call <code>Request.current</code> only in a <code>Routes</code> definition body (because it requires a <code>given Request</code> to be present).</p>
+<p>If you need a request-scoped instance (a-la <code>@RequestScoped @Bean</code> in Spring),<br />
 you need to define a function that is <code>using Request</code>:</p>
 <pre><code class="language-scala">def currentUser(using req: Request): User =
   // extract stuff from request

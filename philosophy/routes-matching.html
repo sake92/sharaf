@@ -59,9 +59,8 @@ public Student studentData3(@PathVariable Integer studentId) {}
 People have to learn how it works, there's probably no syntax highlighting, no autocomplete etc.</p>
 </section><section id="why-not-in-language-dsl"><h2>Why not in-language DSL?</h2><p>Similar to special route file approach, people need to learn it.<br />
 And again, you don't leverage compiler's support like exhaustive pattern matching and extractors.</p>
-</section><section id="sharaf-s-approach"><h2>Sharaf's approach</h2><p>Sharaf does its route matching in plain scala code.</p>
-<hr />
-<p>Scala's pattern matching warns you when you have duplicate routes, or <em>impossible</em> routes.<br />
+</section><section id="sharaf-s-approach"><h2>Sharaf's approach</h2><p>Sharaf does its route matching in plain scala code.<br />
+Scala's pattern matching warns you when you have <em>duplicate routes</em>, or <em>impossible</em> routes.<br />
 For example, if you write this:</p>
 <pre><code class="language-scala">case GET -&gt; Path(&quot;cars&quot;, brand) =&gt; ???
 case GET -&gt; Path(&quot;cars&quot;, model) =&gt; ??? // Unreachable case

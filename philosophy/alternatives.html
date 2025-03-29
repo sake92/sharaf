@@ -36,12 +36,13 @@
 <p>Synchronous programming is much, much easier to understand, debug, profile etc..<br />
 Benefits (performance/throughput) of async handling are mostly void in Java 21, with introduction of Virtual threads. Yay!</p>
 <p>Only bummer for now is that Undertow doesn't still support them.. :/<br />
-But undertow is performant in the current shape too, so for most use cases it will be enough.</p>
+But undertow is very performant in the current shape too, so for most use cases it will be enough.<br />
+Java 24 is a game changer for Undertow, because it solves the problem of <a href="https://openjdk.org/jeps/491">Synchronize Virtual Threads without Pinning</a>.</p>
 <h3>Pure FP libs like http4s, zio-http etc</h3>
 <p>Too much focus on purely functional programming and (mostly unnecessary) math concepts.<br />
 Easy to get lost in that and overcomplicate your code.</p>
 <h3>Enterprise frameworks like Spring Framework, Quarkus etc</h3>
-<p>Too much annotations, autoconfigurations, dependency injection and complexity.</p>
+<p>Too much annotations, autoconfigurations, dependency injection, proxies and complexity.</p>
 <h3>Standalone JEE servers like Tomcat, Jetty etc</h3>
 <p>I was looking into these, but then sharaf would have to depend on Servlets API,<br />
 use <code>@Inject</code> and gazzilion of god-knows-what-they-do annotations just to configure OAuth2 for example...</p>
