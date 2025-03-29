@@ -62,9 +62,7 @@ object RoutesMatching extends PhilosophyPage {
     "Sharaf's approach",
     s"""
     Sharaf does its route matching in plain scala code.  
-
-    ----
-    Scala's pattern matching warns you when you have duplicate routes, or *impossible* routes.  
+    Scala's pattern matching warns you when you have *duplicate routes*, or *impossible* routes.  
     For example, if you write this:
     ```scala
     case GET -> Path("cars", brand) => ???

@@ -38,14 +38,16 @@ object DependencyInjection extends PhilosophyPage {
       // some code that needs an implicit Ctx
     }
     ```
-    and compiler will fill it in for us.
+    and compiler will fill it in for us.  
+    The `Ctx` parameter is implicitly/contextually available (only) in the function body.  
+    You can get it with `summon[Ctx]` or `using ctx: Ctx` (which is a bit more readable).
 
 
     ---
     Sharaf has the `Routes` type that is defined as `Request ?=> PartialFunction[RequestParams, Response[?]]`.  
-    This means that you can call `Request.current` only in a `Routes` definition body (because it requires a `given Request`).  
+    This means that you can call `Request.current` only in a `Routes` definition body (because it requires a `given Request` to be present).  
 
-    If you need a request-scoped instance (`@RequestScoped @Bean` in Spring),  
+    If you need a request-scoped instance (a-la `@RequestScoped @Bean` in Spring),  
     you need to define a function that is `using Request`:
     ```scala
     def currentUser(using req: Request): User =

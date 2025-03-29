@@ -16,7 +16,7 @@ object Index extends PhilosophyPage {
     s"""
     Simplicity and ease of use is the main focus of Sharaf.  
 
-    It is built on top of [Undertow](https://undertow.io/).  
+    Sharaf is built on top of [Undertow](https://undertow.io/).  
     This means you can use awesome libraries built for Undertow, like [pac4j](https://github.com/pac4j/undertow-pac4j) for security and others.  
     You can leverage Undertow's lower level API, e.g. for WebSockets.
 
