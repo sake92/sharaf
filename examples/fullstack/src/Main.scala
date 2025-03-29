@@ -15,10 +15,10 @@ class FullstackModule(port: Int) {
   val baseUrl = s"http://localhost:${port}"
 
   private val routes = Routes:
-    case GET() -> Path() =>
+    case GET -> Path() =>
       Response.withBody(ShowFormPage(CreateCustomerForm.empty))
 
-    case POST() -> Path("form-submit") =>
+    case POST -> Path("form-submit") =>
       // note that here we do the validation *manually* !!
       val formData = Request.current.bodyForm[CreateCustomerForm]
       formData.validate match

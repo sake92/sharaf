@@ -8,30 +8,30 @@ import ba.sake.sharaf.routing.*
 import ba.sake.tupson.JsonRW
 
 class ResponseWritableTest extends munit.FunSuite {
-  
+
   val testFileResourceDir = Paths.get(sys.env("MILL_TEST_RESOURCE_DIR"))
 
   val port = utils.getFreePort()
   val baseUrl = s"http://localhost:$port"
-  
+
   val routes = Routes {
-    case GET() -> Path("string") =>
+    case GET -> Path("string") =>
       Response.withBody("a string")
-    case GET() -> Path("inputstream") =>
+    case GET -> Path("inputstream") =>
       val is = new java.io.ByteArrayInputStream("an inputstream".getBytes(StandardCharsets.UTF_8))
       Response.withBody(is)
-    case GET() -> Path("file") =>
+    case GET -> Path("file") =>
       val file = testFileResourceDir.resolve("text_file.txt")
       Response.withBody(file)
-    case GET() -> Path("json") =>
+    case GET -> Path("json") =>
       case class JsonCaseClass(name: String, age: Int) derives JsonRW
       val json = JsonCaseClass("Meho", 40)
       Response.withBody(json)
-    case GET() -> Path("scalatags", "frag") =>
+    case GET -> Path("scalatags", "frag") =>
       import scalatags.Text.all.*
       val res = div("this is a div")
       Response.withBody(res)
-    case GET() -> Path("scalatags", "doctype") =>
+    case GET -> Path("scalatags", "doctype") =>
       import scalatags.Text.all.{title =>_, *}
       import scalatags.Text.tags2.title
       val res = doctype("html")(
@@ -45,7 +45,7 @@ class ResponseWritableTest extends munit.FunSuite {
         )
       )
       Response.withBody(res)
-    case GET() -> Path("hepek", "htmlpage") =>
+    case GET -> Path("hepek", "htmlpage") =>
       import scalatags.Text.all.*
       import ba.sake.hepek.html.HtmlPage
       val page = new HtmlPage {
@@ -53,13 +53,13 @@ class ResponseWritableTest extends munit.FunSuite {
       }
       Response.withBody(page)
   }
-  
+
   val server = Undertow
     .builder()
     .addHttpListener(port, "localhost")
     .setHandler(SharafHandler(routes))
     .build()
-  
+
   override def beforeAll(): Unit = server.start()
 
   override def afterAll(): Unit = server.stop()
@@ -107,6 +107,4 @@ class ResponseWritableTest extends munit.FunSuite {
     assertEquals(res.headers(Headers.CONTENT_TYPE_STRING.toLowerCase), Seq("text/html; charset=utf-8"))
   }
   
-
 }
-

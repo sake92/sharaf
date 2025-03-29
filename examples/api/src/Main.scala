@@ -19,24 +19,24 @@ class JsonApiModule(port: Int) {
   private var db = Seq.empty[ProductRes]
 
   private val routes = Routes:
-    case GET() -> Path("products", param[UUID](id)) =>
+    case GET -> Path("products", param[UUID](id)) =>
       val productOpt = db.find(_.id == id)
       Response.withBodyOpt(productOpt, s"Product with id=$id")
 
-    case GET() -> Path("products") =>
+    case GET -> Path("products") =>
       val query = Request.current.queryParamsValidated[ProductsQuery]
       val products =
         if query.name.isEmpty then db
         else db.filter(c => query.name.contains(c.name) && query.minQuantity.map(c.quantity >= _).getOrElse(true))
       Response.withBody(products.toList)
 
-    case POST() -> Path("products") =>
+    case POST -> Path("products") =>
       val req = Request.current.bodyJsonValidated[CreateProductReq]
       val res = ProductRes(UUID.randomUUID(), req.name, req.quantity)
       db = db.appended(res)
       Response.withBody(res)
 
-    case GET() -> Path("products.json") =>
+    case GET -> Path("products.json") =>
       val tmpFile = Files.createTempFile("product", ".json")
       tmpFile.toFile().deleteOnExit()
       Files.writeString(tmpFile, db.toJson)

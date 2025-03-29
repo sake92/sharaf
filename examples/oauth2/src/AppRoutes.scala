@@ -8,13 +8,13 @@ import ba.sake.hepek.html.HtmlPage
 class AppRoutes(securityService: SecurityService) {
 
   val routes = Routes:
-    case GET() -> Path("protected") =>
+    case GET -> Path("protected") =>
       Response.withBody(ProtectedPage)
 
-    case GET() -> Path("login") =>
+    case GET -> Path("login") =>
       Response.redirect("/")
 
-    case GET() -> Path() =>
+    case GET -> Path() =>
       Response.withBody(IndexPage(securityService.currentUser))
 
     case _ =>
