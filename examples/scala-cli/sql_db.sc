@@ -1,4 +1,4 @@
-//> using scala "3.4.2"
+//> using scala "3.6.4"
 //> using dep org.postgresql:postgresql:42.7.1
 //> using dep com.zaxxer:HikariCP:5.1.0
 //> using dep ba.sake::sharaf:0.9.0

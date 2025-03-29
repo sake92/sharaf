@@ -1,4 +1,4 @@
-//> using scala "3.4.2"
+//> using scala "3.6.4"
 //> using dep ba.sake::sharaf:0.9.0
 
 // https://htmx.org/examples/click-to-load/

@@ -105,7 +105,7 @@ trait SharafCommonModule extends ScalaModule with ScalafmtModule {
 
 trait SharafTestModule extends TestModule.Munit {
   def ivyDeps = Agg(
-    ivy"org.scalameta::munit::1.0.2"
+    ivy"org.scalameta::munit::1.1.0"
   )
 }
 
