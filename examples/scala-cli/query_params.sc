@@ -1,5 +1,5 @@
 //> using scala "3.4.2"
-//> using dep ba.sake::sharaf:0.8.0
+//> using dep ba.sake::sharaf:0.9.0
 
 import io.undertow.Undertow
 import ba.sake.querson.QueryStringRW
@@ -8,11 +8,11 @@ import ba.sake.sharaf.*, routing.*
 case class SearchParams(q: String, perPage: Int) derives QueryStringRW
 
 val routes = Routes:
-  case GET() -> Path("raw") =>
+  case GET -> Path("raw") =>
     val qp = Request.current.queryParamsRaw
     Response.withBody(s"params = ${qp}")
 
-  case GET() -> Path("typed") =>
+  case GET -> Path("typed") =>
     val qp = Request.current.queryParams[SearchParams]
     Response.withBody(s"params = ${qp}")
 

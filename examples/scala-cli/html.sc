@@ -1,5 +1,5 @@
 //> using scala "3.4.2"
-//> using dep ba.sake::sharaf:0.8.0
+//> using dep ba.sake::sharaf:0.9.0
 
 import io.undertow.Undertow
 import scalatags.Text.all.*
@@ -17,9 +17,9 @@ class HelloView(name: String) extends HtmlPage:
     div("Hello ", b(name), "!")
 
 val routes = Routes:
-  case GET() -> Path() =>
+  case GET -> Path() =>
     Response.withBody(IndexView)
-  case GET() -> Path("hello", name) =>
+  case GET -> Path("hello", name) =>
     Response.withBody(HelloView(name))
 
 Undertow.builder

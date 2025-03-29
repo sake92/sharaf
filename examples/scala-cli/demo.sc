@@ -1,5 +1,5 @@
 //> using scala "3.4.2"
-//> using dep ba.sake::sharaf:0.8.0
+//> using dep ba.sake::sharaf:0.9.0
 
 import io.undertow.Undertow
 import ba.sake.querson.QueryStringRW
@@ -14,14 +14,14 @@ case class CarQuery(model: Option[String]) derives QueryStringRW
 var carsDB = Seq[Car]()
 
 val routes = Routes:
-  case GET() -> Path("cars") =>
+  case GET -> Path("cars") =>
     val qp = Request.current.queryParamsValidated[CarQuery]
     val filteredCars = qp.model match
       case Some(b) => carsDB.filter(_.model == b)
       case None    => carsDB
     Response.withBody(filteredCars)
 
-  case POST() -> Path("cars") =>
+  case POST -> Path("cars") =>
     val newCar = Request.current.bodyJsonValidated[Car]
     carsDB = carsDB.appended(newCar)
     Response.withBody(newCar)

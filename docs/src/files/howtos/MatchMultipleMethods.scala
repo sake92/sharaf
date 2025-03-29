@@ -16,7 +16,7 @@ object MatchMultipleMethods extends HowToPage {
     s"""
     You can use the `|` operator in a pattern match:
     ```scala
-    case (GET() | POST()) -> Path() =>
+    case (GET | POST) -> Path() =>
       ...
     ```
     You can always check the [Scala docs](https://docs.scala-lang.org/scala3/book/control-structures.html#handling-multiple-possible-matches-on-one-line)

@@ -1,5 +1,5 @@
 //> using scala "3.4.2"
-//> using dep ba.sake::sharaf:0.8.0
+//> using dep ba.sake::sharaf:0.9.0
 
 // https://htmx.org/examples/modal-bootstrap/
 
@@ -45,9 +45,9 @@ def bsDialog() = div(cls := "modal-dialog modal-dialog-centered")(
 )
 
 val routes = Routes:
-  case GET() -> Path() =>
+  case GET -> Path() =>
     Response.withBody(IndexView)
-  case GET() -> Path("modal") =>
+  case GET -> Path("modal") =>
     Response.withBody(bsDialog())
 
 Undertow.builder

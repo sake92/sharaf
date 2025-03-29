@@ -1,5 +1,5 @@
 //> using scala "3.4.2"
-//> using dep ba.sake::sharaf:0.8.0
+//> using dep ba.sake::sharaf:0.9.0
 
 import io.undertow.Undertow
 import scalatags.Text.all.*
@@ -22,10 +22,10 @@ object ContacUsView extends HtmlPage:
 case class ContactUsForm(fullName: String, email: String) derives FormDataRW
 
 val routes = Routes:
-  case GET() -> Path() =>
+  case GET -> Path() =>
     Response.withBody(ContacUsView)
 
-  case POST() -> Path("handle-form") =>
+  case POST -> Path("handle-form") =>
     val formData = Request.current.bodyForm[ContactUsForm]
     Response.withBody(s"Got form data: ${formData}")
 

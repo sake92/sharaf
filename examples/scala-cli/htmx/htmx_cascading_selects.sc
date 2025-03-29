@@ -1,5 +1,5 @@
 //> using scala "3.4.2"
-//> using dep ba.sake::sharaf:0.8.0
+//> using dep ba.sake::sharaf:0.9.0
 
 // https://htmx.org/examples/value-select/
 
@@ -47,9 +47,9 @@ enum CarMake(val models: Seq[String]) derives QueryStringRW:
 case class ModelsQP(make: CarMake) derives QueryStringRW
 
 val routes = Routes:
-  case GET() -> Path() =>
+  case GET -> Path() =>
     Response.withBody(IndexView(CarMake.Audi))
-  case GET() -> Path("models") =>
+  case GET -> Path("models") =>
     val qp = Request.current.queryParams[ModelsQP]
     Response.withBody(cascadingSelect(qp.make))
 

@@ -23,7 +23,7 @@ object EnumPathParam extends HowToPage {
       case aws, gcp, azure
 
     val routes = Routes:
-      case GET() -> Path("pricing", param[Cloud](cloud)) =>
+      case GET -> Path("pricing", param[Cloud](cloud)) =>
         Response.withBody(s"cloud = $${cloud}")
     ```
 

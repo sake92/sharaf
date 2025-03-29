@@ -16,7 +16,7 @@ object MatchMultiplePaths extends HowToPage {
     s"""
     You can use the `|` operator in a pattern match:
     ```scala
-    case GET() -> (Path("hello") | Path("hello-world")) =>
+    case GET -> (Path("hello") | Path("hello-world")) =>
       ...
     ```
     You can always check the [Scala docs](https://docs.scala-lang.org/scala3/book/control-structures.html#handling-multiple-possible-matches-on-one-line)
@@ -25,14 +25,14 @@ object MatchMultiplePaths extends HowToPage {
     ---
     If you want to handle all paths that start with "my-prefix/":
     ```scala
-    case GET() -> Path("my-prefix", segments*) =>
+    case GET -> Path("my-prefix", segments*) =>
       ...
     ```
 
     ---
     If you want to handle all possible paths:
     ```scala
-    case GET() -> Path(segments*) =>
+    case GET -> Path(segments*) =>
       ...
     ```
 

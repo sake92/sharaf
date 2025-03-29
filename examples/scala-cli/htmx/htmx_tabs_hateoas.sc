@@ -1,5 +1,5 @@
 //> using scala "3.4.2"
-//> using dep ba.sake::sharaf:0.8.0
+//> using dep ba.sake::sharaf:0.9.0
 
 import io.undertow.Undertow
 import scalatags.Text.all.*
@@ -22,13 +22,13 @@ def tabSnippet(tabNum: Int) = div(
 )
 
 val routes = Routes:
-  case GET() -> Path() =>
+  case GET -> Path() =>
     Response.withBody(IndexView)
-  case GET() -> Path("tab1") =>
+  case GET -> Path("tab1") =>
     Response.withBody(tabSnippet(1))
-  case GET() -> Path("tab2") =>
+  case GET -> Path("tab2") =>
     Response.withBody(tabSnippet(2))
-  case GET() -> Path("tab3") =>
+  case GET -> Path("tab3") =>
     Response.withBody(tabSnippet(3))
 
 Undertow.builder

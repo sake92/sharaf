@@ -1,5 +1,5 @@
 //> using scala "3.4.2"
-//> using dep ba.sake::sharaf:0.8.0
+//> using dep ba.sake::sharaf:0.9.0
 
 // https://htmx.org/examples/bulk-update/
 import io.undertow.Undertow
@@ -71,15 +71,15 @@ case class ContactIdsForm(ids: Set[Int]) derives FormDataRW
 case class AffectedContacts(ids: Set[Int], activated: Boolean)
 
 val routes = Routes:
-  case GET() -> Path() =>
+  case GET -> Path() =>
     Response.withBody(views.ContactsViewPage(currentContacts))
-  case PUT() -> Path("activate") =>
+  case PUT -> Path("activate") =>
     val formData = Request.current.bodyForm[ContactIdsForm]
     currentContacts = currentContacts.map { contact =>
       if formData.ids(contact.id) then contact.copy(active = true) else contact
     }
     Response.withBody(views.contactsRows(currentContacts, AffectedContacts(formData.ids, true)))
-  case PUT() -> Path("deactivate") =>
+  case PUT -> Path("deactivate") =>
     val formData = Request.current.bodyForm[ContactIdsForm]
     currentContacts = currentContacts.map { contact =>
       if formData.ids(contact.id) then contact.copy(active = false) else contact

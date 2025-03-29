@@ -1,5 +1,5 @@
 //> using scala "3.4.2"
-//> using dep ba.sake::sharaf:0.8.0
+//> using dep ba.sake::sharaf:0.9.0
 
 import io.undertow.Undertow
 import ba.sake.tupson.JsonRW
@@ -10,14 +10,14 @@ case class Car(brand: String, model: String, quantity: Int) derives JsonRW
 var db: Seq[Car] = Seq()
 
 val routes = Routes:  
-  case GET() -> Path("cars") =>
+  case GET -> Path("cars") =>
     Response.withBody(db)
 
-  case GET() -> Path("cars", brand) =>
+  case GET -> Path("cars", brand) =>
     val res = db.filter(_.brand == brand)
     Response.withBody(res)
 
-  case POST() -> Path("cars") =>
+  case POST -> Path("cars") =>
     val reqBody = Request.current.bodyJson[Car]
     db = db.appended(reqBody)
     Response.withBody(reqBody)

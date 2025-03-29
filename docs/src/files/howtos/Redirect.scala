@@ -16,7 +16,7 @@ object Redirect extends HowToPage {
     s"""
     Use the `Response.redirect` function:
     ```scala
-    case GET() -> Path("a-deprecated-route") =>
+    case GET -> Path("a-deprecated-route") =>
       Response.redirect("/this-other-place")
     ```
     

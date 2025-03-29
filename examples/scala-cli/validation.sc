@@ -1,5 +1,5 @@
 //> using scala "3.4.2"
-//> using dep ba.sake::sharaf:0.8.0
+//> using dep ba.sake::sharaf:0.9.0
 
 import io.undertow.Undertow
 import ba.sake.querson.QueryStringRW
@@ -24,11 +24,11 @@ object CarQuery:
 case class CarApiResult(message: String) derives JsonRW
 
 val routes = Routes:
-  case GET() -> Path("cars") =>
+  case GET -> Path("cars") =>
     val qp = Request.current.queryParamsValidated[CarQuery]
     Response.withBody(CarApiResult(s"Query OK: ${qp}"))
 
-  case POST() -> Path("cars") =>
+  case POST -> Path("cars") =>
     val json = Request.current.bodyJsonValidated[Car]
     Response.withBody(CarApiResult(s"JSON body OK: ${json}"))
 

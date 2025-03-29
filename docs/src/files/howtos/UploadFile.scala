@@ -32,7 +32,7 @@ object UploadFile extends HowToPage {
     case class MyData(file: Path) derives FormDataRW
 
     // 3. handle the file however you want
-    case POST() -> Path("form-submit") =>
+    case POST -> Path("form-submit") =>
       val formData = Request.current.bodyForm[MyData]
       val fileAsString = Files.readString(formData.file)
     ```

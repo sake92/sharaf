@@ -1,5 +1,5 @@
 //> using scala "3.4.2"
-//> using dep ba.sake::sharaf:0.8.0
+//> using dep ba.sake::sharaf:0.9.0
 
 import io.undertow.Undertow
 import scalatags.Text.all.*
@@ -12,9 +12,9 @@ object IndexView extends HtmlPage with HtmxDependencies:
     button(hx.post := "/html-snippet", hx.swap := "outerHTML")("Click here!")
 
 val routes = Routes:
-  case GET() -> Path() =>
+  case GET -> Path() =>
     Response.withBody(IndexView)
-  case POST() -> Path("html-snippet") =>
+  case POST -> Path("html-snippet") =>
     Response.withBody(
       div(
         b("WOW, it works! 😲"),

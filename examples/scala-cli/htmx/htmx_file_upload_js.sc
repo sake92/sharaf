@@ -1,5 +1,5 @@
 //> using scala "3.4.2"
-//> using dep ba.sake::sharaf:0.8.0
+//> using dep ba.sake::sharaf:0.9.0
 
 import io.undertow.Undertow
 import scalatags.Text.all.*
@@ -28,9 +28,9 @@ object IndexView extends HtmlPage with HtmxDependencies:
 case class FileUpload(file: java.nio.file.Path) derives FormDataRW
 
 val routes = Routes:
-  case GET() -> Path() =>
+  case GET -> Path() =>
     Response.withBody(IndexView)
-  case POST() -> Path("upload") =>
+  case POST -> Path("upload") =>
     val fileUpload = Request.current.bodyForm[FileUpload]
     Response.withBody(div("Upload done!"))
 

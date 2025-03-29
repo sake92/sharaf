@@ -1,5 +1,5 @@
 //> using scala "3.4.2"
-//> using dep ba.sake::sharaf:0.8.0
+//> using dep ba.sake::sharaf:0.9.0
 
 // https://htmx.org/examples/edit-row/
 
@@ -72,17 +72,17 @@ var allContacts = Seq(
 )
 
 val routes = Routes:
-  case GET() -> Path() =>
+  case GET -> Path() =>
     Response.withBody(views.ContactsViewPage(allContacts))
-  case GET() -> Path("contact", id) =>
+  case GET -> Path("contact", id) =>
     val contactOpt = allContacts.find(_.id == id)
     val rowOpt = contactOpt.map(views.viewContactRow)
     Response.withBodyOpt(rowOpt, "contact")
-  case GET() -> Path("contact", id, "edit") =>
+  case GET -> Path("contact", id, "edit") =>
     val contactOpt = allContacts.find(_.id == id)
     val rowOpt = contactOpt.map(views.editContact)
     Response.withBodyOpt(rowOpt, "contact")
-  case PUT() -> Path("contact", id) =>
+  case PUT -> Path("contact", id) =>
     val formData = Request.current.bodyForm[ContactForm]
     val idx = allContacts.indexWhere(_.id == id)
     val updatedContact = allContacts(idx).copy(

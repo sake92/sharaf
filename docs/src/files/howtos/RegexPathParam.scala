@@ -19,7 +19,7 @@ object RegexPathParam extends HowToPage {
     val userIdRegex = "user_id_(\\d+)".r
 
     val routes = Routes:
-      case GET() -> Path("pricing", userIdRegex(userId)) =>
+      case GET -> Path("pricing", userIdRegex(userId)) =>
         Response.withBody(s"userId = $${userId}")
     ```
 
@@ -28,7 +28,7 @@ object RegexPathParam extends HowToPage {
     You could further match on it, for example:
     ```scala
     val routes = Routes:
-      case GET() -> Path("pricing", userIdRegex(param[Int](userId))) =>
+      case GET -> Path("pricing", userIdRegex(param[Int](userId))) =>
     ```
     would extract `userId` as an `Int`.
     """.md

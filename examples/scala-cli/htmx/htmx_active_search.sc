@@ -1,5 +1,5 @@
 //> using scala "3.4.2"
-//> using dep ba.sake::sharaf:0.8.0
+//> using dep ba.sake::sharaf:0.9.0
 
 // https://htmx.org/examples/active-search/
 
@@ -162,9 +162,9 @@ val allContacts = Seq(
 case class SearchForm(search: String) derives FormDataRW
 
 val routes = Routes:
-  case GET() -> Path() =>
+  case GET -> Path() =>
     Response.withBody(views.ContactsViewPage(Seq.empty))
-  case POST() -> Path("search") =>
+  case POST -> Path("search") =>
     Thread.sleep(500) // simulate slow backend :)
     val formData = Request.current.bodyForm[SearchForm]
     val contactsSlice = allContacts.filter(_.matches(formData.search))

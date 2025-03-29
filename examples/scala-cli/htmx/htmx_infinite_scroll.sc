@@ -1,5 +1,5 @@
 //> using scala "3.4.2"
-//> using dep ba.sake::sharaf:0.8.0
+//> using dep ba.sake::sharaf:0.9.0
 
 // https://htmx.org/examples/click-to-load/
 import java.util.UUID
@@ -51,10 +51,10 @@ val PageSize = 10
 val allContacts = Seq.fill(100)(Contact.create())
 
 val routes = Routes:
-  case GET() -> Path() =>
+  case GET -> Path() =>
     val contactsSlice = allContacts.take(PageSize)
     Response.withBody(views.ContactsViewPage(contactsSlice, 0))
-  case GET() -> Path("contacts") =>
+  case GET -> Path("contacts") =>
     Thread.sleep(500) // simulate slow backend :)
     val qp = Request.current.queryParams[PageQP]
     val contactsSlice = allContacts.drop(qp.page * PageSize).take(PageSize)

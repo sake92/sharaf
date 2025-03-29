@@ -1,5 +1,5 @@
 //> using scala "3.4.2"
-//> using dep ba.sake::sharaf:0.8.0
+//> using dep ba.sake::sharaf:0.9.0
 
 // https://htmx.org/examples/click-to-edit/
 import io.undertow.Undertow
@@ -40,13 +40,13 @@ case class ContactForm(firstName: String, lastName: String, email: String) deriv
 var currentValue = ContactForm("Joe", "Blow", "joe@blow.com")
 
 val routes = Routes:
-  case GET() -> Path() =>
+  case GET -> Path() =>
     Response.redirect("/contact/1")
-  case GET() -> Path("contact", param[Int](id)) =>
+  case GET -> Path("contact", param[Int](id)) =>
     Response.withBody(views.ContactViewPage(currentValue))
-  case GET() -> Path("contact", param[Int](id), "edit") =>
+  case GET -> Path("contact", param[Int](id), "edit") =>
     Response.withBody(views.contactEdit(currentValue))
-  case PUT() -> Path("contact", param[Int](id)) =>
+  case PUT -> Path("contact", param[Int](id)) =>
     val formData = Request.current.bodyForm[ContactForm]
     currentValue = formData
     Response.withBody(views.contactView(currentValue))

@@ -1,5 +1,5 @@
 //> using scala "3.4.2"
-//> using dep ba.sake::sharaf:0.8.0
+//> using dep ba.sake::sharaf:0.9.0
 
 // example of BS5 modal with a form
 
@@ -51,11 +51,11 @@ def bsDialog() = div(cls := "modal-dialog modal-dialog-centered")(
 case class DialogForm(stuff: String) derives FormDataRW
 
 val routes = Routes:
-  case GET() -> Path() =>
+  case GET -> Path() =>
     Response.withBody(IndexView)
-  case GET() -> Path("modal") =>
+  case GET -> Path("modal") =>
     Response.withBody(bsDialog())
-  case POST() -> Path("submit-form") =>
+  case POST -> Path("submit-form") =>
     val formData = Request.current.bodyForm[DialogForm]
     Response.withBody(div(s"You submitted: $formData"))
 

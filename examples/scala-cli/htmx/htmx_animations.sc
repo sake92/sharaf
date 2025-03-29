@@ -1,5 +1,5 @@
 //> using scala "3.4.2"
-//> using dep ba.sake::sharaf:0.8.0
+//> using dep ba.sake::sharaf:0.9.0
 
 // https://htmx.org/examples/animations/
 
@@ -87,31 +87,31 @@ object RequestInFlightView extends ExamplePage:
   """)
 
 val routes = Routes:
-  case GET() -> Path() =>
+  case GET -> Path() =>
     Response.withBody(IndexView)
 
-  case GET() -> Path("color-throb") =>
+  case GET -> Path("color-throb") =>
     Response.withBody(ColorThrobView)
-  case GET() -> Path("colors") =>
+  case GET -> Path("colors") =>
     // generate a random #aBc color
     // https://stackoverflow.com/a/19298151
     val x = scala.util.Random.nextInt(256)
     val randomColor = String.format("#%03X", x)
     Response.withBody(ColorThrobView.snippet(randomColor))
 
-  case GET() -> Path("fade-out-on-swap") =>
+  case GET -> Path("fade-out-on-swap") =>
     Response.withBody(FadeOutOnSwapView)
-  case DELETE() -> Path("fade_out_demo") =>
+  case DELETE -> Path("fade_out_demo") =>
     Response.withBody("")
 
-  case GET() -> Path("fade-in-on-addition") =>
+  case GET -> Path("fade-in-on-addition") =>
     Response.withBody(FadeInOnAdditionView)
-  case POST() -> Path("fade_in_demo") =>
+  case POST -> Path("fade_in_demo") =>
     Response.withBody(FadeInOnAdditionView.theButton)
 
-  case GET() -> Path("request-in-flight") =>
+  case GET -> Path("request-in-flight") =>
     Response.withBody(RequestInFlightView)
-  case POST() -> Path("request-in-flight-name")=>
+  case POST -> Path("request-in-flight-name")=>
     Thread.sleep(1000) // simulate sloww
     Response.withBody("Submitted!")
 

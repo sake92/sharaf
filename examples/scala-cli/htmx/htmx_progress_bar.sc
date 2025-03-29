@@ -1,5 +1,5 @@
 //> using scala "3.4.2"
-//> using dep ba.sake::sharaf:0.8.0
+//> using dep ba.sake::sharaf:0.9.0
 import java.util.concurrent.TimeUnit
 
 // https://htmx.org/examples/progress-bar/
@@ -81,9 +81,9 @@ val executor = Executors.newScheduledThreadPool(1)
 var progressJob: java.util.concurrent.Future[?] = null
 
 val routes = Routes:
-  case GET() -> Path() =>
+  case GET -> Path() =>
     Response.withBody(IndexView)
-  case POST() -> Path("start") =>
+  case POST -> Path("start") =>
     percentage = 0
     progressJob = executor.scheduleAtFixedRate(
       { () =>
@@ -95,9 +95,9 @@ val routes = Routes:
       TimeUnit.SECONDS
     )
     Response.withBody(progressBarWrapper(percentage))
-  case GET() -> Path("job") =>
+  case GET -> Path("job") =>
     Response.withBody(progressBarWrapper(percentage))
-  case GET() -> Path("job", "progress") =>
+  case GET -> Path("job", "progress") =>
     val bar = progressBar(percentage)
     if percentage >= 100
     then Response.withBody(bar).settingHeader(ResponseHeaders.Trigger, "done")

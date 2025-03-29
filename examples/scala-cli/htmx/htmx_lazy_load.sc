@@ -1,5 +1,5 @@
 //> using scala "3.4.2"
-//> using dep ba.sake::sharaf:0.8.0
+//> using dep ba.sake::sharaf:0.9.0
 
 // https://htmx.org/examples/lazy-load/
 
@@ -25,9 +25,9 @@ object IndexView extends HtmlPage with HtmxDependencies:
   """)
 
 val routes = Routes:
-  case GET() -> Path() =>
+  case GET -> Path() =>
     Response.withBody(IndexView)
-  case GET() -> Path("graph") =>
+  case GET -> Path("graph") =>
     Thread.sleep(1000) // simulate slow, stonks
     val graph = img(src := "/img/tokyo.png")
     Response.withBody(graph)

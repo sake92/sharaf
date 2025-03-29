@@ -24,7 +24,7 @@ object CustomPathParam extends HowToPage {
     }
 
     val routes = Routes:
-      case GET() -> Path("pricing", param[MyType](myType)) =>
+      case GET -> Path("pricing", param[MyType](myType)) =>
         Response.withBody(s"myType = $${myType}")
     ```
     """.md

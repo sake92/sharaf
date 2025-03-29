@@ -1,5 +1,5 @@
 //> using scala "3.4.2"
-//> using dep ba.sake::sharaf:0.8.0
+//> using dep ba.sake::sharaf:0.9.0
 
 // https://htmx.org/examples/delete-row/
 
@@ -45,9 +45,9 @@ var allContacts = Seq(
 )
 
 val routes = Routes:
-  case GET() -> Path() =>
+  case GET -> Path() =>
     Response.withBody(views.ContactsViewPage(allContacts))
-  case DELETE() -> Path("contacts", id) =>
+  case DELETE -> Path("contacts", id) =>
     allContacts = allContacts.filterNot(_.id == id)
     Response.withBody("") // empty string, remove that <tr>
 

@@ -1,5 +1,5 @@
 //> using scala "3.4.2"
-//> using dep ba.sake::sharaf:0.8.0
+//> using dep ba.sake::sharaf:0.9.0
 
 // https://htmx.org/examples/inline-validation/
 
@@ -52,14 +52,14 @@ object views {
 case class ContactForm(email: String, firstName: String, lastName: String) derives FormDataRW
 
 val routes = Routes:
-  case GET() -> Path() =>
+  case GET -> Path() =>
     val formData = ContactForm("", "", "")
     Response.withBody(views.IndexView(formData))
-  case POST() -> Path("contact", "email") =>
+  case POST -> Path("contact", "email") =>
     val formData = Request.current.bodyForm[ContactForm]
     val isValid = formData.email == "test@test.com"
     Response.withBody(views.emailField(formData.email, !isValid))
-  case POST() -> Path("contact") =>
+  case POST -> Path("contact") =>
     val formData = Request.current.bodyForm[ContactForm]
     Response.withBody(views.contactForm(formData))
 

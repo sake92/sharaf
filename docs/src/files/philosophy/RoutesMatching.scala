@@ -67,18 +67,18 @@ object RoutesMatching extends PhilosophyPage {
     Scala's pattern matching warns you when you have duplicate routes, or *impossible* routes.  
     For example, if you write this:
     ```scala
-    case GET() -> Path("cars", brand) => ???
-    case GET() -> Path("cars", model) => ??? // Unreachable case
+    case GET -> Path("cars", brand) => ???
+    case GET -> Path("cars", model) => ??? // Unreachable case
     
-    case GET() -> Path("files", segments*) => ???
-    case GET() -> Path("files", "abc.txt") => ??? // Unreachable case
+    case GET -> Path("files", segments*) => ???
+    case GET -> Path("files", "abc.txt") => ??? // Unreachable case
     ```
     you will get nice warnings, thanks compiler!
 
     ---
     You can extract path variables with pattern matching:
     ```scala
-      case GET() -> Path("cars", param[Int](carId)) => ???
+      case GET -> Path("cars", param[Int](carId)) => ???
     ```
     Here, the `carId` is parsed as `Int` and it *mentioned only once*, unlike with the annotation approach.
     """.md
