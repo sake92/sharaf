@@ -42,7 +42,7 @@ as its template engine, which has support for HTMX attributes.</p>
 <p>Let's make a simple page that triggers a POST request to fetch a HTML snippet.<br />
 Create a file <code>htmx_load_snippet.sc</code> and paste this code into it:</p>
 <pre><code class="language-scala">    //&gt; using scala &quot;3.4.2&quot;
-//&gt; using dep ba.sake::sharaf:0.8.0
+//&gt; using dep ba.sake::sharaf:0.9.0
 
 import io.undertow.Undertow
 import scalatags.Text.all.*
@@ -55,9 +55,9 @@ object IndexView extends HtmlPage with HtmxDependencies:
     button(hx.post := &quot;/html-snippet&quot;, hx.swap := &quot;outerHTML&quot;)(&quot;Click here!&quot;)
 
 val routes = Routes:
-  case GET() -&gt; Path() =&gt;
+  case GET -&gt; Path() =&gt;
     Response.withBody(IndexView)
-  case POST() -&gt; Path(&quot;html-snippet&quot;) =&gt;
+  case POST -&gt; Path(&quot;html-snippet&quot;) =&gt;
     Response.withBody(
       div(
         b(&quot;WOW, it works! 😲&quot;),

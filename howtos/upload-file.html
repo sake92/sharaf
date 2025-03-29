@@ -45,7 +45,7 @@ import ba.sake.formson.*
 case class MyData(file: Path) derives FormDataRW
 
 // 3. handle the file however you want
-case POST() -&gt; Path(&quot;form-submit&quot;) =&gt;
+case POST -&gt; Path(&quot;form-submit&quot;) =&gt;
   val formData = Request.current.bodyForm[MyData]
   val fileAsString = Files.readString(formData.file)
 </code></pre>

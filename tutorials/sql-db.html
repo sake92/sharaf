@@ -49,8 +49,8 @@
 <pre><code class="language-scala">    //&gt; using scala &quot;3.4.2&quot;
 //&gt; using dep org.postgresql:postgresql:42.7.1
 //&gt; using dep com.zaxxer:HikariCP:5.1.0
-//&gt; using dep ba.sake::sharaf:0.8.0
-//&gt; using dep ba.sake::squery:0.3.0
+//&gt; using dep ba.sake::sharaf:0.9.0
+//&gt; using dep ba.sake::squery:0.7.0
 
 import io.undertow.Undertow
 import ba.sake.tupson.JsonRW
@@ -71,13 +71,13 @@ val ctx = new SqueryContext(ds)
 <pre><code class="language-scala">case class Customer(name: String) derives JsonRW
 
 val routes = Routes:
-  case GET() -&gt; Path(&quot;customers&quot;) =&gt;
+  case GET -&gt; Path(&quot;customers&quot;) =&gt;
     val customerNames = ctx.run {
       sql&quot;SELECT name FROM customers&quot;.readValues[String]()
     }
     Response.withBody(customerNames)
 
-  case POST() -&gt; Path(&quot;customers&quot;) =&gt;
+  case POST -&gt; Path(&quot;customers&quot;) =&gt;
     val customer = Request.current.bodyJson[Customer]
     ctx.run {
       sql&quot;&quot;&quot;

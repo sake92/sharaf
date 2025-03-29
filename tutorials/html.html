@@ -41,7 +41,7 @@ It has useful utilities like Bootstrap 5 templates, form helpers etc. so you can
 <p>Let's make a simple HTML page that greets the user.<br />
 Create a file <code>html.sc</code> and paste this code into it:</p>
 <pre><code class="language-scala">    //&gt; using scala &quot;3.4.2&quot;
-//&gt; using dep ba.sake::sharaf:0.8.0
+//&gt; using dep ba.sake::sharaf:0.9.0
 
 import io.undertow.Undertow
 import scalatags.Text.all.*
@@ -59,9 +59,9 @@ class HelloView(name: String) extends HtmlPage:
     div(&quot;Hello &quot;, b(name), &quot;!&quot;)
 
 val routes = Routes:
-  case GET() -&gt; Path() =&gt;
+  case GET -&gt; Path() =&gt;
     Response.withBody(IndexView)
-  case GET() -&gt; Path(&quot;hello&quot;, name) =&gt;
+  case GET -&gt; Path(&quot;hello&quot;, name) =&gt;
     Response.withBody(HelloView(name))
 
 Undertow.builder

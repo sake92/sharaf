@@ -41,7 +41,7 @@ and then use it like this: <code>Request.current.queryParams[MyParams]</code></p
 <hr />
 <p>Create a file <code>query_params.sc</code> and paste this code into it:</p>
 <pre><code class="language-scala">    //&gt; using scala &quot;3.4.2&quot;
-//&gt; using dep ba.sake::sharaf:0.8.0
+//&gt; using dep ba.sake::sharaf:0.9.0
 
 import io.undertow.Undertow
 import ba.sake.querson.QueryStringRW
@@ -50,11 +50,11 @@ import ba.sake.sharaf.*, routing.*
 case class SearchParams(q: String, perPage: Int) derives QueryStringRW
 
 val routes = Routes:
-  case GET() -&gt; Path(&quot;raw&quot;) =&gt;
+  case GET -&gt; Path(&quot;raw&quot;) =&gt;
     val qp = Request.current.queryParamsRaw
     Response.withBody(s&quot;params = ${qp}&quot;)
 
-  case GET() -&gt; Path(&quot;typed&quot;) =&gt;
+  case GET -&gt; Path(&quot;typed&quot;) =&gt;
     val qp = Request.current.queryParams[SearchParams]
     Response.withBody(s&quot;params = ${qp}&quot;)
 
