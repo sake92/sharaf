@@ -3,13 +3,13 @@ package files.howtos
 import utils.Bundle.*
 
 object QueryParams extends HowToPage {
-  
+
   override def pageSettings = super.pageSettings
     .withTitle("How To Query Parameters in Sharaf")
     .withLabel("Query Parameters")
 
   override def blogSettings =
-    super.blogSettings.withSections(enumSection,optionalSection, sequenceSection, compositeSection, customSection)
+    super.blogSettings.withSections(enumSection, optionalSection, sequenceSection, compositeSection, customSection)
 
   val enumSection = Section(
     "How to bind query parameter as an enum?",
@@ -114,7 +114,7 @@ object QueryParams extends HowToPage {
       ```
       
       ---
-      Note that Sharaf can automatically derive an instance for [singleton enums](${EnumQueryParam.ref}).
+      Note that Sharaf can automatically derive an instance for [singleton enums](${Routes.enumPathSection.ref}).
       """.md
   )
 }

@@ -11,16 +11,11 @@ trait HowToPage extends DocPage {
     List(
       Index,
       Redirect,
-      MatchMultipleMethods,
-      MatchMultiplePaths,
-      EnumPathParam,
-      RegexPathParam,
-      CustomPathParam,
+      Routes,
       QueryParams,
       UploadFile,
       NotFound,
       ExceptionHandler,
-      SplitRoutes,
       ExternalConfig,
       CORS
     )

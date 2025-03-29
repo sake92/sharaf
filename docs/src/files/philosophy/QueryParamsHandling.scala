@@ -1,7 +1,7 @@
 package files.philosophy
 
 import utils.Bundle.*
-import files.howtos.CompositeQueryParam
+import files.howtos.QueryParams
 
 object QueryParamsHandling extends PhilosophyPage {
 
@@ -78,7 +78,7 @@ object QueryParamsHandling extends PhilosophyPage {
     Admittedly, you do have to make a new class if you want to parse them in a typesafe way.  
     But you usually do grouping of these parameters when passing them further, so why not do it immediatelly.  
     
-    [Composition](${CompositeQueryParam.ref}) adds even more benefits, which I rarely saw implemented in any framework.
+    [Composition](${QueryParams.compositeSection.ref}) adds even more benefits, which I rarely saw implemented in any framework.
     """.md
   )
 
