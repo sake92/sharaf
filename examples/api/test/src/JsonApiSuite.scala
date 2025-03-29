@@ -7,7 +7,20 @@ import ba.sake.sharaf.exceptions.*
 import ba.sake.sharaf.utils.*
 
 class JsonApiSuite extends munit.FunSuite {
+  
+  val moduleFixture = new Fixture[JsonApiModule]("JsonApiModule") {
+    private var module: JsonApiModule = uninitialized
 
+    def apply() = module
+
+    override def beforeEach(context: BeforeEach): Unit =
+      module = JsonApiModule(getFreePort())
+      module.server.start()
+
+    override def afterEach(context: AfterEach): Unit =
+      module.server.stop()
+  }
+  
   override def munitFixtures = List(moduleFixture)
 
   test("products can be created and fetched") {
@@ -121,19 +134,6 @@ class JsonApiSuite extends munit.FunSuite {
         )
       )
     )
-  }
-
-  val moduleFixture = new Fixture[JsonApiModule]("JsonApiModule") {
-    private var module: JsonApiModule = uninitialized
-
-    def apply() = module
-
-    override def beforeEach(context: BeforeEach): Unit =
-      module = JsonApiModule(getFreePort())
-      module.server.start()
-
-    override def afterEach(context: AfterEach): Unit =
-      module.server.stop()
   }
 
 }

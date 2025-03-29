@@ -2,12 +2,11 @@ package ba.sake.sharaf.utils
 
 import java.net.ServerSocket
 import scala.util.Using
-import ba.sake.formson
-import ba.sake.querson
+import ba.sake.{formson, querson}
 
 def getFreePort(): Int =
   Using.resource(ServerSocket(0)) { ss =>
-    ss.getLocalPort()
+    ss.getLocalPort
   }
 
 // requests integration
