@@ -23,6 +23,17 @@ trait QueryStringRW[T] {
   /** Global default for `T` when key is missing.
     */
   def default: Option[T] = None
+
+  def bimap[U](f: U => T, g: T => U, default: Option[U] = None): QueryStringRW[U] =
+    val self = this
+    val _default = default
+    new QueryStringRW[U] {
+      override def parse(path: String, qsData: QueryStringData): U =
+        g(self.parse(path, qsData))
+      override def write(path: String, value: U): QueryStringData =
+        self.write(path, f(value))
+      override def default: Option[U] = _default
+    }
 }
 
 object QueryStringRW {

@@ -24,6 +24,17 @@ trait FormDataRW[T] {
   /** Global default for `T` when key is missing.
     */
   def default: Option[T] = None
+
+  def bimap[U](f: U => T, g: T => U, default: Option[U] = None): FormDataRW[U] =
+    val self = this
+    val _default = default
+    new FormDataRW[U] {
+      override def parse(path: String, formData: FormData): U =
+        g(self.parse(path, formData))
+      override def write(path: String, value: U): FormData =
+        self.write(path, f(value))
+      override def default: Option[U] = _default
+    }
 }
 
 object FormDataRW {
@@ -359,7 +370,7 @@ object FormDataRW {
 
           '{
             val discrOpt = $annotations.find(_.isInstanceOf[discriminator]).map(_.asInstanceOf[discriminator])
-                val discrName = discrOpt.map(_.name).getOrElse("@type")
+            val discrName = discrOpt.map(_.name).getOrElse("@type")
             new FormDataRW[T] {
               override def write(path: String, value: T): FormData =
                 val index = $m.ordinal(value)
@@ -370,15 +381,16 @@ object FormDataRW {
                 res.copy(values = newValues)
 
               override def parse(path: String, formData: FormData): T =
-                
+
                 val tpeNameOpt = formData
                   .asInstanceOf[FormData.Obj]
                   .values
                   .get(discrName)
                   .map {
-                    case FormData.Simple(FormValue.Str(value)) => value
+                    case FormData.Simple(FormValue.Str(value))                             => value
                     case FormData.Sequence(Seq(FormData.Simple(FormValue.Str(value)), _*)) => value
-                    case other => throw ParsingException(
+                    case other =>
+                      throw ParsingException(
                         ParseError(
                           path,
                           s"${discrName} has wrong type: '$other'."
