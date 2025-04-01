@@ -63,6 +63,16 @@ object ResponseWritable {
     )
   }
 
+  given ResponseWritable[geny.Readable] with {
+    override def write(value: geny.Readable, exchange: HttpServerExchange): Unit =
+      value.writeBytesTo(exchange.getOutputStream)
+
+    // application/octet-stream says "it can be anything"
+    override def headers(value: geny.Readable): Seq[(HttpString, Seq[String])] = Seq(
+      Headers.CONTENT_TYPE -> Seq("application/octet-stream")
+    )
+  }
+
   given ResponseWritable[Path] with {
     override def write(value: Path, exchange: HttpServerExchange): Unit =
       ResponseWritable[InputStream].write(

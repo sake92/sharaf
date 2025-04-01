@@ -20,6 +20,9 @@ class ResponseWritableTest extends munit.FunSuite {
     case GET -> Path("inputstream") =>
       val is = new java.io.ByteArrayInputStream("an inputstream".getBytes(StandardCharsets.UTF_8))
       Response.withBody(is)
+    case GET -> Path("geny") =>
+      val genyReadable = requests.get.stream(s"${baseUrl}/inputstream")
+      Response.withBody(genyReadable)
     case GET -> Path("file") =>
       val file = testFileResourceDir.resolve("text_file.txt")
       Response.withBody(file)
@@ -72,6 +75,12 @@ class ResponseWritableTest extends munit.FunSuite {
 
   test("Write response InputStream") {
     val res = requests.get(s"${baseUrl}/inputstream")
+    assertEquals(res.text(), "an inputstream")
+    assertEquals(res.headers(Headers.CONTENT_TYPE_STRING.toLowerCase), Seq("application/octet-stream"))
+  }
+
+  test("Write response geny.Readable") {
+    val res = requests.get(s"${baseUrl}/geny")
     assertEquals(res.text(), "an inputstream")
     assertEquals(res.headers(Headers.CONTENT_TYPE_STRING.toLowerCase), Seq("application/octet-stream"))
   }
