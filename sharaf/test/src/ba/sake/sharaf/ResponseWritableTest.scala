@@ -23,6 +23,9 @@ class ResponseWritableTest extends munit.FunSuite {
     case GET -> Path("geny") =>
       val genyReadable = requests.get.stream(s"${baseUrl}/inputstream")
       Response.withBody(genyReadable)
+    case GET -> Path("imperative") =>
+      Request.current.underlyingHttpServerExchange.getOutputStream.write("hello".getBytes(StandardCharsets.UTF_8))
+      Response.withStatus(200)
     case GET -> Path("file") =>
       val file = testFileResourceDir.resolve("text_file.txt")
       Response.withBody(file)
@@ -83,6 +86,13 @@ class ResponseWritableTest extends munit.FunSuite {
     val res = requests.get(s"${baseUrl}/geny")
     assertEquals(res.text(), "an inputstream")
     assertEquals(res.headers(Headers.CONTENT_TYPE_STRING.toLowerCase), Seq("application/octet-stream"))
+  }
+
+  test("Write response in an imperative way") {
+    val res = requests.get(s"${baseUrl}/imperative")
+    println(res.headers)
+    assertEquals(res.text(), "hello")
+    
   }
 
   test("Write response file") {
