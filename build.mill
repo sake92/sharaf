@@ -24,6 +24,7 @@ object sharaf extends SharafPublishModule {
   def ivyDeps = Agg(
     ivy"io.undertow:undertow-core:2.3.18.Final",
     ivy"com.lihaoyi::requests:0.9.0",
+    ivy"com.lihaoyi::geny:1.1.1",
     ivy"ba.sake::tupson:${V.tupson}",
     ivy"ba.sake::tupson-config:${V.tupson}",
     ivy"ba.sake::hepek-components:${V.hepek}"
@@ -40,7 +41,7 @@ object querson extends SharafPublishModule {
 
   def moduleDeps = Seq(validson)
 
-  def pomSettings = super.pomSettings().copy(description = "Simple query params library")
+  def pomSettings = super.pomSettings().copy(description = "Sharaf query params library")
 
   def ivyDeps = Agg(
     ivy"com.lihaoyi::fastparse:3.0.1"
@@ -55,7 +56,7 @@ object formson extends SharafPublishModule {
 
   def moduleDeps = Seq(validson)
 
-  def pomSettings = super.pomSettings().copy(description = "Simple form binding library")
+  def pomSettings = super.pomSettings().copy(description = "Sharaf form binding library")
 
   object test extends ScalaTests with SharafTestModule
 
@@ -72,7 +73,7 @@ object validson extends SharafPublishModule {
     ivy"com.lihaoyi::sourcecode::0.3.0"
   )
 
-  def pomSettings = super.pomSettings().copy(description = "Simple validation library")
+  def pomSettings = super.pomSettings().copy(description = "Sharaf validation library")
 
   object test extends ScalaTests with SharafTestModule
 }
