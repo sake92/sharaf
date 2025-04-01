@@ -3,8 +3,6 @@ package files.howtos
 import utils.*
 import Bundle.*
 
-// TODO custom response body
-
 trait HowToPage extends DocPage {
 
   override def categoryPosts =
@@ -13,6 +11,7 @@ trait HowToPage extends DocPage {
       Redirect,
       Routes,
       QueryParams,
+      ResponseBody,
       UploadFile,
       NotFound,
       ExceptionHandler,
