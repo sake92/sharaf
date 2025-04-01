@@ -7,7 +7,7 @@ class QueryStringBimapSuite extends munit.FunSuite {
   enum Bar:
     case A, B
 
-  given QueryStringRW[Bar] = summon[QueryStringRW[String]].bimap(_.toString(), Bar.valueOf)
+  given QueryStringRW[Bar] = QueryStringRW[String].bimap(_.toString(), Bar.valueOf)
 
   case class Foo(bar: Bar)
 
@@ -16,24 +16,19 @@ class QueryStringBimapSuite extends munit.FunSuite {
     val result = SeqMap(
       "bar" -> Seq("A")
     ).parseQueryStringMap[Foo]
-
     assertEquals(result.bar, Bar.A)
   }
 
   test("bimap QueryStringRW write") {
     given QueryStringRW[Foo] = QueryStringRW.derived
-
     val result = Foo(Bar.B).toQueryStringMap()
-
     assertEquals(result, SeqMap("bar" -> Seq("B")))
   }
 
   test("bimap QueryStringRW default") {
-    given QueryStringRW[Bar] = summon[QueryStringRW[String]].bimap(_.toString(), Bar.valueOf, default = Some(Bar.A))
+    given QueryStringRW[Bar] = QueryStringRW[String].bimap(_.toString(), Bar.valueOf, default = Some(Bar.A))
     given QueryStringRW[Foo] = QueryStringRW.derived
-
     val result = SeqMap().parseQueryStringMap[Foo]
-
     assertEquals(result.bar, Bar.A)
   }
 }
