@@ -90,9 +90,7 @@ class ResponseWritableTest extends munit.FunSuite {
 
   test("Write response in an imperative way") {
     val res = requests.get(s"${baseUrl}/imperative")
-    println(res.headers)
     assertEquals(res.text(), "hello")
-    
   }
 
   test("Write response file") {
