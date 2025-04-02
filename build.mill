@@ -1,6 +1,5 @@
 package build
 
-import $ivy.`com.lihaoyi::mill-contrib-sonatypecentral:`
 import $ivy.`de.tototec::de.tobiasroeser.mill.vcs.version::0.4.1`
 import $ivy.`ba.sake::mill-hepek::0.1.0`
 
@@ -8,7 +7,6 @@ import mill._
 import mill.scalalib._
 import mill.scalalib.scalafmt._
 import mill.scalalib.publish._
-import mill.contrib.sonatypecentral.SonatypeCentralPublishModule
 import de.tobiasroeser.mill.vcs.version.VcsVersion
 import ba.sake.millhepek.MillHepekModule
 
@@ -78,7 +76,7 @@ object validson extends SharafPublishModule {
   object test extends ScalaTests with SharafTestModule
 }
 
-trait SharafPublishModule extends SharafCommonModule with SonatypeCentralPublishModule {
+trait SharafPublishModule extends SharafCommonModule with PublishModule {
 
   def publishVersion = VcsVersion.vcsState().format()
 
