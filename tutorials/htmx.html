@@ -42,17 +42,14 @@ as its template engine, which has support for HTMX attributes.</p>
 <p>Let's make a simple page that triggers a POST request to fetch a HTML snippet.<br />
 Create a file <code>htmx_load_snippet.sc</code> and paste this code into it:</p>
 <pre><code class="language-scala">    //&gt; using scala &quot;3.6.4&quot;
-//&gt; using dep ba.sake::sharaf:0.9.0
+//&gt; using dep ba.sake::sharaf:0.9.2
+
+// scala htmx_load_snippet.sc --resource-dir resources
 
 import io.undertow.Undertow
 import scalatags.Text.all.*
-import ba.sake.hepek.html.HtmlPage
 import ba.sake.hepek.htmx.*
 import ba.sake.sharaf.*, routing.*
-
-object IndexView extends HtmlPage with HtmxDependencies:
-  override def pageContent =
-    button(hx.post := &quot;/html-snippet&quot;, hx.swap := &quot;outerHTML&quot;)(&quot;Click here!&quot;)
 
 val routes = Routes:
   case GET -&gt; Path() =&gt;
@@ -72,6 +69,17 @@ Undertow.builder
   .start()
 
 println(s&quot;Server started at http://localhost:8181&quot;)
+
+def IndexView = doctype(&quot;html&quot;)(
+  html(
+    head(
+      script(src := &quot;https://unpkg.com/htmx.org@2.0.4&quot;)
+    ),
+    body(
+      button(hx.post := &quot;/html-snippet&quot;, hx.swap := &quot;outerHTML&quot;)(&quot;Click here!&quot;)
+    )
+  )
+)
 
 </code></pre>
 <p>and run it like this:</p>
