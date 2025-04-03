@@ -1,10 +1,9 @@
 package ba.sake.sharaf
 
 import java.time.Instant
+import java.util.Date
 import io.undertow.server.handlers.Cookie as UndertowCookie
 import io.undertow.server.handlers.CookieImpl as UndertowCookieImpl
-
-import java.util.Date
 
 final case class Cookie(
     name: String,
