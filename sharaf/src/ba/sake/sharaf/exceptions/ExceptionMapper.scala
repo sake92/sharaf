@@ -28,20 +28,22 @@ object ExceptionMapper {
     case e: NotFoundException =>
       Response.withBody(e.getMessage).withStatus(StatusCodes.NOT_FOUND)
     case se: SharafException =>
-      Option(se.getCause()) match
+      Option(se.getCause) match
         case Some(cause) =>
           cause match
             case e: validson.ValidsonException =>
               val fieldValidationErrors = e.errors.mkString("[", "; ", "]")
-              Response.withBody(s"Validation errors: $fieldValidationErrors").withStatus(StatusCodes.UNPROCESSABLE_ENTITY)
+              Response
+                .withBody(s"Validation errors: $fieldValidationErrors")
+                .withStatus(StatusCodes.UNPROCESSABLE_ENTITY)
             case e: querson.ParsingException =>
-              Response.withBody(e.getMessage()).withStatus(StatusCodes.BAD_REQUEST)
+              Response.withBody(e.getMessage).withStatus(StatusCodes.BAD_REQUEST)
             case e: tupson.ParsingException =>
-              Response.withBody(e.getMessage()).withStatus(StatusCodes.BAD_REQUEST)
+              Response.withBody(e.getMessage).withStatus(StatusCodes.BAD_REQUEST)
             case e: tupson.TupsonException =>
-              Response.withBody(e.getMessage()).withStatus(StatusCodes.BAD_REQUEST)
+              Response.withBody(e.getMessage).withStatus(StatusCodes.BAD_REQUEST)
             case e: formson.ParsingException =>
-              Response.withBody(e.getMessage()).withStatus(StatusCodes.BAD_REQUEST)
+              Response.withBody(e.getMessage).withStatus(StatusCodes.BAD_REQUEST)
             case other =>
               other.printStackTrace()
               Response.withBody("Server error").withStatus(StatusCodes.INTERNAL_SERVER_ERROR)
@@ -55,7 +57,7 @@ object ExceptionMapper {
       val problemDetails = ProblemDetails(StatusCodes.NOT_FOUND, "Not Found", e.getMessage)
       Response.withBody(problemDetails).withStatus(StatusCodes.NOT_FOUND)
     case se: SharafException =>
-      Option(se.getCause()) match
+      Option(se.getCause) match
         case Some(cause) =>
           cause match
             case e: validson.ValidsonException =>

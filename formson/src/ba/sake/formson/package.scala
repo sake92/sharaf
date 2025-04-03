@@ -48,9 +48,7 @@ sealed class FormsonException(msg: String, cause: Throwable = null) extends Exce
 
 final class ParsingException(val errors: Seq[ParseError])
     extends FormsonException(
-      errors
-        .map(_.text)
-        .mkString("; ")
+      "Form parsing error: " + errors.map(_.text).mkString("; ")
     )
 
 object ParsingException:

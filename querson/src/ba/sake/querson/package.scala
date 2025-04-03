@@ -71,9 +71,7 @@ sealed class QuersonException(msg: String, cause: Throwable = null) extends Exce
 
 final class ParsingException(val errors: Seq[ParseError])
     extends QuersonException(
-      errors
-        .map(_.text)
-        .mkString("; ")
+      "Query string parsing error: " + errors.map(_.text).mkString("; ")
     )
 object ParsingException {
   def apply(errors: Seq[ParseError]): ParsingException =
