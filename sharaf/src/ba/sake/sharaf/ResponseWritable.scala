@@ -2,8 +2,6 @@ package ba.sake.sharaf
 
 import java.nio.file.Path
 import java.io.{FileInputStream, InputStream}
-import java.nio.ByteBuffer
-import java.nio.charset.StandardCharsets
 import scala.jdk.CollectionConverters.*
 import scala.util.Using
 import io.undertow.server.HttpServerExchange
@@ -34,6 +32,10 @@ object ResponseWritable extends LowPriResponseWritableInstances {
         exchange.getResponseHeaders.putAll(name, values.asJava)
       case HeaderUpdate.Remove(name) =>
         exchange.getResponseHeaders.remove(name)
+    }
+    
+    response.cookieUpdates.updates.foreach { cookie =>
+      exchange.setResponseCookie(cookie.toUndertow)
     }
 
     // status code

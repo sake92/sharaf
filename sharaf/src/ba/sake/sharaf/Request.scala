@@ -83,6 +83,9 @@ final class Request private (
     hMap.getHeaderNames.asScala.map { name =>
       name -> hMap.get(name).asScala.toSeq
     }.toMap
+    
+  def cookies: Seq[Cookie] = 
+    undertowExchange.requestCookies().asScala.map(Cookie.fromUndertow).toSeq
 
 }
 

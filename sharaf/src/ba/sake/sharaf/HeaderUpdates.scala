@@ -10,13 +10,13 @@ import io.undertow.util.HttpString
   */
 private[sharaf] final case class HeaderUpdates(updates: Seq[HeaderUpdate]) {
 
-  def setting(name: HttpString, values: Seq[String]) =
+  def setting(name: HttpString, values: Seq[String]): HeaderUpdates =
     copy(updates = updates.appended(HeaderUpdate.Set(name, values)))
 
-  def setting(name: HttpString, value: String) =
+  def setting(name: HttpString, value: String): HeaderUpdates =
     copy(updates = updates.appended(HeaderUpdate.Set(name, Seq(value))))
 
-  def removing(name: HttpString) =
+  def removing(name: HttpString): HeaderUpdates =
     copy(updates = updates.appended(HeaderUpdate.Remove(name)))
 
 }
