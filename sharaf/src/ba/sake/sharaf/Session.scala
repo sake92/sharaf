@@ -11,14 +11,14 @@ final class Session private (
 ) {
   def id: String =
     underlyingSession.getId
-    
+
   def createdAt: Instant =
     Instant.ofEpochMilli(underlyingSession.getCreationTime)
-    
+
   def lastAccessedAt: Instant =
     Instant.ofEpochMilli(underlyingSession.getLastAccessedTime)
 
-  def getKeys: Set[String] =
+  def keys: Set[String] =
     underlyingSession.getAttributeNames.asScala.toSet
 
   def get[T <: Serializable](key: String): T =
@@ -30,12 +30,13 @@ final class Session private (
   def set[T <: Serializable](key: String, value: T): Unit =
     underlyingSession.setAttribute(key, value)
 
+  def remove[T <: Serializable](key: String): Unit =
+    underlyingSession.removeAttribute(key)
+
 }
 
 object Session {
-  def current(using r: Request): Session = {
+  def current(using r: Request): Session =
     val undertowSession = UndertowSessions.getOrCreateSession(r.underlyingHttpServerExchange)
-    println(s"Returning session: ${undertowSession.getId}")
     Session(undertowSession)
-  }
 }
