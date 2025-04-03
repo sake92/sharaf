@@ -25,7 +25,7 @@ class ResponseWritableTest extends munit.FunSuite {
       Response.withBody(genyWritable)
     case GET -> Path("imperative") =>
       Request.current.underlyingHttpServerExchange.getOutputStream.write("hello".getBytes(StandardCharsets.UTF_8))
-      Response.withStatus(200)
+      Response.default
     case GET -> Path("file") =>
       val file = testFileResourceDir.resolve("text_file.txt")
       Response.withBody(file)

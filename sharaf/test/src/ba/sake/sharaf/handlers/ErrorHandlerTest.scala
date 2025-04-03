@@ -12,7 +12,7 @@ import ba.sake.sharaf.utils.*
 import ba.sake.tupson.JsonRW
 import ba.sake.validson.Validator
 
-class SharafHandlerTest extends munit.FunSuite {
+class ErrorHandlerTest extends munit.FunSuite {
 
   val port = getFreePort()
   val baseUrl = s"http://localhost:$port"
