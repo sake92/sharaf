@@ -1,42 +1,67 @@
 //> using scala "3.6.4"
-//> using dep ba.sake::sharaf:0.9.0
+//> using dep ba.sake::sharaf:0.9.2
 
 // https://htmx.org/examples/active-search/
+// scala htmx_active_search.sc --resource-dir resources
 
 import io.undertow.Undertow
 import ba.sake.formson.FormDataRW
 import ba.sake.sharaf.*, routing.*
 
+val routes = Routes:
+  case GET -> Path() =>
+    Response.withBody(views.ContactsViewPage(Seq.empty))
+  case POST -> Path("search") =>
+    Thread.sleep(500) // simulate slow backend :)
+    val formData = Request.current.bodyForm[SearchForm]
+    val contactsSlice = allContacts.filter(_.matches(formData.search))
+    Response.withBody(views.contactsRows(contactsSlice))
+
+Undertow.builder
+  .addHttpListener(8181, "localhost")
+  .setHandler(SharafHandler(routes))
+  .build
+  .start()
+
+println("Server started at http://localhost:8181")
+
+case class SearchForm(search: String) derives FormDataRW
+
 object views {
   import scalatags.Text.all.*
-  import ba.sake.hepek.html.HtmlPage
   import ba.sake.hepek.htmx.*
 
-  trait BasePage extends HtmlPage with HtmxDependencies
-
-  class ContactsViewPage(contacts: Seq[Contact]) extends BasePage:
-    override def pageContent = div(
-      h1("Active Search example"),
-      span(cls := "htmx-indicator")(
-        img(src := "/img/bars.svg"),
-        "Searching... "
+  def ContactsViewPage(contacts: Seq[Contact]) = doctype("html")(
+    html(
+      head(
+        script(src := "https://unpkg.com/htmx.org@2.0.4")
       ),
-      input(
-        tpe := "search",
-        name := "search",
-        placeholder := "Begin Typing To Search Users...",
-        hx.post := "/search",
-        hx.trigger := "input changed delay:500ms, search",
-        hx.target := "#search-results",
-        hx.indicator := ".htmx-indicator"
-      ),
-      table(
-        thead(tr(th("First Name"), th(" LastName"), th("Email"))),
-        tbody(id := "search-results")(
-          contactsRows(contacts)
+      body(
+        div(
+          h1("Active Search example"),
+          span(cls := "htmx-indicator")(
+            img(src := "/img/bars.svg"),
+            "Searching... "
+          ),
+          input(
+            tpe := "search",
+            name := "search",
+            placeholder := "Begin Typing To Search Users...",
+            hx.post := "/search",
+            hx.trigger := "input changed delay:500ms, search",
+            hx.target := "#search-results",
+            hx.indicator := ".htmx-indicator"
+          ),
+          table(
+            thead(tr(th("First Name"), th("Last Name"), th("Email"))),
+            tbody(id := "search-results")(
+              contactsRows(contacts)
+            )
+          )
         )
       )
     )
+  )
 
   def contactsRows(contacts: Seq[Contact]): Frag =
     contacts.zipWithIndex.map { case (contact, idx) =>
@@ -158,22 +183,3 @@ val allContacts = Seq(
   Contact("Juliet", "Bush", "consectetuer.euismod@vitaeeratVivamus.co.uk"),
   Contact("Caryn", "Hooper", "eu.enim.Etiam@ridiculus.org")
 )
-
-case class SearchForm(search: String) derives FormDataRW
-
-val routes = Routes:
-  case GET -> Path() =>
-    Response.withBody(views.ContactsViewPage(Seq.empty))
-  case POST -> Path("search") =>
-    Thread.sleep(500) // simulate slow backend :)
-    val formData = Request.current.bodyForm[SearchForm]
-    val contactsSlice = allContacts.filter(_.matches(formData.search))
-    Response.withBody(views.contactsRows(contactsSlice))
-
-Undertow.builder
-  .addHttpListener(8181, "localhost")
-  .setHandler(SharafHandler(routes))
-  .build
-  .start()
-
-println(s"Server started at http://localhost:8181")

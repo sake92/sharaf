@@ -1,41 +1,12 @@
 //> using scala "3.6.4"
-//> using dep ba.sake::sharaf:0.9.0
+//> using dep ba.sake::sharaf:0.9.2
 
 // https://htmx.org/examples/click-to-edit/
 import io.undertow.Undertow
+import scalatags.Text.all.{param =>_, *}
+import ba.sake.hepek.htmx.*
 import ba.sake.sharaf.*, routing.*
 import ba.sake.formson.FormDataRW
-
-object views {
-  import scalatags.Text.all.*
-  import ba.sake.hepek.html.HtmlPage
-  import ba.sake.hepek.htmx.*
-
-  trait BasePage extends HtmlPage with HtmxDependencies
-
-  class ContactViewPage(formData: ContactForm) extends BasePage:
-    override def pageContent = div(
-      h1("Click to Edit example"),
-      contactView(formData)
-    )
-
-  def contactView(formData: ContactForm) = div(hx.target := "this", hx.swap := "outerHTML")(
-    div(label("First Name"), s": ${formData.firstName}"),
-    div(label("Last Name"), s": ${formData.lastName}"),
-    div(label("Email"), s": ${formData.email}"),
-    button(hx.get := "/contact/1/edit")("Click To Edit")
-  )
-
-  def contactEdit(formData: ContactForm) = form(hx.put := "/contact/1", hx.target := "this", hx.swap := "outerHTML")(
-    div(label("First Name"), input(tpe := "text", name := "firstName", value := formData.firstName)),
-    div(label("Last Name"), input(tpe := "text", name := "lastName", value := formData.lastName)),
-    div(label("Email"), input(tpe := "email", name := "email", value := formData.email)),
-    button("Submit"),
-    button(hx.get := "/contact/1")("Cancel")
-  )
-}
-
-case class ContactForm(firstName: String, lastName: String, email: String) derives FormDataRW
 
 var currentValue = ContactForm("Joe", "Blow", "joe@blow.com")
 
@@ -57,4 +28,41 @@ Undertow.builder
   .build
   .start()
 
-println(s"Server started at http://localhost:8181")
+println("Server started at http://localhost:8181")
+
+case class ContactForm(firstName: String, lastName: String, email: String) derives FormDataRW
+
+object views {
+
+  def ContactViewPage(formData: ContactForm) = createPage(
+    div(
+      h1("Click to Edit example"),
+      contactView(formData)
+    )
+  )
+
+  def contactView(formData: ContactForm) = div(hx.target := "this", hx.swap := "outerHTML")(
+    div(label("First Name"), s": ${formData.firstName}"),
+    div(label("Last Name"), s": ${formData.lastName}"),
+    div(label("Email"), s": ${formData.email}"),
+    button(hx.get := "/contact/1/edit")("Click To Edit")
+  )
+
+  def contactEdit(formData: ContactForm) = form(hx.put := "/contact/1", hx.target := "this", hx.swap := "outerHTML")(
+    div(label("First Name"), input(tpe := "text", name := "firstName", value := formData.firstName)),
+    div(label("Last Name"), input(tpe := "text", name := "lastName", value := formData.lastName)),
+    div(label("Email"), input(tpe := "email", name := "email", value := formData.email)),
+    button("Submit"),
+    button(hx.get := "/contact/1")("Cancel")
+  )
+
+  private def createPage(bodyContent: Frag, inlineStyle: String = "") = doctype("html")(
+    html(
+      head(
+        tag("style")(inlineStyle),
+        script(src := "https://unpkg.com/htmx.org@2.0.4")
+      ),
+      body(bodyContent)
+    )
+  )
+}

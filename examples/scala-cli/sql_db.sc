@@ -1,7 +1,7 @@
 //> using scala "3.6.4"
-//> using dep org.postgresql:postgresql:42.7.1
-//> using dep com.zaxxer:HikariCP:5.1.0
-//> using dep ba.sake::sharaf:0.9.0
+//> using dep org.postgresql:postgresql:42.7.5
+//> using dep com.zaxxer:HikariCP:6.3.0
+//> using dep ba.sake::sharaf:0.9.2
 //> using dep ba.sake::squery:0.7.0
 
 import io.undertow.Undertow

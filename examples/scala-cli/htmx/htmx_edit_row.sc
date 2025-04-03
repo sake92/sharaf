@@ -1,68 +1,14 @@
 //> using scala "3.6.4"
-//> using dep ba.sake::sharaf:0.9.0
+//> using dep ba.sake::sharaf:0.9.2
 
 // https://htmx.org/examples/edit-row/
+// scala htmx_edit_row.sc --resource-dir resources
 
 import io.undertow.Undertow
+import scalatags.Text.all.*
+import ba.sake.hepek.htmx.*
 import ba.sake.formson.FormDataRW
 import ba.sake.sharaf.*, routing.*
-
-object views {
-  import scalatags.Text.all.*
-  import ba.sake.hepek.html.HtmlPage
-  import ba.sake.hepek.htmx.*
-
-  trait BasePage extends HtmlPage with HtmxDependencies
-
-  class ContactsViewPage(contacts: Seq[Contact]) extends BasePage:
-    override def pageContent = div(
-      h1("Click to Edit example"),
-      table(
-        thead(tr(th("Name"), th("Email"), th())),
-        tbody(hx.target := "closest tr", hx.swap := "outerHTML")(
-          contacts.map(viewContactRow)
-        )
-      )
-    )
-
-  def viewContactRow(contact: Contact) = tr(
-    td(contact.name),
-    td(contact.email),
-    td(
-      button(
-        hx.get := s"/contact/${contact.id}/edit",
-        hx.trigger := "edit",
-        onclick := """
-              let editing = document.querySelector('.editing')
-              if (editing) {
-                const doWant = confirm("You are already editing a row!  Do you want to cancel that edit and continue?");
-                if (doWant) {
-                  htmx.trigger(editing, 'cancel')
-                  htmx.trigger(this, 'edit')
-                }
-              } else {
-                htmx.trigger(this, 'edit')
-              }"""
-      )("Edit")
-    )
-  )
-
-  def editContact(contact: Contact) = tr(
-    hx.trigger := "cancel",
-    hx.get := s"/contact/${contact.id}"
-  )(
-    td(input(name := "name", value := contact.name, autofocus)),
-    td(input(name := "email", value := contact.email)),
-    td(
-      button(hx.get := s"/contact/${contact.id}")("Cancel"),
-      button(hx.put := s"/contact/${contact.id}", hx.include := "closest tr")("Save")
-    )
-  )
-
-}
-case class Contact(id: String, name: String, email: String)
-
-case class ContactForm(name: String, email: String) derives FormDataRW
 
 var allContacts = Seq(
   Contact("1", "Joe Smith", "joe@smith.org"),
@@ -99,3 +45,67 @@ Undertow.builder
   .start()
 
 println(s"Server started at http://localhost:8181")
+
+case class Contact(id: String, name: String, email: String)
+
+case class ContactForm(name: String, email: String) derives FormDataRW
+
+object views {
+
+  def ContactsViewPage(contacts: Seq[Contact]) = createPage(
+    div(
+      h1("Click to Edit example"),
+      table(
+        thead(tr(th("Name"), th("Email"), th())),
+        tbody(hx.target := "closest tr", hx.swap := "outerHTML")(
+          contacts.map(viewContactRow)
+        )
+      )
+    )
+  )
+
+  def viewContactRow(contact: Contact) = tr(
+    td(contact.name),
+    td(contact.email),
+    td(
+      button(
+        hx.get := s"/contact/${contact.id}/edit",
+        hx.trigger := "edit",
+        onclick := """
+              let editing = document.querySelector('.editing')
+              if (editing) {
+                const doWant = confirm("You are already editing a row!  Do you want to cancel that edit and continue?");
+                if (doWant) {
+                  htmx.trigger(editing, 'cancel')
+                  htmx.trigger(this, 'edit')
+                }
+              } else {
+                htmx.trigger(this, 'edit')
+              }"""
+      )("Edit")
+    )
+  )
+
+  def editContact(contact: Contact) = tr(
+    hx.trigger := "cancel",
+    hx.get := s"/contact/${contact.id}"
+  )(
+    td(input(name := "name", value := contact.name, autofocus)),
+    td(input(name := "email", value := contact.email)),
+    td(
+      button(hx.get := s"/contact/${contact.id}")("Cancel"),
+      button(hx.put := s"/contact/${contact.id}", hx.include := "closest tr")("Save")
+    )
+  )
+
+  private def createPage(bodyContent: Frag, inlineStyle: String = "") = doctype("html")(
+    html(
+      head(
+        tag("style")(inlineStyle),
+        script(src := "https://unpkg.com/htmx.org@2.0.4")
+      ),
+      body(bodyContent)
+    )
+  )
+
+}

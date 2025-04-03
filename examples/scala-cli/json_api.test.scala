@@ -1,5 +1,5 @@
 //> using scala "3.6.4"
-//> using dep ba.sake::sharaf:0.9.0
+//> using dep ba.sake::sharaf:0.9.2
 //> using test.dep org.scalameta::munit::1.1.0
 
 import ba.sake.tupson.*

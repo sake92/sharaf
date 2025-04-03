@@ -6,7 +6,8 @@
 ## 0.9.0
 - add HttpMethod enum (breaking change)
   - You can use this regex to find: `case (GET|POST|PUT|DELETE|OPTIONS|PATCH)\(\)` and replace: `case $1`
-- add support for response body InputStream and scalatags doctype
+- add support for response body InputStream
+- add support for scalatags doctype
 
 ## 0.8.2
 - support WebJars

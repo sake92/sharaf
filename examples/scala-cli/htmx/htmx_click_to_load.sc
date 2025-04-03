@@ -1,21 +1,49 @@
 //> using scala "3.6.4"
-//> using dep ba.sake::sharaf:0.9.0
+//> using dep ba.sake::sharaf:0.9.2
 
 // https://htmx.org/examples/click-to-load/
+// scala htmx_click_to_load.sc --resource-dir resources
+
 import java.util.UUID
 import io.undertow.Undertow
+import scalatags.Text.all.*
+import ba.sake.hepek.htmx.*
 import ba.sake.querson.QueryStringRW
 import ba.sake.sharaf.*, routing.*
 
+val PageSize = 5
+
+val allContacts = Seq.fill(100)(Contact.create())
+
+val routes = Routes:
+  case GET -> Path() =>
+    val contactsSlice = allContacts.take(PageSize)
+    Response.withBody(views.ContactsViewPage(contactsSlice, 0))
+  case GET -> Path("contacts") =>
+    Thread.sleep(500) // simulate slow backend :)
+    case class PageQP(page: Int) derives QueryStringRW
+    val qp = Request.current.queryParams[PageQP]
+    val contactsSlice = allContacts.slice(qp.page * PageSize, qp.page * PageSize + PageSize)
+    Response.withBody(views.contactsRowsWithButton(contactsSlice, qp.page))
+
+Undertow.builder
+  .addHttpListener(8181, "localhost")
+  .setHandler(SharafHandler(routes))
+  .build
+  .start()
+
+println("Server started at http://localhost:8181")
+
+case class Contact(id: String, name: String, email: String)
+object Contact:
+  def create(): Contact =
+    val id = UUID.randomUUID().toString
+    Contact(id, "Agent Smith", s"agent_smith_${id.take(8)}@example.com")
+
 object views {
-  import scalatags.Text.all.*
-  import ba.sake.hepek.html.HtmlPage
-  import ba.sake.hepek.htmx.*
 
-  trait BasePage extends HtmlPage with HtmxDependencies
-
-  class ContactsViewPage(contacts: Seq[Contact], page: Int) extends BasePage:
-    override def pageContent = div(
+  def ContactsViewPage(contacts: Seq[Contact], page: Int) = createPage(
+    div(
       h1("Click to Load example"),
       table(
         thead(tr(th("ID"), th("Name"), th("Email"))),
@@ -24,6 +52,7 @@ object views {
         )
       )
     )
+  )
 
   def contactsRowsWithButton(contacts: Seq[Contact], page: Int) = frag(
     contacts.map { contact =>
@@ -43,33 +72,14 @@ object views {
     )
   )
 
+  private def createPage(bodyContent: Frag, inlineStyle: String = "") = doctype("html")(
+    html(
+      head(
+        tag("style")(inlineStyle),
+        script(src := "https://unpkg.com/htmx.org@2.0.4")
+      ),
+      body(bodyContent)
+    )
+  )
+
 }
-case class Contact(id: String, name: String, email: String)
-object Contact:
-  def create(): Contact =
-    val id = UUID.randomUUID().toString
-    Contact(id, "Agent Smith", s"agent_smith_${id.take(8)}@example.com")
-
-case class PageQP(page: Int) derives QueryStringRW
-
-val PageSize = 5
-
-val allContacts = Seq.fill(100)(Contact.create())
-
-val routes = Routes:
-  case GET -> Path() =>
-    val contactsSlice = allContacts.take(PageSize)
-    Response.withBody(views.ContactsViewPage(contactsSlice, 0))
-  case GET -> Path("contacts") =>
-    Thread.sleep(500) // simulate slow backend :)
-    val qp = Request.current.queryParams[PageQP]
-    val contactsSlice = allContacts.drop(qp.page * PageSize).take(PageSize)
-    Response.withBody(views.contactsRowsWithButton(contactsSlice, qp.page))
-
-Undertow.builder
-  .addHttpListener(8181, "localhost")
-  .setHandler(SharafHandler(routes))
-  .build
-  .start()
-
-println(s"Server started at http://localhost:8181")
