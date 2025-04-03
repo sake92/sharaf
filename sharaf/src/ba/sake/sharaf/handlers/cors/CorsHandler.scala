@@ -18,7 +18,7 @@ final class CorsHandler private (next: HttpHandler, corsSettings: CorsSettings) 
 
   // only for OPTIONS / preflight
   private val accessControlAllowMethods = HttpString("Access-Control-Allow-Methods")
-  private val acccessControlAllowHeaders = HttpString("Access-Control-Allow-Headers")
+  private val accessControlAllowHeaders = HttpString("Access-Control-Allow-Headers")
 
   override def handleRequest(exchange: HttpServerExchange): Unit =
     if exchange.getRequestMethod == Methods.OPTIONS then
@@ -32,13 +32,13 @@ final class CorsHandler private (next: HttpHandler, corsSettings: CorsSettings) 
     exchange.getResponseHeaders
       .putAll(accessControlAllowMethods, corsSettings.allowedHttpMethods.map(_.toString).asJava)
     exchange.getResponseHeaders
-      .putAll(acccessControlAllowHeaders, corsSettings.allowedHttpHeaders.map(_.toString).asJava)
+      .putAll(accessControlAllowHeaders, corsSettings.allowedHttpHeaders.map(_.toString).asJava)
   }
 
   private def setCorsHeaders(exchange: HttpServerExchange): Unit = {
     exchange.getResponseHeaders
       .put(accessControlAllowCredentials, corsSettings.allowCredentials.toString)
-    if corsSettings.allowedOrigins.contains("*") then exchange.getResponseHeaders().put(accessControlAllowOrigin, "*")
+    if corsSettings.allowedOrigins.contains("*") then exchange.getResponseHeaders.put(accessControlAllowOrigin, "*")
     else
       Option(exchange.getRequestHeaders.getFirst(Headers.ORIGIN)) match {
         case None => // noop

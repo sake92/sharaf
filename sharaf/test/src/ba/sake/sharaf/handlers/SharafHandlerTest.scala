@@ -6,6 +6,7 @@ import io.undertow.{Handlers, Undertow}
 import io.undertow.util.Headers
 import io.undertow.util.StatusCodes
 import ba.sake.sharaf.*
+import ba.sake.sharaf.handlers.cors.*
 import ba.sake.sharaf.routing.*
 import ba.sake.sharaf.utils.*
 import ba.sake.tupson.JsonRW
@@ -26,6 +27,8 @@ class SharafHandlerTest extends munit.FunSuite {
     case POST -> Path("json") =>
       val body = Request.current.bodyJsonValidated[TestJson]
       Response.withBody(body)
+    case GET -> Path() =>
+      Response.withBody("OK")
   }
 
   val server = Undertow
@@ -36,6 +39,10 @@ class SharafHandlerTest extends munit.FunSuite {
         .path()
         .addPrefixPath("default", SharafHandler(routes))
         .addPrefixPath("json", SharafHandler(routes).withExceptionMapper(ExceptionMapper.json))
+        .addPrefixPath(
+          "cors",
+          SharafHandler(routes).withCorsSettings(CorsSettings.default.withAllowedOrigins(Set("http://example.com")))
+        )
     )
     .build()
 
@@ -108,7 +115,10 @@ class SharafHandlerTest extends munit.FunSuite {
     val res =
       requests.post(s"${baseUrl}/json/form", data = requests.MultiPart(requests.MultiItem("bla", "")), check = false)
     assertEquals(res.statusCode, StatusCodes.BAD_REQUEST)
-    assertEquals(res.text(), """{"instance":null,"invalidArguments":[],"detail":"Form parsing error: Key 'name' is missing","type":null,"title":"Form parsing error","status":400}""")
+    assertEquals(
+      res.text(),
+      """{"instance":null,"invalidArguments":[],"detail":"Form parsing error: Key 'name' is missing","type":null,"title":"Form parsing error","status":400}"""
+    )
     assertEquals(res.headers(Headers.CONTENT_TYPE_STRING.toLowerCase), Seq("application/json"))
   }
   test("JSON error mapper handles form validation failure") {
@@ -124,7 +134,10 @@ class SharafHandlerTest extends munit.FunSuite {
   test("JSON error mapper handles JSON parsing failure") {
     val res = requests.post(s"${baseUrl}/json/json", data = "", check = false)
     assertEquals(res.statusCode, StatusCodes.BAD_REQUEST)
-    assertEquals(res.text(), """{"instance":null,"invalidArguments":[],"detail":"JSON parsing exception","type":null,"title":"JSON parsing error","status":400}""")
+    assertEquals(
+      res.text(),
+      """{"instance":null,"invalidArguments":[],"detail":"JSON parsing exception","type":null,"title":"JSON parsing error","status":400}"""
+    )
     assertEquals(res.headers(Headers.CONTENT_TYPE_STRING.toLowerCase), Seq("application/json"))
   }
   test("JSON error mapper handles JSON validation failure") {
@@ -135,6 +148,33 @@ class SharafHandlerTest extends munit.FunSuite {
       """{"instance":null,"invalidArguments":[{"reason":"must be >= 3","path":"$.name","value":""}],"detail":"","type":null,"title":"Validation errors","status":400}"""
     )
     assertEquals(res.headers(Headers.CONTENT_TYPE_STRING.toLowerCase), Seq("application/json"))
+  }
+
+  // WebJars
+  test("WebJars should work") {
+    val res = requests.get(s"${baseUrl}/default/jquery/3.7.1/jquery.js")
+    assertEquals(res.headers(Headers.CONTENT_TYPE_STRING.toLowerCase), Seq("application/javascript"))
+    assert(res.text().length > 100)
+  }
+
+  // CORS
+  test("CORS should work") {
+    locally {
+      // localhost always works
+      val res = requests.get(s"${baseUrl}/cors")
+      assertEquals(res.statusCode, StatusCodes.OK)
+    }
+    locally {
+      // allowed origin is allowed
+      val res = requests.get(s"${baseUrl}/cors", headers = Map(Headers.ORIGIN_STRING -> "http://example.com"))
+      assertEquals(res.headers("access-control-allow-origin"), Seq("http://example.com"))
+    }
+    locally {
+      // forbidden origin is not allowed (to browser)
+      val res =
+        requests.get(s"${baseUrl}/cors", headers = Map(Headers.ORIGIN_STRING -> "http://example2.com"), check = false)
+      assertEquals(res.headers.get("access-control-allow-origin"), None)
+    }
   }
 
   case class TestQuery(name: String) derives QueryStringRW

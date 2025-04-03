@@ -50,6 +50,17 @@ final class CorsSettings private (
     allowCredentials,
     preflightMaxAge
   )
+
+  override def toString: String = s"""
+    CorsSettings(
+      pathPrefixes = $pathPrefixes,
+      allowedOrigins = $allowedOrigins,
+      allowedHttpMethods = $allowedHttpMethods,
+      allowedHttpHeaders = $allowedHttpHeaders,
+      allowCredentials = $allowCredentials,
+      preflightMaxAge = $preflightMaxAge
+    )
+  """
 }
 
 object CorsSettings:
