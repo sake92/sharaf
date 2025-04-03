@@ -19,7 +19,7 @@ trait ResponseWritable[-T]:
   def headers(value: T): Seq[(HttpString, Seq[String])]
 
 object ResponseWritable extends LowPriResponseWritableInstances {
-  
+
   def apply[T](using rw: ResponseWritable[T]): ResponseWritable[T] = rw
 
   private[sharaf] def writeResponse(response: Response[?], exchange: HttpServerExchange): Unit = {
@@ -120,8 +120,9 @@ trait LowPriResponseWritableInstances {
       value.writeBytesTo(exchange.getOutputStream)
 
     // application/octet-stream says "it can be anything"
-    override def headers(value: geny.Writable): Seq[(HttpString, Seq[String])] = Seq(
-      Headers.CONTENT_TYPE -> Seq("application/octet-stream")
-    )
+    override def headers(value: geny.Writable): Seq[(HttpString, Seq[String])] =
+      Seq(
+        Headers.CONTENT_TYPE -> Seq(value.httpContentType.getOrElse("application/octet-stream"))
+      )
   }
 }
