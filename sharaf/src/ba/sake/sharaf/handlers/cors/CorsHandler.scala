@@ -20,43 +20,32 @@ final class CorsHandler private (next: HttpHandler, corsSettings: CorsSettings) 
   private val accessControlAllowMethods = HttpString("Access-Control-Allow-Methods")
   private val acccessControlAllowHeaders = HttpString("Access-Control-Allow-Headers")
 
-  override def handleRequest(exchange: HttpServerExchange): Unit = {
-    exchange.startBlocking()
-    if exchange.isInIoThread then exchange.dispatch(this)
-    else {
-      if exchange.getRequestMethod() == Methods.OPTIONS then
-        setCorsHeaders(exchange)
-        setPreflightHeaders(exchange)
-      else
-        setCorsHeaders(exchange)
-        next.handleRequest(exchange)
-    }
-  }
+  override def handleRequest(exchange: HttpServerExchange): Unit =
+    if exchange.getRequestMethod == Methods.OPTIONS then
+      setCorsHeaders(exchange)
+      setPreflightHeaders(exchange)
+    else
+      setCorsHeaders(exchange)
+      next.handleRequest(exchange)
 
   private def setPreflightHeaders(exchange: HttpServerExchange): Unit = {
-    exchange
-      .getResponseHeaders()
+    exchange.getResponseHeaders
       .putAll(accessControlAllowMethods, corsSettings.allowedHttpMethods.map(_.toString).asJava)
-    exchange
-      .getResponseHeaders()
+    exchange.getResponseHeaders
       .putAll(acccessControlAllowHeaders, corsSettings.allowedHttpHeaders.map(_.toString).asJava)
   }
 
   private def setCorsHeaders(exchange: HttpServerExchange): Unit = {
-
-    exchange
-      .getResponseHeaders()
+    exchange.getResponseHeaders
       .put(accessControlAllowCredentials, corsSettings.allowCredentials.toString)
-
     if corsSettings.allowedOrigins.contains("*") then exchange.getResponseHeaders().put(accessControlAllowOrigin, "*")
     else
       Option(exchange.getRequestHeaders.getFirst(Headers.ORIGIN)) match {
         case None => // noop
         case Some(origin) =>
           if corsSettings.allowedOrigins.contains(origin) then
-            exchange.getResponseHeaders().put(accessControlAllowOrigin, origin)
+            exchange.getResponseHeaders.put(accessControlAllowOrigin, origin)
       }
-
   }
 }
 

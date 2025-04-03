@@ -9,19 +9,9 @@ import ba.sake.sharaf.routing.*
 final class RoutesHandler private (routes: Routes, nextHandler: Option[HttpHandler]) extends HttpHandler {
 
   override def handleRequest(exchange: HttpServerExchange): Unit = {
-    exchange.startBlocking()
-    if (exchange.isInIoThread) {
-      exchange.dispatch(this)
-    } else {
-
-      val request = Request.create(exchange)
-
-      given Request = request
-
+      given Request = Request.create(exchange)
       val reqParams = fillReqParams(exchange)
-
       val resOpt = routes.definition.lift(reqParams)
-
       resOpt match {
         case Some(res) => ResponseWritable.writeResponse(res, exchange)
         case None =>
@@ -31,7 +21,6 @@ final class RoutesHandler private (routes: Routes, nextHandler: Option[HttpHandl
               // will be catched by ExceptionHandler
               throw exceptions.NotFoundException("route")
       }
-    }
   }
 
   private def fillReqParams(exchange: HttpServerExchange): RequestParams = {

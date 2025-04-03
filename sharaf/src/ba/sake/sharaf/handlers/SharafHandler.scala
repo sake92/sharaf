@@ -2,6 +2,7 @@ package ba.sake.sharaf.handlers
 
 import io.undertow.server.HttpHandler
 import io.undertow.server.HttpServerExchange
+import io.undertow.server.handlers.BlockingHandler
 import io.undertow.server.handlers.resource.ResourceHandler
 import io.undertow.server.handlers.resource.ClassPathResourceManager
 import io.undertow.util.StatusCodes
@@ -18,25 +19,28 @@ final class SharafHandler private (
     notFoundHandler: Request => Response[?]
 ) extends HttpHandler {
 
-  private val notFoundRoutes = Routes { case _ =>
+  private val notFoundRoutes = Routes { _ =>
     notFoundHandler(Request.current)
   }
 
-  private val finalHandler = ExceptionHandler(
-    CorsHandler(
-      RoutesHandler(
-        routes,
-        ResourceHandler(
-          ClassPathResourceManager(getClass.getClassLoader, "public"),
+  // everything is wrapped in a synchronous/blocking handler
+  private val finalHandler = BlockingHandler(
+    ExceptionHandler(
+      CorsHandler(
+        RoutesHandler(
+          routes,
           ResourceHandler(
-            ClassPathResourceManager(getClass.getClassLoader, "META-INF/resources/webjars"),
-            RoutesHandler(notFoundRoutes) // handle 404s at the end
+            ClassPathResourceManager(getClass.getClassLoader, "public"),
+            ResourceHandler(
+              ClassPathResourceManager(getClass.getClassLoader, "META-INF/resources/webjars"),
+              RoutesHandler(notFoundRoutes) // handle 404s at the end
+            )
           )
-        )
+        ),
+        corsSettings
       ),
-      corsSettings
-    ),
-    exceptionMapper
+      exceptionMapper
+    )
   )
 
   override def handleRequest(exchange: HttpServerExchange): Unit =
