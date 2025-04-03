@@ -33,7 +33,7 @@ object ResponseWritable extends LowPriResponseWritableInstances {
       case HeaderUpdate.Remove(name) =>
         exchange.getResponseHeaders.remove(name)
     }
-    
+
     response.cookieUpdates.updates.foreach { cookie =>
       exchange.setResponseCookie(cookie.toUndertow)
     }

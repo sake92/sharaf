@@ -53,18 +53,18 @@ object Response {
   def settingHeader(name: HttpString, values: Seq[String]): Response[String] =
     default.settingHeader(name, values)
   def settingHeader(name: String, values: Seq[String]): Response[String] =
-      default.settingHeader(name, values)
+    default.settingHeader(name, values)
   def settingHeader(name: HttpString, value: String): Response[String] =
     default.settingHeader(name, Seq(value))
   def settingHeader(name: String, value: String): Response[String] =
-      default.settingHeader(name, value)
+    default.settingHeader(name, value)
   def removingHeader(name: HttpString): Response[String] =
     default.removingHeader(name)
   def removingHeader(name: String): Response[String] =
     default.removingHeader(name)
 
   def settingCookie(value: Cookie): Response[String] =
-    default.settingCookie( value)
+    default.settingCookie(value)
   def removingCookie(name: String): Response[String] =
     default.removingCookie(name)
 

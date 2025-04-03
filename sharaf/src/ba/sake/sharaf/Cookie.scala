@@ -39,7 +39,7 @@ final case class Cookie(
 }
 
 object Cookie {
-  def fromUndertow(c: UndertowCookie): Cookie = 
+  def fromUndertow(c: UndertowCookie): Cookie =
     Cookie(
       name = c.getName,
       value = c.getValue,
@@ -54,5 +54,5 @@ object Cookie {
       comment = Option(c.getComment),
       sameSite = c.isSameSite,
       sameSiteMode = Option(c.getSameSiteMode)
-    ) 
+    )
 }

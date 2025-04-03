@@ -9,18 +9,18 @@ import ba.sake.sharaf.routing.*
 final class RoutesHandler private (routes: Routes, nextHandler: Option[HttpHandler]) extends HttpHandler {
 
   override def handleRequest(exchange: HttpServerExchange): Unit = {
-      given Request = Request.create(exchange)
-      val reqParams = fillReqParams(exchange)
-      val resOpt = routes.definition.lift(reqParams)
-      resOpt match {
-        case Some(res) => ResponseWritable.writeResponse(res, exchange)
-        case None =>
-          nextHandler match
-            case Some(next) => next.handleRequest(exchange)
-            case None       =>
-              // will be catched by ExceptionHandler
-              throw exceptions.NotFoundException("route")
-      }
+    given Request = Request.create(exchange)
+    val reqParams = fillReqParams(exchange)
+    val resOpt = routes.definition.lift(reqParams)
+    resOpt match {
+      case Some(res) => ResponseWritable.writeResponse(res, exchange)
+      case None =>
+        nextHandler match
+          case Some(next) => next.handleRequest(exchange)
+          case None       =>
+            // will be catched by ExceptionHandler
+            throw exceptions.NotFoundException("route")
+    }
   }
 
   private def fillReqParams(exchange: HttpServerExchange): RequestParams = {
