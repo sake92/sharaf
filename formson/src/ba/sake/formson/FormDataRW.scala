@@ -61,6 +61,15 @@ object FormDataRW {
       str.toIntOption.getOrElse(typeError(path, "Int", str))
   }
 
+  given FormDataRW[Long] with {
+    override def write(path: String, value: Long): FormData =
+      FormDataRW[String].write(path, value.toString)
+
+    override def parse(path: String, formData: FormData): Long =
+      val str = FormDataRW[String].parse(path, formData)
+      str.toLongOption.getOrElse(typeError(path, "Long", str))
+  }
+
   given FormDataRW[Double] with {
     override def write(path: String, value: Double): FormData =
       FormDataRW[String].write(path, value.toString)

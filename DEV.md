@@ -18,7 +18,7 @@ scala-cli compile examples\scala-cli
 ```sh
 
 # RELEASE
-$VERSION="0.9.2"
+$VERSION="0.9.3"
 git commit --allow-empty -m "Release $VERSION"
 git tag -a $VERSION -m "Release $VERSION"
 git push --atomic origin main --tags
@@ -26,6 +26,8 @@ git push --atomic origin main --tags
 ```
 
 # TODOs
+
+- make sure / always returns 404 by default. for some reason 403 is returned...
 
 - MiMa bin compat
 
