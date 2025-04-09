@@ -31,7 +31,9 @@ object sharaf extends SharafPublishModule {
   def moduleDeps = Seq(querson, formson)
 
   object test extends ScalaTests with SharafTestModule {
-    def ivyDeps = super.ivyDeps() ++ Agg(ivy"org.webjars:jquery:3.7.1")
+    def ivyDeps = super.ivyDeps() ++ Agg(
+      ivy"org.webjars:jquery:3.7.1"
+    )
   }
 }
 
