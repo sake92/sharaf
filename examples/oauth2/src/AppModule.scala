@@ -33,18 +33,11 @@ class AppModule(port: Int, clients: Clients) {
 
     val pathHandler = Handlers
       .path()
-      .addExactPath(
-        "/callback",
-        CallbackHandler.build(securityConfig.pac4jConfig, null, CustomCallbackLogic())
-      )
+      .addExactPath("/callback", CallbackHandler.build(securityConfig.pac4jConfig, null, CustomCallbackLogic()))
       .addExactPath("/logout", LogoutHandler(securityConfig.pac4jConfig, "/"))
       .addPrefixPath("/", securityHandler)
 
-    SessionAttachmentHandler(
-      pathHandler,
-      InMemorySessionManager("SessionManager"),
-      SessionCookieConfig()
-    )
+    SessionAttachmentHandler(pathHandler, InMemorySessionManager("SessionManager"), SessionCookieConfig())
   }
 
   val server = Undertow

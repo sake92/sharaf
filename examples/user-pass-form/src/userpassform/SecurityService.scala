@@ -1,4 +1,4 @@
-package demo
+package userpassform
 
 import scala.jdk.OptionConverters.*
 import org.pac4j.core.config.Config
@@ -14,9 +14,6 @@ class SecurityService(config: Config) {
     val sessionStore = FindBest.sessionStore(null, config, UndertowSessionStore(exchange))
     val profileManager = config.getProfileManagerFactory.apply(UndertowWebContext(exchange), sessionStore)
     profileManager.getProfile().toScala.map { profile =>
-      // val identityProvider = profile match ..
-      // val identityProviderId = profile.getId()
-      // find it in db by type+id for example
       CustomUserProfile(profile.getUsername)
     }
   }

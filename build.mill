@@ -128,6 +128,15 @@ object examples extends mill.Module {
     def moduleDeps = Seq(sharaf)
     object test extends ScalaTests with SharafTestModule
   }
+  object `user-pass-form` extends SharafExampleModule {
+    def moduleDeps = Seq(sharaf)
+    def ivyDeps = super.ivyDeps() ++ Agg(
+      ivy"org.pac4j:undertow-pac4j:5.0.1",
+      ivy"org.pac4j:pac4j-http:5.7.0",
+      ivy"org.mindrot:jbcrypt:0.4"
+    )
+    object test extends ScalaTests with SharafTestModule
+  }
   object oauth2 extends SharafExampleModule {
     def moduleDeps = Seq(sharaf)
     def ivyDeps = super.ivyDeps() ++ Agg(
