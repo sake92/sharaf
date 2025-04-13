@@ -6,6 +6,16 @@ final class Path private (
   override def toString(): String =
     val p = segments.mkString("/")
     s"Path($p)"
+
+  override def equals(that: Any): Boolean =
+    that match {
+      case that: Path =>
+        this.segments == that.segments
+      case _ => false
+    }
+
+  override def hashCode(): Int =
+    segments.hashCode()
 }
 
 object Path:
