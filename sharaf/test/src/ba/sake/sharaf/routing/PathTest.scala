@@ -54,6 +54,23 @@ class PathTest extends munit.FunSuite {
 
   }
 
+  test("match on value") {
+    val path = Path("hello")
+
+    Path("hello") match
+      case `path` => // ok
+      case _ =>
+        fail("Did not match path")
+  }
+
+  test("equals") {
+    assertEquals(Path("hello"), Path("hello"))
+    assertNotEquals(Path("world"), Path("hello"))
+  }
+
+  test("hashCode") {
+    assertEquals(Path("hello").hashCode(), Path("hello").hashCode())
+  }
 }
 
 enum Sort derives FromPathParam:
