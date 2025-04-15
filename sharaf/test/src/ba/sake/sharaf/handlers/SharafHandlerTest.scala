@@ -26,7 +26,9 @@ class SharafHandlerTest extends munit.FunSuite {
 
   override def afterAll(): Unit = server.stop()
 
-  // TODO fix this ???
+  // This returns a 403 because of
+  // https://github.com/undertow-io/undertow/blob/42993e8d2c787541bb686fb97b13bea4649d19bb/core/src/main/java/io/undertow/server/handlers/resource/ResourceHandler.java#L236
+  // Need to manually handle empty Path()
   test("/ returns a 404".ignore) {
     assertEquals(requests.get(s"${baseUrl}", check = false).statusCode, 404)
     assertEquals(requests.get(s"${baseUrl}/", check = false).statusCode, 404)

@@ -24,30 +24,30 @@ final class SharafHandler private (
   }
 
   // everything is wrapped in a synchronous/blocking handler
-  private val finalHandler = {
-    val webJarHandler = new ResourceHandler(
-      ClassPathResourceManager(getClass.getClassLoader, "META-INF/resources/webjars"),
-      RoutesHandler(notFoundRoutes) // handle 404s at the end
-    )
-    // dont want to serve index.html from random webjars...
-    webJarHandler.setWelcomeFiles()
-    val publicFilesHandler = ResourceHandler(
-      ClassPathResourceManager(getClass.getClassLoader, "public"),
-      webJarHandler
-    )
-    BlockingHandler(
-      ExceptionHandler(
-        CorsHandler(
-          RoutesHandler(
+  private val finalHandler =
+    BlockingHandler( // synchronous/blocking handler
+      ExceptionHandler( // handle exceptions gracefully
+        CorsHandler( // handle CORS preflight requests
+          RoutesHandler( // main Sharaf routes handler
             routes,
-            publicFilesHandler
+            ResourceHandler( // or else load from classpath in public/ folder
+              ClassPathResourceManager(getClass.getClassLoader, "public"), {
+                // or else load from classpath in WebJars
+                val webJarHandler = new ResourceHandler(
+                  ClassPathResourceManager(getClass.getClassLoader, "META-INF/resources/webjars"),
+                  RoutesHandler(notFoundRoutes) // handle 404s at the end
+                )
+                // dont serve index.html etc from random webjars...
+                webJarHandler.setWelcomeFiles()
+                webJarHandler
+              }
+            )
           ),
           corsSettings
         ),
         exceptionMapper
       )
     )
-  }
 
   override def handleRequest(exchange: HttpServerExchange): Unit =
     finalHandler.handleRequest(exchange)
