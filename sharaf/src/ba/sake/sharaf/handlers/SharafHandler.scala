@@ -7,8 +7,7 @@ import io.undertow.server.handlers.resource.ResourceHandler
 import io.undertow.server.handlers.resource.ClassPathResourceManager
 import io.undertow.util.StatusCodes
 import ba.sake.sharaf.routing.Routes
-import ba.sake.sharaf.Request
-import ba.sake.sharaf.Response
+import ba.sake.sharaf.{Request, Response, SharafController}
 import ba.sake.sharaf.exceptions.ExceptionMapper
 import ba.sake.sharaf.handlers.cors.*
 
@@ -78,3 +77,7 @@ object SharafHandler:
 
   def apply(routes: Routes): SharafHandler =
     new SharafHandler(routes, CorsSettings.default, ExceptionMapper.default, _ => SharafHandler.defaultNotFoundResponse)
+    
+  def apply(controllers: SharafController*): SharafHandler =
+    val routes = Routes.merge(controllers.map(_.routes))
+    apply(routes)

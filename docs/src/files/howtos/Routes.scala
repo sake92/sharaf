@@ -140,6 +140,20 @@ object Routes extends HowToPage {
   
       val allRoutes: Routes = Routes.merge(routes)
       ```
+      
+      You can also `extend SharafController` instead of `Routes` directly.
+      ```scala
+      class MyController1 extends SharafController:
+        override def routes: Routes = Routes:
+          case ...
+      class MyController2 extends SharafController:
+        override def routes: Routes = Routes:
+          case ...
+          
+      val handler = SharafHandler(
+        new MyController1, new MyController2
+      )
+      ```
   
       """.md
   )
