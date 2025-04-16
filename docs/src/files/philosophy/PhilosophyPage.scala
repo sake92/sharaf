@@ -10,7 +10,8 @@ trait PhilosophyPage extends DocPage {
     Alternatives,
     RoutesMatching,
     QueryParamsHandling,
-    DependencyInjection
+    DependencyInjection,
+    Authentication
   )
 
   override def pageCategory = Some("Philosophy")
