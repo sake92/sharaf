@@ -20,7 +20,7 @@ class AppRoutes(callbackUrl: String, securityService: SecurityService) {
 }
 
 object views {
-  def index(currentUserOpt: Option[CustomUserProfile]): Frag = doctype("html")(
+  def index(currentUserOpt: Option[CustomUserProfile]) = doctype("html")(
     html(
       body(
         a(href := "/protected-resource")("Protected resource"),
@@ -36,7 +36,7 @@ object views {
     )
   )
 
-  def protectedResource(using currentUser: CustomUserProfile): Frag = doctype("html")(
+  def protectedResource(using currentUser: CustomUserProfile) = doctype("html")(
     html(
       body(
         a(href := "/")("Home"),
@@ -45,7 +45,7 @@ object views {
     )
   )
 
-  def showForm(callbackUrl: String): Frag = doctype("html")(
+  def showForm(callbackUrl: String) = doctype("html")(
     html(
       body(
         form(action := s"${callbackUrl}?client_name=FormClient", method := "POST")(
