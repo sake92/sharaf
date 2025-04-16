@@ -9,15 +9,18 @@ class AppRoutes(callbackUrl: String, securityService: SecurityService) {
     case GET -> Path("login-form") =>
       Response.withBody(views.showForm(callbackUrl))
     case GET -> Path("protected-resource") =>
-      Response.withBody(views.protectedResource())
+      securityService.withCurrentUser {
+        Response.withBody(views.protectedResource)
+      }
     case GET -> Path() =>
       val view = views.index(securityService.currentUser)
       Response.withBody(view)
   }
+
 }
 
 object views {
-  def index(currentUserOpt: Option[CustomUserProfile]) = doctype("html")(
+  def index(currentUserOpt: Option[CustomUserProfile]): Frag = doctype("html")(
     html(
       body(
         a(href := "/protected-resource")("Protected resource"),
@@ -33,16 +36,16 @@ object views {
     )
   )
 
-  def protectedResource() = doctype("html")(
+  def protectedResource(using currentUser: CustomUserProfile): Frag = doctype("html")(
     html(
       body(
         a(href := "/")("Home"),
-        div("Yay! You are logged in!")
+        div(s"Hello ${currentUser.name}! You are logged in!")
       )
     )
   )
 
-  def showForm(callbackUrl: String) = doctype("html")(
+  def showForm(callbackUrl: String): Frag = doctype("html")(
     html(
       body(
         form(action := s"${callbackUrl}?client_name=FormClient", method := "POST")(

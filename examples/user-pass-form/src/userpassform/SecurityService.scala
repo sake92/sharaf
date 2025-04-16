@@ -20,8 +20,11 @@ class SecurityService(config: Config) {
 
   def getCurrentUser(using req: Request): CustomUserProfile =
     currentUser.getOrElse(throw NotAuthenticatedException())
+    
+  // convenient utility method so that you don't have to pass the user around
+  def withCurrentUser[T](f: CustomUserProfile ?=> T)(using req: Request): T = {
+    f(using getCurrentUser)
+  }
 }
-
-case class CustomUserProfile(name: String)
 
 class NotAuthenticatedException extends RuntimeException
