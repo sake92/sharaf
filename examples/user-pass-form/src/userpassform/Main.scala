@@ -47,7 +47,6 @@ class UserPassFormModule(port: Int) {
   private val publicRoutesMatcher = PathMatcher()
   private val publicRoutesMatcherName = "publicRoutesMatcher"
   publicRoutesMatcher.excludePaths("/", "/login-form")
-  publicRoutesMatcher.excludeRegex("")
   pac4jConfig.addMatcher(publicRoutesMatcherName, publicRoutesMatcher)
   private val clientNames = clients.getClients.asScala.map(_.getName()).toSeq
   val securityService = SecurityService(pac4jConfig)
