@@ -1,7 +1,7 @@
 package api
 
-import ba.sake.tupson.JsonRW
 import ba.sake.querson.QueryStringRW
+import ba.sake.tupson.JsonRW
 import ba.sake.validson.*
 
 case class CreateProductReq private (name: String, quantity: Int) derives JsonRW

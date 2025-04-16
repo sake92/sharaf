@@ -2,9 +2,10 @@ package api
 
 import java.nio.file.Files
 import java.util.UUID
-import io.undertow.Undertow
-import ba.sake.sharaf.*, routing.*
+import ba.sake.sharaf.*
+import ba.sake.sharaf.routing.*
 import ba.sake.tupson.toJson
+import io.undertow.Undertow
 
 @main def main: Unit =
   val module = JsonApiModule(8181)
@@ -38,7 +39,7 @@ class JsonApiModule(port: Int) {
 
     case GET -> Path("products.json") =>
       val tmpFile = Files.createTempFile("product", ".json")
-      tmpFile.toFile().deleteOnExit()
+      tmpFile.toFile.deleteOnExit()
       Files.writeString(tmpFile, db.toJson)
       Response.withBody(tmpFile)
 
