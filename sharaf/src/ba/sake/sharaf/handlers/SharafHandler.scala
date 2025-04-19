@@ -11,6 +11,8 @@ import ba.sake.sharaf.{Request, Response, SharafController}
 import ba.sake.sharaf.exceptions.ExceptionMapper
 import ba.sake.sharaf.handlers.cors.*
 
+import java.util.concurrent.Executors
+
 final class SharafHandler private (
     routes: Routes,
     corsSettings: CorsSettings,
@@ -23,9 +25,8 @@ final class SharafHandler private (
   }
 
   // everything is wrapped in a synchronous/blocking handler
-  private val finalHandler =
-    BlockingHandler( // synchronous/blocking handler
-      ExceptionHandler( // handle exceptions gracefully
+  private val finalHandler = {
+    val handler= ExceptionHandler( // handle exceptions gracefully
         CorsHandler( // handle CORS preflight requests
           RoutesHandler( // main Sharaf routes handler
             routes,
@@ -46,7 +47,21 @@ final class SharafHandler private (
         ),
         exceptionMapper
       )
-    )
+    new HttpHandler {
+      val virtualThreadExecutor = Executors.newVirtualThreadPerTaskExecutor()
+      override def handleRequest(exchange: HttpServerExchange): Unit = {
+        // adapted from Undertow's BlockingHandler
+        exchange.startBlocking();
+        if (exchange.isInIoThread) {
+          exchange.dispatch(handler);
+        } else {
+          // just delegate to a virtual thread to handle the request
+          val runnable : Runnable = () => handler.handleRequest(exchange)
+          virtualThreadExecutor.submit(runnable)
+        }
+      }
+    }
+  }
 
   override def handleRequest(exchange: HttpServerExchange): Unit =
     finalHandler.handleRequest(exchange)
