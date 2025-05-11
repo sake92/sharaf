@@ -2,10 +2,10 @@ package userpassform
 
 import scalatags.Text.all.*
 import ba.sake.sharaf.*
-import ba.sake.sharaf.routing.*
+import ba.sake.sharaf.undertow.{*, given}
 
 class AppRoutes(callbackUrl: String, securityService: SecurityService) {
-  val routes = Routes {
+  val routes = UndertowSharafRoutes {
     case GET -> Path("login-form") =>
       Response.withBody(views.showForm(callbackUrl))
     case GET -> Path("protected-resource") =>

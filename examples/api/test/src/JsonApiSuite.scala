@@ -7,7 +7,7 @@ import ba.sake.sharaf.exceptions.*
 import ba.sake.sharaf.utils.*
 
 class JsonApiSuite extends munit.FunSuite {
-  
+
   val moduleFixture = new Fixture[JsonApiModule]("JsonApiModule") {
     private var module: JsonApiModule = uninitialized
 
@@ -20,7 +20,7 @@ class JsonApiSuite extends munit.FunSuite {
     override def afterEach(context: AfterEach): Unit =
       module.server.stop()
   }
-  
+
   override def munitFixtures = List(moduleFixture)
 
   test("products can be created and fetched") {
@@ -31,7 +31,7 @@ class JsonApiSuite extends munit.FunSuite {
     locally {
       val res = requests.get(s"$baseUrl/products")
       assertEquals(res.statusCode, 200)
-      assertEquals(res.headers("content-type"), Seq("application/json"))
+      assertEquals(res.headers("content-type"), Seq("application/json; charset=utf-8"))
       assertEquals(res.text.parseJson[Seq[ProductRes]], Seq.empty)
     }
 
@@ -39,9 +39,13 @@ class JsonApiSuite extends munit.FunSuite {
     val firstProduct = locally {
       val reqBody = CreateProductReq.of("Chocolate", 5)
       val res =
-        requests.post(s"$baseUrl/products", data = reqBody.toJson, headers = Map("Content-Type" -> "application/json"))
+        requests.post(
+          s"$baseUrl/products",
+          data = reqBody.toJson,
+          headers = Map("Content-Type" -> "application/json; charset=utf-8")
+        )
       assertEquals(res.statusCode, 200)
-      assertEquals(res.headers("content-type"), Seq("application/json"))
+      assertEquals(res.headers("content-type"), Seq("application/json; charset=utf-8"))
       val resBody = res.text.parseJson[ProductRes]
       assertEquals(resBody.name, "Chocolate")
       assertEquals(resBody.quantity, 5)
@@ -53,14 +57,14 @@ class JsonApiSuite extends munit.FunSuite {
     requests.post(
       s"$baseUrl/products",
       data = CreateProductReq.of("Milk", 7).toJson,
-      headers = Map("Content-Type" -> "application/json")
+      headers = Map("Content-Type" -> "application/json; charset=utf-8")
     )
 
     // second GET -> new product
     locally {
       val res = requests.get(s"$baseUrl/products")
       assertEquals(res.statusCode, 200)
-      assertEquals(res.headers("content-type"), Seq("application/json"))
+      assertEquals(res.headers("content-type"), Seq("application/json; charset=utf-8"))
       val resBody = res.text.parseJson[Seq[ProductRes]]
       assertEquals(resBody.size, 2)
       assertEquals(resBody.head.name, "Chocolate")
@@ -68,11 +72,12 @@ class JsonApiSuite extends munit.FunSuite {
     }
 
     // filtering GET
+    // TODO reenable
     locally {
       val queryParams = ProductsQuery(Set("Chocolate"), Option(1)).toRequestsQuery()
       val res = requests.get(s"$baseUrl/products", params = queryParams)
       assertEquals(res.statusCode, 200)
-      assertEquals(res.headers("content-type"), Seq("application/json"))
+      assertEquals(res.headers("content-type"), Seq("application/json; charset=utf-8"))
       val resBody = res.text.parseJson[Seq[ProductRes]]
       assertEquals(resBody.size, 1)
       assertEquals(resBody.head.name, "Chocolate")
@@ -83,7 +88,7 @@ class JsonApiSuite extends munit.FunSuite {
     locally {
       val res = requests.get(s"$baseUrl/products/${firstProduct.id}")
       assertEquals(res.statusCode, 200)
-      assertEquals(res.headers("content-type"), Seq("application/json"))
+      assertEquals(res.headers("content-type"), Seq("application/json; charset=utf-8"))
       val resBody = res.text.parseJson[ProductRes]
       assertEquals(resBody, firstProduct)
     }
@@ -119,7 +124,11 @@ class JsonApiSuite extends munit.FunSuite {
       "quantity": 0
     }"""
     val ex = intercept[requests.RequestFailedException] {
-      requests.post(s"$baseUrl/products", data = reqBody, headers = Map("Content-Type" -> "application/json"))
+      requests.post(
+        s"$baseUrl/products",
+        data = reqBody,
+        headers = Map("Content-Type" -> "application/json; charset=utf-8")
+      )
     }
     val resProblem = ex.response.text().parseJson[ProblemDetails]
 

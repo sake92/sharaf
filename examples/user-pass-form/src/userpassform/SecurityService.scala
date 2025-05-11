@@ -4,11 +4,11 @@ import scala.jdk.OptionConverters.*
 import org.pac4j.core.config.Config
 import org.pac4j.core.util.FindBest
 import org.pac4j.undertow.context.{UndertowSessionStore, UndertowWebContext}
-import ba.sake.sharaf.Request
+import ba.sake.sharaf.undertow.UndertowSharafRequest
 
 class SecurityService(config: Config) {
 
-  def currentUser(using req: Request): Option[CustomUserProfile] = {
+  def currentUser(using req: UndertowSharafRequest): Option[CustomUserProfile] = {
     val exchange = req.underlyingHttpServerExchange
     @annotation.nowarn
     val sessionStore = FindBest.sessionStore(null, config, UndertowSessionStore(exchange))
@@ -18,11 +18,11 @@ class SecurityService(config: Config) {
     }
   }
 
-  def getCurrentUser(using req: Request): CustomUserProfile =
+  def getCurrentUser(using req: UndertowSharafRequest): CustomUserProfile =
     currentUser.getOrElse(throw NotAuthenticatedException())
-    
+
   // convenient utility method so that you don't have to pass the user around
-  def withCurrentUser[T](f: CustomUserProfile ?=> T)(using req: Request): T = {
+  def withCurrentUser[T](f: CustomUserProfile ?=> T)(using req: UndertowSharafRequest): T = {
     f(using getCurrentUser)
   }
 }

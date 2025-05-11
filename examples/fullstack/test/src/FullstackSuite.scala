@@ -2,7 +2,7 @@ package fullstack
 
 import scala.compiletime.uninitialized
 import ba.sake.formson.*
-import ba.sake.sharaf.*
+import ba.sake.sharaf.{*, given}
 import ba.sake.sharaf.utils.*
 import java.nio.file.Path
 

@@ -2,6 +2,7 @@ package userpassform
 
 import scala.jdk.CollectionConverters.*
 import ba.sake.sharaf.*
+import ba.sake.sharaf.undertow.handlers.SharafHandler
 import io.undertow.server.session.{InMemorySessionManager, SessionAttachmentHandler, SessionCookieConfig}
 import io.undertow.{Handlers, Undertow}
 import org.pac4j.core.client.Clients

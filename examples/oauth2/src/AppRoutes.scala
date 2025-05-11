@@ -4,10 +4,11 @@ import scalatags.Text.all.*
 import ba.sake.sharaf.*
 import ba.sake.sharaf.routing.*
 import ba.sake.hepek.html.HtmlPage
+import ba.sake.sharaf.undertow.{*, given}
 
 class AppRoutes(securityService: SecurityService) {
 
-  val routes = Routes:
+  val routes = UndertowSharafRoutes:
     case GET -> Path("protected") =>
       Response.withBody(ProtectedPage)
 

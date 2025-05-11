@@ -21,7 +21,8 @@ class QueryStringWriteSuite extends munit.FunSuite {
 
   test("toQueryString should write simple query parameters to string") {
     val res1 =
-      QuerySimple("some text", Some("optional"), 42, uuid, URL("http://example.com"), instant, ldt, duration, period).toQueryString()
+      QuerySimple("some text", Some("optional"), 42, uuid, URL("http://example.com"), instant, ldt, duration, period)
+        .toQueryString()
     assertEquals(
       res1,
       s"duration=PT5H2S&url=http%3A%2F%2Fexample.com&uuid=$uuid&strOpt%5B0%5D=optional&str=some+text&instant=2007-12-03T10%3A15%3A30Z&int=42&period=P4M1D&ldt=2007-12-03T10%3A15%3A30"
