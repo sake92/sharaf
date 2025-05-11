@@ -1,4 +1,4 @@
-package ba.sake.sharaf.handlers
+package ba.sake.sharaf.undertow.handlers
 
 import ba.sake.sharaf.*
 import io.undertow.server.{HttpHandler, HttpServerExchange}

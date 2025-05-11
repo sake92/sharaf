@@ -1,4 +1,4 @@
-package ba.sake.sharaf
+package ba.sake.sharaf.undertow
 
 import ba.sake.sharaf.Cookie
 import io.undertow.server.handlers.{Cookie as UndertowCookie, CookieImpl as UndertowCookieImpl}

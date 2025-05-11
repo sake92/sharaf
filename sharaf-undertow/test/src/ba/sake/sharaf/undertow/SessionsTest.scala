@@ -1,9 +1,10 @@
-package ba.sake.sharaf
+package ba.sake.sharaf.undertow
 
 import io.undertow.Undertow
 import io.undertow.server.session.{InMemorySessionManager, SessionAttachmentHandler, SessionCookieConfig}
+import ba.sake.sharaf.*
 import ba.sake.sharaf.undertow.{*, given}
-import ba.sake.sharaf.handlers.SharafHandler
+import ba.sake.sharaf.undertow.handlers.SharafHandler
 
 class SessionsTest extends munit.FunSuite {
   val port = utils.getFreePort()

@@ -5,14 +5,13 @@ import ba.sake.hepek.html.HtmlPage
 import ba.sake.sharaf.*
 import ba.sake.sharaf.routing.*
 
-
 type UndertowSharafRoutes = SharafRoutes[UndertowSharafRequest]
 type UndertowSharafController = SharafController[UndertowSharafRequest]
 
 object UndertowSharafRoutes:
+  export SharafRoutes.merge
   def apply(routesDef: UndertowSharafRequest ?=> PartialFunction[RequestParams, Response[?]]): UndertowSharafRoutes =
     SharafRoutes(routesDef)
-  export SharafRoutes.merge
 
 // TODO separate library
 given ResponseWritable[HtmlPage] with {

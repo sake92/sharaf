@@ -1,8 +1,9 @@
-package ba.sake.sharaf
+package ba.sake.sharaf.undertow
 
 import scala.jdk.CollectionConverters.*
 import io.undertow.server.HttpServerExchange
 import io.undertow.util.HttpString as UndertowHttpString
+import ba.sake.sharaf.*
 
 object ResponseUtils {
   
@@ -22,7 +23,7 @@ object ResponseUtils {
     }
 
     response.cookieUpdates.updates.foreach { cookie =>
-      exchange.setResponseCookie(CookieUtils.toUndertow(cookie))
+      exchange.setResponseCookie(undertow.CookieUtils.toUndertow(cookie))
     }
 
     exchange.setStatusCode(response.status)

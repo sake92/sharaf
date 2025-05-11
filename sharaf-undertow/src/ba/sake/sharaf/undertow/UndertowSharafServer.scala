@@ -1,8 +1,8 @@
-package ba.sake.sharaf
+package ba.sake.sharaf.undertow
 
 import io.undertow.Undertow
-import io.undertow.server.HttpHandler
-import ba.sake.sharaf.handlers.SharafHandler
+import ba.sake.sharaf.*
+import ba.sake.sharaf.undertow.handlers.SharafHandler
 import ba.sake.sharaf.undertow.UndertowSharafRoutes
 
 class UndertowSharafServer private (host: String, port: Int, sharafHandler: SharafHandler) {

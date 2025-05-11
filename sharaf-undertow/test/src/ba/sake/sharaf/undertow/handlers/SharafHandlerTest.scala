@@ -1,8 +1,7 @@
-package ba.sake.sharaf.handlers
+package ba.sake.sharaf.undertow.handlers
 
 import ba.sake.sharaf.*
-import ba.sake.sharaf.undertow.UndertowSharafRoutes
-import ba.sake.sharaf.utils
+import ba.sake.sharaf.undertow.*
 
 class SharafHandlerTest extends munit.FunSuite {
 
