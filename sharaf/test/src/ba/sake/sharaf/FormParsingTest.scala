@@ -10,7 +10,7 @@ class FormParsingTest extends munit.FunSuite {
     val uFormData = UFormData(50)
     for i <- 0 until 50 do uFormData.add(s"a$i", "bla")
 
-    val formsonMap = Request.undertowFormData2FormsonMap(uFormData)
+    val formsonMap = UndertowSharafRequest.undertowFormData2FormsonMap(uFormData)
 
     assertEquals(
       formsonMap,

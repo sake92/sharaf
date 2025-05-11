@@ -1,13 +1,10 @@
-package ba.sake.sharaf.handlers.cors
-
-import scala.jdk.CollectionConverters.*
-import io.undertow.server.HttpHandler
-import io.undertow.server.HttpServerExchange
-import io.undertow.util.Headers
-import io.undertow.util.HttpString
-import io.undertow.util.Methods
+package ba.sake.sharaf.handlers
 
 import ba.sake.sharaf.*
+import io.undertow.server.{HttpHandler, HttpServerExchange}
+import io.undertow.util.{Headers, HttpString, Methods}
+
+import scala.jdk.CollectionConverters.*
 
 // TODO write some tests
 // https://www.moesif.com/blog/technical/cors/Authoritative-Guide-to-CORS-Cross-Origin-Resource-Sharing-for-REST-APIs/

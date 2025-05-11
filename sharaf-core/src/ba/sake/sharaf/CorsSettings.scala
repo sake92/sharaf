@@ -1,9 +1,6 @@
-package ba.sake.sharaf.handlers.cors
+package ba.sake.sharaf
 
 import java.time.Duration
-import io.undertow.util.Headers
-import io.undertow.util.HttpString
-import io.undertow.util.Methods
 
 // stolen from Play
 // https://www.playframework.com/documentation/2.8.x/CorsFilter#Configuring-the-CORS-filter
@@ -11,7 +8,7 @@ import io.undertow.util.Methods
 final class CorsSettings private (
     val pathPrefixes: Set[String],
     val allowedOrigins: Set[String],
-    val allowedHttpMethods: Set[HttpString],
+    val allowedHttpMethods: Set[HttpMethod],
     val allowedHttpHeaders: Set[HttpString],
     val allowCredentials: Boolean,
     val preflightMaxAge: Duration
@@ -23,7 +20,7 @@ final class CorsSettings private (
   def withAllowedOrigins(allowedOrigins: Set[String]): CorsSettings =
     copy(allowedOrigins = allowedOrigins)
 
-  def withAllowedHttpMethods(allowedHttpMethods: Set[HttpString]): CorsSettings =
+  def withAllowedHttpMethods(allowedHttpMethods: Set[HttpMethod]): CorsSettings =
     copy(allowedHttpMethods = allowedHttpMethods)
 
   def withAllowedHttpHeaders(allowedHttpHeaders: Set[HttpString]): CorsSettings =
@@ -38,7 +35,7 @@ final class CorsSettings private (
   private def copy(
       pathPrefixes: Set[String] = pathPrefixes,
       allowedOrigins: Set[String] = allowedOrigins,
-      allowedHttpMethods: Set[HttpString] = allowedHttpMethods,
+      allowedHttpMethods: Set[HttpMethod] = allowedHttpMethods,
       allowedHttpHeaders: Set[HttpString] = allowedHttpHeaders,
       allowCredentials: Boolean = allowCredentials,
       preflightMaxAge: Duration = preflightMaxAge
@@ -68,7 +65,7 @@ object CorsSettings:
     pathPrefixes = Set("/"),
     allowedOrigins = Set.empty,
     allowedHttpMethods =
-      Set(Methods.GET, Methods.HEAD, Methods.OPTIONS, Methods.POST, Methods.PUT, Methods.PATCH, Methods.DELETE),
+      Set(HttpMethod.GET, HttpMethod.HEAD, HttpMethod.OPTIONS, HttpMethod.POST, HttpMethod.PUT, HttpMethod.PATCH, HttpMethod.DELETE),
     allowedHttpHeaders = Set(Headers.ACCEPT, Headers.ACCEPT_LANGUAGE, Headers.CONTENT_LANGUAGE, Headers.CONTENT_TYPE),
     allowCredentials = false,
     preflightMaxAge = Duration.ofDays(3)

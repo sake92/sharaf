@@ -1,9 +1,17 @@
 package ba.sake.sharaf.utils
 
-import ba.sake.{formson, querson}
+import java.net.ServerSocket
+import scala.util.Using
+
+def getFreePort(): Int =
+  Using.resource(ServerSocket(0)) { ss =>
+    ss.getLocalPort
+  }
+
+// TODO use sttp 4 instead of requests
+/*
 
 // requests integration
-// TODO replace with sttp in sharaf-core
 extension [T](value: T)(using rw: formson.FormDataRW[T])
   def toRequestsMultipart(config: formson.Config = formson.DefaultFormsonConfig): requests.MultiPart =
     import formson.*
@@ -20,3 +28,4 @@ extension [T](value: T)(using rw: querson.QueryStringRW[T])
   def toRequestsQuery(config: querson.Config = querson.DefaultQuersonConfig): Map[String, String] =
     import querson.*
     value.toQueryStringMap().map { (k, vs) => k -> vs.head }
+    */

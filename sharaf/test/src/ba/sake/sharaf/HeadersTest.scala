@@ -1,14 +1,14 @@
 package ba.sake.sharaf
 
 import io.undertow.Undertow
-import ba.sake.sharaf.routing.*
+import ba.sake.sharaf.undertow.*
 
 class HeadersTest extends munit.FunSuite {
   
   val port = utils.getFreePort()
   val baseUrl = s"http://localhost:$port"
 
-  val routes = Routes {
+  val routes = UndertowSharafRoutes {
     case GET -> Path("settingHeader") =>
       Response.settingHeader("header1", "header1Value")
     case GET -> Path("removingHeader") =>
@@ -18,11 +18,7 @@ class HeadersTest extends munit.FunSuite {
       Response.settingHeader("header1", "header1Value").removingHeader("header1")
   }
 
-  val server = Undertow
-    .builder()
-    .addHttpListener(port, "localhost")
-    .setHandler(SharafHandler(routes))
-    .build()
+  val server = UndertowSharafServer("localhost", port, routes)
 
   override def beforeAll(): Unit = server.start()
 

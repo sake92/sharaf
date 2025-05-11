@@ -1,0 +1,64 @@
+package ba.sake.sharaf
+
+object StatusCodes {
+  val CONTINUE : Int = 100
+  val SWITCHING_PROTOCOLS : Int = 101
+  val PROCESSING : Int = 102
+  
+  val OK : Int = 200
+  val CREATED : Int = 201
+  val ACCEPTED : Int = 202
+  val NON_AUTHORITATIVE_INFORMATION : Int = 203
+  val NO_CONTENT : Int = 204
+  val RESET_CONTENT : Int = 205
+  val PARTIAL_CONTENT : Int = 206
+  val MULTI_STATUS : Int = 207
+  val ALREADY_REPORTED : Int = 208
+  val IM_USED : Int = 226
+  
+  val MULTIPLE_CHOICES : Int = 300
+  val MOVED_PERMANENTLY : Int = 301
+  val FOUND : Int = 302
+  val SEE_OTHER : Int = 303
+  val NOT_MODIFIED : Int = 304
+  val USE_PROXY : Int = 305
+  val TEMPORARY_REDIRECT : Int = 307
+  val PERMANENT_REDIRECT : Int = 308
+  
+  val BAD_REQUEST : Int = 400
+  val UNAUTHORIZED : Int = 401
+  val PAYMENT_REQUIRED : Int = 402
+  val FORBIDDEN : Int = 403
+  val NOT_FOUND : Int = 404
+  val METHOD_NOT_ALLOWED : Int = 405
+  val NOT_ACCEPTABLE : Int = 406
+  val PROXY_AUTHENTICATION_REQUIRED : Int = 407
+  val REQUEST_TIME_OUT : Int = 408
+  val CONFLICT : Int = 409
+  val GONE : Int = 410
+  val LENGTH_REQUIRED : Int = 411
+  val PRECONDITION_FAILED : Int = 412
+  val REQUEST_ENTITY_TOO_LARGE : Int = 413
+  val REQUEST_URI_TOO_LARGE : Int = 414
+  val UNSUPPORTED_MEDIA_TYPE : Int = 415
+  val REQUEST_RANGE_NOT_SATISFIABLE : Int = 416
+  val EXPECTATION_FAILED : Int = 417
+  val UNPROCESSABLE_ENTITY : Int = 422
+  val LOCKED : Int = 423
+  val FAILED_DEPENDENCY : Int = 424
+  val UPGRADE_REQUIRED : Int = 426
+  val PRECONDITION_REQUIRED : Int = 428
+  val TOO_MANY_REQUESTS : Int = 429
+  val REQUEST_HEADER_FIELDS_TOO_LARGE : Int = 431
+  
+  val INTERNAL_SERVER_ERROR : Int = 500
+  val NOT_IMPLEMENTED : Int = 501
+  val BAD_GATEWAY : Int = 502
+  val SERVICE_UNAVAILABLE : Int = 503
+  val GATEWAY_TIME_OUT : Int = 504
+  val HTTP_VERSION_NOT_SUPPORTED : Int = 505
+  val INSUFFICIENT_STORAGE : Int = 507
+  val LOOP_DETECTED : Int = 508
+  val NOT_EXTENDED : Int = 510
+  val NETWORK_AUTHENTICATION_REQUIRED : Int = 511
+}

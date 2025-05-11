@@ -1,7 +1,5 @@
 package ba.sake.sharaf
 
-import io.undertow.util.HttpString
-
 /** Headers represented as a series of immutable transformations. This is handy when you dynamically remove header(s),
   * maybe set by a previous Undertow handler.
   *

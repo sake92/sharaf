@@ -1,6 +1,8 @@
 # TODO
 
-- migrate to Pico.css
+- some kind of middleware mechanism
+
+- migrate docs to Pico.css
 
 - MiMa bin compat
 

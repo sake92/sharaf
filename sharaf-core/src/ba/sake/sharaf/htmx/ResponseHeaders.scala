@@ -1,6 +1,6 @@
 package ba.sake.sharaf.htmx
 
-import io.undertow.util.HttpString
+import ba.sake.sharaf.HttpString
 
 object ResponseHeaders {
 

@@ -2,18 +2,18 @@ package ba.sake.sharaf.handlers
 
 import io.undertow.server.HttpHandler
 import io.undertow.server.HttpServerExchange
-
 import ba.sake.sharaf.*
 import ba.sake.sharaf.routing.*
+import ba.sake.sharaf.undertow.*
 
-final class RoutesHandler private (routes: Routes, nextHandler: Option[HttpHandler]) extends HttpHandler {
+final class RoutesHandler private (routes: UndertowSharafRoutes, nextHandler: Option[HttpHandler]) extends HttpHandler {
 
   override def handleRequest(exchange: HttpServerExchange): Unit = {
-    given Request = Request.create(exchange)
+    given UndertowSharafRequest = UndertowSharafRequest.create(exchange)
     val reqParams = fillReqParams(exchange)
     val resOpt = routes.definition.lift(reqParams)
     resOpt match {
-      case Some(res) => ResponseWritable.writeResponse(res, exchange)
+      case Some(res) => ResponseUtils.writeResponse(res, exchange)
       case None =>
         nextHandler match
           case Some(next) => next.handleRequest(exchange)
@@ -39,8 +39,8 @@ final class RoutesHandler private (routes: Routes, nextHandler: Option[HttpHandl
 }
 
 object RoutesHandler:
-  def apply(routes: Routes): RoutesHandler =
+  def apply(routes: UndertowSharafRoutes): RoutesHandler =
     new RoutesHandler(routes, None)
 
-  def apply(routes: Routes, nextHandler: HttpHandler): RoutesHandler =
+  def apply(routes: UndertowSharafRoutes, nextHandler: HttpHandler): RoutesHandler =
     new RoutesHandler(routes, Some(nextHandler))

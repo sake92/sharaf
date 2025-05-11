@@ -2,7 +2,6 @@ package ba.sake.sharaf.exceptions
 
 import java.net.URI
 import scala.jdk.CollectionConverters.*
-import io.undertow.util.StatusCodes
 import ba.sake.tupson
 import ba.sake.formson
 import ba.sake.querson

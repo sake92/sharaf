@@ -1,14 +1,10 @@
-package ba.sake.sharaf
-package routing
+package ba.sake.sharaf.routing
 
 import java.util.UUID
 import scala.deriving.*
 import scala.quoted.*
 import scala.util.Try
 
-object param:
-  def unapply[T](str: String)(using fp: FromPathParam[T]): Option[T] =
-    fp.parse(str)
 
 // typeclass for converting a path parameter to T
 trait FromPathParam[T]:

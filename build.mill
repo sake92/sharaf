@@ -11,14 +11,27 @@ import de.tobiasroeser.mill.vcs.version.VcsVersion
 import ba.sake.millhepek.MillHepekModule
 
 object V {
-  val hepek = "0.30.0"
   val tupson = "0.13.0"
+  val scalatags = "0.13.1"
+  val hepek = "0.30.0"
+}
+
+object `sharaf-core` extends SharafPublishModule {
+  def artifactName = "sharaf-core"
+  // all deps should be cross jvm/js/native
+  def ivyDeps = Agg(
+    ivy"ba.sake::tupson:${V.tupson}",
+    ivy"ba.sake::tupson-config:${V.tupson}",
+    ivy"com.lihaoyi::scalatags:${V.scalatags}",
+    ivy"com.lihaoyi::geny:1.1.1"
+  )
+  def moduleDeps = Seq(querson, formson)
+  object test extends ScalaTests with SharafTestModule {
+  }
 }
 
 object sharaf extends SharafPublishModule {
-
   def artifactName = "sharaf"
-
   def ivyDeps = Agg(
     ivy"io.undertow:undertow-core:2.3.18.Final",
     ivy"com.lihaoyi::requests:0.9.0",
@@ -27,9 +40,7 @@ object sharaf extends SharafPublishModule {
     ivy"ba.sake::tupson-config:${V.tupson}",
     ivy"ba.sake::hepek-components:${V.hepek}"
   )
-
-  def moduleDeps = Seq(querson, formson)
-
+  def moduleDeps = Seq(`sharaf-core`)
   object test extends ScalaTests with SharafTestModule {
     def ivyDeps = super.ivyDeps() ++ Agg(
       ivy"org.webjars:jquery:3.7.1"
@@ -38,52 +49,36 @@ object sharaf extends SharafPublishModule {
 }
 
 object querson extends SharafPublishModule {
-
   def artifactName = "querson"
-
   def moduleDeps = Seq(validson)
-
   def pomSettings = super.pomSettings().copy(description = "Sharaf query params library")
-
   def ivyDeps = Agg(
     ivy"com.lihaoyi::fastparse:3.0.1"
   )
-
   object test extends ScalaTests with SharafTestModule
 }
 
 object formson extends SharafPublishModule {
-
   def artifactName = "formson"
-
   def moduleDeps = Seq(validson)
-
   def pomSettings = super.pomSettings().copy(description = "Sharaf form binding library")
-
-  object test extends ScalaTests with SharafTestModule
-
   def ivyDeps = Agg(
     ivy"com.lihaoyi::fastparse:3.0.1"
   )
+  object test extends ScalaTests with SharafTestModule
 }
 
 object validson extends SharafPublishModule {
-
   def artifactName = "validson"
-
   def ivyDeps = Agg(
     ivy"com.lihaoyi::sourcecode::0.3.0"
   )
-
   def pomSettings = super.pomSettings().copy(description = "Sharaf validation library")
-
   object test extends ScalaTests with SharafTestModule
 }
 
 trait SharafPublishModule extends SharafCommonModule with PublishModule {
-
   def publishVersion = VcsVersion.vcsState().format()
-
   def pomSettings = PomSettings(
     organization = "ba.sake",
     url = "https://github.com/sake92/sharaf",

@@ -1,8 +1,5 @@
 package ba.sake.sharaf
 
-import io.undertow.util.StatusCodes
-import io.undertow.util.HttpString
-
 final class Response[T] private (
     val status: Int,
     private[sharaf] val headerUpdates: HeaderUpdates,

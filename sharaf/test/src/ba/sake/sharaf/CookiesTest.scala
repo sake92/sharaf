@@ -1,25 +1,20 @@
 package ba.sake.sharaf
 
-import ba.sake.sharaf.routing.*
-import io.undertow.Undertow
+import ba.sake.sharaf.undertow.*
 
 class CookiesTest extends munit.FunSuite {
 
   val port = utils.getFreePort()
   val baseUrl = s"http://localhost:$port"
 
-  val routes = Routes {
+  val routes = UndertowSharafRoutes {
     case GET -> Path("settingCookie") =>
       Response.settingCookie(Cookie("cookie1", "cookie1Value"))
     case GET -> Path("removingCookie") =>
       Response.removingCookie("cookie1")
   }
 
-  val server = Undertow
-    .builder()
-    .addHttpListener(port, "localhost")
-    .setHandler(SharafHandler(routes))
-    .build()
+  val server = UndertowSharafServer("localhost", port, routes)
 
   override def beforeAll(): Unit = server.start()
 

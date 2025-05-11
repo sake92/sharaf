@@ -4,6 +4,7 @@ import scala.util.control.NonFatal
 import io.undertow.server.HttpHandler
 import io.undertow.server.HttpServerExchange
 import ba.sake.sharaf.*
+import ba.sake.sharaf.exceptions.ExceptionMapper
 
 final class ExceptionHandler private (next: HttpHandler, exceptionMapper: ExceptionMapper) extends HttpHandler {
 
@@ -14,7 +15,7 @@ final class ExceptionHandler private (next: HttpHandler, exceptionMapper: Except
         val responseOpt = exceptionMapper.lift(e)
         responseOpt match {
           case Some(response) =>
-            ResponseWritable.writeResponse(response, exchange)
+            ResponseUtils.writeResponse(response, exchange)
           case None =>
             // if no error response match, just propagate.
             // will return 500

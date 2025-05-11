@@ -2,9 +2,9 @@ package ba.sake.sharaf
 
 import java.nio.charset.StandardCharsets
 import java.nio.file.Paths
-import io.undertow.Undertow
 import io.undertow.util.Headers
 import ba.sake.sharaf.routing.*
+import ba.sake.sharaf.undertow.{*, given}
 import ba.sake.tupson.JsonRW
 
 class ResponseWritableTest extends munit.FunSuite {
@@ -14,7 +14,7 @@ class ResponseWritableTest extends munit.FunSuite {
   val port = utils.getFreePort()
   val baseUrl = s"http://localhost:$port"
 
-  val routes = Routes {
+  val routes = UndertowSharafRoutes {
     case GET -> Path("string") =>
       Response.withBody("a string")
     case GET -> Path("inputstream") =>
@@ -60,11 +60,7 @@ class ResponseWritableTest extends munit.FunSuite {
       Response.withBody(page)
   }
 
-  val server = Undertow
-    .builder()
-    .addHttpListener(port, "localhost")
-    .setHandler(SharafHandler(routes))
-    .build()
+  val server = UndertowSharafServer("localhost", port, routes)
 
   override def beforeAll(): Unit = server.start()
 
@@ -73,7 +69,7 @@ class ResponseWritableTest extends munit.FunSuite {
   test("Write response String") {
     val res = requests.get(s"${baseUrl}/string")
     assertEquals(res.text(), "a string")
-    assertEquals(res.headers(Headers.CONTENT_TYPE_STRING.toLowerCase), Seq("text/plain"))
+    assertEquals(res.headers(Headers.CONTENT_TYPE_STRING.toLowerCase), Seq("text/plain; charset=utf-8"))
   }
 
   test("Write response InputStream") {
@@ -103,7 +99,7 @@ class ResponseWritableTest extends munit.FunSuite {
   test("Write response JSON") {
     val res = requests.get(s"${baseUrl}/json")
     assertEquals(res.text(), """ {"name":"Meho","age":40} """.trim)
-    assertEquals(res.headers(Headers.CONTENT_TYPE_STRING.toLowerCase), Seq("application/json"))
+    assertEquals(res.headers(Headers.CONTENT_TYPE_STRING.toLowerCase), Seq("application/json; charset=utf-8"))
   }
 
   test("Write response scalatags Frag") {

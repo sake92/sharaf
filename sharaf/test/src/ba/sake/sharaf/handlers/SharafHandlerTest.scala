@@ -1,9 +1,7 @@
 package ba.sake.sharaf.handlers
 
-
-import io.undertow.Undertow
 import ba.sake.sharaf.*
-import ba.sake.sharaf.routing.*
+import ba.sake.sharaf.undertow.UndertowSharafRoutes
 import ba.sake.sharaf.utils
 
 class SharafHandlerTest extends munit.FunSuite {
@@ -11,16 +9,12 @@ class SharafHandlerTest extends munit.FunSuite {
   val port = utils.getFreePort()
   val baseUrl = s"http://localhost:$port"
 
-  val routes = Routes {
+  val routes = UndertowSharafRoutes {
     case GET -> Path("hello") =>
       Response.withBody("hello")
   }
 
-  val server = Undertow
-    .builder()
-    .addHttpListener(port, "localhost")
-    .setHandler(SharafHandler(routes))
-    .build()
+  val server = UndertowSharafServer("localhost", port,routes)
 
   override def beforeAll(): Unit = server.start()
 

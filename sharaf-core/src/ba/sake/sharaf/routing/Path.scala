@@ -1,4 +1,4 @@
-package ba.sake.sharaf
+package ba.sake.sharaf.routing
 
 final class Path private (
     val segments: Seq[String]

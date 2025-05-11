@@ -2,13 +2,13 @@ package ba.sake.sharaf
 
 import io.undertow.Undertow
 import io.undertow.server.session.{InMemorySessionManager, SessionAttachmentHandler, SessionCookieConfig}
-import ba.sake.sharaf.routing.*
+import ba.sake.sharaf.undertow.{*, given}
 
 class SessionsTest extends munit.FunSuite {
   val port = utils.getFreePort()
   val baseUrl = s"http://localhost:$port"
 
-  val routes = Routes {
+  val routes = UndertowSharafRoutes {
     case GET -> Path("getopt-session-value") =>
       val key1Value = Session.current.getOpt[String]("key1")
       Response.withBody(key1Value.getOrElse("not found"))
@@ -20,17 +20,14 @@ class SessionsTest extends munit.FunSuite {
       Response.default
   }
 
-  val server = Undertow
-    .builder()
-    .addHttpListener(port, "localhost")
-    .setHandler(
+  val server = UndertowSharafServer(
+    "localhost", port, 
       new SessionAttachmentHandler(
         SharafHandler(routes),
         new InMemorySessionManager("in-memory-session-manager"),
         new SessionCookieConfig()
       )
     )
-    .build()
 
   override def beforeAll(): Unit = server.start()
 
