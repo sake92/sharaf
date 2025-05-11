@@ -1,23 +1,18 @@
 package ba.sake.sharaf.undertow
 
+import java.io.OutputStream
 import ba.sake.hepek.html.HtmlPage
-import io.undertow.util.Sessions as UndertowSessions
 import ba.sake.sharaf.*
 import ba.sake.sharaf.routing.*
 
-import java.io.OutputStream
 
 type UndertowSharafRoutes = SharafRoutes[UndertowSharafRequest]
 type UndertowSharafController = SharafController[UndertowSharafRequest]
 
-// this is a
 object UndertowSharafRoutes:
   def apply(routesDef: UndertowSharafRequest ?=> PartialFunction[RequestParams, Response[?]]): UndertowSharafRoutes =
     SharafRoutes(routesDef)
   export SharafRoutes.merge
-
-// TODO rename
-val SharafHandler = ba.sake.sharaf.handlers.SharafHandler
 
 // TODO separate library
 given ResponseWritable[HtmlPage] with {
@@ -30,5 +25,5 @@ given ResponseWritable[HtmlPage] with {
 }
 
 given (using r: UndertowSharafRequest): Session =
-  val s = UndertowSessions.getOrCreateSession(r.underlyingHttpServerExchange)
+  val s = io.undertow.util.Sessions.getOrCreateSession(r.underlyingHttpServerExchange)
   UndertowSharafSession(s)

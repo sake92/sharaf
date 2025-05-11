@@ -3,6 +3,7 @@ package ba.sake.sharaf
 import io.undertow.Undertow
 import io.undertow.server.session.{InMemorySessionManager, SessionAttachmentHandler, SessionCookieConfig}
 import ba.sake.sharaf.undertow.{*, given}
+import ba.sake.sharaf.handlers.SharafHandler
 
 class SessionsTest extends munit.FunSuite {
   val port = utils.getFreePort()
@@ -20,14 +21,16 @@ class SessionsTest extends munit.FunSuite {
       Response.default
   }
 
-  val server = UndertowSharafServer(
-    "localhost", port, 
+  val server =  Undertow
+    .builder()
+    .addHttpListener(port, "localhost")
+    .setHandler(
       new SessionAttachmentHandler(
         SharafHandler(routes),
         new InMemorySessionManager("in-memory-session-manager"),
         new SessionCookieConfig()
       )
-    )
+    ).build()
 
   override def beforeAll(): Unit = server.start()
 

@@ -1,6 +1,13 @@
 package ba.sake.sharaf.utils
 
+import java.net.ServerSocket
+import scala.util.Using
 import ba.sake.{formson, querson}
+
+def getFreePort(): Int =
+  Using.resource(ServerSocket(0)) { ss =>
+    ss.getLocalPort
+  }
 
 // requests integration
 // TODO replace with sttp in sharaf-core

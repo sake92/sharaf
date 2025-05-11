@@ -31,17 +31,19 @@ class ErrorHandlerTest extends munit.FunSuite {
       Response.withBody("OK")
   }
 
-  val server = UndertowSharafServer("localhost", port,
-      Handlers
+  val server = Undertow
+    .builder()
+    .addHttpListener(port, "localhost")
+    .setHandler(Handlers
         .path()
         .addPrefixPath("default", SharafHandler(routes))
         .addPrefixPath("json", SharafHandler(routes).withExceptionMapper(ExceptionMapper.json))
         .addPrefixPath(
           "cors",
           SharafHandler(routes).withCorsSettings(CorsSettings.default.withAllowedOrigins(Set("http://example.com")))
-        )
-    )
-
+        ))
+    .build()
+    
   override def beforeAll(): Unit = server.start()
 
   override def afterAll(): Unit = server.stop()
@@ -67,15 +69,12 @@ class ErrorHandlerTest extends munit.FunSuite {
     assertEquals(res.text(), "Form parsing error: Key 'name' is missing")
     assertEquals(res.headers(Headers.CONTENT_TYPE_STRING.toLowerCase), Seq("text/plain; charset=utf-8"))
   }
-  // TODO reenable
-  /*
   test("Default error mapper handles form validation failure") {
     val res = requests.post(s"${baseUrl}/default/form", data = TestForm("").toRequestsMultipart(), check = false)
     assertEquals(res.statusCode, StatusCodes.UNPROCESSABLE_ENTITY)
     assertEquals(res.text(), "Validation errors: [ValidationError($.name,must be >= 3,)]")
     assertEquals(res.headers(Headers.CONTENT_TYPE_STRING.toLowerCase), Seq("text/plain; charset=utf-8"))
   }
-   */
 
   test("Default error mapper handles JSON parsing failure") {
     val res = requests.post(s"${baseUrl}/default/json", data = "", check = false)
@@ -120,8 +119,7 @@ class ErrorHandlerTest extends munit.FunSuite {
     )
     assertEquals(res.headers(Headers.CONTENT_TYPE_STRING.toLowerCase), Seq("application/json; charset=utf-8"))
   }
-  // TODO reenable
-  /*test("JSON error mapper handles form validation failure") {
+  test("JSON error mapper handles form validation failure") {
     val res = requests.post(s"${baseUrl}/json/form", data = TestForm("").toRequestsMultipart(), check = false)
     assertEquals(res.statusCode, StatusCodes.UNPROCESSABLE_ENTITY)
     assertEquals(
@@ -129,7 +127,7 @@ class ErrorHandlerTest extends munit.FunSuite {
       """{"instance":null,"invalidArguments":[{"reason":"must be >= 3","path":"$.name","value":""}],"detail":"","type":null,"title":"Validation errors","status":400}"""
     )
     assertEquals(res.headers(Headers.CONTENT_TYPE_STRING.toLowerCase), Seq("application/json; charset=utf-8"))
-  }*/
+  }
 
   test("JSON error mapper handles JSON parsing failure") {
     val res = requests.post(s"${baseUrl}/json/json", data = "", check = false)

@@ -5,7 +5,6 @@ import $ivy.`ba.sake::mill-hepek::0.1.0`
 
 import mill._
 import mill.scalalib._
-import mill.scalalib.scalafmt._
 import mill.scalalib.publish._
 import de.tobiasroeser.mill.vcs.version.VcsVersion
 import ba.sake.millhepek.MillHepekModule
@@ -30,8 +29,8 @@ object `sharaf-core` extends SharafPublishModule {
   }
 }
 
-object sharaf extends SharafPublishModule {
-  def artifactName = "sharaf"
+object `sharaf-undertow` extends SharafPublishModule {
+  def artifactName = "sharaf-undertow"
   def ivyDeps = Agg(
     ivy"io.undertow:undertow-core:2.3.18.Final",
     ivy"com.lihaoyi::requests:0.9.0",
@@ -91,7 +90,7 @@ trait SharafPublishModule extends SharafCommonModule with PublishModule {
   )
 }
 
-trait SharafCommonModule extends ScalaModule with ScalafmtModule {
+trait SharafCommonModule extends ScalaModule {
   def scalaVersion = "3.4.2"
   def scalacOptions = super.scalacOptions() ++ Seq(
     "-Yretain-trees", // needed for default parameters
@@ -116,15 +115,15 @@ trait SharafExampleModule extends SharafCommonModule {
 
 object examples extends mill.Module {
   object api extends SharafExampleModule {
-    def moduleDeps = Seq(sharaf)
+    def moduleDeps = Seq(`sharaf-undertow`)
     object test extends ScalaTests with SharafTestModule
   }
   object fullstack extends SharafExampleModule {
-    def moduleDeps = Seq(sharaf)
+    def moduleDeps = Seq(`sharaf-undertow`)
     object test extends ScalaTests with SharafTestModule
   }
   object `user-pass-form` extends SharafExampleModule {
-    def moduleDeps = Seq(sharaf)
+    def moduleDeps = Seq(`sharaf-undertow`)
     def ivyDeps = super.ivyDeps() ++ Agg(
       ivy"org.pac4j:undertow-pac4j:5.0.1",
       ivy"org.pac4j:pac4j-http:5.7.0",
@@ -133,7 +132,7 @@ object examples extends mill.Module {
     object test extends ScalaTests with SharafTestModule
   }
   object oauth2 extends SharafExampleModule {
-    def moduleDeps = Seq(sharaf)
+    def moduleDeps = Seq(`sharaf-undertow`)
     def ivyDeps = super.ivyDeps() ++ Agg(
       ivy"org.pac4j:undertow-pac4j:5.0.1",
       ivy"org.pac4j:pac4j-oauth:5.7.0"

@@ -72,7 +72,6 @@ final class SharafHandler private (
   ) = new SharafHandler(routes, corsSettings, exceptionMapper, notFoundHandler)
 }
 
-// TODO rename to SharafUndertowHandler
 object SharafHandler:
 
   private val defaultNotFoundResponse = Response.withBody("Not Found").withStatus(StatusCodes.NOT_FOUND)

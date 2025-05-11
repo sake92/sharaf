@@ -1,8 +1,8 @@
 package fullstack
 
-import io.undertow.Undertow
 import ba.sake.validson.*
-import ba.sake.sharaf.*, routing.*
+import ba.sake.sharaf.*
+import ba.sake.sharaf.undertow.{*, given}
 import fullstack.views.*
 
 @main def main: Unit =
@@ -14,7 +14,7 @@ class FullstackModule(port: Int) {
 
   val baseUrl = s"http://localhost:${port}"
 
-  private val routes = Routes:
+  private val routes = UndertowSharafRoutes:
     case GET -> Path() =>
       Response.withBody(ShowFormPage(CreateCustomerForm.empty))
 
@@ -27,9 +27,5 @@ class FullstackModule(port: Int) {
         case errors =>
           Response.withBody(ShowFormPage(formData, errors)).withStatus(400)
 
-  val server = Undertow
-    .builder()
-    .addHttpListener(port, "localhost")
-    .setHandler(SharafHandler(routes))
-    .build()
+  val server = UndertowSharafServer("localhost", port, routes)
 }

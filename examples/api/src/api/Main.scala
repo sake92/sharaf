@@ -3,9 +3,8 @@ package api
 import java.nio.file.Files
 import java.util.UUID
 import ba.sake.sharaf.*
-import ba.sake.sharaf.routing.*
+import ba.sake.sharaf.undertow.*
 import ba.sake.tupson.toJson
-import io.undertow.Undertow
 
 @main def main: Unit =
   val module = JsonApiModule(8181)
@@ -19,7 +18,7 @@ class JsonApiModule(port: Int) {
   // don't do this at home!
   private var db = Seq.empty[ProductRes]
 
-  private val routes = Routes:
+  private val routes = UndertowSharafRoutes:
     case GET -> Path("products", param[UUID](id)) =>
       val productOpt = db.find(_.id == id)
       Response.withBodyOpt(productOpt, s"Product with id=$id")
@@ -43,12 +42,6 @@ class JsonApiModule(port: Int) {
       Files.writeString(tmpFile, db.toJson)
       Response.withBody(tmpFile)
 
-  private val handler = SharafHandler(routes)
+  val server = UndertowSharafServer("localhost", port, routes)
     .withExceptionMapper(ExceptionMapper.json)
-
-  val server = Undertow
-    .builder()
-    .addHttpListener(port, "localhost")
-    .setHandler(handler)
-    .build()
 }

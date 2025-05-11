@@ -11,6 +11,7 @@ import org.pac4j.undertow.handler.CallbackHandler
 import org.pac4j.undertow.handler.LogoutHandler
 import org.pac4j.undertow.handler.SecurityHandler
 import ba.sake.sharaf.*
+import ba.sake.sharaf.handlers.SharafHandler
 
 class AppModule(port: Int, clients: Clients) {
 
