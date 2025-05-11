@@ -1,8 +1,7 @@
 package ba.sake.sharaf
 
-/**
- * Case-insensitive string for HTTP headers and such.
- */
+/** Case-insensitive string for HTTP headers and such.
+  */
 final class HttpString private (val value: String) {
 
   override def equals(other: Any): Boolean = other match {

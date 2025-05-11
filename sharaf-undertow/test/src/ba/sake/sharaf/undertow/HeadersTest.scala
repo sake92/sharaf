@@ -4,7 +4,7 @@ import ba.sake.sharaf.*
 import ba.sake.sharaf.undertow.*
 
 class HeadersTest extends munit.FunSuite {
-  
+
   val port = utils.getFreePort()
   val baseUrl = s"http://localhost:$port"
 
@@ -28,7 +28,7 @@ class HeadersTest extends munit.FunSuite {
     val res = requests.get(s"${baseUrl}/settingHeader")
     assertEquals(res.headers("header1"), Seq("header1Value"))
   }
-  
+
   test("removingHeader removes a header") {
     val res = requests.get(s"${baseUrl}/removingHeader")
     assertEquals(res.headers.get("access-control-allow-credentials"), None)

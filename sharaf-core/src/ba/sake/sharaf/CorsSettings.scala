@@ -64,8 +64,15 @@ object CorsSettings:
   val default: CorsSettings = new CorsSettings(
     pathPrefixes = Set("/"),
     allowedOrigins = Set.empty,
-    allowedHttpMethods =
-      Set(HttpMethod.GET, HttpMethod.HEAD, HttpMethod.OPTIONS, HttpMethod.POST, HttpMethod.PUT, HttpMethod.PATCH, HttpMethod.DELETE),
+    allowedHttpMethods = Set(
+      HttpMethod.GET,
+      HttpMethod.HEAD,
+      HttpMethod.OPTIONS,
+      HttpMethod.POST,
+      HttpMethod.PUT,
+      HttpMethod.PATCH,
+      HttpMethod.DELETE
+    ),
     allowedHttpHeaders = Set(Headers.ACCEPT, Headers.ACCEPT_LANGUAGE, Headers.CONTENT_LANGUAGE, Headers.CONTENT_TYPE),
     allowCredentials = false,
     preflightMaxAge = Duration.ofDays(3)

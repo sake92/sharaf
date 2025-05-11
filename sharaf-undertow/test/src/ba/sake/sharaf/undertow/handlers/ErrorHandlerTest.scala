@@ -34,16 +34,18 @@ class ErrorHandlerTest extends munit.FunSuite {
   val server = Undertow
     .builder()
     .addHttpListener(port, "localhost")
-    .setHandler(Handlers
+    .setHandler(
+      Handlers
         .path()
         .addPrefixPath("default", SharafHandler(routes))
         .addPrefixPath("json", SharafHandler(routes).withExceptionMapper(ExceptionMapper.json))
         .addPrefixPath(
           "cors",
           SharafHandler(routes).withCorsSettings(CorsSettings.default.withAllowedOrigins(Set("http://example.com")))
-        ))
+        )
+    )
     .build()
-    
+
   override def beforeAll(): Unit = server.start()
 
   override def afterAll(): Unit = server.stop()

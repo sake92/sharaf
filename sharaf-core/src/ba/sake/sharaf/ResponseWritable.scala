@@ -9,7 +9,6 @@ import scalatags.Text.all.doctype
 import scalatags.Text.Frag
 import ba.sake.tupson.{JsonRW, toJson}
 
-
 trait ResponseWritable[-T]:
   def write(value: T, outputStream: OutputStream): Unit
   def headers(value: T): Seq[(HttpString, Seq[String])]

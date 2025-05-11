@@ -5,7 +5,6 @@ import scala.deriving.*
 import scala.quoted.*
 import scala.util.Try
 
-
 // typeclass for converting a path parameter to T
 trait FromPathParam[T]:
   def parse(str: String): Option[T]

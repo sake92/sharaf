@@ -27,7 +27,7 @@ class CookiesTest extends munit.FunSuite {
     assertEquals(cookie.getValue, "cookie1Value")
     assertEquals(cookie.getMaxAge, -1L)
   }
-  
+
   test("removingCookie removes a cookie (sets value to empty and expires to min)") {
     val session = requests.Session()
     session.get(s"${baseUrl}/settingCookie") // first set it

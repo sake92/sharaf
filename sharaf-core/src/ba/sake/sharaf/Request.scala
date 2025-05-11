@@ -9,12 +9,14 @@ import org.typelevel.jawn.ast.JValue
 
 trait Request {
 
-  /*** HEADERS ***/
+  /** * HEADERS **
+    */
   def headers: Map[HttpString, Seq[String]]
 
   def cookies: Seq[Cookie]
 
-  /*** QUERY ***/
+  /** * QUERY **
+    */
   def queryParamsRaw: QueryStringMap
 
   // must be a Product (case class)
@@ -26,7 +28,8 @@ trait Request {
     try queryParams[T].validateOrThrow
     catch case e: ValidsonException => throw RequestHandlingException(e)
 
-  /*** BODY ***/
+  /** * BODY **
+    */
   def bodyString: String
 
   // JSON
@@ -51,7 +54,6 @@ trait Request {
   def bodyFormValidated[T <: Product: FormDataRW: Validator]: T =
     try bodyForm[T].validateOrThrow
     catch case e: ValidsonException => throw RequestHandlingException(e)
-
 
 }
 

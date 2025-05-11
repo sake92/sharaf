@@ -17,4 +17,4 @@ final case class Cookie(
     comment: Option[String] = None,
     sameSite: Boolean = false,
     sameSiteMode: Option[String] = None
-) 
+)

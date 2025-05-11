@@ -4,7 +4,7 @@ import java.time.Instant
 import ba.sake.sharaf.exceptions.SharafException
 
 trait Session {
-  
+
   def id: String
 
   def createdAt: Instant
@@ -19,10 +19,10 @@ trait Session {
   def getOpt[T <: Serializable](key: String): Option[T]
 
   def set[T <: Serializable](key: String, value: T): Unit
-  
-  def remove[T <: Serializable](key: String): Unit 
+
+  def remove[T <: Serializable](key: String): Unit
 
 }
 
 object Session:
-  def current(using s: Session):  Session = s
+  def current(using s: Session): Session = s

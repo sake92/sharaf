@@ -239,8 +239,6 @@ class QueryStringParseSuite extends munit.FunSuite {
 
 }
 
-
-
 package other_package_givens {
   given QueryStringRW[other_package.PageReq] = QueryStringRW.derived
 }

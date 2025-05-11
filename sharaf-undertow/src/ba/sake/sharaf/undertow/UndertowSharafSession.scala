@@ -3,10 +3,10 @@ package ba.sake.sharaf.undertow
 import java.time.Instant
 import scala.jdk.CollectionConverters.*
 
-final class UndertowSharafSession (
+final class UndertowSharafSession(
     private val underlyingSession: io.undertow.server.session.Session
 ) extends ba.sake.sharaf.Session {
-  
+
   override def id: String =
     underlyingSession.getId
 

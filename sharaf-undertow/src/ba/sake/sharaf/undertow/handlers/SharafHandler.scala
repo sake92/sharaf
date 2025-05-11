@@ -78,7 +78,7 @@ object SharafHandler:
 
   def apply(routes: UndertowSharafRoutes): SharafHandler =
     new SharafHandler(routes, CorsSettings.default, ExceptionMapper.default, _ => SharafHandler.defaultNotFoundResponse)
-    
+
   def apply(controllers: SharafController[UndertowSharafRequest]*): SharafHandler =
     val routes = SharafRoutes.merge(controllers.map(_.routes))
     apply(routes)

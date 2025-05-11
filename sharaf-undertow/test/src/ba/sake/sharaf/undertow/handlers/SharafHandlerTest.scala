@@ -8,12 +8,11 @@ class SharafHandlerTest extends munit.FunSuite {
   val port = utils.getFreePort()
   val baseUrl = s"http://localhost:$port"
 
-  val routes = UndertowSharafRoutes {
-    case GET -> Path("hello") =>
-      Response.withBody("hello")
+  val routes = UndertowSharafRoutes { case GET -> Path("hello") =>
+    Response.withBody("hello")
   }
 
-  val server = UndertowSharafServer("localhost", port,routes)
+  val server = UndertowSharafServer("localhost", port, routes)
 
   override def beforeAll(): Unit = server.start()
 
@@ -32,7 +31,7 @@ class SharafHandlerTest extends munit.FunSuite {
     assertEquals(res.statusCode, 404)
     assertEquals(res.text(), "Not Found")
   }
-  
+
   test("/hello returns a string") {
     val res = requests.get(s"${baseUrl}/hello")
     assertEquals(res.text(), "hello")

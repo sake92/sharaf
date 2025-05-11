@@ -11,5 +11,4 @@ object param:
   def unapply[T](str: String)(using fp: FromPathParam[T]): Option[T] =
     fp.parse(str)
 
-
 export HttpMethod.*

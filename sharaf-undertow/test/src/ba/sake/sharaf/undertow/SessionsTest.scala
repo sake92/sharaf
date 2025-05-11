@@ -22,7 +22,7 @@ class SessionsTest extends munit.FunSuite {
       Response.default
   }
 
-  val server =  Undertow
+  val server = Undertow
     .builder()
     .addHttpListener(port, "localhost")
     .setHandler(
@@ -31,7 +31,8 @@ class SessionsTest extends munit.FunSuite {
         new InMemorySessionManager("in-memory-session-manager"),
         new SessionCookieConfig()
       )
-    ).build()
+    )
+    .build()
 
   override def beforeAll(): Unit = server.start()
 

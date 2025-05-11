@@ -6,7 +6,7 @@ import io.undertow.util.HttpString as UndertowHttpString
 import ba.sake.sharaf.*
 
 object ResponseUtils {
-  
+
   def writeResponse(response: Response[?], exchange: HttpServerExchange): Unit = {
     val bodyContentHeaders = response.body.flatMap(response.rw.headers)
     bodyContentHeaders.foreach { case (name, values) =>
@@ -15,7 +15,7 @@ object ResponseUtils {
     }
     response.headerUpdates.updates.foreach {
       case HeaderUpdate.Set(name, values) =>
-      val undertowHttpString = UndertowHttpString(name.toString)
+        val undertowHttpString = UndertowHttpString(name.toString)
         exchange.getResponseHeaders.putAll(undertowHttpString, values.asJava)
       case HeaderUpdate.Remove(name) =>
         val undertowHttpString = UndertowHttpString(name.toString)
@@ -29,5 +29,5 @@ object ResponseUtils {
     exchange.setStatusCode(response.status)
     response.body.foreach(b => response.rw.write(b, exchange.getOutputStream))
   }
-  
+
 }

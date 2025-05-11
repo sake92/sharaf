@@ -20,7 +20,7 @@ object CookieUtils {
       comment = Option(c.getComment),
       sameSite = c.isSameSite,
       sameSiteMode = Option(c.getSameSiteMode)
-        )
+    )
 
   def toUndertow(c: Cookie): UndertowCookie = {
     import java.util.Date
@@ -38,6 +38,5 @@ object CookieUtils {
     c.sameSiteMode.foreach(cookie.setSameSiteMode)
     cookie
   }
-  
-  
+
 }

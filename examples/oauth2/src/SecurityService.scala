@@ -6,7 +6,6 @@ import org.pac4j.core.util.FindBest
 import org.pac4j.undertow.context.{UndertowSessionStore, UndertowWebContext}
 import ba.sake.sharaf.undertow.UndertowSharafRequest
 
-
 class SecurityService(config: Config) {
 
   def currentUser(using req: UndertowSharafRequest): Option[CustomUserProfile] = {

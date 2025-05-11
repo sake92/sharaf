@@ -7,7 +7,7 @@ import ba.sake.sharaf.exceptions.*
 import ba.sake.sharaf.utils.*
 
 class JsonApiSuite extends munit.FunSuite {
-  
+
   val moduleFixture = new Fixture[JsonApiModule]("JsonApiModule") {
     private var module: JsonApiModule = uninitialized
 
@@ -20,7 +20,7 @@ class JsonApiSuite extends munit.FunSuite {
     override def afterEach(context: AfterEach): Unit =
       module.server.stop()
   }
-  
+
   override def munitFixtures = List(moduleFixture)
 
   test("products can be created and fetched") {
@@ -39,7 +39,11 @@ class JsonApiSuite extends munit.FunSuite {
     val firstProduct = locally {
       val reqBody = CreateProductReq.of("Chocolate", 5)
       val res =
-        requests.post(s"$baseUrl/products", data = reqBody.toJson, headers = Map("Content-Type" -> "application/json; charset=utf-8"))
+        requests.post(
+          s"$baseUrl/products",
+          data = reqBody.toJson,
+          headers = Map("Content-Type" -> "application/json; charset=utf-8")
+        )
       assertEquals(res.statusCode, 200)
       assertEquals(res.headers("content-type"), Seq("application/json; charset=utf-8"))
       val resBody = res.text.parseJson[ProductRes]
@@ -120,7 +124,11 @@ class JsonApiSuite extends munit.FunSuite {
       "quantity": 0
     }"""
     val ex = intercept[requests.RequestFailedException] {
-      requests.post(s"$baseUrl/products", data = reqBody, headers = Map("Content-Type" -> "application/json; charset=utf-8"))
+      requests.post(
+        s"$baseUrl/products",
+        data = reqBody,
+        headers = Map("Content-Type" -> "application/json; charset=utf-8")
+      )
     }
     val resProblem = ex.response.text().parseJson[ProblemDetails]
 
