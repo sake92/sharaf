@@ -3,7 +3,7 @@
 
 ./mill clean
 
-./mill __.reformat
+./mill -i mill.scalalib.scalafmt/
 
 ./mill __.test
 

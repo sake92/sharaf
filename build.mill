@@ -47,6 +47,20 @@ object `sharaf-undertow` extends SharafPublishModule {
   }
 }
 
+object `sharaf-helidon` extends SharafPublishModule {
+  def artifactName = "sharaf-helidon"
+  def ivyDeps = Agg(
+    ivy"io.helidon.webserver:helidon-webserver:4.2.2",
+    ivy"io.helidon.config:helidon-config-yaml:4.2.2"
+  )
+  def moduleDeps = Seq(`sharaf-core`)
+  object test extends ScalaTests with SharafTestModule {
+    def ivyDeps = super.ivyDeps() ++ Agg(
+      ivy"com.lihaoyi::requests:0.9.0"
+    )
+  }
+}
+
 object querson extends SharafPublishModule {
   def artifactName = "querson"
   def moduleDeps = Seq(validson)
