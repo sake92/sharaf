@@ -12,12 +12,9 @@ import ba.sake.querson.*
 import ba.sake.sharaf.*
 import ba.sake.sharaf.exceptions.*
 
-final class UndertowSharafRequest(
-    val underlyingHttpServerExchange: UHttpServerExchange
-) extends Request {
+final class UndertowSharafRequest(val underlyingHttpServerExchange: UHttpServerExchange) extends Request {
 
-  /** * HEADERS **
-    */
+  /* *** HEADERS *** */
   def headers: Map[HttpString, Seq[String]] =
     val hMap = underlyingHttpServerExchange.getRequestHeaders
     hMap.getHeaderNames.asScala.map { name =>
@@ -27,15 +24,13 @@ final class UndertowSharafRequest(
   def cookies: Seq[Cookie] =
     underlyingHttpServerExchange.requestCookies().asScala.map(CookieUtils.fromUndertow).toSeq
 
-  /** * QUERY **
-    */
+  /* *** QUERY *** */
   override lazy val queryParamsRaw: QueryStringMap =
     underlyingHttpServerExchange.getQueryParameters.asScala.toMap.map { (k, v) =>
       (k, v.asScala.toSeq)
     }
 
-  /** * BODY **
-    */
+  /* *** BODY *** */
   private val formBodyParserFactory = locally {
     val parserFactoryBuilder = FormParserFactory.builder
     parserFactoryBuilder.setDefaultCharset("utf-8")
@@ -45,7 +40,7 @@ final class UndertowSharafRequest(
   override lazy val bodyString: String =
     String(underlyingHttpServerExchange.getInputStream.readAllBytes(), StandardCharsets.UTF_8)
 
-  def bodyFormRaw: FormDataMap =
+  override def bodyFormRaw: FormDataMap =
     // createParser returns null if content-type is not suitable
     val parser = formBodyParserFactory.createParser(underlyingHttpServerExchange)
     Option(parser) match

@@ -29,9 +29,7 @@ class UndertowSharafServer private (host: String, port: Int, sharafHandler: Shar
     val newHandler = sharafHandler.withNotFoundHandler(notFoundHandler)
     copy(sharafHandler = newHandler)
 
-  private def copy(
-      sharafHandler: SharafHandler = sharafHandler
-  ) = new UndertowSharafServer(host, port, sharafHandler)
+  private def copy(sharafHandler: SharafHandler = sharafHandler) = new UndertowSharafServer(host, port, sharafHandler)
 }
 
 object UndertowSharafServer {
