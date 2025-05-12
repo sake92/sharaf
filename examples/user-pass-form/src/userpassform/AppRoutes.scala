@@ -5,7 +5,7 @@ import ba.sake.sharaf.*
 import ba.sake.sharaf.undertow.{*, given}
 
 class AppRoutes(callbackUrl: String, securityService: SecurityService) {
-  val routes = UndertowSharafRoutes {
+  val routes = Routes {
     case GET -> Path("login-form") =>
       Response.withBody(views.showForm(callbackUrl))
     case GET -> Path("protected-resource") =>

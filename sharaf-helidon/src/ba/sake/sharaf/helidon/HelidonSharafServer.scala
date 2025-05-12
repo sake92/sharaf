@@ -3,6 +3,7 @@ package ba.sake.sharaf.helidon
 import io.helidon.config.Config
 import io.helidon.webserver.WebServer
 import io.helidon.webserver.http.HttpRouting
+import ba.sake.sharaf.Routes
 
 class HelidonSharafServer(host: String, port: Int, sharafHandler: SharafHelidonHandler) {
     
@@ -28,7 +29,7 @@ object HelidonSharafServer {
   def apply(host: String, port: Int, sharafHelidonHandler: SharafHelidonHandler): HelidonSharafServer =
     new HelidonSharafServer(host, port, sharafHelidonHandler)
 
-  def apply(host: String, port: Int, routes: HelidonSharafRoutes): HelidonSharafServer =
+  def apply(host: String, port: Int, routes: Routes): HelidonSharafServer =
     apply(host, port, SharafHelidonHandler(routes))
 
 }

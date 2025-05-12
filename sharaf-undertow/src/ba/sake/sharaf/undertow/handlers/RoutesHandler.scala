@@ -6,13 +6,12 @@ import ba.sake.sharaf.*
 import ba.sake.sharaf.routing.*
 import ba.sake.sharaf.undertow.*
 
-final class RoutesHandler private (routes: UndertowSharafRoutes, nextHandler: Option[HttpHandler]) extends HttpHandler {
+final class RoutesHandler private (routes: Routes, nextHandler: Option[HttpHandler]) extends HttpHandler {
 
   override def handleRequest(exchange: HttpServerExchange): Unit = {
-    given UndertowSharafRequest = UndertowSharafRequest.create(exchange)
+    given Request = UndertowSharafRequest.create(exchange)
     val reqParams = fillReqParams(exchange)
-    val resOpt = routes.definition.lift(reqParams)
-    resOpt match {
+    routes.definition.lift(reqParams) match {
       case Some(res) => ResponseUtils.writeResponse(res, exchange)
       case None =>
         nextHandler match
@@ -39,8 +38,8 @@ final class RoutesHandler private (routes: UndertowSharafRoutes, nextHandler: Op
 }
 
 object RoutesHandler:
-  def apply(routes: UndertowSharafRoutes): RoutesHandler =
+  def apply(routes: Routes): RoutesHandler =
     new RoutesHandler(routes, None)
 
-  def apply(routes: UndertowSharafRoutes, nextHandler: HttpHandler): RoutesHandler =
+  def apply(routes: Routes, nextHandler: HttpHandler): RoutesHandler =
     new RoutesHandler(routes, Some(nextHandler))

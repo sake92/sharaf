@@ -8,7 +8,7 @@ class CookiesTest extends munit.FunSuite {
   val port = utils.getFreePort()
   val baseUrl = s"http://localhost:$port"
 
-  val routes = UndertowSharafRoutes {
+  val routes = Routes {
     case GET -> Path("settingCookie") =>
       Response.settingCookie(Cookie("cookie1", "cookie1Value"))
     case GET -> Path("removingCookie") =>

@@ -13,13 +13,13 @@ import ba.sake.sharaf.routing.*
 import ba.sake.sharaf.undertow.*
 
 final class SharafHandler private (
-    routes: UndertowSharafRoutes,
+    routes: Routes,
     corsSettings: CorsSettings,
     exceptionMapper: ExceptionMapper,
     notFoundHandler: Request => Response[?]
 ) extends HttpHandler {
 
-  private val notFoundRoutes = UndertowSharafRoutes { _ =>
+  private val notFoundRoutes = Routes { _ =>
     notFoundHandler(Request.current)
   }
 
@@ -52,7 +52,7 @@ final class SharafHandler private (
   override def handleRequest(exchange: HttpServerExchange): Unit =
     finalHandler.handleRequest(exchange)
 
-  def withRoutes(routes: UndertowSharafRoutes): SharafHandler =
+  def withRoutes(routes: Routes): SharafHandler =
     copy(routes)
 
   def withCorsSettings(corsSettings: CorsSettings): SharafHandler =
@@ -65,7 +65,7 @@ final class SharafHandler private (
     copy(notFoundHandler = notFoundHandler)
 
   private def copy(
-      routes: UndertowSharafRoutes = routes,
+      routes: Routes = routes,
       corsSettings: CorsSettings = corsSettings,
       exceptionMapper: ExceptionMapper = exceptionMapper,
       notFoundHandler: Request => Response[?] = notFoundHandler
@@ -76,9 +76,9 @@ object SharafHandler:
 
   private val defaultNotFoundResponse = Response.withBody("Not Found").withStatus(StatusCodes.NOT_FOUND)
 
-  def apply(routes: UndertowSharafRoutes): SharafHandler =
+  def apply(routes: Routes): SharafHandler =
     new SharafHandler(routes, CorsSettings.default, ExceptionMapper.default, _ => SharafHandler.defaultNotFoundResponse)
 
-  def apply(controllers: SharafController[UndertowSharafRequest]*): SharafHandler =
-    val routes = SharafRoutes.merge(controllers.map(_.routes))
+  def apply(controllers: SharafController*): SharafHandler =
+    val routes = Routes.merge(controllers.map(_.routes))
     apply(routes)

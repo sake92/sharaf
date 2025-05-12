@@ -14,7 +14,7 @@ class ResponseWritableTest extends munit.FunSuite {
   val port = utils.getFreePort()
   val baseUrl = s"http://localhost:$port"
 
-  val routes = UndertowSharafRoutes {
+  val routes = Routes {
     case GET -> Path("string") =>
       Response.withBody("a string")
     case GET -> Path("inputstream") =>
@@ -24,7 +24,7 @@ class ResponseWritableTest extends munit.FunSuite {
       val genyWritable = requests.get.stream(s"${baseUrl}/inputstream")
       Response.withBody(genyWritable)
     case GET -> Path("imperative") =>
-      Request.current.underlyingHttpServerExchange.getOutputStream.write("hello".getBytes(StandardCharsets.UTF_8))
+      Request.current.asInstanceOf[UndertowSharafRequest].underlyingHttpServerExchange.getOutputStream.write("hello".getBytes(StandardCharsets.UTF_8))
       Response.default
     case GET -> Path("file") =>
       val file = testFileResourceDir.resolve("text_file.txt")

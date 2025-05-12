@@ -8,7 +8,7 @@ class HeadersTest extends munit.FunSuite {
   val port = utils.getFreePort()
   val baseUrl = s"http://localhost:$port"
 
-  val routes = UndertowSharafRoutes {
+  val routes = Routes {
     case GET -> Path("settingHeader") =>
       Response.settingHeader("header1", "header1Value")
     case GET -> Path("removingHeader") =>
