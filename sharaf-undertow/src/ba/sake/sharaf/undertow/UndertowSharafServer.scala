@@ -3,7 +3,6 @@ package ba.sake.sharaf.undertow
 import io.undertow.Undertow
 import ba.sake.sharaf.*
 import ba.sake.sharaf.undertow.handlers.SharafHandler
-import ba.sake.sharaf.undertow.UndertowSharafRoutes
 
 class UndertowSharafServer private (host: String, port: Int, sharafHandler: SharafHandler) {
 
@@ -33,7 +32,9 @@ class UndertowSharafServer private (host: String, port: Int, sharafHandler: Shar
 }
 
 object UndertowSharafServer {
-  def apply(host: String, port: Int, sharafHandler: SharafHandler) = new UndertowSharafServer(host, port, sharafHandler)
-  def apply(host: String, port: Int, routes: UndertowSharafRoutes) =
-    new UndertowSharafServer(host, port, SharafHandler(routes))
+  def apply(host: String, port: Int, sharafHandler: SharafHandler): UndertowSharafServer =
+    new UndertowSharafServer(host, port, sharafHandler)
+  
+  def apply(host: String, port: Int, routes: Routes): UndertowSharafServer =
+    apply(host, port, SharafHandler(routes))
 }

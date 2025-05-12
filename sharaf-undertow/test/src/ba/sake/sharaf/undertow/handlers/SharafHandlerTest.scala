@@ -8,7 +8,7 @@ class SharafHandlerTest extends munit.FunSuite {
   val port = utils.getFreePort()
   val baseUrl = s"http://localhost:$port"
 
-  val routes = UndertowSharafRoutes { case GET -> Path("hello") =>
+  val routes = Routes { case GET -> Path("hello") =>
     Response.withBody("hello")
   }
 

@@ -8,7 +8,7 @@ import ba.sake.sharaf.undertow.{*, given}
 
 class AppRoutes(securityService: SecurityService) {
 
-  val routes = UndertowSharafRoutes:
+  val routes = Routes:
     case GET -> Path("protected") =>
       Response.withBody(ProtectedPage)
 

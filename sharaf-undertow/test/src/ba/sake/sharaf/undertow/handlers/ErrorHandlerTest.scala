@@ -7,7 +7,6 @@ import io.undertow.util.Headers
 import io.undertow.util.StatusCodes
 import ba.sake.sharaf.*
 import ba.sake.sharaf.routing.*
-import ba.sake.sharaf.undertow.UndertowSharafRoutes
 import ba.sake.sharaf.utils.*
 import ba.sake.tupson.JsonRW
 import ba.sake.validson.Validator
@@ -17,7 +16,7 @@ class ErrorHandlerTest extends munit.FunSuite {
   val port = getFreePort()
   val baseUrl = s"http://localhost:$port"
 
-  val routes = UndertowSharafRoutes {
+  val routes = Routes {
     case GET -> Path("query") =>
       val qp = Request.current.queryParamsValidated[TestQuery]
       Response.withBody(qp.toString)

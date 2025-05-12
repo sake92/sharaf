@@ -1,6 +1,6 @@
 package ba.sake.sharaf
 
-import ba.sake.sharaf.routing.SharafRoutes
+import ba.sake.sharaf.routing.Routes
 
-trait SharafController[R <: Request]:
-  def routes: SharafRoutes[R]
+trait SharafController:
+  def routes: Routes

@@ -5,6 +5,9 @@ import ba.sake.sharaf.routing.FromPathParam
 type ExceptionMapper = exceptions.ExceptionMapper
 val ExceptionMapper = exceptions.ExceptionMapper
 
+type Routes = ba.sake.sharaf.routing.Routes
+val Routes = ba.sake.sharaf.routing.Routes
+
 val Path = ba.sake.sharaf.routing.Path
 
 object param:

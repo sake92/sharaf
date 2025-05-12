@@ -4,7 +4,7 @@ import java.nio.charset.StandardCharsets
 import scala.jdk.CollectionConverters.*
 import scala.collection.mutable
 import scala.collection.immutable.SeqMap
-import io.undertow.server.HttpServerExchange as UHttpServerExchange
+import io.undertow.server.HttpServerExchange
 import io.undertow.server.handlers.form.FormData as UFormData
 import io.undertow.server.handlers.form.FormParserFactory
 import ba.sake.formson.*
@@ -12,7 +12,7 @@ import ba.sake.querson.*
 import ba.sake.sharaf.*
 import ba.sake.sharaf.exceptions.*
 
-final class UndertowSharafRequest(val underlyingHttpServerExchange: UHttpServerExchange) extends Request {
+final class UndertowSharafRequest(val underlyingHttpServerExchange: HttpServerExchange) extends Request {
 
   /* *** HEADERS *** */
   def headers: Map[HttpString, Seq[String]] =
@@ -53,7 +53,7 @@ final class UndertowSharafRequest(val underlyingHttpServerExchange: UHttpServerE
 
 object UndertowSharafRequest {
 
-  def create(underlyingHttpServerExchange: UHttpServerExchange): UndertowSharafRequest =
+  def create(underlyingHttpServerExchange: HttpServerExchange): UndertowSharafRequest =
     UndertowSharafRequest(underlyingHttpServerExchange)
 
   private[sharaf] def undertowFormData2FormsonMap(uFormData: UFormData): FormDataMap = {

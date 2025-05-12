@@ -5,14 +5,6 @@ import ba.sake.hepek.html.HtmlPage
 import ba.sake.sharaf.*
 import ba.sake.sharaf.routing.*
 
-type UndertowSharafRoutes = SharafRoutes[UndertowSharafRequest]
-type UndertowSharafController = SharafController[UndertowSharafRequest]
-
-object UndertowSharafRoutes:
-  export SharafRoutes.merge
-  def apply(routesDef: UndertowSharafRequest ?=> PartialFunction[RequestParams, Response[?]]): UndertowSharafRoutes =
-    SharafRoutes(routesDef)
-
 // TODO separate library
 given ResponseWritable[HtmlPage] with {
   override def write(value: HtmlPage, outputStream: OutputStream): Unit =
@@ -23,6 +15,7 @@ given ResponseWritable[HtmlPage] with {
   )
 }
 
-given (using r: UndertowSharafRequest): Session =
-  val s = io.undertow.util.Sessions.getOrCreateSession(r.underlyingHttpServerExchange)
+given (using r: Request): Session =
+  val undertowReq = r.asInstanceOf[ UndertowSharafRequest]
+  val s = io.undertow.util.Sessions.getOrCreateSession(undertowReq.underlyingHttpServerExchange)
   UndertowSharafSession(s)

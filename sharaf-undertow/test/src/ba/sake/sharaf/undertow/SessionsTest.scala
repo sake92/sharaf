@@ -10,7 +10,7 @@ class SessionsTest extends munit.FunSuite {
   val port = utils.getFreePort()
   val baseUrl = s"http://localhost:$port"
 
-  val routes = UndertowSharafRoutes {
+  val routes = Routes {
     case GET -> Path("getopt-session-value") =>
       val key1Value = Session.current.getOpt[String]("key1")
       Response.withBody(key1Value.getOrElse("not found"))

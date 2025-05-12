@@ -9,12 +9,8 @@ on:
 
 jobs:
   test:
-    name: test ${{ matrix.java }}
+    name: test
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        java: [11, 21]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -22,5 +18,5 @@ jobs:
       - uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
-          java-version: ${{ matrix.java }}
+          java-version: 21
       - run: ./mill __.test

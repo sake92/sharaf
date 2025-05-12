@@ -5,7 +5,7 @@ import ba.sake.sharaf.helidon.*
 
 class HelidonSharafServerTest extends munit.FunSuite {
 
-  val routes = HelidonSharafRoutes { case GET -> Path("hello") =>
+  val routes = Routes { case GET -> Path("hello") =>
     Response.withBody("Hello World!")
   }
   val port = 8080

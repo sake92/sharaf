@@ -4,15 +4,15 @@ import ba.sake.sharaf.{HttpMethod, Request, Response}
 
 type RequestParams = (HttpMethod, Path)
 
-type SharafRoutesDefinition[Req <: Request] = Req ?=> PartialFunction[RequestParams, Response[?]]
+type RoutesDefinition = Request ?=> PartialFunction[RequestParams, Response[?]]
 
 // this is to make compiler happy at routes construction time... def apply doesnt work
-class SharafRoutes[Req <: Request](val definition: SharafRoutesDefinition[Req])
+class Routes(val definition: RoutesDefinition)
 
-object SharafRoutes:
-  def merge[Req <: Request](routesDefinitions: Seq[SharafRoutes[Req]]): SharafRoutes[Req] = {
-    val res: SharafRoutesDefinition[Req] = routesDefinitions.map(_.definition).reduceLeft { case (acc, next) =>
+object Routes:
+  def merge(routesDefinitions: Seq[Routes]): Routes = {
+    val res: RoutesDefinition = routesDefinitions.map(_.definition).reduceLeft { case (acc, next) =>
       acc.orElse(next)
     }
-    SharafRoutes(res)
+    Routes(res)
   }

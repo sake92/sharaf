@@ -14,7 +14,7 @@ class FullstackModule(port: Int) {
 
   val baseUrl = s"http://localhost:${port}"
 
-  private val routes = UndertowSharafRoutes:
+  private val routes = Routes:
     case GET -> Path() =>
       Response.withBody(ShowFormPage(CreateCustomerForm.empty))
 
