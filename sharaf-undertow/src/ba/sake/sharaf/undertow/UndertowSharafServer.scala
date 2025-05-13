@@ -34,7 +34,7 @@ class UndertowSharafServer private (host: String, port: Int, sharafHandler: Shar
 object UndertowSharafServer {
   def apply(host: String, port: Int, sharafHandler: SharafHandler): UndertowSharafServer =
     new UndertowSharafServer(host, port, sharafHandler)
-  
+
   def apply(host: String, port: Int, routes: Routes): UndertowSharafServer =
     apply(host, port, SharafHandler(routes))
 }

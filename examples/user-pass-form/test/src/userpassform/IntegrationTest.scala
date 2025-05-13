@@ -1,8 +1,7 @@
 package userpassform
 
-import ba.sake.sharaf.utils.*
-
 import scala.compiletime.uninitialized
+import ba.sake.sharaf.utils.NetworkUtils
 
 trait IntegrationTest extends munit.FunSuite {
 
@@ -13,7 +12,7 @@ trait IntegrationTest extends munit.FunSuite {
     def apply() = module
 
     override def beforeEach(context: BeforeEach): Unit =
-      val port = getFreePort()
+      val port = NetworkUtils.getFreePort()
       module = UserPassFormModule(port)
       module.server.start()
 

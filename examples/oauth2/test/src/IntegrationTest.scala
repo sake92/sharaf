@@ -16,13 +16,6 @@ object TestData {
 
 trait IntegrationTest extends munit.FunSuite {
 
-  def createSession(baseUrl: String) =
-    val session = requests.Session()
-    // this does OAuth2 ping-pong redirects etc,
-    // and we get a JSESSSIONID cookie
-    session.get(s"$baseUrl/login?provider=GenericOAuth20Client")
-    session
-
   protected val moduleFixture = new Fixture[AppModule]("AppModule") {
 
     private var mockOauth2server: MockOAuth2Server = uninitialized
@@ -63,7 +56,7 @@ trait IntegrationTest extends munit.FunSuite {
       client.setTokenUrl(mockOauth2server.tokenEndpointUrl(issuerId).toString())
       client.setProfileUrl(mockOauth2server.userInfoUrl(issuerId).toString())
 
-      val port = getFreePort()
+      val port = NetworkUtils.getFreePort()
       val clients = Clients(s"http://localhost:${port}/callback", client)
 
       // assign fixture

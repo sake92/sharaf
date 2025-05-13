@@ -1,14 +1,15 @@
 package ba.sake.sharaf.helidon
 
+import sttp.client4.quick.*
 import ba.sake.sharaf.*
-import ba.sake.sharaf.helidon.*
+import ba.sake.sharaf.utils.NetworkUtils
 
 class HelidonSharafServerTest extends munit.FunSuite {
 
   val routes = Routes { case GET -> Path("hello") =>
     Response.withBody("Hello World!")
   }
-  val port = 8080
+  val port = NetworkUtils.getFreePort()
   val server = HelidonSharafServer("localhost", port, routes)
 
   override def beforeAll(): Unit = server.start()
@@ -16,7 +17,7 @@ class HelidonSharafServerTest extends munit.FunSuite {
   override def afterAll(): Unit = server.stop()
 
   test("Hello") {
-    val res = requests.get(s"http://localhost:8080/hello")
-    assertEquals(res.text(), "Hello World!")
+    val res = quickRequest.get(uri"http://localhost:${port}/hello").send()
+    assertEquals(res.body, "Hello World!")
   }
 }

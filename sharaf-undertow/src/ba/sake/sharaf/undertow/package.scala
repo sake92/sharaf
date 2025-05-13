@@ -3,7 +3,7 @@ package ba.sake.sharaf.undertow
 import java.io.OutputStream
 import ba.sake.hepek.html.HtmlPage
 import ba.sake.sharaf.*
-import ba.sake.sharaf.routing.*
+import sttp.model.HeaderNames
 
 // TODO separate library
 given ResponseWritable[HtmlPage] with {
@@ -11,11 +11,11 @@ given ResponseWritable[HtmlPage] with {
     val htmlText = "<!DOCTYPE html>" + value.contents
     ResponseWritable[String].write(htmlText, outputStream)
   override def headers(value: HtmlPage): Seq[(HttpString, Seq[String])] = Seq(
-    Headers.CONTENT_TYPE -> Seq("text/html; charset=utf-8")
+    HttpString(HeaderNames.ContentType) -> Seq("text/html; charset=utf-8")
   )
 }
 
 given (using r: Request): Session =
-  val undertowReq = r.asInstanceOf[ UndertowSharafRequest]
+  val undertowReq = r.asInstanceOf[UndertowSharafRequest]
   val s = io.undertow.util.Sessions.getOrCreateSession(undertowReq.underlyingHttpServerExchange)
   UndertowSharafSession(s)

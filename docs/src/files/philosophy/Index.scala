@@ -26,7 +26,7 @@ object Index extends PhilosophyPage {
     - [formson](${Consts.GhSourcesUrl}/formson) for forms
     - [validson](${Consts.GhSourcesUrl}/validson) for validation
     - [hepek-components](https://github.com/sake92/hepek) for HTML (with [scalatags](https://github.com/com-lihaoyi/scalatags))
-    - [requests](https://github.com/com-lihaoyi/requests-scala) for firing HTTP requests
+    - [sttp](https://sttp.softwaremill.com/en/latest/) for firing HTTP requests
     - [typesafe-config](https://github.com/lightbend/config) for configuration
 
     You can use any of above separately in your projects.

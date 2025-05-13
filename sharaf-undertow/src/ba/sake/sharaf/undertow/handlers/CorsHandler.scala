@@ -6,7 +6,6 @@ import io.undertow.util.{Headers, HttpString, Methods}
 
 import scala.jdk.CollectionConverters.*
 
-// TODO write some tests
 // https://www.moesif.com/blog/technical/cors/Authoritative-Guide-to-CORS-Cross-Origin-Resource-Sharing-for-REST-APIs/
 final class CorsHandler private (next: HttpHandler, corsSettings: CorsSettings) extends HttpHandler {
 

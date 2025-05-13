@@ -1,6 +1,11 @@
 package ba.sake.sharaf
 
+import sttp.client4.*
+import sttp.model.*
 import ba.sake.sharaf.routing.FromPathParam
+import ba.sake.{formson, querson}
+import formson.*
+import querson.*
 
 type ExceptionMapper = exceptions.ExceptionMapper
 val ExceptionMapper = exceptions.ExceptionMapper
@@ -15,3 +20,20 @@ object param:
     fp.parse(str)
 
 export HttpMethod.*
+
+// conversions to STTP
+extension [T](value: T)(using rw: formson.FormDataRW[T])
+  def toSttpMultipart(config: formson.Config = formson.DefaultFormsonConfig): Seq[Part[BasicBodyPart]] =
+    val multiParts = value.toFormDataMap().flatMap { case (key, values) =>
+      values.map {
+        case formson.FormValue.Str(value)       => multipart(key, value)
+        case formson.FormValue.File(value)      => multipartFile(key, value.toFile)
+        case formson.FormValue.ByteArray(value) => multipart(key, value)
+      }
+    }
+    multiParts.toSeq
+
+extension [T](value: T)(using rw: querson.QueryStringRW[T])
+  def toSttpQuery(config: querson.Config = querson.DefaultQuersonConfig): QueryParams =
+    val params = value.toQueryStringMap().map { (k, vs) => k -> vs }
+    QueryParams.fromMultiMap(params)

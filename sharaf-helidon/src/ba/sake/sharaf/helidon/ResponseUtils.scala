@@ -27,7 +27,7 @@ object ResponseUtils {
     }
      */
 
-    helidonRes.status(response.status)
+    helidonRes.status(response.status.code)
     response.body.foreach(b => response.rw.write(b, helidonRes.outputStream()))
   }
 }
