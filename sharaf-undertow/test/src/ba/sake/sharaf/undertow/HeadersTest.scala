@@ -1,11 +1,13 @@
 package ba.sake.sharaf.undertow
 
+import sttp.model.*
+import sttp.client4.quick.*
 import ba.sake.sharaf.*
-import ba.sake.sharaf.undertow.*
+import ba.sake.sharaf.utils.NetworkUtils
 
 class HeadersTest extends munit.FunSuite {
 
-  val port = utils.getFreePort()
+  val port = NetworkUtils.getFreePort()
   val baseUrl = s"http://localhost:$port"
 
   val routes = Routes {
@@ -25,17 +27,17 @@ class HeadersTest extends munit.FunSuite {
   override def afterAll(): Unit = server.stop()
 
   test("settingHeader sets a header") {
-    val res = requests.get(s"${baseUrl}/settingHeader")
+    val res = quickRequest.get(uri"${baseUrl}/settingHeader").send()
     assertEquals(res.headers("header1"), Seq("header1Value"))
   }
 
   test("removingHeader removes a header") {
-    val res = requests.get(s"${baseUrl}/removingHeader")
-    assertEquals(res.headers.get("access-control-allow-credentials"), None)
+    val res = quickRequest.get(uri"${baseUrl}/removingHeader").send()
+    assertEquals(res.headers(HeaderNames.AccessControlAllowCredentials), Seq.empty)
   }
 
   test("settingHeader and then removingHeader removes a header") {
-    val res = requests.get(s"${baseUrl}/setAndRemove")
-    assertEquals(res.headers.get("header1"), None)
+    val res = quickRequest.get(uri"${baseUrl}/setAndRemove").send()
+    assertEquals(res.headers("header1"), Seq.empty)
   }
 }

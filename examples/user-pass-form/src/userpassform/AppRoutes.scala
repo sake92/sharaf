@@ -2,7 +2,6 @@ package userpassform
 
 import scalatags.Text.all.*
 import ba.sake.sharaf.*
-import ba.sake.sharaf.undertow.{*, given}
 
 class AppRoutes(callbackUrl: String, securityService: SecurityService) {
   val routes = Routes {

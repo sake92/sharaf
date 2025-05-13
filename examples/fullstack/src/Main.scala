@@ -4,6 +4,7 @@ import ba.sake.validson.*
 import ba.sake.sharaf.*
 import ba.sake.sharaf.undertow.{*, given}
 import fullstack.views.*
+import sttp.model.StatusCode
 
 @main def main: Unit =
   val module = FullstackModule(8181)
@@ -25,7 +26,7 @@ class FullstackModule(port: Int) {
         case Seq() =>
           Response.withBody(SucessPage(formData))
         case errors =>
-          Response.withBody(ShowFormPage(formData, errors)).withStatus(400)
+          Response.withBody(ShowFormPage(formData, errors)).withStatus(StatusCode.Ok)
 
   val server = UndertowSharafServer("localhost", port, routes)
 }

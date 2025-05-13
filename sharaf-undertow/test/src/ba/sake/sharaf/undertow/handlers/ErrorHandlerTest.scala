@@ -1,19 +1,19 @@
 package ba.sake.sharaf.undertow.handlers
 
+import io.undertow.{Handlers, Undertow}
+import sttp.model.*
+import sttp.client4.quick.*
 import ba.sake.formson.FormDataRW
 import ba.sake.querson.QueryStringRW
-import io.undertow.{Handlers, Undertow}
-import io.undertow.util.Headers
-import io.undertow.util.StatusCodes
+import ba.sake.tupson.JsonRW
+import ba.sake.validson.Validator
 import ba.sake.sharaf.*
 import ba.sake.sharaf.routing.*
 import ba.sake.sharaf.utils.*
-import ba.sake.tupson.JsonRW
-import ba.sake.validson.Validator
 
 class ErrorHandlerTest extends munit.FunSuite {
 
-  val port = getFreePort()
+  val port = NetworkUtils.getFreePort()
   val baseUrl = s"http://localhost:$port"
 
   val routes = Routes {
@@ -51,128 +51,125 @@ class ErrorHandlerTest extends munit.FunSuite {
 
   // default (plain string) error mapper
   test("Default error mapper handles query parsing failure") {
-    val res = requests.get(s"${baseUrl}/default/query", check = false)
-    assertEquals(res.statusCode, StatusCodes.BAD_REQUEST)
-    assertEquals(res.text(), "Query string parsing error: Key 'name' is missing")
-    assertEquals(res.headers(Headers.CONTENT_TYPE_STRING.toLowerCase), Seq("text/plain; charset=utf-8"))
+    val res = quickRequest.get(uri"${baseUrl}/default/query").send()
+    assertEquals(res.code, StatusCode.BadRequest)
+    assertEquals(res.body, "Query string parsing error: Key 'name' is missing")
+    assertEquals(res.headers(HeaderNames.ContentType), Seq("text/plain; charset=utf-8"))
   }
   test("Default error mapper handles query validation failure") {
-    val res = requests.get(s"${baseUrl}/default/query?name=", check = false)
-    assertEquals(res.statusCode, StatusCodes.UNPROCESSABLE_ENTITY)
-    assertEquals(res.text(), "Validation errors: [ValidationError($.name,must be >= 3,)]")
-    assertEquals(res.headers(Headers.CONTENT_TYPE_STRING.toLowerCase), Seq("text/plain; charset=utf-8"))
+    val res = quickRequest.get(uri"${baseUrl}/default/query?name=").send()
+    assertEquals(res.code, StatusCode.UnprocessableEntity)
+    assertEquals(res.body, "Validation errors: [ValidationError($.name,must be >= 3,)]")
+    assertEquals(res.headers(HeaderNames.ContentType), Seq("text/plain; charset=utf-8"))
   }
 
   test("Default error mapper handles form parsing failure") {
-    val res =
-      requests.post(s"${baseUrl}/default/form", data = requests.MultiPart(requests.MultiItem("bla", "")), check = false)
-    assertEquals(res.statusCode, StatusCodes.BAD_REQUEST)
-    assertEquals(res.text(), "Form parsing error: Key 'name' is missing")
-    assertEquals(res.headers(Headers.CONTENT_TYPE_STRING.toLowerCase), Seq("text/plain; charset=utf-8"))
+    val res = quickRequest.post(uri"${baseUrl}/default/form").multipartBody(multipart("bla", "")).send()
+    assertEquals(res.code, StatusCode.BadRequest)
+    assertEquals(res.body, "Form parsing error: Key 'name' is missing")
+    assertEquals(res.headers(HeaderNames.ContentType), Seq("text/plain; charset=utf-8"))
   }
   test("Default error mapper handles form validation failure") {
-    val res = requests.post(s"${baseUrl}/default/form", data = TestForm("").toRequestsMultipart(), check = false)
-    assertEquals(res.statusCode, StatusCodes.UNPROCESSABLE_ENTITY)
-    assertEquals(res.text(), "Validation errors: [ValidationError($.name,must be >= 3,)]")
-    assertEquals(res.headers(Headers.CONTENT_TYPE_STRING.toLowerCase), Seq("text/plain; charset=utf-8"))
+    val res = quickRequest.post(uri"${baseUrl}/default/form").multipartBody(TestForm("").toSttpMultipart()).send()
+    assertEquals(res.code, StatusCode.UnprocessableEntity)
+    assertEquals(res.body, "Validation errors: [ValidationError($.name,must be >= 3,)]")
+    assertEquals(res.headers(HeaderNames.ContentType), Seq("text/plain; charset=utf-8"))
   }
 
   test("Default error mapper handles JSON parsing failure") {
-    val res = requests.post(s"${baseUrl}/default/json", data = "", check = false)
-    assertEquals(res.statusCode, StatusCodes.BAD_REQUEST)
-    assertEquals(res.text(), "JSON parsing exception")
-    assertEquals(res.headers(Headers.CONTENT_TYPE_STRING.toLowerCase), Seq("text/plain; charset=utf-8"))
+    val res = quickRequest.post(uri"${baseUrl}/default/json").body("").send()
+    assertEquals(res.code, StatusCode.BadRequest)
+    assertEquals(res.body, "JSON parsing exception")
+    assertEquals(res.headers(HeaderNames.ContentType), Seq("text/plain; charset=utf-8"))
   }
   test("Default error mapper handles JSON validation failure") {
-    val res = requests.post(s"${baseUrl}/default/json", data = """ { "name": "" } """, check = false)
-    assertEquals(res.statusCode, StatusCodes.UNPROCESSABLE_ENTITY)
-    assertEquals(res.text(), "Validation errors: [ValidationError($.name,must be >= 3,)]")
-    assertEquals(res.headers(Headers.CONTENT_TYPE_STRING.toLowerCase), Seq("text/plain; charset=utf-8"))
+    val res = quickRequest.post(uri"${baseUrl}/default/json").body(""" { "name": "" } """).send()
+    assertEquals(res.code, StatusCode.UnprocessableEntity)
+    assertEquals(res.body, "Validation errors: [ValidationError($.name,must be >= 3,)]")
+    assertEquals(res.headers(HeaderNames.ContentType), Seq("text/plain; charset=utf-8"))
   }
 
   // JSON error mapper
   test("JSON error mapper handles query parsing failure") {
-    val res = requests.get(s"${baseUrl}/json/query", check = false)
-    assertEquals(res.statusCode, StatusCodes.BAD_REQUEST)
+    val res = quickRequest.get(uri"${baseUrl}/json/query").send()
+    assertEquals(res.code, StatusCode.BadRequest)
     assertEquals(
-      res.text(),
+      res.body,
       """{"instance":null,"invalidArguments":[{"reason":"is missing","path":"name","value":null}],"detail":"","type":null,"title":"Invalid query parameters","status":400}"""
     )
-    assertEquals(res.headers(Headers.CONTENT_TYPE_STRING.toLowerCase), Seq("application/json; charset=utf-8"))
+    assertEquals(res.headers(HeaderNames.ContentType), Seq("application/json; charset=utf-8"))
   }
   test("JSON error mapper handles query validation failure") {
-    val res = requests.get(s"${baseUrl}/json/query?name=", check = false)
-    assertEquals(res.statusCode, StatusCodes.UNPROCESSABLE_ENTITY)
+    val res = quickRequest.get(uri"${baseUrl}/json/query?name=").send()
+    assertEquals(res.code, StatusCode.UnprocessableEntity)
     assertEquals(
-      res.text(),
-      """{"instance":null,"invalidArguments":[{"reason":"must be >= 3","path":"$.name","value":""}],"detail":"","type":null,"title":"Validation errors","status":400}"""
+      res.body,
+      """{"instance":null,"invalidArguments":[{"reason":"must be >= 3","path":"$.name","value":""}],"detail":"","type":null,"title":"Validation errors","status":422}"""
     )
-    assertEquals(res.headers(Headers.CONTENT_TYPE_STRING.toLowerCase), Seq("application/json; charset=utf-8"))
+    assertEquals(res.headers(HeaderNames.ContentType), Seq("application/json; charset=utf-8"))
   }
 
   test("JSON error mapper handles form parsing failure") {
-    val res =
-      requests.post(s"${baseUrl}/json/form", data = requests.MultiPart(requests.MultiItem("bla", "")), check = false)
-    assertEquals(res.statusCode, StatusCodes.BAD_REQUEST)
+    val res = quickRequest.post(uri"${baseUrl}/json/form").multipartBody(multipart("bla", "")).send()
+    assertEquals(res.code, StatusCode.BadRequest)
     assertEquals(
-      res.text(),
+      res.body,
       """{"instance":null,"invalidArguments":[],"detail":"Form parsing error: Key 'name' is missing","type":null,"title":"Form parsing error","status":400}"""
     )
-    assertEquals(res.headers(Headers.CONTENT_TYPE_STRING.toLowerCase), Seq("application/json; charset=utf-8"))
+    assertEquals(res.headers(HeaderNames.ContentType), Seq("application/json; charset=utf-8"))
   }
   test("JSON error mapper handles form validation failure") {
-    val res = requests.post(s"${baseUrl}/json/form", data = TestForm("").toRequestsMultipart(), check = false)
-    assertEquals(res.statusCode, StatusCodes.UNPROCESSABLE_ENTITY)
+    val res = quickRequest.post(uri"${baseUrl}/json/form").multipartBody(TestForm("").toSttpMultipart()).send()
+    assertEquals(res.code, StatusCode.UnprocessableEntity)
     assertEquals(
-      res.text(),
-      """{"instance":null,"invalidArguments":[{"reason":"must be >= 3","path":"$.name","value":""}],"detail":"","type":null,"title":"Validation errors","status":400}"""
+      res.body,
+      """{"instance":null,"invalidArguments":[{"reason":"must be >= 3","path":"$.name","value":""}],"detail":"","type":null,"title":"Validation errors","status":422}"""
     )
-    assertEquals(res.headers(Headers.CONTENT_TYPE_STRING.toLowerCase), Seq("application/json; charset=utf-8"))
+    assertEquals(res.headers(HeaderNames.ContentType), Seq("application/json; charset=utf-8"))
   }
 
   test("JSON error mapper handles JSON parsing failure") {
-    val res = requests.post(s"${baseUrl}/json/json", data = "", check = false)
-    assertEquals(res.statusCode, StatusCodes.BAD_REQUEST)
+    val res = quickRequest.post(uri"${baseUrl}/json/json").body("").send()
+    assertEquals(res.code, StatusCode.BadRequest)
     assertEquals(
-      res.text(),
+      res.body,
       """{"instance":null,"invalidArguments":[],"detail":"JSON parsing exception","type":null,"title":"JSON parsing error","status":400}"""
     )
-    assertEquals(res.headers(Headers.CONTENT_TYPE_STRING.toLowerCase), Seq("application/json; charset=utf-8"))
+    assertEquals(res.headers(HeaderNames.ContentType), Seq("application/json; charset=utf-8"))
   }
   test("JSON error mapper handles JSON validation failure") {
-    val res = requests.post(s"${baseUrl}/json/json", data = """ { "name": "" } """, check = false)
-    assertEquals(res.statusCode, StatusCodes.UNPROCESSABLE_ENTITY)
+    val res = quickRequest.post(uri"${baseUrl}/json/json").body(""" { "name": "" } """).send()
+    assertEquals(res.code, StatusCode.UnprocessableEntity)
     assertEquals(
-      res.text(),
-      """{"instance":null,"invalidArguments":[{"reason":"must be >= 3","path":"$.name","value":""}],"detail":"","type":null,"title":"Validation errors","status":400}"""
+      res.body,
+      """{"instance":null,"invalidArguments":[{"reason":"must be >= 3","path":"$.name","value":""}],"detail":"","type":null,"title":"Validation errors","status":422}"""
     )
-    assertEquals(res.headers(Headers.CONTENT_TYPE_STRING.toLowerCase), Seq("application/json; charset=utf-8"))
+    assertEquals(res.headers(HeaderNames.ContentType), Seq("application/json; charset=utf-8"))
   }
 
   // WebJars
   test("WebJars should work") {
-    val res = requests.get(s"${baseUrl}/default/jquery/3.7.1/jquery.js")
-    assertEquals(res.headers(Headers.CONTENT_TYPE_STRING.toLowerCase), Seq("application/javascript"))
-    assert(res.text().length > 100)
+    val res = quickRequest.get(uri"${baseUrl}/default/jquery/3.7.1/jquery.js").send()
+    assertEquals(res.headers(HeaderNames.ContentType), Seq("application/javascript"))
+    assert(res.body.length > 100)
   }
 
   // CORS
   test("CORS should work") {
     locally {
       // localhost always works
-      val res = requests.get(s"${baseUrl}/cors")
-      assertEquals(res.statusCode, StatusCodes.OK)
+      val res = quickRequest.get(uri"${baseUrl}/cors").send()
+      assertEquals(res.code, StatusCode.Ok)
     }
     locally {
       // allowed origin is allowed
-      val res = requests.get(s"${baseUrl}/cors", headers = Map(Headers.ORIGIN_STRING -> "http://example.com"))
-      assertEquals(res.headers("access-control-allow-origin"), Seq("http://example.com"))
+      val res = quickRequest.get(uri"${baseUrl}/cors").headers(Map(HeaderNames.Origin -> "http://example.com")).send()
+      assertEquals(res.headers(HeaderNames.AccessControlAllowOrigin), Seq("http://example.com"))
     }
     locally {
       // forbidden origin is not allowed (to browser)
-      val res =
-        requests.get(s"${baseUrl}/cors", headers = Map(Headers.ORIGIN_STRING -> "http://example2.com"), check = false)
-      assertEquals(res.headers.get("access-control-allow-origin"), None)
+      val res = quickRequest.get(uri"${baseUrl}/cors").headers(Map(HeaderNames.Origin -> "http://example2.com")).send()
+      assertEquals(res.headers(HeaderNames.AccessControlAllowOrigin), Seq.empty)
     }
   }
 

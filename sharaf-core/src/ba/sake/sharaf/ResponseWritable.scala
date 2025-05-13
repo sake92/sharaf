@@ -5,9 +5,13 @@ import java.nio.file.Path
 import java.io.{FileInputStream, InputStream, OutputStream}
 import scala.jdk.CollectionConverters.*
 import scala.util.Using
+import sttp.model.HeaderNames
 import scalatags.Text.all.doctype
 import scalatags.Text.Frag
 import ba.sake.tupson.{JsonRW, toJson}
+
+private val ContentTypeHttpString = HttpString(HeaderNames.ContentType)
+private val ContentDispositionHttpString = HttpString(HeaderNames.ContentDisposition)
 
 trait ResponseWritable[-T]:
   def write(value: T, outputStream: OutputStream): Unit
@@ -22,7 +26,7 @@ object ResponseWritable extends LowPriResponseWritableInstances {
     override def write(value: String, outputStream: OutputStream): Unit =
       outputStream.write(value.getBytes(StandardCharsets.UTF_8))
     override def headers(value: String): Seq[(HttpString, Seq[String])] = Seq(
-      Headers.CONTENT_TYPE -> Seq("text/plain; charset=utf-8")
+      ContentTypeHttpString -> Seq("text/plain; charset=utf-8")
     )
   }
 
@@ -34,7 +38,7 @@ object ResponseWritable extends LowPriResponseWritableInstances {
 
     // application/octet-stream says "it can be anything"
     override def headers(value: InputStream): Seq[(HttpString, Seq[String])] = Seq(
-      Headers.CONTENT_TYPE -> Seq("application/octet-stream")
+      ContentTypeHttpString -> Seq("application/octet-stream")
     )
   }
 
@@ -47,8 +51,8 @@ object ResponseWritable extends LowPriResponseWritableInstances {
 
     // https://stackoverflow.com/questions/20508788/do-i-need-content-type-application-octet-stream-for-file-download
     override def headers(value: Path): Seq[(HttpString, Seq[String])] = Seq(
-      Headers.CONTENT_TYPE -> Seq("application/octet-stream"),
-      Headers.CONTENT_DISPOSITION -> Seq(s""" attachment; filename="${value.getFileName}" """.trim)
+      ContentTypeHttpString -> Seq("application/octet-stream"),
+      ContentDispositionHttpString -> Seq(s""" attachment; filename="${value.getFileName}" """.trim)
     )
   }
 
@@ -57,7 +61,7 @@ object ResponseWritable extends LowPriResponseWritableInstances {
     override def write(value: Frag, outputStream: OutputStream): Unit =
       ResponseWritable[String].write(value.render, outputStream)
     override def headers(value: Frag): Seq[(HttpString, Seq[String])] = Seq(
-      Headers.CONTENT_TYPE -> Seq("text/html; charset=utf-8")
+      ContentTypeHttpString -> Seq("text/html; charset=utf-8")
     )
   }
 
@@ -65,7 +69,7 @@ object ResponseWritable extends LowPriResponseWritableInstances {
     override def write(value: doctype, outputStream: OutputStream): Unit =
       ResponseWritable[String].write(value.render, outputStream)
     override def headers(value: doctype): Seq[(HttpString, Seq[String])] = Seq(
-      Headers.CONTENT_TYPE -> Seq("text/html; charset=utf-8")
+      ContentTypeHttpString -> Seq("text/html; charset=utf-8")
     )
   }
 
@@ -73,7 +77,7 @@ object ResponseWritable extends LowPriResponseWritableInstances {
     override def write(value: T, outputStream: OutputStream): Unit =
       ResponseWritable[String].write(value.toJson, outputStream)
     override def headers(value: T): Seq[(HttpString, Seq[String])] = Seq(
-      Headers.CONTENT_TYPE -> Seq("application/json; charset=utf-8")
+      ContentTypeHttpString -> Seq("application/json; charset=utf-8")
     )
   }
 
@@ -87,7 +91,7 @@ trait LowPriResponseWritableInstances {
     // application/octet-stream says "it can be anything"
     override def headers(value: geny.Writable): Seq[(HttpString, Seq[String])] =
       Seq(
-        Headers.CONTENT_TYPE -> Seq(value.httpContentType.getOrElse("application/octet-stream"))
+        ContentTypeHttpString -> Seq(value.httpContentType.getOrElse("application/octet-stream"))
       )
   }
 }

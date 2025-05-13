@@ -2,16 +2,18 @@ package ba.sake.sharaf.undertow
 
 import java.nio.charset.StandardCharsets
 import java.nio.file.Paths
-import io.undertow.util.Headers
+import sttp.model.*
+import sttp.client4.quick.*
 import ba.sake.sharaf.*
 import ba.sake.sharaf.undertow.{*, given}
+import ba.sake.sharaf.utils.NetworkUtils
 import ba.sake.tupson.JsonRW
 
 class ResponseWritableTest extends munit.FunSuite {
 
   val testFileResourceDir = Paths.get(sys.env("MILL_TEST_RESOURCE_DIR"))
 
-  val port = utils.getFreePort()
+  val port = NetworkUtils.getFreePort()
   val baseUrl = s"http://localhost:$port"
 
   val routes = Routes {
@@ -21,10 +23,14 @@ class ResponseWritableTest extends munit.FunSuite {
       val is = new java.io.ByteArrayInputStream("an inputstream".getBytes(StandardCharsets.UTF_8))
       Response.withBody(is)
     case GET -> Path("geny") =>
-      val genyWritable = requests.get.stream(s"${baseUrl}/inputstream")
+      val genyWritable: geny.Writable = "geny writable".getBytes(StandardCharsets.UTF_8)
       Response.withBody(genyWritable)
     case GET -> Path("imperative") =>
-      Request.current.asInstanceOf[UndertowSharafRequest].underlyingHttpServerExchange.getOutputStream.write("hello".getBytes(StandardCharsets.UTF_8))
+      Request.current
+        .asInstanceOf[UndertowSharafRequest]
+        .underlyingHttpServerExchange
+        .getOutputStream
+        .write("hello".getBytes(StandardCharsets.UTF_8))
       Response.default
     case GET -> Path("file") =>
       val file = testFileResourceDir.resolve("text_file.txt")
@@ -67,66 +73,66 @@ class ResponseWritableTest extends munit.FunSuite {
   override def afterAll(): Unit = server.stop()
 
   test("Write response String") {
-    val res = requests.get(s"${baseUrl}/string")
-    assertEquals(res.text(), "a string")
-    assertEquals(res.headers(Headers.CONTENT_TYPE_STRING.toLowerCase), Seq("text/plain; charset=utf-8"))
+    val res = quickRequest.get(uri"${baseUrl}/string").send()
+    assertEquals(res.body, "a string")
+    assertEquals(res.headers(HeaderNames.ContentType), Seq("text/plain; charset=utf-8"))
   }
 
   test("Write response InputStream") {
-    val res = requests.get(s"${baseUrl}/inputstream")
-    assertEquals(res.text(), "an inputstream")
-    assertEquals(res.headers(Headers.CONTENT_TYPE_STRING.toLowerCase), Seq("application/octet-stream"))
+    val res = quickRequest.get(uri"${baseUrl}/inputstream").send()
+    assertEquals(res.body, "an inputstream")
+    assertEquals(res.headers(HeaderNames.ContentType), Seq("application/octet-stream"))
   }
 
   test("Write response geny.Writable") {
-    val res = requests.get(s"${baseUrl}/geny")
-    assertEquals(res.text(), "an inputstream")
-    assertEquals(res.headers(Headers.CONTENT_TYPE_STRING.toLowerCase), Seq("application/octet-stream"))
+    val res = quickRequest.get(uri"${baseUrl}/geny").send()
+    assertEquals(res.body, "geny writable")
+    assertEquals(res.headers(HeaderNames.ContentType), Seq("application/octet-stream"))
   }
 
   test("Write response in an imperative way") {
-    val res = requests.get(s"${baseUrl}/imperative")
-    assertEquals(res.text(), "hello")
+    val res = quickRequest.get(uri"${baseUrl}/imperative").send()
+    assertEquals(res.body, "hello")
   }
 
   test("Write response file") {
-    val res = requests.get(s"${baseUrl}/file")
-    assertEquals(res.text(), "a text file")
-    assertEquals(res.headers(Headers.CONTENT_TYPE_STRING.toLowerCase), Seq("application/octet-stream"))
+    val res = quickRequest.get(uri"${baseUrl}/file").send()
+    assertEquals(res.body, "a text file")
+    assertEquals(res.headers(HeaderNames.ContentType), Seq("application/octet-stream"))
     assertEquals(
-      res.headers(Headers.CONTENT_DISPOSITION_STRING.toLowerCase),
+      res.headers(HeaderNames.ContentDisposition),
       Seq(""" attachment; filename="text_file.txt" """.trim)
     )
   }
 
   test("Write response JSON") {
-    val res = requests.get(s"${baseUrl}/json")
-    assertEquals(res.text(), """ {"name":"Meho","age":40} """.trim)
-    assertEquals(res.headers(Headers.CONTENT_TYPE_STRING.toLowerCase), Seq("application/json; charset=utf-8"))
+    val res = quickRequest.get(uri"${baseUrl}/json").send()
+    assertEquals(res.body, """ {"name":"Meho","age":40} """.trim)
+    assertEquals(res.headers(HeaderNames.ContentType), Seq("application/json; charset=utf-8"))
   }
 
   test("Write response scalatags Frag") {
-    val res = requests.get(s"${baseUrl}/scalatags/frag")
-    assertEquals(res.text(), """ <div>this is a div</div> """.trim)
-    assertEquals(res.headers(Headers.CONTENT_TYPE_STRING.toLowerCase), Seq("text/html; charset=utf-8"))
+    val res = quickRequest.get(uri"${baseUrl}/scalatags/frag").send()
+    assertEquals(res.body, """ <div>this is a div</div> """.trim)
+    assertEquals(res.headers(HeaderNames.ContentType), Seq("text/html; charset=utf-8"))
   }
 
   test("Write response scalatags doctype") {
-    val res = requests.get(s"${baseUrl}/scalatags/doctype")
+    val res = quickRequest.get(uri"${baseUrl}/scalatags/doctype").send()
     assertEquals(
-      res.text(),
+      res.body,
       """ <!DOCTYPE html><html><head><title>doctype title</title></head><body>this is doctype body</body></html> """.trim
     )
-    assertEquals(res.headers(Headers.CONTENT_TYPE_STRING.toLowerCase), Seq("text/html; charset=utf-8"))
+    assertEquals(res.headers(HeaderNames.ContentType), Seq("text/html; charset=utf-8"))
   }
 
   test("Write response hepek HtmlPage") {
-    val res = requests.get(s"${baseUrl}/hepek/htmlpage")
+    val res = quickRequest.get(uri"${baseUrl}/hepek/htmlpage").send()
     assertEquals(
-      res.text(),
+      res.body,
       """ <!DOCTYPE html><html lang="en"><head><meta charset="utf-8" /><meta http-equiv="X-UA-Compatible" content="ie=edge" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta name="generator" content="hepek" /><meta name="theme-color" content="#000" /><meta name="mobile-web-app-capable" content="yes" /><meta name="twitter:card" content="summary_large_image" /><title>changeme</title></head><body><div>this is body</div></body></html> """.trim
     )
-    assertEquals(res.headers(Headers.CONTENT_TYPE_STRING.toLowerCase), Seq("text/html; charset=utf-8"))
+    assertEquals(res.headers(HeaderNames.ContentType), Seq("text/html; charset=utf-8"))
   }
 
 }
