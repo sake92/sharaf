@@ -1,10 +1,12 @@
 package fullstack
 
+import java.nio.file.Path
 import scala.compiletime.uninitialized
+import sttp.model.*
+import sttp.client4.quick.*
 import ba.sake.formson.*
 import ba.sake.sharaf.{*, given}
 import ba.sake.sharaf.utils.*
-import java.nio.file.Path
 
 class FullstackSuite extends munit.FunSuite {
 
@@ -18,13 +20,10 @@ class FullstackSuite extends munit.FunSuite {
 
     val reqBody =
       CreateCustomerForm("Džemal", exampleFile, List("hobby1", "hobby2"))
-    val res = requests.post(
-      s"${module.baseUrl}/form-submit",
-      data = reqBody.toRequestsMultipart()
-    )
+    val res = quickRequest.post(uri"${module.baseUrl}/form-submit").multipartBody(reqBody.toSttpMultipart()).send()
 
-    assertEquals(res.statusCode, 200)
-    val resBody = res.text()
+    assertEquals(res.code, StatusCode.Ok)
+    val resBody = res.body
     // this tests utf-8 encoding too :)
     assert(resBody.contains("Džemal"), "Result does not contain input name")
     assert(resBody.contains("This is a text file :)"), "Result does not contain input file")
@@ -36,7 +35,7 @@ class FullstackSuite extends munit.FunSuite {
     def apply() = module
 
     override def beforeEach(context: BeforeEach): Unit =
-      module = FullstackModule(getFreePort())
+      module = FullstackModule(NetworkUtils.getFreePort())
       module.server.start()
     override def afterEach(context: AfterEach): Unit =
       module.server.stop()

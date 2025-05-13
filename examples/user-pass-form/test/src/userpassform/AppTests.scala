@@ -1,38 +1,42 @@
 package userpassform
 
+import sttp.model.*
+import sttp.client4.quick.*
 import ba.sake.formson.FormDataRW
-import ba.sake.sharaf.utils.*
+import ba.sake.sharaf.*
 
 class AppTests extends IntegrationTest {
 
   test("/protected-resource should return 302 redirect to /login-form when not logged in") {
     val module = moduleFixture()
     val baseUrl = module.baseUrl
-    val res = requests.get(s"$baseUrl/protected-resource", check = false, maxRedirects = 0)
-    assertEquals(res.statusCode, 302)
-    assertEquals(res.headers("location"), Seq("/login-form"))
+    val res = quickRequest.get(uri"$baseUrl/protected-resource").followRedirects(false).send()
+    assertEquals(res.code, StatusCode.Found)
+    assertEquals(res.headers(HeaderNames.Location), Seq("/login-form"))
   }
 
   test("/ and /form-login should return 200 when not logged in") {
     val module = moduleFixture()
-    val baseUrl = module.baseUrl
-    assertEquals(requests.get(baseUrl).statusCode, 200)
-    assertEquals(requests.get(s"$baseUrl/form-login").statusCode, 200)
+    val baseUrl = Uri.apply(module.baseUrl)
+    assertEquals(quickRequest.get(baseUrl).send().code, StatusCode.Ok)
+    assertEquals(quickRequest.get(uri"$baseUrl/form-login").send().code, StatusCode.Ok)
   }
 
   test("/protected-resource should return 200 when logged in") {
     val module = moduleFixture()
     val baseUrl = module.baseUrl
-    val session = requests.Session()
-    val loginRes = session.post(
-      s"$baseUrl/callback?client_name=FormClient",
-      data = LoginFormData("johndoe", "johndoe").toRequestsMultipart(),
-      check = false,
-      maxRedirects = 0
-    )
-    assertEquals(loginRes.statusCode, 303)
-    val res = session.get(s"$baseUrl/protected-resource", check = false)
-    assertEquals(res.statusCode, 200)
+    val cookieHandler = new java.net.CookieManager()
+    val javaClient = java.net.http.HttpClient.newBuilder().cookieHandler(cookieHandler).build()
+    val statefulBackend = sttp.client4.httpclient.HttpClientSyncBackend.usingClient(javaClient)
+    val loginRes = quickRequest
+      .get(uri"$baseUrl/callback?client_name=FormClient")
+      .multipartBody(LoginFormData("johndoe", "johndoe").toSttpMultipart())
+      .followRedirects(false)
+      .send(statefulBackend)
+
+    assertEquals(loginRes.code, StatusCode.SeeOther)
+    val res = quickRequest.get(uri"$baseUrl/protected-resource").send(statefulBackend)
+    assertEquals(res.code, StatusCode.Ok)
   }
 }
 

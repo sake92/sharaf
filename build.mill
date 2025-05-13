@@ -25,19 +25,19 @@ object `sharaf-core` extends Module {
   trait SharafCoreModule extends SharafPublishModule with PlatformScalaModule {
     def artifactName = "sharaf-core"
     // all deps should be cross jvm/native
-    def ivyDeps = Agg(
+    def ivyDeps = super.ivyDeps() ++ Agg(
       ivy"ba.sake::tupson::${V.tupson}",
       ivy"com.lihaoyi::scalatags::${V.scalatags}",
-      ivy"com.lihaoyi::geny::1.1.1"
+      ivy"com.lihaoyi::geny::1.1.1",
+      ivy"com.softwaremill.sttp.client4::core::4.0.5"
     )
   }
 }
 
 object `sharaf-undertow` extends SharafPublishModule {
   def artifactName = "sharaf-undertow"
-  def ivyDeps = Agg(
+  def ivyDeps = super.ivyDeps() ++ Agg(
     ivy"io.undertow:undertow-core:2.3.18.Final",
-    ivy"com.lihaoyi::requests:0.9.0",
     ivy"ba.sake::tupson-config:${V.tupson}",
     ivy"ba.sake::hepek-components:${V.hepek}"
   )
@@ -51,7 +51,7 @@ object `sharaf-undertow` extends SharafPublishModule {
 
 object `sharaf-helidon` extends SharafPublishModule {
   def artifactName = "sharaf-helidon"
-  def ivyDeps = Agg(
+  def ivyDeps = super.ivyDeps() ++ Agg(
     ivy"io.helidon.webserver:helidon-webserver:4.2.2",
     ivy"io.helidon.config:helidon-config-yaml:4.2.2"
   )
@@ -70,7 +70,7 @@ object querson extends Module {
   trait QuersonModule extends SharafPublishModule with PlatformScalaModule {
     def artifactName = "querson"
     def pomSettings = super.pomSettings().copy(description = "Sharaf query params library")
-    def ivyDeps = Agg(
+    def ivyDeps = super.ivyDeps() ++ Agg(
       ivy"com.lihaoyi::fastparse::3.1.1"
     )
   }
@@ -83,7 +83,7 @@ object formson extends Module {
   trait FormsonModule extends SharafPublishModule with PlatformScalaModule {
     def artifactName = "formson"
     def pomSettings = super.pomSettings().copy(description = "Sharaf form binding library")
-    def ivyDeps = Agg(
+    def ivyDeps = super.ivyDeps() ++ Agg(
       ivy"com.lihaoyi::fastparse::3.1.1"
     )
   }
@@ -95,7 +95,7 @@ object validson extends Module {
   object native extends ValidsonModule with ScalaNativeCommonModule
   trait ValidsonModule extends SharafPublishModule with PlatformScalaModule  {
     def artifactName = "validson"
-    def ivyDeps = Agg(
+    def ivyDeps = super.ivyDeps() ++ Agg(
       ivy"com.lihaoyi::sourcecode::0.4.2"
     )
     def pomSettings = super.pomSettings().copy(description = "Sharaf validation library")

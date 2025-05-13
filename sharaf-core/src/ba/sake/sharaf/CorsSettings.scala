@@ -1,5 +1,7 @@
 package ba.sake.sharaf
 
+import sttp.model.HeaderNames
+
 import java.time.Duration
 
 // stolen from Play
@@ -61,6 +63,9 @@ final class CorsSettings private (
 }
 
 object CorsSettings:
+  private val allowedHttpHeaders =
+    Set(HeaderNames.Accept, HeaderNames.AcceptLanguage, HeaderNames.ContentLanguage, HeaderNames.ContentType)
+      .map(HttpString.apply)
   val default: CorsSettings = new CorsSettings(
     pathPrefixes = Set("/"),
     allowedOrigins = Set.empty,
@@ -73,7 +78,7 @@ object CorsSettings:
       HttpMethod.PATCH,
       HttpMethod.DELETE
     ),
-    allowedHttpHeaders = Set(Headers.ACCEPT, Headers.ACCEPT_LANGUAGE, Headers.CONTENT_LANGUAGE, Headers.CONTENT_TYPE),
+    allowedHttpHeaders = allowedHttpHeaders,
     allowCredentials = false,
     preflightMaxAge = Duration.ofDays(3)
   )

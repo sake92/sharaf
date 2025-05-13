@@ -1,13 +1,15 @@
 package ba.sake.sharaf
 
+import sttp.model.StatusCode
+
 final class Response[T] private (
-    val status: Int,
+    val status: StatusCode,
     private[sharaf] val headerUpdates: HeaderUpdates,
     private[sharaf] val cookieUpdates: CookieUpdates,
     val body: Option[T]
 )(using val rw: ResponseWritable[T]) {
 
-  def withStatus(status: Int): Response[T] =
+  def withStatus(status: StatusCode): Response[T] =
     copy(status = status)
 
   def settingHeader(name: HttpString, values: Seq[String]): Response[T] =
@@ -32,7 +34,7 @@ final class Response[T] private (
     copy(body = Some(body))
 
   private def copy[T2](
-      status: Int = status,
+      status: StatusCode = status,
       headerUpdates: HeaderUpdates = headerUpdates,
       cookieUpdates: CookieUpdates = cookieUpdates,
       body: Option[T2] = body
@@ -41,10 +43,12 @@ final class Response[T] private (
 
 object Response {
 
-  val default: Response[String] =
-    new Response[String](StatusCodes.OK, HeaderUpdates(Seq.empty), CookieUpdates(Seq.empty), None)
+  private val LocationHeader = HttpString("Location")
 
-  def withStatus(status: Int): Response[String] =
+  val default: Response[String] =
+    new Response[String](StatusCode.Ok, HeaderUpdates(Seq.empty), CookieUpdates(Seq.empty), None)
+
+  def withStatus(status: StatusCode): Response[String] =
     default.withStatus(status)
 
   def settingHeader(name: HttpString, values: Seq[String]): Response[String] =
@@ -73,6 +77,6 @@ object Response {
     case None        => throw exceptions.NotFoundException(name)
 
   def redirect(location: String): Response[String] =
-    default.withStatus(StatusCodes.MOVED_PERMANENTLY).settingHeader(HttpString("Location"), location)
+    default.withStatus(StatusCode.MovedPermanently).settingHeader(LocationHeader, location)
 
 }

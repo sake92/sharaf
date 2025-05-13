@@ -26,7 +26,7 @@ object ResponseUtils {
       exchange.setResponseCookie(undertow.CookieUtils.toUndertow(cookie))
     }
 
-    exchange.setStatusCode(response.status)
+    exchange.setStatusCode(response.status.code)
     response.body.foreach(b => response.rw.write(b, exchange.getOutputStream))
   }
 

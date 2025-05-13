@@ -6,7 +6,7 @@ import io.helidon.webserver.http.HttpRouting
 import ba.sake.sharaf.Routes
 
 class HelidonSharafServer(host: String, port: Int, sharafHandler: SharafHelidonHandler) {
-    
+
   System.setProperty("server.host", host)
   System.setProperty("server.port", port.toString)
 

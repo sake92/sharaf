@@ -5,8 +5,7 @@ import io.undertow.server.HttpServerExchange
 import io.undertow.server.handlers.BlockingHandler
 import io.undertow.server.handlers.resource.ResourceHandler
 import io.undertow.server.handlers.resource.ClassPathResourceManager
-import io.undertow.util.StatusCodes
-
+import sttp.model.StatusCode
 import ba.sake.sharaf.*
 import ba.sake.sharaf.exceptions.ExceptionMapper
 import ba.sake.sharaf.routing.*
@@ -74,7 +73,7 @@ final class SharafHandler private (
 
 object SharafHandler:
 
-  private val defaultNotFoundResponse = Response.withBody("Not Found").withStatus(StatusCodes.NOT_FOUND)
+  private val defaultNotFoundResponse = Response.withBody("Not Found").withStatus(StatusCode.NotFound)
 
   def apply(routes: Routes): SharafHandler =
     new SharafHandler(routes, CorsSettings.default, ExceptionMapper.default, _ => SharafHandler.defaultNotFoundResponse)

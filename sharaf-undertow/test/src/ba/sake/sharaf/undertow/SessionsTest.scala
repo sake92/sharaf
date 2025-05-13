@@ -2,12 +2,13 @@ package ba.sake.sharaf.undertow
 
 import io.undertow.Undertow
 import io.undertow.server.session.{InMemorySessionManager, SessionAttachmentHandler, SessionCookieConfig}
+import sttp.client4.quick.*
 import ba.sake.sharaf.*
-import ba.sake.sharaf.undertow.{*, given}
 import ba.sake.sharaf.undertow.handlers.SharafHandler
+import ba.sake.sharaf.utils.NetworkUtils
 
 class SessionsTest extends munit.FunSuite {
-  val port = utils.getFreePort()
+  val port = NetworkUtils.getFreePort()
   val baseUrl = s"http://localhost:$port"
 
   val routes = Routes {
@@ -40,17 +41,19 @@ class SessionsTest extends munit.FunSuite {
 
   test("Session.set sets a value and Session.get gets it") {
     // cookies are used to track sessions
-    val session = requests.Session()
+    val cookieHandler = new java.net.CookieManager()
+    val javaClient = java.net.http.HttpClient.newBuilder().cookieHandler(cookieHandler).build()
+    val statefulBackend = sttp.client4.httpclient.HttpClientSyncBackend.usingClient(javaClient)
     locally {
-      val res = session.get(s"${baseUrl}/getopt-session-value")
-      assertEquals(res.text(), "not found")
+      val res = quickRequest.get(uri"${baseUrl}/getopt-session-value").send(statefulBackend)
+      assertEquals(res.body, "not found")
     }
     locally {
-      session.get(s"${baseUrl}/set-session-value/value1")
+      quickRequest.get(uri"${baseUrl}/set-session-value/value1").send(statefulBackend)
     }
     locally {
-      val res = session.get(s"${baseUrl}/get-session-value")
-      assertEquals(res.text(), "value1")
+      val res = quickRequest.get(uri"${baseUrl}/get-session-value").send(statefulBackend)
+      assertEquals(res.body, "value1")
     }
   }
 }
