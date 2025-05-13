@@ -19,7 +19,7 @@ jobs:
           distribution: temurin
           java-version: 17
       - name: Build
-        run: ./mill docs.hepek
+        run: ./mill -i docs.hepek
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
         with:
