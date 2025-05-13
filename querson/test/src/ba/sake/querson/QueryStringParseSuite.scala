@@ -1,6 +1,6 @@
 package ba.sake.querson
 
-import java.net.URL
+import java.net.URI
 import java.util.UUID
 import java.time.*
 
@@ -26,7 +26,7 @@ class QueryStringParseSuite extends munit.FunSuite {
           "duration" -> Seq("PT5H2S"),
           "period" -> Seq("P4M1D")
         ),
-        QuerySimple("text", None, 42, uuid, URL("http://example.com"), instant, ldt, duration, period)
+        QuerySimple("text", None, 42, uuid, URI.create("http://example.com"), instant, ldt, duration, period)
       )
     ).foreach { case (qsMap, expected) =>
       val res = qsMap.parseQueryStringMap[QuerySimple]
@@ -169,7 +169,7 @@ class QueryStringParseSuite extends munit.FunSuite {
           "str" -> Seq(),
           "int" -> Seq("not_an_int"),
           "uuid" -> Seq("uuidddd_NOT"),
-          "url" -> Seq("nope://example.com"),
+          "url" -> Seq(":://example.com"),
           "instant" -> Seq("2007-12-03T10:15:30"), // missing Z at end
           "ldt" -> Seq("2007-12-03Hmm10:15:30"),
           "duration" -> Seq("PT5H2S_"),
@@ -183,7 +183,7 @@ class QueryStringParseSuite extends munit.FunSuite {
           ParseError("str", "is missing", None),
           ParseError("int", "invalid Int", Some("not_an_int")),
           ParseError("uuid", "invalid UUID", Some("uuidddd_NOT")),
-          ParseError("url", "invalid URL", Some("nope://example.com")),
+          ParseError("url", "invalid URI", Some(":://example.com")),
           ParseError("instant", "invalid Instant", Some("2007-12-03T10:15:30")),
           ParseError("ldt", "invalid LocalDateTime", Some("2007-12-03Hmm10:15:30")),
           ParseError("duration", "invalid Duration", Some("PT5H2S_")),
