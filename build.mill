@@ -15,17 +15,22 @@ object V {
   val hepek = "0.30.0"
 }
 
-object `sharaf-core` extends SharafPublishModule {
-  def artifactName = "sharaf-core"
-  // all deps should be cross jvm/js/native
-  def ivyDeps = Agg(
-    ivy"ba.sake::tupson:${V.tupson}",
-    ivy"ba.sake::tupson-config:${V.tupson}",
-    ivy"com.lihaoyi::scalatags:${V.scalatags}",
-    ivy"com.lihaoyi::geny:1.1.1"
-  )
-  def moduleDeps = Seq(querson.jvm, formson.jvm, validson.jvm)
-  object test extends ScalaTests with SharafTestModule
+object `sharaf-core` extends Module {
+  object jvm extends SharafCoreModule with ScalaJvmCommonModule {
+    def moduleDeps = Seq(querson.jvm, formson.jvm, validson.jvm)
+  }
+  object native extends SharafCoreModule with ScalaNativeCommonModule {
+    def moduleDeps = Seq(querson.native, formson.native, validson.native)
+  }
+  trait SharafCoreModule extends SharafPublishModule with PlatformScalaModule {
+    def artifactName = "sharaf-core"
+    // all deps should be cross jvm/native
+    def ivyDeps = Agg(
+      ivy"ba.sake::tupson::${V.tupson}",
+      ivy"com.lihaoyi::scalatags::${V.scalatags}",
+      ivy"com.lihaoyi::geny::1.1.1"
+    )
+  }
 }
 
 object `sharaf-undertow` extends SharafPublishModule {
@@ -33,12 +38,10 @@ object `sharaf-undertow` extends SharafPublishModule {
   def ivyDeps = Agg(
     ivy"io.undertow:undertow-core:2.3.18.Final",
     ivy"com.lihaoyi::requests:0.9.0",
-    ivy"com.lihaoyi::geny:1.1.1",
-    ivy"ba.sake::tupson:${V.tupson}",
     ivy"ba.sake::tupson-config:${V.tupson}",
     ivy"ba.sake::hepek-components:${V.hepek}"
   )
-  def moduleDeps = Seq(`sharaf-core`)
+  def moduleDeps = Seq(`sharaf-core`.jvm)
   object test extends ScalaTests with SharafTestModule {
     def ivyDeps = super.ivyDeps() ++ Agg(
       ivy"org.webjars:jquery:3.7.1"
@@ -52,7 +55,7 @@ object `sharaf-helidon` extends SharafPublishModule {
     ivy"io.helidon.webserver:helidon-webserver:4.2.2",
     ivy"io.helidon.config:helidon-config-yaml:4.2.2"
   )
-  def moduleDeps = Seq(`sharaf-core`)
+  def moduleDeps = Seq(`sharaf-core`.jvm)
   object test extends ScalaTests with SharafTestModule {
     def ivyDeps = super.ivyDeps() ++ Agg(
       ivy"com.lihaoyi::requests:0.9.0"
