@@ -1,8 +1,7 @@
 package ba.sake.sharaf.exceptions
 
-import ba.sake.tupson.{*, given}
-
 import java.net.URI
+import ba.sake.tupson.{*, given}
 
 // https://www.rfc-editor.org/rfc/rfc7807#section-3.1
 case class ProblemDetails(

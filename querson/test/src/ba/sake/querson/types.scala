@@ -1,6 +1,6 @@
 package ba.sake.querson
 
-import java.net.URL
+import java.net.URI
 import java.time.*
 import java.util.UUID
 
@@ -13,7 +13,7 @@ case class QuerySimple(
     strOpt: Option[String],
     int: Int,
     uuid: UUID,
-    url: URL,
+    url: URI,
     instant: Instant,
     ldt: LocalDateTime,
     duration: Duration,

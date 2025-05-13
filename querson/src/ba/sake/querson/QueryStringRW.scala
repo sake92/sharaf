@@ -106,15 +106,6 @@ object QueryStringRW {
       Try(URI(str)).toOption.getOrElse(typeError(path, "URI", str))
   }
 
-  given QueryStringRW[URL] with {
-    override def write(path: String, value: URL): QueryStringData =
-      QueryStringRW[String].write(path, value.toString)
-
-    override def parse(path: String, qsData: QueryStringData): URL =
-      val str = QueryStringRW[String].parse(path, qsData)
-      Try(URI(str).toURL).toOption.getOrElse(typeError(path, "URL", str))
-  }
-
   // java.time
   given QueryStringRW[Instant] with {
     override def write(path: String, value: Instant): QueryStringData =

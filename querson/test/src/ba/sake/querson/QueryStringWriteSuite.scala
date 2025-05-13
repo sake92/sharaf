@@ -1,6 +1,6 @@
 package ba.sake.querson
 
-import java.net.URL
+import java.net.URI
 import java.util.UUID
 import java.time.*
 
@@ -21,7 +21,7 @@ class QueryStringWriteSuite extends munit.FunSuite {
 
   test("toQueryString should write simple query parameters to string") {
     val res1 =
-      QuerySimple("some text", Some("optional"), 42, uuid, URL("http://example.com"), instant, ldt, duration, period)
+      QuerySimple("some text", Some("optional"), 42, uuid, URI.create("http://example.com"), instant, ldt, duration, period)
         .toQueryString()
     assertEquals(
       res1,
