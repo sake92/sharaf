@@ -17,8 +17,8 @@ class AppTests extends IntegrationTest {
 
   test("/ and /form-login should return 200 when not logged in") {
     val module = moduleFixture()
-    val baseUrl = Uri.apply(module.baseUrl)
-    assertEquals(quickRequest.get(baseUrl).send().code, StatusCode.Ok)
+    val baseUrl = module.baseUrl
+    assertEquals(quickRequest.get(uri"$baseUrl").send().code, StatusCode.Ok)
     assertEquals(quickRequest.get(uri"$baseUrl/form-login").send().code, StatusCode.Ok)
   }
 
@@ -34,7 +34,7 @@ class AppTests extends IntegrationTest {
       .followRedirects(false)
       .send(statefulBackend)
 
-    assertEquals(loginRes.code, StatusCode.SeeOther)
+    assertEquals(loginRes.code, StatusCode.Found)
     val res = quickRequest.get(uri"$baseUrl/protected-resource").send(statefulBackend)
     assertEquals(res.code, StatusCode.Ok)
   }
