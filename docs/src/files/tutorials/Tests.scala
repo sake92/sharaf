@@ -1,7 +1,7 @@
 package files.tutorials
 
+import scalatags.Text.all.*
 import utils.*
-import Bundle.*, Tags.*
 
 object Tests extends TutorialPage {
 

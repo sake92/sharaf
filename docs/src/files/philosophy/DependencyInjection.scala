@@ -1,6 +1,7 @@
 package files.philosophy
 
-import utils.Bundle.*
+
+import utils.*
 
 object DependencyInjection extends PhilosophyPage {
 

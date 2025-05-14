@@ -1,6 +1,7 @@
 package files.philosophy
 
-import utils.Bundle.*
+
+import utils.*
 import files.howtos.QueryParams
 
 object QueryParamsHandling extends PhilosophyPage {

@@ -1,7 +1,7 @@
 package files.howtos
 
-import utils.Bundle.*
-import utils.Consts
+
+import utils.*
 
 object UploadFile extends HowToPage {
 

@@ -1,6 +1,6 @@
 package files.howtos
 
-import utils.Bundle.*
+import utils.*
 
 object CORS extends HowToPage {
 

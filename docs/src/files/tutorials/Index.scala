@@ -1,7 +1,7 @@
 package files.tutorials
 
 import utils.*
-import Bundle.*
+
 
 object Index extends TutorialPage {
 

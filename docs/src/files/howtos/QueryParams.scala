@@ -1,6 +1,6 @@
 package files.howtos
 
-import utils.Bundle.*
+import utils.*
 
 object QueryParams extends HowToPage {
 
@@ -87,7 +87,7 @@ object QueryParams extends HowToPage {
 
   val customSection = Section(
     "How to bind a custom query parameter?",
-    s"""
+    """
       When you want to handle a custom *scalar* value in query params,
       you need to implement a `QueryStringRW[T]` instance manually:
       ```scala
@@ -103,7 +103,7 @@ object QueryParams extends HowToPage {
       }
   
       private def typeError(path: String, tpe: String, value: Any): Nothing =
-        throw ParsingException(ParseError(path, s"invalid $$tpe", Some(value)))
+        throw ParsingException(ParseError(path, s"invalid \$tpe", Some(value)))
       ```
   
       Then you can use it:

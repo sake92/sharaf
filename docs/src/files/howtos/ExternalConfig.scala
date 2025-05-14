@@ -1,7 +1,6 @@
 package files.howtos
 
-import utils.Consts
-import utils.Bundle.*
+import utils.*
 
 object ExternalConfig extends HowToPage {
 

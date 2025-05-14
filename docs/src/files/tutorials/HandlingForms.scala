@@ -1,7 +1,6 @@
 package files.tutorials
 
 import utils.*
-import Bundle.*
 
 object HandlingForms extends TutorialPage {
 

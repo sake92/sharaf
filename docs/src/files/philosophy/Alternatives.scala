@@ -1,6 +1,6 @@
 package files.philosophy
 
-import utils.Bundle.*
+import utils.*
 
 object Alternatives extends PhilosophyPage {
 

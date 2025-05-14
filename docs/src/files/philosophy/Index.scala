@@ -1,7 +1,7 @@
 package files.philosophy
 
-import utils.Bundle.*
-import utils.Consts
+
+import utils.*
 
 object Index extends PhilosophyPage {
 
@@ -25,7 +25,7 @@ object Index extends PhilosophyPage {
     - [tupson](https://github.com/sake92/tupson) for JSON
     - [formson](${Consts.GhSourcesUrl}/formson) for forms
     - [validson](${Consts.GhSourcesUrl}/validson) for validation
-    - [hepek-components](https://github.com/sake92/hepek) for HTML (with [scalatags](https://github.com/com-lihaoyi/scalatags))
+    - [scalatags](https://github.com/com-lihaoyi/scalatags) for HTML
     - [sttp](https://sttp.softwaremill.com/en/latest/) for firing HTTP requests
     - [typesafe-config](https://github.com/lightbend/config) for configuration
 

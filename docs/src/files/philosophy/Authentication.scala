@@ -1,6 +1,7 @@
 package files.philosophy
 
-import utils.Bundle.*
+import utils.*
+
 
 object Authentication extends PhilosophyPage {
 
@@ -52,7 +53,7 @@ object Authentication extends PhilosophyPage {
 
   val denyByDefaultSection = Section(
     "Deny by Default Principle",
-    s"""
+    """
     One important principle in security is the "deny by default" principle.
     You should use whitelisting, allow access only to what is needed.  
     This is because it is easy to forget to deny something, and it is hard to remember everything that should be denied.
@@ -75,7 +76,7 @@ object Authentication extends PhilosophyPage {
     
     There are also:
     - `excludeBranch("/somepath")` to exclude all paths starting with "/somepath"
-    - `excludeRegex("^/somepath/.*$$")` to exclude all paths matching the regex (be careful with this one!)
+    - `excludeRegex("^/somepath/.*\$")` to exclude all paths matching the regex (be careful with this one!)
     """.md
   )
 }

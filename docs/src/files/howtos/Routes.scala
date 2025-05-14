@@ -1,6 +1,6 @@
 package files.howtos
 
-import utils.Bundle.*
+import utils.*
 
 object Routes extends HowToPage {
 
@@ -69,7 +69,7 @@ object Routes extends HowToPage {
 
   val enumPathSection = Section(
     "How to bind path parameter as an enum?",
-    s"""
+    """
   
       Sharaf needs a `FromPathParam[T]` instance for the `param[T]` extractor.  
       It can automatically derive an instance for singleton enums:
@@ -80,7 +80,7 @@ object Routes extends HowToPage {
   
       val routes = Routes:
         case GET -> Path("pricing", param[Cloud](cloud)) =>
-          Response.withBody(s"cloud = $${cloud}")
+          Response.withBody(s"cloud = \${cloud}")
       ```
   
       """.md
@@ -88,14 +88,14 @@ object Routes extends HowToPage {
 
   val regexPathSection = Section(
     "How to bind path parameter as a regex?",
-    s"""
+    """
   
       ```scala
       val userIdRegex = "user_id_(\\d+)".r
   
       val routes = Routes:
         case GET -> Path("pricing", userIdRegex(userId)) =>
-          Response.withBody(s"userId = $${userId}")
+          Response.withBody(s"userId = \${userId}")
       ```
   
       Note that the `userId` is bound as a `String`.  
@@ -111,7 +111,7 @@ object Routes extends HowToPage {
 
   val customPathSection = Section(
     "How to bind a custom path parameter?",
-    s"""
+    """
       Sharaf needs a `FromPathParam[T]` instance available:
       ```scala
       import ba.sake.sharaf.routing.*
@@ -123,7 +123,7 @@ object Routes extends HowToPage {
   
       val routes = Routes:
         case GET -> Path("pricing", param[MyType](myType)) =>
-          Response.withBody(s"myType = $${myType}")
+          Response.withBody(s"myType =  \${myType}")
       ```
       """.md
   )

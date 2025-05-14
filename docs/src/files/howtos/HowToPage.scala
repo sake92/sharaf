@@ -1,9 +1,8 @@
 package files.howtos
 
 import utils.*
-import Bundle.*
 
-trait HowToPage extends DocPage {
+trait HowToPage extends utils.DocPage {
 
   override def categoryPosts =
     List(
@@ -21,5 +20,4 @@ trait HowToPage extends DocPage {
 
   override def pageCategory = Some("How-Tos")
 
-  override def navbar = Some(Navbar.withActiveUrl(Index.ref))
 }

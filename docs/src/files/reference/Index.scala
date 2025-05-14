@@ -1,7 +1,7 @@
 package files.reference
 
+import scalatags.Text.all.*
 import utils.*
-import Bundle.*, Tags.*
 
 object Index extends ReferencePage {
 

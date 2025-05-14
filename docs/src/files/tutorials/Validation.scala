@@ -1,7 +1,7 @@
 package files.tutorials
 
 import utils.*
-import Bundle.*
+
 
 object Validation extends TutorialPage {
 
@@ -57,7 +57,7 @@ object Validation extends TutorialPage {
       "invalidArguments": [
         {
           "reason": "must not be blank",
-          "path": "$$.brand",
+          "path": "\\$$.brand",
           "value": ""
         }
       ],
@@ -88,12 +88,12 @@ object Validation extends TutorialPage {
       "invalidArguments": [
         {
           "reason": "must not be blank",
-          "path": "$$.brand",
+          "path": "\\$$.brand",
           "value": " "
         },
         {
           "reason": "must not be negative",
-          "path": "$$.quantity",
+          "path": "\\$$.quantity",
           "value": "-5"
         }
       ],

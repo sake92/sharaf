@@ -36,4 +36,4 @@ object ScalaCliFiles:
   private def get(chunk: os.PathChunk) =
     // os.pwd is sandboxed, this is called from plugin !
     val wd = os.Path(System.getenv("MILL_WORKSPACE_ROOT"))
-    os.read(wd / "examples" / chunk)
+    os.read(wd / "examples" / chunk).replace("${", "\\${") // escaping for nodejs shiki

@@ -1,24 +1,13 @@
 package utils
 
+import scalatags.Text.all.*
 import ba.sake.hepek.core.RelativePath
-import ba.sake.hepek.html.statik.BlogPostPage
-import ba.sake.hepek.bootstrap5.statik.BootstrapStaticBundle
+import ba.sake.hepek.html.statik
 
-val Bundle = locally {
-  val b = BootstrapStaticBundle.default
-  import b.*
+type Section = statik.Section
+val Section = statik.Section
 
-  val ratios = Ratios.default.withSingle(1, 2, 1).withHalf(1, 1).withThird(1, 2, 1)
-  val grid = Grid.withScreenRatios(
-    Grid.screenRatios.withSm(None).withXs(None).withLg(ratios).withMd(ratios)
-  )
-  b.withGrid(grid)
-}
-
-val FA = ba.sake.hepek.fontawesome5.FA
-
-def pager(thisSp: BlogPostPage)(using caller: RelativePath) = {
-  import Bundle.Tags.*
+def pager(thisSp: statik.BlogPostPage)(using caller: RelativePath) = {
 
   def bsNavigation(navLinks: Frag*) = tag("nav")(
     ul(cls := "pagination justify-content-center")(navLinks)
