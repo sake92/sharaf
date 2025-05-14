@@ -1,24 +1,29 @@
-body {
-  font-size: 17px;
-  padding-top: 5rem;
-  /* coz navbar */
-  margin-bottom: 55px;
+
+.flex-centered {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
 }
 
-.affix {
+/* default SVG maximum height */
+object[type="image/svg+xml"] {
+  max-height: 300px;
   width: 100%;
 }
 
-.navbar-brand {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
 
-.navbar-brand img {
-  width: 24px;
-}
-
-.site-map p {
-  margin-bottom: 0;
+@media (min-width: 768px) {
+    .blog-post {
+        display: grid;
+        grid-template-areas: "left-menu main-content";
+    }
+    .left-menu {
+        grid-area: left-menu;
+        padding: 1rem;
+    }
+    .main-content {
+        grid-area: main-content;
+        padding: 1rem;
+    }
 }
