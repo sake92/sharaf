@@ -2,9 +2,7 @@
 //> using dep ba.sake::sharaf-undertow:0.10.0
 
 // https://htmx.org/examples/bulk-update/
-// scala htmx_bulk_update.sc --resource-dir resources
 
-import io.undertow.Undertow
 import scalatags.Text.all.*
 import ba.sake.sharaf.*
 import ba.sake.sharaf.undertow.UndertowSharafServer

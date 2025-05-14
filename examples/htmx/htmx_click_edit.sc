@@ -2,7 +2,7 @@
 //> using dep ba.sake::sharaf-undertow:0.10.0
 
 // https://htmx.org/examples/click-to-edit/
-import io.undertow.Undertow
+
 import scalatags.Text.all.{param =>_, *}
 import ba.sake.hepek.htmx.*
 import ba.sake.sharaf.*

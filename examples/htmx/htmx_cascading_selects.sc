@@ -3,7 +3,6 @@
 
 // https://htmx.org/examples/value-select/
 
-import io.undertow.Undertow
 import scalatags.Text.all.*
 import ba.sake.hepek.htmx.*
 import ba.sake.querson.QueryStringRW

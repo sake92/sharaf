@@ -2,9 +2,7 @@
 //> using dep ba.sake::sharaf-undertow:0.10.0
 
 // https://htmx.org/examples/inline-validation/
-// scala htmx_inline_validation.sc --resource-dir resources
 
-import io.undertow.Undertow
 import scalatags.Text.all.*
 import ba.sake.hepek.htmx.*
 import ba.sake.sharaf.*

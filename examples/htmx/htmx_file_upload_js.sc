@@ -1,7 +1,6 @@
 //> using scala "3.7.0"
 //> using dep ba.sake::sharaf-undertow:0.10.0
 
-import io.undertow.Undertow
 import scalatags.Text.all.*
 import ba.sake.hepek.htmx.*
 import ba.sake.formson.FormDataRW

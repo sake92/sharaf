@@ -1,9 +1,6 @@
 //> using scala "3.7.0"
 //> using dep ba.sake::sharaf-undertow:0.10.0
 
-// scala htmx_tabs_hateoas.sc --resource-dir resources
-
-import io.undertow.Undertow
 import scalatags.Text.all.*
 import ba.sake.hepek.htmx.*
 import ba.sake.sharaf.*

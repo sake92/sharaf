@@ -35,10 +35,10 @@ object SqlDb extends TutorialPage {
 
   private val snip1 = ScalaCliFiles.sql_db.snippet(until = "case class Customer").indent(4)
   private val snip2 = ScalaCliFiles.sql_db
-    .snippet(from = "case class Customer", until = "Undertow.builder")
+    .snippet(from = "case class Customer", until = "UndertowSharafServer")
     .indent(4)
     .trim
-  private val snip3 = ScalaCliFiles.sql_db.snippet(from = "Undertow.builder").indent(4)
+  private val snip3 = ScalaCliFiles.sql_db.snippet(from = "UndertowSharafServer").indent(4)
 
   val squerySetup = Section(
     "Squery setup",

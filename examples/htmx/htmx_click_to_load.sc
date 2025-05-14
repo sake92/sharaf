@@ -2,10 +2,8 @@
 //> using dep ba.sake::sharaf-undertow:0.10.0
 
 // https://htmx.org/examples/click-to-load/
-// scala htmx_click_to_load.sc --resource-dir resources
 
 import java.util.UUID
-import io.undertow.Undertow
 import scalatags.Text.all.*
 import ba.sake.hepek.htmx.*
 import ba.sake.querson.QueryStringRW

@@ -12,11 +12,13 @@ object JsonAPI extends TutorialPage {
     super.blogSettings.withSections(modelSection, routesSection, runSection)
 
   private val snip1 = ScalaCliFiles.json_api.snippet(until = "val routes").indent(4)
+  
   private val snip2 = ScalaCliFiles.json_api
-    .snippet(from = "val routes", until = "Undertow.builder")
+    .snippet(from = "val routes", until = "UndertowSharafServer")
     .indent(4)
     .trim
-  private val snip3 = ScalaCliFiles.json_api.snippet(from = "Undertow.builder").indent(4)
+  
+  private val snip3 = ScalaCliFiles.json_api.snippet(from = "UndertowSharafServer").indent(4)
 
   val modelSection = Section(
     "Model definition",

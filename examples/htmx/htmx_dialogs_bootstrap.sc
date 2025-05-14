@@ -2,9 +2,7 @@
 //> using dep ba.sake::sharaf-undertow:0.10.0
 
 // https://htmx.org/examples/modal-bootstrap/
-// scala htmx_dialogs_bootstrap.sc --resource-dir resources
 
-import io.undertow.Undertow
 import scalatags.Text.all.*
 import ba.sake.hepek.htmx.*
 import ba.sake.sharaf.*

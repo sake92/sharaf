@@ -3,10 +3,8 @@
 import java.util.concurrent.TimeUnit
 
 // https://htmx.org/examples/progress-bar/
-// scala htmx_progress_bar.sc --resource-dir resources
 
 import java.util.concurrent.Executors
-import io.undertow.Undertow
 import scalatags.Text.all.*
 import ba.sake.hepek.htmx.*
 import ba.sake.sharaf.*
