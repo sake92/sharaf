@@ -1,5 +1,5 @@
-//> using scala "3.6.4"
-//> using dep ba.sake::sharaf:0.9.2
+//> using scala "3.7.0"
+//> using dep ba.sake::sharaf-undertow:0.10.0
 
 // https://htmx.org/examples/click-to-load/
 // scala htmx_infinite_scroll.sc --resource-dir resources
@@ -9,7 +9,8 @@ import io.undertow.Undertow
 import scalatags.Text.all.*
 import ba.sake.hepek.htmx.*
 import ba.sake.querson.QueryStringRW
-import ba.sake.sharaf.*, routing.*
+import ba.sake.sharaf.*
+import ba.sake.sharaf.undertow.UndertowSharafServer
 
 val PageSize = 10
 
@@ -26,11 +27,7 @@ val routes = Routes:
     val contactsSlice = allContacts.slice(qp.page * PageSize, qp.page * PageSize + PageSize)
     Response.withBody(views.contactsRows(contactsSlice, qp.page))
 
-Undertow.builder
-  .addHttpListener(8181, "localhost")
-  .setHandler(SharafHandler(routes))
-  .build
-  .start()
+UndertowSharafServer("localhost", 8181, routes).start()
 
 println(s"Server started at http://localhost:8181")
 

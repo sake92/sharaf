@@ -1,5 +1,5 @@
-//> using scala "3.6.4"
-//> using dep ba.sake::sharaf:0.9.2
+//> using scala "3.7.0"
+//> using dep ba.sake::sharaf-undertow:0.10.0
 import java.util.concurrent.TimeUnit
 
 // https://htmx.org/examples/progress-bar/
@@ -9,7 +9,8 @@ import java.util.concurrent.Executors
 import io.undertow.Undertow
 import scalatags.Text.all.*
 import ba.sake.hepek.htmx.*
-import ba.sake.sharaf.*, routing.*
+import ba.sake.sharaf.*
+import ba.sake.sharaf.undertow.UndertowSharafServer
 import ba.sake.sharaf.htmx.ResponseHeaders
 
 var percentage = 0
@@ -40,11 +41,7 @@ val routes = Routes:
     then Response.withBody(bar).settingHeader(ResponseHeaders.Trigger, "done")
     else Response.withBody(bar)
 
-Undertow.builder
-  .addHttpListener(8181, "localhost")
-  .setHandler(SharafHandler(routes))
-  .build
-  .start()
+UndertowSharafServer("localhost", 8181, routes).start()
 
 println(s"Server started at http://localhost:8181")
 

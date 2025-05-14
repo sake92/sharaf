@@ -1,5 +1,5 @@
-//> using scala "3.6.4"
-//> using dep ba.sake::sharaf:0.9.2
+//> using scala "3.7.0"
+//> using dep ba.sake::sharaf-undertow:0.10.0
 
 // example of BS5 modal with a form
 // scala htmx_dialogs_bootstrap_form.sc --resource-dir resources
@@ -8,7 +8,8 @@ import io.undertow.Undertow
 import scalatags.Text.all.*
 import ba.sake.hepek.htmx.*
 import ba.sake.formson.FormDataRW
-import ba.sake.sharaf.*, routing.*
+import ba.sake.sharaf.*
+import ba.sake.sharaf.undertow.UndertowSharafServer
 
 val routes = Routes:
   case GET -> Path() =>
@@ -20,11 +21,7 @@ val routes = Routes:
     val formData = Request.current.bodyForm[DialogForm]
     Response.withBody(div(s"You submitted: $formData"))
 
-Undertow.builder
-  .addHttpListener(8181, "localhost")
-  .setHandler(SharafHandler(routes))
-  .build
-  .start()
+UndertowSharafServer("localhost", 8181, routes).start()
 
 println("Server started at http://localhost:8181")
 

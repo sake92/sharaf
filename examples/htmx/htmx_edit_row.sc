@@ -1,5 +1,5 @@
-//> using scala "3.6.4"
-//> using dep ba.sake::sharaf:0.9.2
+//> using scala "3.7.0"
+//> using dep ba.sake::sharaf-undertow:0.10.0
 
 // https://htmx.org/examples/edit-row/
 // scala htmx_edit_row.sc --resource-dir resources
@@ -8,7 +8,8 @@ import io.undertow.Undertow
 import scalatags.Text.all.*
 import ba.sake.hepek.htmx.*
 import ba.sake.formson.FormDataRW
-import ba.sake.sharaf.*, routing.*
+import ba.sake.sharaf.*
+import ba.sake.sharaf.undertow.UndertowSharafServer
 
 var allContacts = Seq(
   Contact("1", "Joe Smith", "joe@smith.org"),
@@ -38,11 +39,7 @@ val routes = Routes:
     allContacts = allContacts.updated(idx, updatedContact)
     Response.withBody(views.viewContactRow(updatedContact))
 
-Undertow.builder
-  .addHttpListener(8181, "localhost")
-  .setHandler(SharafHandler(routes))
-  .build
-  .start()
+UndertowSharafServer("localhost", 8181, routes).start()
 
 println(s"Server started at http://localhost:8181")
 

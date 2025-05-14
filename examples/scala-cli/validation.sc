@@ -1,11 +1,11 @@
-//> using scala "3.6.4"
-//> using dep ba.sake::sharaf:0.9.2
+//> using scala "3.7.0"
+//> using dep ba.sake::sharaf-undertow:0.10.0
 
-import io.undertow.Undertow
 import ba.sake.querson.QueryStringRW
 import ba.sake.tupson.JsonRW
 import ba.sake.validson.Validator
-import ba.sake.sharaf.*, routing.*
+import ba.sake.sharaf.*
+import ba.sake.sharaf.undertow.UndertowSharafServer
 
 val routes = Routes:
   case GET -> Path("cars") =>
@@ -16,12 +16,8 @@ val routes = Routes:
     val json = Request.current.bodyJsonValidated[Car]
     Response.withBody(CarApiResult(s"JSON body OK: ${json}"))
 
-Undertow.builder
-  .addHttpListener(8181, "localhost")
-  .setHandler(
-    SharafHandler(routes).withExceptionMapper(ExceptionMapper.json)
-  )
-  .build
+UndertowSharafServer("localhost", 8181, routes)
+  .withExceptionMapper(ExceptionMapper.json)
   .start()
 
 println(s"Server started at http://localhost:8181")

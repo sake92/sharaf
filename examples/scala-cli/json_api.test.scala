@@ -1,6 +1,7 @@
-//> using scala "3.6.4"
-//> using dep ba.sake::sharaf:0.9.2
-//> using test.dep org.scalameta::munit::1.1.0
+//> using scala "3.7.0"
+//> using dep ba.sake::tupson:0.13.0
+//> using dep com.lihaoyi::requests:0.9.0
+//> using test.dep org.scalameta::munit::1.1.1
 
 import ba.sake.tupson.*
 
@@ -15,7 +16,7 @@ class JsonApiSuite extends munit.FunSuite {
       val res = requests.get(s"$baseUrl/cars")
       val resBody = res.text.parseJson[Seq[Car]]
       assertEquals(res.statusCode, 200)
-      assertEquals(res.headers("content-type"), Seq("application/json"))
+      assertEquals(res.headers("content-type"), Seq("application/json; charset=utf-8"))
       assertEquals(res.text.parseJson[Seq[Car]], Seq.empty)
     }
 
@@ -29,7 +30,7 @@ class JsonApiSuite extends munit.FunSuite {
       val res = requests.get(s"$baseUrl/cars/Mercedes")
       val resBody = res.text.parseJson[Seq[Car]]
       assertEquals(res.statusCode, 200)
-      assertEquals(res.headers("content-type"), Seq("application/json"))
+      assertEquals(res.headers("content-type"), Seq("application/json; charset=utf-8"))
       assertEquals(resBody, Seq(Car("Mercedes", "ML350", 1)))
     }
   }
