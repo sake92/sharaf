@@ -2,7 +2,6 @@ package files.tutorials
 
 import utils.*
 
-
 object PathParams extends TutorialPage {
 
   override def pageSettings = super.pageSettings

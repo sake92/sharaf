@@ -9,40 +9,27 @@ val Section = statik.Section
 
 def pager(thisSp: statik.BlogPostPage)(using caller: RelativePath) = {
 
-  def bsNavigation(navLinks: Frag*) = tag("nav")(
-    ul(cls := "pagination justify-content-center")(navLinks)
+  def picoButtons(navLinks: Frag*) = tag("nav")(
+    div(role := "group")(navLinks)
   )
 
   val posts = thisSp.categoryPosts
   val indexOfThis = posts.indexOf(thisSp)
   if posts.length > 1 && indexOfThis >= 0 then {
-
     if indexOfThis == 0 then
-      bsNavigation(
-        li(cls := "disabled page-item")(
-          a(href := "#", cls := "page-link")("Previous")
-        ),
-        li(title := posts(indexOfThis + 1).pageSettings.label, cls := "page-item")(
-          a(href := posts(indexOfThis + 1).ref, cls := "page-link")("Next")
-        )
+      picoButtons(
+        a(href := "#", disabled, role := "button", cls := "outline")("Previous"),
+        a(href := posts(indexOfThis + 1).ref, role := "button", cls := "outline")("Next")
       )
     else if indexOfThis == posts.length - 1 then
-      bsNavigation(
-        li(title := posts(indexOfThis - 1).pageSettings.label, cls := "page-item")(
-          a(href := posts(indexOfThis - 1).ref, cls := "page-link")("Previous")
-        ),
-        li(cls := "disabled page-item")(
-          a(href := "#", cls := "page-link")("Next")
-        )
+      picoButtons(
+        a(href := posts(indexOfThis - 1).ref, role := "button", cls := "outline")("Previous"),
+        a(href := "#", disabled, role := "button", cls := "outline")("Next")
       )
     else
-      bsNavigation(
-        li(title := posts(indexOfThis - 1).pageSettings.label, cls := "page-item")(
-          a(href := posts(indexOfThis - 1).ref, cls := "page-link")("Previous")
-        ),
-        li(title := posts(indexOfThis + 1).pageSettings.label, cls := "page-item")(
-          a(href := posts(indexOfThis + 1).ref, cls := "page-link")("Next")
-        )
+      picoButtons(
+        a(href := posts(indexOfThis - 1).ref, role := "button", cls := "outline")("Previous"),
+        a(href := posts(indexOfThis + 1).ref, role := "button", cls := "outline")("Next")
       )
   } else frag()
 

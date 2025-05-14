@@ -1,6 +1,5 @@
 package files.philosophy
 
-
 import utils.*
 
 object RoutesMatching extends PhilosophyPage {

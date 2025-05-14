@@ -13,4 +13,5 @@ trait PhilosophyPage extends utils.DocPage {
 
   override def pageCategory = Some("Philosophy")
 
+  override def currentCategoryPage = Some(Index)
 }

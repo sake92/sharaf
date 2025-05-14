@@ -1,5 +1,6 @@
 package files.reference
 
+import files.tutorials.Index
 import utils.*
 
 trait ReferencePage extends DocPage {
@@ -8,4 +9,5 @@ trait ReferencePage extends DocPage {
 
   override def pageCategory = Some("Reference")
 
+  override def currentCategoryPage = Some(Index)
 }

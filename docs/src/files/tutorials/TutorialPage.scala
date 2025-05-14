@@ -2,7 +2,6 @@ package files.tutorials
 
 import utils.*
 
-
 // TODO logging, logback + slf4j
 // TODO docker
 
@@ -34,4 +33,5 @@ trait TutorialPage extends DocPage {
 
   override def pageCategory = Some("Tutorials")
 
+  override def currentCategoryPage = Some(Index)
 }

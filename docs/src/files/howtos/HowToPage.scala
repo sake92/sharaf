@@ -20,4 +20,5 @@ trait HowToPage extends utils.DocPage {
 
   override def pageCategory = Some("How-Tos")
 
+  override def currentCategoryPage = Some(Index)
 }

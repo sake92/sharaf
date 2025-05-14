@@ -2,7 +2,6 @@ package files.philosophy
 
 import utils.*
 
-
 object Authentication extends PhilosophyPage {
 
   override def pageSettings = super.pageSettings

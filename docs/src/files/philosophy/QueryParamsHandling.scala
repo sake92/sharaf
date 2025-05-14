@@ -1,6 +1,5 @@
 package files.philosophy
 
-
 import utils.*
 import files.howtos.QueryParams
 

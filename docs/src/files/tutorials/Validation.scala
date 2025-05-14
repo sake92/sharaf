@@ -2,7 +2,6 @@ package files.tutorials
 
 import utils.*
 
-
 object Validation extends TutorialPage {
 
   override def pageSettings = super.pageSettings

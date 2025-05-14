@@ -23,7 +23,7 @@ object ResponseBody extends HowToPage {
       override def write(value: MyXML, exchange: HttpServerExchange): Unit =
         exchange.getResponseSender.send(value.asString)
       override def headers(value: String): Seq[(HttpString, Seq[String])] = Seq(
-        Headers.CONTENT_TYPE -> Seq("text/xml")
+        HttpString(HeaderNames.ContentType) -> Seq("text/xml")
       )
     }
     ```

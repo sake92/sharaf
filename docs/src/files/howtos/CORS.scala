@@ -21,10 +21,10 @@ object CORS extends HowToPage {
     use the `withCorsSettings` method and set desired config:
     ```scala
     import ba.sake.sharaf.handlers.cors.CorsSettings
-    import ba.sake.sharaf.*, routing.*
+    import ba.sake.sharaf.*
 
     val corsSettings = CorsSettings.default.withAllowedOrigins(Set("https://example.com"))
-    SharafHandler(routes).withCorsSettings(corsSettings)...
+    UndertowSharafServer(routes).withCorsSettings(corsSettings)...
     ```
     """.md
   )

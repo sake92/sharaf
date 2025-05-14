@@ -2,7 +2,6 @@ package files.tutorials
 
 import utils.*
 
-
 object Index extends TutorialPage {
 
   override def pageSettings = super.pageSettings
@@ -55,7 +54,7 @@ object Index extends TutorialPage {
         "Examples",
         s"""
         - [scala-cli examples](${Consts.GhSourcesUrl}/examples/scala-cli), standalone examples using scala-cli
-        - [scala-cli HTMX examples](${Consts.GhSourcesUrl}/examples/scala-cli/htmx), standalone examples featuring HTMX
+        - [scala-cli HTMX examples](${Consts.GhSourcesUrl}/examples/htmx), standalone examples featuring HTMX
         - [API example](${Consts.GhSourcesUrl}/examples/api) featuring JSON and validation
         - [full-stack example](${Consts.GhSourcesUrl}/examples/fullstack) featuring HTML, static files and forms
         - [sharaf-todo-backend](https://github.com/sake92/sharaf-todo-backend), implementation of the [todobackend.com](http://todobackend.com/) spec, featuring CORS handling

@@ -1,6 +1,5 @@
 package files.philosophy
 
-
 import utils.*
 
 object Index extends PhilosophyPage {

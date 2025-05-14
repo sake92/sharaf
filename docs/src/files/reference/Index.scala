@@ -15,11 +15,8 @@ object Index extends ReferencePage {
     s"${Consts.ProjectName} reference",
     div(
       s"""
-      ...
-
-      ```scala
-      println("Hello!")
-      ```
+      
+      Take a look at [Sharaf scaladoc](https://javadoc.io/doc/ba.sake/sharaf_3).
       """.md
     )
   )

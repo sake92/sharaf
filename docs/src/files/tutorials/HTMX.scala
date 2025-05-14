@@ -2,7 +2,6 @@ package files.tutorials
 
 import utils.*
 
-
 object HTMX extends TutorialPage {
 
   override def pageSettings = super.pageSettings

@@ -15,11 +15,11 @@ object NotFound extends HowToPage {
     "How to customize 404 NotFound handler?",
     s"""
 
-    Use the `withNotFoundHandler` on `SharafHandler`:
+    Use the `withNotFoundHandler` on `UndertowSharafServer`:
     ```scala
-    SharafHandler(routes).withNotFoundHandler { req =>
+    UndertowSharafServer(routes).withNotFoundHandler { req =>
       Response.withBody(MyCustomNotFoundPage)
-        .withStatus(StatusCodes.NOT_FOUND)
+        .withStatus(StatusCode.NotFound)
     }
     ```
 

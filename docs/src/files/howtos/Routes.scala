@@ -123,7 +123,7 @@ object Routes extends HowToPage {
   
       val routes = Routes:
         case GET -> Path("pricing", param[MyType](myType)) =>
-          Response.withBody(s"myType =  \${myType}")
+          Response.withBody(s"myType = \${myType}")
       ```
       """.md
   )
@@ -150,7 +150,7 @@ object Routes extends HowToPage {
         override def routes: Routes = Routes:
           case ...
           
-      val handler = SharafHandler(
+      val server = UndertowSharafServer(
         new MyController1, new MyController2
       )
       ```

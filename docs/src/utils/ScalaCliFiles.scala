@@ -19,7 +19,7 @@ extension (str: String) {
 object ScalaCliFiles:
 
   val hello = get(os.RelPath("scala-cli/hello.sc"))
-  val path_params = get(os.RelPath( "scala-cli/path_params.sc"))
+  val path_params = get(os.RelPath("scala-cli/path_params.sc"))
   val query_params = get(os.RelPath("scala-cli/query_params.sc"))
   val static_files = get(os.RelPath("scala-cli/static_files.sc"))
   val html_scalatags = get(os.RelPath("scala-cli/html_scalatags.sc"))

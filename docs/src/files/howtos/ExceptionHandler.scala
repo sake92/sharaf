@@ -15,16 +15,16 @@ object ExceptionHandler extends HowToPage {
     "How to customize the Exception handler?",
     s"""
 
-    Use the `withExceptionMapper` on `SharafHandler`:
+    Use the `withExceptionMapper` on `UndertowSharafServer`:
     ```scala
     val customExceptionMapper: ExceptionMapper = {
       case e: MyException =>
         val errorPage = MyErrorPage(e.getMessage())
         Response.withBody(errorPage)
-            .withStatus(StatusCodes.INTERNAL_SERVER_ERROR)
+            .withStatus(StatusCode.InternalServerError)
     }
     val finalExceptionMapper = customExceptionMapper.orElse(ExceptionMapper.default)
-    val httpHandler = SharafHandler(routes)
+    val server = UndertowSharafServer(routes)
       .withExceptionMapper(finalExceptionMapper)
     ```
 

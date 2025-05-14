@@ -14,10 +14,9 @@ object Consts:
   val GhSourcesUrl = s"https://github.com/${GhHandle}/${GhProjectName}/tree/main"
 
   val tq = """""""""
-  
+
   def allSearchIndexedPages = Seq(files.Index) ++
     files.tutorials.Index.categoryPosts ++
     files.howtos.Index.categoryPosts ++
     files.reference.Index.categoryPosts ++
     files.philosophy.Index.categoryPosts
-  
