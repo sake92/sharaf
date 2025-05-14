@@ -48,14 +48,14 @@ object ValidatedData:
 <p>The <code>ValidatedData</code> can be any <code>case class</code>: json data, form data, query params..</p>
 <hr />
 <p>Create a file <code>validation.sc</code> and paste this code into it:</p>
-<pre><code class="language-scala">    //&gt; using scala &quot;3.6.4&quot;
-//&gt; using dep ba.sake::sharaf:0.9.2
+<pre><code class="language-scala">    //&gt; using scala &quot;3.7.0&quot;
+//&gt; using dep ba.sake::sharaf-undertow:0.10.0
 
-import io.undertow.Undertow
 import ba.sake.querson.QueryStringRW
 import ba.sake.tupson.JsonRW
 import ba.sake.validson.Validator
-import ba.sake.sharaf.*, routing.*
+import ba.sake.sharaf.*
+import ba.sake.sharaf.undertow.UndertowSharafServer
 
 val routes = Routes:
   case GET -&gt; Path(&quot;cars&quot;) =&gt;
@@ -66,12 +66,8 @@ val routes = Routes:
     val json = Request.current.bodyJsonValidated[Car]
     Response.withBody(CarApiResult(s&quot;JSON body OK: ${json}&quot;))
 
-Undertow.builder
-  .addHttpListener(8181, &quot;localhost&quot;)
-  .setHandler(
-    SharafHandler(routes).withExceptionMapper(ExceptionMapper.json)
-  )
-  .build
+UndertowSharafServer(&quot;localhost&quot;, 8181, routes)
+  .withExceptionMapper(ExceptionMapper.json)
   .start()
 
 println(s&quot;Server started at http://localhost:8181&quot;)

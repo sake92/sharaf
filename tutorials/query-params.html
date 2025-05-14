@@ -42,13 +42,12 @@ Make a <code>case class MyParams(..) derives QueryStringRW</code><br />
 and then use it like this: <code>Request.current.queryParams[MyParams]</code></p>
 <hr />
 <p>Create a file <code>query_params.sc</code> and paste this code into it:</p>
-<pre><code class="language-scala">    //&gt; using scala &quot;3.6.4&quot;
-//&gt; using dep ba.sake::sharaf:0.9.2
+<pre><code class="language-scala">    //&gt; using scala &quot;3.7.0&quot;
+//&gt; using dep ba.sake::sharaf-undertow:0.10.0
 
-import io.undertow.Undertow
 import ba.sake.querson.QueryStringRW
-import ba.sake.sharaf.*, routing.*
-
+import ba.sake.sharaf.*
+import ba.sake.sharaf.undertow.UndertowSharafServer
 
 val routes = Routes:
   case GET -&gt; Path(&quot;raw&quot;) =&gt;
@@ -60,11 +59,7 @@ val routes = Routes:
     val qp = Request.current.queryParams[SearchParams]
     Response.withBody(s&quot;params = ${qp}&quot;)
 
-Undertow.builder
-  .addHttpListener(8181, &quot;localhost&quot;)
-  .setHandler(SharafHandler(routes))
-  .build
-  .start()
+UndertowSharafServer(&quot;localhost&quot;, 8181, routes).start()
 
 println(s&quot;Server started at http://localhost:8181&quot;)
 
