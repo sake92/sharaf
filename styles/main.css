@@ -17,6 +17,7 @@ object[type="image/svg+xml"] {
     .blog-post {
         display: grid;
         grid-template-areas: "left-menu main-content";
+        grid-template-columns: 300px 1fr;
     }
     .left-menu {
         grid-area: left-menu;
