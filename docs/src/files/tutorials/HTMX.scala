@@ -20,7 +20,7 @@ object HTMX extends TutorialPage {
     Sharaf is using the [hepek-components](https://sake92.github.io/hepek/hepek/components/reference/bundle-reference.html)
     as its template engine, which has support for HTMX attributes.
 
-    You can lots of examples in [examples/scala-cli/htmx](${Consts.GhSourcesUrl}/examples/htmx) folder.
+    You can lots of examples in [examples/htmx](${Consts.GhSourcesUrl}/examples/htmx) folder.
 
     ---
     
