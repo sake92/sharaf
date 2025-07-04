@@ -198,6 +198,9 @@ object examples extends mill.Module {
       )
     }
   }
+  object snunit extends SharafExampleModule with ScalaNativeCommonModule {
+    def moduleDeps = Seq(`sharaf-snunit`)
+  }
 }
 
 //////////////////// docs
