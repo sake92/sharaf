@@ -63,6 +63,15 @@ object `sharaf-helidon` extends SharafPublishModule {
   }
 }
 
+
+object `sharaf-snunit` extends ScalaNativeCommonModule with SharafPublishModule {
+  def artifactName = "sharaf-helidon"
+  def ivyDeps = super.ivyDeps() ++ Agg(
+    ivy"com.github.lolgab::snunit::0.10.3"
+  )
+  def moduleDeps = Seq(`sharaf-core`.native)
+}
+
 object querson extends Module {
   object jvm extends QuersonModule with ScalaJvmCommonModule
   object js extends QuersonModule with ScalaJSCommonModule
