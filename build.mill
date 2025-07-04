@@ -21,6 +21,7 @@ object `sharaf-core` extends Module {
   }
   object native extends SharafCoreModule with ScalaNativeCommonModule {
     def moduleDeps = Seq(querson.native, formson.native, validson.native)
+    object test extends ScalaNativeTests with SharafTestModule
   }
   trait SharafCoreModule extends SharafPublishModule with PlatformScalaModule {
     def artifactName = "sharaf-core"
@@ -75,7 +76,9 @@ object `sharaf-snunit` extends ScalaNativeCommonModule with SharafPublishModule 
 object querson extends Module {
   object jvm extends QuersonModule with ScalaJvmCommonModule
   object js extends QuersonModule with ScalaJSCommonModule
-  object native extends QuersonModule with ScalaNativeCommonModule
+  object native extends QuersonModule with ScalaNativeCommonModule {
+    object test extends ScalaNativeTests with SharafTestModule
+  }
   trait QuersonModule extends SharafPublishModule with PlatformScalaModule {
     def artifactName = "querson"
     def pomSettings = super.pomSettings().copy(description = "Sharaf query params library")
@@ -88,7 +91,9 @@ object querson extends Module {
 object formson extends Module {
   object jvm extends FormsonModule with ScalaJvmCommonModule
   //object js extends FormsonModule with ScalaJSCommonModule // java.nio.Path not supported
-  object native extends FormsonModule with ScalaNativeCommonModule
+  object native extends FormsonModule with ScalaNativeCommonModule {
+    object test extends ScalaNativeTests with SharafTestModule
+  }
   trait FormsonModule extends SharafPublishModule with PlatformScalaModule {
     def artifactName = "formson"
     def pomSettings = super.pomSettings().copy(description = "Sharaf form binding library")
@@ -101,7 +106,9 @@ object formson extends Module {
 object validson extends Module {
   object jvm extends ValidsonModule with ScalaJvmCommonModule
   object js extends ValidsonModule with ScalaJSCommonModule
-  object native extends ValidsonModule with ScalaNativeCommonModule
+  object native extends ValidsonModule with ScalaNativeCommonModule {
+    object test extends ScalaNativeTests with SharafTestModule
+  }
   trait ValidsonModule extends SharafPublishModule with PlatformScalaModule  {
     def artifactName = "validson"
     def ivyDeps = super.ivyDeps() ++ Agg(
@@ -152,7 +159,7 @@ trait ScalaNativeCommonModule extends ScalaNativeModule {
   def ivyDeps = super.ivyDeps() ++ Agg(
     ivy"io.github.cquiroz::scala-java-time::2.6.0"
   )
-  object test extends ScalaNativeTests with SharafTestModule
+  
 }
 
 trait SharafTestModule extends TestModule.Munit {
