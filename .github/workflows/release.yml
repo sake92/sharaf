@@ -30,7 +30,7 @@ jobs:
           passphrase: ${{ secrets.PGP_PASSPHRASE }}
       - name: Publish
         run: >
-          ./mill -i mill.scalalib.PublishModule/publishAll \
+          ./mill -i mill.scalalib.SonatypeCentralPublishModule/publishAll \
               --gpgArgs --passphrase=$PGP_PASSPHRASE,--no-tty,--pinentry-mode,loopback,--batch,--yes,-a,-b \
               --publishArtifacts __.publishArtifacts \
               --readTimeout 600000 \

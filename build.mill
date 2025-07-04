@@ -6,6 +6,7 @@ import $ivy.`ba.sake::mill-hepek::0.1.0`
 import mill._
 import mill.scalalib._, scalajslib._, scalanativelib._
 import mill.scalalib.publish._
+import mill.scalalib.SonatypeCentralPublishModule
 import de.tobiasroeser.mill.vcs.version.VcsVersion
 import ba.sake.millhepek.MillHepekModule
 
@@ -118,7 +119,7 @@ object validson extends Module {
   }
 }
 
-trait SharafPublishModule extends SharafCommonModule with PublishModule {
+trait SharafPublishModule extends SharafCommonModule with SonatypeCentralPublishModule {
   def publishVersion = VcsVersion.vcsState().format()
   def pomSettings = PomSettings(
     organization = "ba.sake",
