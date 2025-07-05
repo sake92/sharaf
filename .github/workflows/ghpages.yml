@@ -25,7 +25,7 @@ jobs:
             FLATMARK_VERSION=0.0.24
             curl -L https://github.com/sake92/flatmark/releases/download/v${FLATMARK_VERSION}/flatmark_${FLATMARK_VERSION}_amd64.deb -o flatmark.deb
             sudo apt install -y ./flatmark.deb
-            flatmark build
+            flatmark build -i docs
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
         with:
