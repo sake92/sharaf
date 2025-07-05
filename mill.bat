@@ -23,7 +23,7 @@ rem this script downloads a binary file from Maven Central or Github Pages (this
 rem into a cache location (%USERPROFILE%\.mill\download).
 rem
 rem Mill Project URL: https://github.com/com-lihaoyi/mill
-rem Script Version: 1.0.0-M1-49-ac90e3
+rem Script Version: 1.0.0-M1-21-7b6fae-DIRTY892b63e8
 rem
 rem If you want to improve this script, please also contribute your changes back!
 rem This script was generated from: dist/scripts/src/mill.bat
@@ -272,18 +272,21 @@ if [%~1%]==[--bsp] (
       if [%~1%]==[--no-server] (
         set MILL_FIRST_ARG=%1%
       ) else (
-        if [%~1%]==[--repl] (
+        if [%~1%]==[--no-daemon] (
           set MILL_FIRST_ARG=%1%
         ) else (
-          if [%~1%]==[--help] (
+          if [%~1%]==[--repl] (
             set MILL_FIRST_ARG=%1%
+          ) else (
+            if [%~1%]==[--help] (
+              set MILL_FIRST_ARG=%1%
+            )
           )
         )
       )
     )
   )
 )
-
 set "MILL_PARAMS=%*%"
 
 if not [!MILL_FIRST_ARG!]==[] (

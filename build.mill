@@ -1,14 +1,10 @@
+//| mill-version: 1.0.0-RC3
 package build
-
-import $ivy.`de.tototec::de.tobiasroeser.mill.vcs.version::0.4.1`
-import $ivy.`ba.sake::mill-hepek::0.1.0`
-
 import mill._
 import mill.scalalib._, scalajslib._, scalanativelib._
 import mill.scalalib.publish._
-import mill.scalalib.SonatypeCentralPublishModule
-import de.tobiasroeser.mill.vcs.version.VcsVersion
-import ba.sake.millhepek.MillHepekModule
+import mill.javalib.SonatypeCentralPublishModule
+import mill.vcs.VcsVersion
 
 object V {
   val tupson = "0.13.0"
@@ -27,40 +23,40 @@ object `sharaf-core` extends Module {
   trait SharafCoreModule extends SharafPublishModule with PlatformScalaModule {
     def artifactName = "sharaf-core"
     // all deps should be cross jvm/native
-    def ivyDeps = super.ivyDeps() ++ Agg(
-      ivy"ba.sake::tupson::${V.tupson}",
-      ivy"com.lihaoyi::scalatags::${V.scalatags}",
-      ivy"com.lihaoyi::geny::1.1.1",
-      ivy"com.softwaremill.sttp.client4::core::4.0.5"
+    def mvnDeps = super.mvnDeps() ++ Seq(
+      mvn"ba.sake::tupson::${V.tupson}",
+      mvn"com.lihaoyi::scalatags::${V.scalatags}",
+      mvn"com.lihaoyi::geny::1.1.1",
+      mvn"com.softwaremill.sttp.client4::core::4.0.5"
     )
   }
 }
 
 object `sharaf-undertow` extends SharafPublishModule {
   def artifactName = "sharaf-undertow"
-  def ivyDeps = super.ivyDeps() ++ Agg(
-    ivy"io.undertow:undertow-core:2.3.18.Final",
-    ivy"ba.sake::tupson-config:${V.tupson}",
-    ivy"ba.sake::hepek-components:${V.hepek}"
+  def mvnDeps = super.mvnDeps() ++ Seq(
+    mvn"io.undertow:undertow-core:2.3.18.Final",
+    mvn"ba.sake::tupson-config:${V.tupson}",
+    mvn"ba.sake::hepek-components:${V.hepek}"
   )
   def moduleDeps = Seq(`sharaf-core`.jvm)
   object test extends ScalaTests with SharafTestModule {
-    def ivyDeps = super.ivyDeps() ++ Agg(
-      ivy"org.webjars:jquery:3.7.1"
+    def mvnDeps = super.mvnDeps() ++ Seq(
+      mvn"org.webjars:jquery:3.7.1"
     )
   }
 }
 
 object `sharaf-helidon` extends SharafPublishModule {
   def artifactName = "sharaf-helidon"
-  def ivyDeps = super.ivyDeps() ++ Agg(
-    ivy"io.helidon.webserver:helidon-webserver:4.2.2",
-    ivy"io.helidon.config:helidon-config-yaml:4.2.2"
+  def mvnDeps = super.mvnDeps() ++ Seq(
+    mvn"io.helidon.webserver:helidon-webserver:4.2.2",
+    mvn"io.helidon.config:helidon-config-yaml:4.2.2"
   )
   def moduleDeps = Seq(`sharaf-core`.jvm)
   object test extends ScalaTests with SharafTestModule {
-    def ivyDeps = super.ivyDeps() ++ Agg(
-      ivy"com.lihaoyi::requests:0.9.0"
+    def mvnDeps = super.mvnDeps() ++ Seq(
+      mvn"com.lihaoyi::requests:0.9.0"
     )
   }
 }
@@ -68,8 +64,8 @@ object `sharaf-helidon` extends SharafPublishModule {
 
 object `sharaf-snunit` extends ScalaNativeCommonModule with SharafPublishModule {
   def artifactName = "sharaf-snunit"
-  def ivyDeps = super.ivyDeps() ++ Agg(
-    ivy"com.github.lolgab::snunit::0.10.3"
+  def mvnDeps = super.mvnDeps() ++ Seq(
+    mvn"com.github.lolgab::snunit::0.10.3"
   )
   def moduleDeps = Seq(`sharaf-core`.native)
 }
@@ -83,8 +79,8 @@ object querson extends Module {
   trait QuersonModule extends SharafPublishModule with PlatformScalaModule {
     def artifactName = "querson"
     def pomSettings = super.pomSettings().copy(description = "Sharaf query params library")
-    def ivyDeps = super.ivyDeps() ++ Agg(
-      ivy"com.lihaoyi::fastparse::3.1.1"
+    def mvnDeps = super.mvnDeps() ++ Seq(
+      mvn"com.lihaoyi::fastparse::3.1.1"
     )
   }
 }
@@ -98,8 +94,8 @@ object formson extends Module {
   trait FormsonModule extends SharafPublishModule with PlatformScalaModule {
     def artifactName = "formson"
     def pomSettings = super.pomSettings().copy(description = "Sharaf form binding library")
-    def ivyDeps = super.ivyDeps() ++ Agg(
-      ivy"com.lihaoyi::fastparse::3.1.1"
+    def mvnDeps = super.mvnDeps() ++ Seq(
+      mvn"com.lihaoyi::fastparse::3.1.1"
     )
   }
 }
@@ -112,8 +108,8 @@ object validson extends Module {
   }
   trait ValidsonModule extends SharafPublishModule with PlatformScalaModule  {
     def artifactName = "validson"
-    def ivyDeps = super.ivyDeps() ++ Agg(
-      ivy"com.lihaoyi::sourcecode::0.4.2"
+    def mvnDeps = super.mvnDeps() ++ Seq(
+      mvn"com.lihaoyi::sourcecode::0.4.2"
     )
     def pomSettings = super.pomSettings().copy(description = "Sharaf validation library")
   }
@@ -149,30 +145,30 @@ trait ScalaJvmCommonModule extends ScalaModule {
 
 trait ScalaJSCommonModule extends ScalaJSModule {
   def scalaJSVersion = "1.19.0"
-  def ivyDeps = super.ivyDeps() ++ Agg(
-    ivy"io.github.cquiroz::scala-java-time::2.6.0"
+  def mvnDeps = super.mvnDeps() ++ Seq(
+    mvn"io.github.cquiroz::scala-java-time::2.6.0"
   )
   object test extends ScalaJSTests with SharafTestModule
 }
 
 trait ScalaNativeCommonModule extends ScalaNativeModule {
   def scalaNativeVersion = "0.5.7"
-  def ivyDeps = super.ivyDeps() ++ Agg(
-    ivy"io.github.cquiroz::scala-java-time::2.6.0"
+  def mvnDeps = super.mvnDeps() ++ Seq(
+    mvn"io.github.cquiroz::scala-java-time::2.6.0"
   )
   
 }
 
 trait SharafTestModule extends TestModule.Munit {
-  def ivyDeps = Agg(
-    ivy"org.scalameta::munit::1.1.0"
+  def mvnDeps = Seq(
+    mvn"org.scalameta::munit::1.1.0"
   )
 }
 
 //////////////////// examples
 trait SharafExampleModule extends SharafCommonModule {
-  def ivyDeps = Agg(
-    ivy"ch.qos.logback:logback-classic:1.4.6"
+  def mvnDeps = Seq(
+    mvn"ch.qos.logback:logback-classic:1.4.6"
   )
 }
 
@@ -187,34 +183,26 @@ object examples extends mill.Module {
   }
   object `user-pass-form` extends SharafExampleModule {
     def moduleDeps = Seq(`sharaf-undertow`)
-    def ivyDeps = super.ivyDeps() ++ Agg(
-      ivy"org.pac4j:undertow-pac4j:5.0.1",
-      ivy"org.pac4j:pac4j-http:5.7.0",
-      ivy"org.mindrot:jbcrypt:0.4"
+    def mvnDeps = super.mvnDeps() ++ Seq(
+      mvn"org.pac4j:undertow-pac4j:5.0.1",
+      mvn"org.pac4j:pac4j-http:5.7.0",
+      mvn"org.mindrot:jbcrypt:0.4"
     )
     object test extends ScalaTests with SharafTestModule
   }
   object oauth2 extends SharafExampleModule {
     def moduleDeps = Seq(`sharaf-undertow`)
-    def ivyDeps = super.ivyDeps() ++ Agg(
-      ivy"org.pac4j:undertow-pac4j:5.0.1",
-      ivy"org.pac4j:pac4j-oauth:5.7.0"
+    def mvnDeps = super.mvnDeps() ++ Seq(
+      mvn"org.pac4j:undertow-pac4j:5.0.1",
+      mvn"org.pac4j:pac4j-oauth:5.7.0"
     )
     object test extends ScalaTests with SharafTestModule {
-      def ivyDeps = super.ivyDeps() ++ Agg(
-        ivy"no.nav.security:mock-oauth2-server:0.5.10"
+      def mvnDeps = super.mvnDeps() ++ Seq(
+        mvn"no.nav.security:mock-oauth2-server:0.5.10"
       )
     }
   }
   object snunit extends SharafExampleModule with ScalaNativeCommonModule {
     def moduleDeps = Seq(`sharaf-snunit`)
   }
-}
-
-//////////////////// docs
-object docs extends MillHepekModule with SharafCommonModule {
-  def ivyDeps = Agg(
-    ivy"ba.sake::hepek:${V.hepek}",
-    ivy"com.lihaoyi::os-lib:0.9.3"
-  )
 }
