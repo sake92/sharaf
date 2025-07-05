@@ -67,7 +67,7 @@ object `sharaf-helidon` extends SharafPublishModule {
 
 
 object `sharaf-snunit` extends ScalaNativeCommonModule with SharafPublishModule {
-  def artifactName = "sharaf-helidon"
+  def artifactName = "sharaf-snunit"
   def ivyDeps = super.ivyDeps() ++ Agg(
     ivy"com.github.lolgab::snunit::0.10.3"
   )
