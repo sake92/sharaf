@@ -1,0 +1,13 @@
+name: Sharaf
+
+gh:
+  handle: "sake92"
+  projectName: "sharaf"
+  url: "https://github.com/sake92/sharaf"
+  sourcesUrl: "https://github.com/sake92/sharaf/tree/main"
+
+artifact:
+  org: "ba.sake"
+  name: "sharaf-undertow"
+  version: "0.11.1"
+

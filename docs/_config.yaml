@@ -1,0 +1,17 @@
+
+name: Sharaf Documentation
+description: Sharaf Framework Documentation
+
+categories:
+  tutorials:
+    label: Tutorials
+    description: Sharaf Tutorials
+  howtos:
+    label: How-Tos
+    description: Sharaf How-Tos
+  reference:
+    label: Reference
+    description: Sharaf Reference Documentation
+  philosophy:
+    label: Philosophy
+    description: Sharaf Philosophy

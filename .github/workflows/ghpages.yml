@@ -19,8 +19,14 @@ jobs:
           distribution: temurin
           java-version: 21
       - name: Build
-        run: ./mill -i docs.hepek
+        env: 
+          FLATMARK_BASE_URL: https://sake92.github.io/sharaf
+        run: |
+            FLATMARK_VERSION=0.0.24
+            curl -L https://github.com/sake92/flatmark/releases/download/v${FLATMARK_VERSION}/flatmark_${FLATMARK_VERSION}_amd64.deb -o flatmark.deb
+            sudo apt install -y ./flatmark.deb
+            flatmark build
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: docs/hepek_output
+          folder: _site

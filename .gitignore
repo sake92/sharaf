@@ -16,5 +16,6 @@ out/
 
 .env
 
-hepek_output/
+_site/
+.flatmark-cache
 
