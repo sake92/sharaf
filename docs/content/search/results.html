@@ -1,0 +1,3 @@
+---
+layout: search-results.html
+---
