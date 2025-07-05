@@ -115,7 +115,7 @@ private[querson] class KeyParser(key: String) {
 
   def parse(): Seq[String] = {
 
-    val res = fastparse.parse(key, parseFinal(_))
+    val res = fastparse.parse(key, parseFinal(using _))
     res match
       case Success((firstKey, subKeys), index) => subKeys.prepended(firstKey)
       case f: Failure                          => throw QuersonException(f.msg)

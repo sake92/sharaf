@@ -109,7 +109,7 @@ private[formson] class KeyParser(key: String) {
   private val ForbiddenKeyChars = Set('[', ']', '.')
 
   def parse(): Seq[String] =
-    val res = fastparse.parse(key, parseFinal(_))
+    val res = fastparse.parse(key, parseFinal(using _))
     res match
       case Success((firstKey, subKeys), index) => subKeys.prepended(firstKey)
       case f: Failure                          => throw FormsonException(f.msg)

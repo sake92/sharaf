@@ -1,9 +1,9 @@
 package ba.sake.sharaf.snunit
 
+import java.io.ByteArrayOutputStream
 import snunit.{Request as SnunitRequest, *}
 import ba.sake.sharaf.*
 import ba.sake.sharaf.routing.*
-import java.io.ByteArrayOutputStream
 
 class SharafRequestHandler(routes: Routes) extends RequestHandler {
   override def handleRequest(snunitRequest: SnunitRequest): Unit = {
