@@ -1,0 +1,28 @@
+
+html,
+body {
+    height: 100%;
+}
+
+/* stick footer to bottom */
+body > footer {
+    position: sticky;
+    top: 100vh;
+    padding: 2rem 0 1rem 0;
+}
+
+/* show anchor */
+a.flatmark-anchor {
+    text-decoration: none;
+    font-size: 0.8em;
+    display: none;
+}
+
+h1:hover>a.flatmark-anchor,
+h2:hover>a.flatmark-anchor,
+h3:hover>a.flatmark-anchor,
+h4:hover>a.flatmark-anchor,
+h5:hover>a.flatmark-anchor,
+h6:hover>a.flatmark-anchor {
+    display: inline;
+}
