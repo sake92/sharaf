@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Sharaf Alternatives">
+  <title> Alternatives | Sharaf Documentation </title>
+  <link rel="shortcut icon" href="https://sake92.github.io/sharaf/images/favicon.png" type="image/png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-dark.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.conditional.min.css">
+  <link rel="stylesheet" href="https://sake92.github.io/sharaf/styles/default.css">
+ </head>
+ <body>
+  <header class="pico container">
+   <nav>
+    <ul>
+     <li><a href="https://sake92.github.io/sharaf/">Home</a></li>
+    </ul>
+    <ul>
+     <li>
+      <form action="https://sake92.github.io/sharaf/search/results.html" method="GET">
+       <input name="q" type="search" placeholder="Search">
+      </form>
+     </li>
+    </ul>
+    <ul>
+     <li><a href="https://sake92.github.io/sharaf/tutorials">Tutorials</a></li>
+     <li><a href="https://sake92.github.io/sharaf/howtos">How-Tos</a></li>
+     <li><a href="https://sake92.github.io/sharaf/reference">Reference</a></li>
+     <li><a href="https://sake92.github.io/sharaf/philosophy">Philosophy</a></li>
+    </ul>
+   </nav>
+  </header>
+  <main class="pico container">
+   <div class="grid">
+    <div>
+     <details>
+      <summary>Table of Contents</summary>
+      <div>
+       <ul>
+        <li><a href="#alternatives">Alternatives</a>
+         <ul>
+          <li><a href="#async-frameworks-like-play-akka-http-etc">Async frameworks like Play, Akka HTTP etc</a></li>
+          <li><a href="#pure-fp-libs-like-http4s-zio-http-etc">Pure FP libs like http4s, zio-http etc</a></li>
+          <li><a href="#enterprise-frameworks-like-spring-framework-quarkus-etc">Enterprise frameworks like Spring Framework, Quarkus etc</a></li>
+          <li><a href="#standalone-jee-servers-like-tomcat-jetty-etc">Standalone JEE servers like Tomcat, Jetty etc</a></li>
+         </ul></li>
+       </ul>
+      </div>
+     </details>
+     <hr>
+    </div>
+    <div></div>
+    <div></div>
+   </div>
+   <h1 id="alternatives">Alternatives<a href="#alternatives" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
+   <p>What about other frameworks?</p>
+   <h2 id="async-frameworks-like-play-akka-http-etc">Async frameworks like Play, Akka HTTP etc<a href="#async-frameworks-like-play-akka-http-etc" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+   <p>Synchronous programming is much, much easier to understand, debug, profile etc..
+    <br>
+    Benefits (performance/throughput) of async handling are mostly void in Java 21, with introduction of Virtual threads. Yay!</p>
+   <p>Only bummer for now is that Undertow doesn't still support them.. :/
+    <br>
+    But undertow is very performant in the current shape too, so for most use cases it will be enough.
+    <br>
+    Java 24 is a game changer for Undertow, because it solves the problem of <a href="https://openjdk.org/jeps/491">Synchronize Virtual Threads without Pinning</a>.</p>
+   <h2 id="pure-fp-libs-like-http4s-zio-http-etc">Pure FP libs like http4s, zio-http etc<a href="#pure-fp-libs-like-http4s-zio-http-etc" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+   <p>Too much focus on purely functional programming and (mostly unnecessary) math concepts.
+    <br>
+    Easy to get lost in that and overcomplicate your code.</p>
+   <h2 id="enterprise-frameworks-like-spring-framework-quarkus-etc">Enterprise frameworks like Spring Framework, Quarkus etc<a href="#enterprise-frameworks-like-spring-framework-quarkus-etc" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+   <p>Too much annotations, autoconfigurations, dependency injection, proxies and complexity.</p>
+   <h2 id="standalone-jee-servers-like-tomcat-jetty-etc">Standalone JEE servers like Tomcat, Jetty etc<a href="#standalone-jee-servers-like-tomcat-jetty-etc" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+   <p>I was looking into these, but then sharaf would have to depend on Servlets API,
+    <br>
+    use <code>@Inject</code> and gazzilion of god-knows-what-they-do annotations just to configure OAuth2 for example...</p>
+  </main>
+  <footer class="pico container flex-centered">
+   <a href="https://github.com/sake92/sharaf"> <!--?xml version="1.0" encoding="utf-8"?--><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools --> 
+    <svg width="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+     <path fill-rule="evenodd" clip-rule="evenodd" d="M12 0C5.37 0 0 5.37 0 12C0 17.31 3.435 21.795 8.205 23.385C8.805 23.49 9.03 23.13 9.03 22.815C9.03 22.53 9.015 21.585 9.015 20.58C6 21.135 5.22 19.845 4.98 19.17C4.845 18.825 4.26 17.76 3.75 17.475C3.33 17.25 2.73 16.695 3.735 16.68C4.68 16.665 5.355 17.55 5.58 17.91C6.66 19.725 8.385 19.215 9.075 18.9C9.18 18.12 9.495 17.595 9.84 17.295C7.17 16.995 4.38 15.96 4.38 11.37C4.38 10.065 4.845 8.985 5.61 8.145C5.49 7.845 5.07 6.615 5.73 4.965C5.73 4.965 6.735 4.65 9.03 6.195C9.99 5.925 11.01 5.79 12.03 5.79C13.05 5.79 14.07 5.925 15.03 6.195C17.325 4.635 18.33 4.965 18.33 4.965C18.99 6.615 18.57 7.845 18.45 8.145C19.215 8.985 19.68 10.05 19.68 11.37C19.68 15.975 16.875 16.995 14.205 17.295C14.64 17.67 15.015 18.39 15.015 19.515C15.015 21.12 15 22.41 15 22.815C15 23.13 15.225 23.505 15.825 23.385C18.2072 22.5808 20.2773 21.0498 21.7438 19.0074C23.2103 16.9651 23.9994 14.5143 24 12C24 5.37 18.63 0 12 0Z" fill="#000000" />
+    </svg> </a> <a href="https://discord.gg/g9KVY3WkMG"> <!--?xml version="1.0" encoding="utf-8"?--><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools --> 
+    <svg width="24px" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+     <circle cx="512" cy="512" r="512" style="fill:#5865f2" /> <path d="M689.43 349a422.21 422.21 0 0 0-104.22-32.32 1.58 1.58 0 0 0-1.68.79 294.11 294.11 0 0 0-13 26.66 389.78 389.78 0 0 0-117.05 0 269.75 269.75 0 0 0-13.18-26.66 1.64 1.64 0 0 0-1.68-.79A421 421 0 0 0 334.44 349a1.49 1.49 0 0 0-.69.59c-66.37 99.17-84.55 195.9-75.63 291.41a1.76 1.76 0 0 0 .67 1.2 424.58 424.58 0 0 0 127.85 64.63 1.66 1.66 0 0 0 1.8-.59 303.45 303.45 0 0 0 26.15-42.54 1.62 1.62 0 0 0-.89-2.25 279.6 279.6 0 0 1-39.94-19 1.64 1.64 0 0 1-.16-2.72c2.68-2 5.37-4.1 7.93-6.22a1.58 1.58 0 0 1 1.65-.22c83.79 38.26 174.51 38.26 257.31 0a1.58 1.58 0 0 1 1.68.2c2.56 2.11 5.25 4.23 8 6.24a1.64 1.64 0 0 1-.14 2.72 262.37 262.37 0 0 1-40 19 1.63 1.63 0 0 0-.87 2.28 340.72 340.72 0 0 0 26.13 42.52 1.62 1.62 0 0 0 1.8.61 423.17 423.17 0 0 0 128-64.63 1.64 1.64 0 0 0 .67-1.18c10.68-110.44-17.88-206.38-75.7-291.42a1.3 1.3 0 0 0-.63-.63zM427.09 582.85c-25.23 0-46-23.16-46-51.6s20.38-51.6 46-51.6c25.83 0 46.42 23.36 46 51.6.02 28.44-20.37 51.6-46 51.6zm170.13 0c-25.23 0-46-23.16-46-51.6s20.38-51.6 46-51.6c25.83 0 46.42 23.36 46 51.6.01 28.44-20.17 51.6-46 51.6z" style="fill:#fff" />
+    </svg> </a>
+  </footer>
+ </body>
+</html>

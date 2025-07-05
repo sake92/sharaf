@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Sharaf Tutorial Validation">
+  <title> Validation | Sharaf Documentation </title>
+  <link rel="shortcut icon" href="https://sake92.github.io/sharaf/images/favicon.png" type="image/png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-dark.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.conditional.min.css">
+  <link rel="stylesheet" href="https://sake92.github.io/sharaf/styles/default.css">
+ </head>
+ <body>
+  <header class="pico container">
+   <nav>
+    <ul>
+     <li><a href="https://sake92.github.io/sharaf/">Home</a></li>
+    </ul>
+    <ul>
+     <li>
+      <form action="https://sake92.github.io/sharaf/search/results.html" method="GET">
+       <input name="q" type="search" placeholder="Search">
+      </form>
+     </li>
+    </ul>
+    <ul>
+     <li><a href="https://sake92.github.io/sharaf/tutorials">Tutorials</a></li>
+     <li><a href="https://sake92.github.io/sharaf/howtos">How-Tos</a></li>
+     <li><a href="https://sake92.github.io/sharaf/reference">Reference</a></li>
+     <li><a href="https://sake92.github.io/sharaf/philosophy">Philosophy</a></li>
+    </ul>
+   </nav>
+  </header>
+  <main class="pico container">
+   <div class="grid">
+    <div>
+     <details>
+      <summary>Table of Contents</summary>
+      <div>
+       <ul>
+        <li><a href="#validation">Validation</a></li>
+       </ul>
+      </div>
+     </details>
+     <hr>
+    </div>
+    <div></div>
+    <div></div>
+   </div>
+   <h1 id="validation">Validation<a href="#validation" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
+   <p>For validating data you need to use the <code>Validator</code> typeclass.
+    <br>
+    A small example:</p>
+   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">import</span> ba.sake.validson.<span class="hljs-type">Validator</span>
+
+<span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ValidatedData</span>(<span class="hljs-params">num: <span class="hljs-type">Int</span>, str: <span class="hljs-type">String</span>, seq: <span class="hljs-type">Seq</span>[<span class="hljs-type">String</span>]</span>)</span>
+
+<span class="hljs-class"><span class="hljs-keyword">object</span> <span class="hljs-title">ValidatedData</span></span>:
+    <span class="hljs-keyword">given</span> <span class="hljs-type">Validator</span>[<span class="hljs-type">ValidatedData</span>] = <span class="hljs-type">Validator</span>
+    .derived[<span class="hljs-type">ValidatedData</span>]
+    .positive(_.num)
+    .notBlank(_.str)
+    .minItems(_.seq, <span class="hljs-number">1</span>)
+</code></pre>
+   <p>The <code>ValidatedData</code> can be any <code>case class</code>: json data, form data, query params..</p>
+   <hr>
+   <p>Create a file <code>validation.sc</code> and paste this code into it:</p>
+   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">scala</span> <span class="hljs-string">"3.7.0"</span>
+<span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">ba.sake::sharaf-undertow:0.10.0</span>
+
+<span class="hljs-keyword">import</span> ba.sake.querson.<span class="hljs-type">QueryStringRW</span>
+<span class="hljs-keyword">import</span> ba.sake.tupson.<span class="hljs-type">JsonRW</span>
+<span class="hljs-keyword">import</span> ba.sake.validson.<span class="hljs-type">Validator</span>
+<span class="hljs-keyword">import</span> ba.sake.sharaf.*
+<span class="hljs-keyword">import</span> ba.sake.sharaf.undertow.<span class="hljs-type">UndertowSharafServer</span>
+
+<span class="hljs-keyword">val</span> routes = <span class="hljs-type">Routes</span>:
+  <span class="hljs-keyword">case</span> <span class="hljs-type">GET</span> -&gt; <span class="hljs-type">Path</span>(<span class="hljs-string">"cars"</span>) =&gt;
+    <span class="hljs-keyword">val</span> qp = <span class="hljs-type">Request</span>.current.queryParamsValidated[<span class="hljs-type">CarQuery</span>]
+    <span class="hljs-type">Response</span>.withBody(<span class="hljs-type">CarApiResult</span>(<span class="hljs-string">s"Query OK: <span class="hljs-subst">${qp}</span>"</span>))
+
+  <span class="hljs-keyword">case</span> <span class="hljs-type">POST</span> -&gt; <span class="hljs-type">Path</span>(<span class="hljs-string">"cars"</span>) =&gt;
+    <span class="hljs-keyword">val</span> json = <span class="hljs-type">Request</span>.current.bodyJsonValidated[<span class="hljs-type">Car</span>]
+    <span class="hljs-type">Response</span>.withBody(<span class="hljs-type">CarApiResult</span>(<span class="hljs-string">s"JSON body OK: <span class="hljs-subst">${json}</span>"</span>))
+
+<span class="hljs-type">UndertowSharafServer</span>(<span class="hljs-string">"localhost"</span>, <span class="hljs-number">8181</span>, routes)
+  .withExceptionMapper(<span class="hljs-type">ExceptionMapper</span>.json)
+  .start()
+
+println(<span class="hljs-string">s"Server started at http://localhost:8181"</span>)
+
+
+<span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Car</span>(<span class="hljs-params">brand: <span class="hljs-type">String</span>, model: <span class="hljs-type">String</span>, quantity: <span class="hljs-type">Int</span></span>) <span class="hljs-title">derives</span> <span class="hljs-title">JsonRW</span></span>
+<span class="hljs-class"><span class="hljs-keyword">object</span> <span class="hljs-title">Car</span></span>:
+  <span class="hljs-keyword">given</span> <span class="hljs-type">Validator</span>[<span class="hljs-type">Car</span>] = <span class="hljs-type">Validator</span>
+    .derived[<span class="hljs-type">Car</span>]
+    .notBlank(_.brand)
+    .notBlank(_.model)
+    .nonNegative(_.quantity)
+
+<span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CarQuery</span>(<span class="hljs-params">brand: <span class="hljs-type">String</span></span>) <span class="hljs-title">derives</span> <span class="hljs-title">QueryStringRW</span></span>
+<span class="hljs-class"><span class="hljs-keyword">object</span> <span class="hljs-title">CarQuery</span></span>:
+  <span class="hljs-keyword">given</span> <span class="hljs-type">Validator</span>[<span class="hljs-type">CarQuery</span>] = <span class="hljs-type">Validator</span>
+    .derived[<span class="hljs-type">CarQuery</span>]
+    .notBlank(_.brand)
+
+<span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">CarApiResult</span>(<span class="hljs-params">message: <span class="hljs-type">String</span></span>) <span class="hljs-title">derives</span> <span class="hljs-title">JsonRW</span></span>
+</code></pre>
+   <p>Then run it like this:</p>
+   <pre><code class="language-sh hljs language-bash" data-highlighted="yes">scala-cli validation.sc 
+</code></pre>
+   <p>Notice above that we used <code>queryParamsValidated</code> and not plain <code>queryParams</code> (does not validate query params).
+    <br>
+    Also, for JSON body parsing+validation we use <code>bodyJsonValidated</code> and not plain <code>bodyJson</code> (does not validate JSON body).</p>
+   <hr>
+   <p>When you do a GET <a href="http://localhost:8181/cars?brand=">http://localhost:8181/cars?brand= </a>
+    <br>
+    you will get a nice JSON error message with HTTP Status of <code>400 Bad Request</code>:</p>
+   <pre><code class="language-json hljs" data-highlighted="yes"><span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">"instance"</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">null</span></span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"invalidArguments"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span>
+    <span class="hljs-punctuation">{</span>
+        <span class="hljs-attr">"reason"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"must not be blank"</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">"path"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"$.brand"</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">"value"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">""</span>
+    <span class="hljs-punctuation">}</span>
+    <span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"detail"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">""</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"type"</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">null</span></span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"title"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"Validation errors"</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"status"</span><span class="hljs-punctuation">:</span> <span class="hljs-number">400</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+   <p>The error message format follows the <a href="https://datatracker.ietf.org/doc/html/rfc7807">RFC 7807 problem detail</a>.</p>
+   <hr>
+   <p>When you do a POST <a href="http://localhost:8181/cars">http://localhost:8181/cars</a> with a malformed body:</p>
+   <pre><code class="language-json hljs" data-highlighted="yes"><span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">"brand"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">" "</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"model"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"ML350"</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"quantity"</span><span class="hljs-punctuation">:</span> <span class="hljs-number">-5</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+   <p>you will get these errors:</p>
+   <pre><code class="language-json hljs" data-highlighted="yes"><span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">"instance"</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">null</span></span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"invalidArguments"</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span>
+    <span class="hljs-punctuation">{</span>
+        <span class="hljs-attr">"reason"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"must not be blank"</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">"path"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"$.brand"</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">"value"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">" "</span>
+    <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-punctuation">{</span>
+        <span class="hljs-attr">"reason"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"must not be negative"</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">"path"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"$.quantity"</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">"value"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"-5"</span>
+    <span class="hljs-punctuation">}</span>
+    <span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"detail"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">""</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"type"</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">null</span></span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"title"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"Validation errors"</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"status"</span><span class="hljs-punctuation">:</span> <span class="hljs-number">400</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+  </main>
+  <footer class="pico container flex-centered">
+   <a href="https://github.com/sake92/sharaf"> <!--?xml version="1.0" encoding="utf-8"?--><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools --> 
+    <svg width="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+     <path fill-rule="evenodd" clip-rule="evenodd" d="M12 0C5.37 0 0 5.37 0 12C0 17.31 3.435 21.795 8.205 23.385C8.805 23.49 9.03 23.13 9.03 22.815C9.03 22.53 9.015 21.585 9.015 20.58C6 21.135 5.22 19.845 4.98 19.17C4.845 18.825 4.26 17.76 3.75 17.475C3.33 17.25 2.73 16.695 3.735 16.68C4.68 16.665 5.355 17.55 5.58 17.91C6.66 19.725 8.385 19.215 9.075 18.9C9.18 18.12 9.495 17.595 9.84 17.295C7.17 16.995 4.38 15.96 4.38 11.37C4.38 10.065 4.845 8.985 5.61 8.145C5.49 7.845 5.07 6.615 5.73 4.965C5.73 4.965 6.735 4.65 9.03 6.195C9.99 5.925 11.01 5.79 12.03 5.79C13.05 5.79 14.07 5.925 15.03 6.195C17.325 4.635 18.33 4.965 18.33 4.965C18.99 6.615 18.57 7.845 18.45 8.145C19.215 8.985 19.68 10.05 19.68 11.37C19.68 15.975 16.875 16.995 14.205 17.295C14.64 17.67 15.015 18.39 15.015 19.515C15.015 21.12 15 22.41 15 22.815C15 23.13 15.225 23.505 15.825 23.385C18.2072 22.5808 20.2773 21.0498 21.7438 19.0074C23.2103 16.9651 23.9994 14.5143 24 12C24 5.37 18.63 0 12 0Z" fill="#000000" />
+    </svg> </a> <a href="https://discord.gg/g9KVY3WkMG"> <!--?xml version="1.0" encoding="utf-8"?--><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools --> 
+    <svg width="24px" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+     <circle cx="512" cy="512" r="512" style="fill:#5865f2" /> <path d="M689.43 349a422.21 422.21 0 0 0-104.22-32.32 1.58 1.58 0 0 0-1.68.79 294.11 294.11 0 0 0-13 26.66 389.78 389.78 0 0 0-117.05 0 269.75 269.75 0 0 0-13.18-26.66 1.64 1.64 0 0 0-1.68-.79A421 421 0 0 0 334.44 349a1.49 1.49 0 0 0-.69.59c-66.37 99.17-84.55 195.9-75.63 291.41a1.76 1.76 0 0 0 .67 1.2 424.58 424.58 0 0 0 127.85 64.63 1.66 1.66 0 0 0 1.8-.59 303.45 303.45 0 0 0 26.15-42.54 1.62 1.62 0 0 0-.89-2.25 279.6 279.6 0 0 1-39.94-19 1.64 1.64 0 0 1-.16-2.72c2.68-2 5.37-4.1 7.93-6.22a1.58 1.58 0 0 1 1.65-.22c83.79 38.26 174.51 38.26 257.31 0a1.58 1.58 0 0 1 1.68.2c2.56 2.11 5.25 4.23 8 6.24a1.64 1.64 0 0 1-.14 2.72 262.37 262.37 0 0 1-40 19 1.63 1.63 0 0 0-.87 2.28 340.72 340.72 0 0 0 26.13 42.52 1.62 1.62 0 0 0 1.8.61 423.17 423.17 0 0 0 128-64.63 1.64 1.64 0 0 0 .67-1.18c10.68-110.44-17.88-206.38-75.7-291.42a1.3 1.3 0 0 0-.63-.63zM427.09 582.85c-25.23 0-46-23.16-46-51.6s20.38-51.6 46-51.6c25.83 0 46.42 23.36 46 51.6.02 28.44-20.37 51.6-46 51.6zm170.13 0c-25.23 0-46-23.16-46-51.6s20.38-51.6 46-51.6c25.83 0 46.42 23.36 46 51.6.01 28.44-20.17 51.6-46 51.6z" style="fill:#fff" />
+    </svg> </a>
+  </footer>
+ </body>
+</html>
