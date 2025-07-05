@@ -1,6 +1,8 @@
 ---
 title: Sharaf
 description: Sharaf - a minimalistic Scala 3 web framework.
+pagination:
+  enabled: false
 ---
 
 # {{ page.title }}
