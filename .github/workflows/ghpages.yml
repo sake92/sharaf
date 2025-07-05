@@ -29,4 +29,4 @@ jobs:
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: _site
+          folder: docs/_site
