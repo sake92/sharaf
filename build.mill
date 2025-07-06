@@ -14,6 +14,7 @@ object V:
 object `sharaf-core` extends Module:
   object jvm extends SharafCoreModule with ScalaJvmCommonModule:
     def moduleDeps = Seq(querson.jvm, formson.jvm, validson.jvm)
+    object test extends ScalaTests with SharafTestModule
   
   object native extends SharafCoreModule with ScalaNativeCommonModule:
     def moduleDeps = Seq(querson.native, formson.native, validson.native)
@@ -63,8 +64,10 @@ object `sharaf-snunit` extends ScalaNativeCommonModule with SharafPublishModule:
   def moduleDeps = Seq(`sharaf-core`.native)
 
 object querson extends Module:
-  object jvm extends QuersonModule with ScalaJvmCommonModule
-  object js extends QuersonModule with ScalaJSCommonModule
+  object jvm extends QuersonModule with ScalaJvmCommonModule:
+    object test extends ScalaTests with SharafTestModule
+  object js extends QuersonModule with ScalaJSCommonModule:
+    object test extends ScalaJSTests with SharafTestModule
   object native extends QuersonModule with ScalaNativeCommonModule:
     object test extends ScalaNativeTests with SharafTestModule
   trait QuersonModule extends SharafPublishModule with PlatformScalaModule:
@@ -75,8 +78,10 @@ object querson extends Module:
     )
 
 object formson extends Module:
-  object jvm extends FormsonModule with ScalaJvmCommonModule
-  //object js extends FormsonModule with ScalaJSCommonModule // java.nio.Path not supported
+  object jvm extends FormsonModule with ScalaJvmCommonModule:
+    object test extends ScalaTests with SharafTestModule
+  //object js extends FormsonModule with ScalaJSCommonModule: // java.nio.Path not supported
+    // object test extends ScalaJSTests with SharafTestModule
   object native extends FormsonModule with ScalaNativeCommonModule:
     object test extends ScalaNativeTests with SharafTestModule
   trait FormsonModule extends SharafPublishModule with PlatformScalaModule:
@@ -88,8 +93,10 @@ object formson extends Module:
 
 
 object validson extends Module:
-  object jvm extends ValidsonModule with ScalaJvmCommonModule
-  object js extends ValidsonModule with ScalaJSCommonModule
+  object jvm extends ValidsonModule with ScalaJvmCommonModule:
+    object test extends ScalaTests with SharafTestModule
+  object js extends ValidsonModule with ScalaJSCommonModule:
+    object test extends ScalaJSTests with SharafTestModule
   object native extends ValidsonModule with ScalaNativeCommonModule:
     object test extends ScalaNativeTests with SharafTestModule
   trait ValidsonModule extends SharafPublishModule with PlatformScalaModule:
@@ -122,15 +129,13 @@ trait SharafCommonModule extends ScalaModule:
     "-explain"
   )
 
-trait ScalaJvmCommonModule extends ScalaModule:
-  object test extends ScalaTests with SharafTestModule
+trait ScalaJvmCommonModule extends ScalaModule
 
 trait ScalaJSCommonModule extends ScalaJSModule:
   def scalaJSVersion = "1.19.0"
   def mvnDeps = super.mvnDeps() ++ Seq(
     mvn"io.github.cquiroz::scala-java-time::2.6.0"
   )
-  object test extends ScalaJSTests with SharafTestModule
 
 trait ScalaNativeCommonModule extends ScalaNativeModule:
   def scalaNativeVersion = "0.5.7"

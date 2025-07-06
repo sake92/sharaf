@@ -2,8 +2,6 @@
 
 - some kind of middleware mechanism
 
-- migrate docs to Pico.css
-
 - MiMa bin compat
 
 - add more validators https://javaee.github.io/javaee-spec/javadocs/javax/validation/constraints/package-summary.html
