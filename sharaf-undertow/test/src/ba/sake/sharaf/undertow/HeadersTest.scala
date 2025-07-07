@@ -14,8 +14,7 @@ class HeadersTest extends munit.FunSuite {
     case GET -> Path("settingHeader") =>
       Response.settingHeader("header1", "header1Value")
     case GET -> Path("removingHeader") =>
-      // this one is set by default in the CorsHandler
-      Response.removingHeader("access-control-allow-credentials")
+      Response.settingHeader("bla", "bla1").removingHeader("bla")
     case GET -> Path("setAndRemove") =>
       Response.settingHeader("header1", "header1Value").removingHeader("header1")
   }
@@ -33,7 +32,7 @@ class HeadersTest extends munit.FunSuite {
 
   test("removingHeader removes a header") {
     val res = quickRequest.get(uri"${baseUrl}/removingHeader").send()
-    assertEquals(res.headers(HeaderNames.AccessControlAllowCredentials), Seq.empty)
+    assertEquals(res.headers("bla"), Seq.empty)
   }
 
   test("settingHeader and then removingHeader removes a header") {

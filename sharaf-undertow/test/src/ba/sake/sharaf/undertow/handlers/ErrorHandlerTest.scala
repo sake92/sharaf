@@ -10,6 +10,8 @@ import ba.sake.validson.Validator
 import ba.sake.sharaf.*
 import ba.sake.sharaf.routing.*
 import ba.sake.sharaf.utils.*
+import ba.sake.sharaf.undertow.SharafUndertowHandler
+import io.undertow.server.handlers.BlockingHandler
 
 class ErrorHandlerTest extends munit.FunSuite {
 
@@ -36,11 +38,24 @@ class ErrorHandlerTest extends munit.FunSuite {
     .setHandler(
       Handlers
         .path()
-        .addPrefixPath("default", SharafHandler(routes))
-        .addPrefixPath("json", SharafHandler(routes).withExceptionMapper(ExceptionMapper.json))
         .addPrefixPath(
-          "cors",
-          SharafHandler(routes).withCorsSettings(CorsSettings.default.withAllowedOrigins(Set("http://example.com")))
+          "default",
+          BlockingHandler(
+            SharafUndertowHandler(
+              SharafHandler.exceptions(SharafHandler.routes(routes))
+            )
+          )
+        )
+        .addPrefixPath(
+          "json",
+          BlockingHandler(
+            SharafUndertowHandler(
+              SharafHandler.exceptions(
+                ExceptionMapper.json,
+                SharafHandler.routes(routes)
+              )
+            )
+          )
         )
     )
     .build()
@@ -145,32 +160,6 @@ class ErrorHandlerTest extends munit.FunSuite {
       """{"instance":null,"invalidArguments":[{"reason":"must be >= 3","path":"$.name","value":""}],"detail":"","type":null,"title":"Validation errors","status":422}"""
     )
     assertEquals(res.headers(HeaderNames.ContentType), Seq("application/json; charset=utf-8"))
-  }
-
-  // WebJars
-  test("WebJars should work") {
-    val res = quickRequest.get(uri"${baseUrl}/default/jquery/3.7.1/jquery.js").send()
-    assertEquals(res.headers(HeaderNames.ContentType), Seq("application/javascript"))
-    assert(res.body.length > 100)
-  }
-
-  // CORS
-  test("CORS should work") {
-    locally {
-      // localhost always works
-      val res = quickRequest.get(uri"${baseUrl}/cors").send()
-      assertEquals(res.code, StatusCode.Ok)
-    }
-    locally {
-      // allowed origin is allowed
-      val res = quickRequest.get(uri"${baseUrl}/cors").headers(Map(HeaderNames.Origin -> "http://example.com")).send()
-      assertEquals(res.headers(HeaderNames.AccessControlAllowOrigin), Seq("http://example.com"))
-    }
-    locally {
-      // forbidden origin is not allowed (to browser)
-      val res = quickRequest.get(uri"${baseUrl}/cors").headers(Map(HeaderNames.Origin -> "http://example2.com")).send()
-      assertEquals(res.headers(HeaderNames.AccessControlAllowOrigin), Seq.empty)
-    }
   }
 
   case class TestQuery(name: String) derives QueryStringRW

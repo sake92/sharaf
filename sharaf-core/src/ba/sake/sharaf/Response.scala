@@ -39,6 +39,9 @@ final class Response[T] private (
       cookieUpdates: CookieUpdates = cookieUpdates,
       body: Option[T2] = body
   )(using ResponseWritable[T2]) = new Response(status, headerUpdates, cookieUpdates, body)
+
+  override def toString(): String =
+    s"Response(status=$status, headerUpdates=${headerUpdates}, cookieUpdates=${cookieUpdates}, body=...)"
 }
 
 object Response {

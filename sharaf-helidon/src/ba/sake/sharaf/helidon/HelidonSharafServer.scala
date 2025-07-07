@@ -3,9 +3,9 @@ package ba.sake.sharaf.helidon
 import io.helidon.config.Config
 import io.helidon.webserver.WebServer
 import io.helidon.webserver.http.HttpRouting
-import ba.sake.sharaf.Routes
+import ba.sake.sharaf.SharafHandler
 
-class HelidonSharafServer(host: String, port: Int, sharafHandler: SharafHelidonHandler) {
+class HelidonSharafServer(host: String, port: Int, sharafHelidonHandler: SharafHelidonHandler) {
 
   System.setProperty("server.host", host)
   System.setProperty("server.port", port.toString)
@@ -14,7 +14,7 @@ class HelidonSharafServer(host: String, port: Int, sharafHandler: SharafHelidonH
     .builder()
     .config(Config.create().get("server"))
     .routing { (builder: HttpRouting.Builder) =>
-      builder.any(sharafHandler)
+      builder.any(sharafHelidonHandler)
       ()
     }
     .build()
@@ -26,10 +26,11 @@ class HelidonSharafServer(host: String, port: Int, sharafHandler: SharafHelidonH
 
 object HelidonSharafServer {
 
+  def apply(host: String, port: Int, sharafHandler: SharafHandler): HelidonSharafServer =
+    new HelidonSharafServer(host, port, SharafHelidonHandler(sharafHandler))
+
+  // if need tweaking
   def apply(host: String, port: Int, sharafHelidonHandler: SharafHelidonHandler): HelidonSharafServer =
     new HelidonSharafServer(host, port, sharafHelidonHandler)
-
-  def apply(host: String, port: Int, routes: Routes): HelidonSharafServer =
-    apply(host, port, SharafHelidonHandler(routes))
 
 }
