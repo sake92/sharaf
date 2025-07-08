@@ -1,13 +1,11 @@
 //> using scala "3.7.0"
-//> using dep ba.sake::sharaf-undertow:0.10.0
+//> using dep ba.sake::sharaf-undertow:0.12.1
 import java.util.concurrent.TimeUnit
 
 // https://htmx.org/examples/progress-bar/
 
 import java.util.concurrent.Executors
-import scalatags.Text.all.*
-import ba.sake.hepek.htmx.*
-import ba.sake.sharaf.*
+import ba.sake.sharaf.{*, given}
 import ba.sake.sharaf.undertow.UndertowSharafServer
 import ba.sake.sharaf.htmx.ResponseHeaders
 
@@ -43,11 +41,14 @@ UndertowSharafServer("localhost", 8181, routes).start()
 
 println(s"Server started at http://localhost:8181")
 
-def IndexView = doctype("html")(
-  html(
-    head(
-      tag("style")("""
-        .progress {
+def IndexView =
+  html"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+      <style>
+      .progress {
             height: 20px;
             margin-bottom: 20px;
             overflow: hidden;
@@ -70,44 +71,45 @@ def IndexView = doctype("html")(
             -o-transition: width .6s ease;
             transition: width .6s ease;
         }
-      """),
-      script(src := "https://unpkg.com/htmx.org@2.0.4")
-    ),
-    body(
-      div(hx.target := "this", hx.swap := "outerHTML")(
-        h3("Start Progress"),
-        button(hx.post := "/start")("Start Job")
-      )
-    )
-  )
-)
+        </style>
+    </head>
+    <body>
+        <div hx-target="this" hx-swap="outerHTML">
+            <h3>Start Progress</h3>
+            <button hx-post="/start">Start Job</button>
+        </div>
+    </body>
+    </html>
+  """
 
 def progressBarWrapper(currentPercentage: Int) =
   val completed = currentPercentage >= 100
-  div(hx.get := "/job", hx.trigger := "done", hx.target := "this", hx.swap := "outerHTML")(
-    h3(role := "status", id := "pblabel", tabindex := "-1")(if completed then "Completed" else "Running"),
-    progressBar(currentPercentage),
-    Option.when(completed)(
-      button(hx.post := "/start")("Restart Job")
-    )
-  )
+  html"""
+  <div hx-get="/job" hx-trigger="done" hx-target="this" hx-swap="outerHTML">
+        <h3 role="status" id="pblabel" tabindex="-1">
+        ${if completed then "Completed" else "Running"}
+        </h3>
+        ${progressBar(currentPercentage)}
+        ${Option.when(completed)(
+      html""" <button hx-post="/start">Restart Job</button> """
+    )}
+  </div>
+  """
 
 def progressBar(currentPercentage: Int) =
   val completed = currentPercentage >= 100
-  div(
-    hx.get := "/job/progress",
-    Option.unless(completed)(hx.trigger := "every 600ms"),
-    hx.target := "this",
-    hx.swap := "innerHTML"
-  )(
-    div(
-      cls := "progress",
-      role := "progressbar",
-      aria.valuemin := "0",
-      aria.valuemax := "100",
-      aria.valuenow := currentPercentage,
-      aria.labelledby := "pblabel"
-    )(
-      div(id := "pb", cls := "progress-bar", style := s"width:${currentPercentage}%")
-    )
-  )
+  html"""
+    <div hx-get="/job/progress"
+       ${Option.unless(completed)(html""" hx-trigger="every 600ms" """)}
+       hx-target="this"
+       hx-swap="innerHTML">
+        <div class="progress"
+            role="progressbar"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            aria-valuenow="${currentPercentage}"
+            aria-labelledby="pblabel">
+        <div id="pb" class="progress-bar" style="width:${currentPercentage}%"></div>
+        </div>
+    </div>
+  """

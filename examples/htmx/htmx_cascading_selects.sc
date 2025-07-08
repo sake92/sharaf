@@ -1,12 +1,11 @@
 //> using scala "3.7.0"
-//> using dep ba.sake::sharaf-undertow:0.10.0
+//> using dep ba.sake::sharaf-undertow:0.12.1
 
 // https://htmx.org/examples/value-select/
 
-import scalatags.Text.all.*
-import ba.sake.hepek.htmx.*
+import play.twirl.api.Html
 import ba.sake.querson.QueryStringRW
-import ba.sake.sharaf.*
+import ba.sake.sharaf.{*, given}
 import ba.sake.sharaf.undertow.UndertowSharafServer
 
 val routes = Routes:
@@ -29,42 +28,51 @@ enum CarMake(val models: Seq[String]) derives QueryStringRW:
 object views {
 
   def IndexView(make: CarMake) = createPage(
-    div(
-      div(
-        label("Make"),
-        select(
-          name := "make",
-          hx.get := "/models",
-          hx.target := "#models",
-          hx.swap := "outerHTML",
-          hx.indicator := ".htmx-indicator"
-        )(
-          CarMake.values.map { make =>
-            option(value := make.toString)(make.toString)
-          }
-        )
-      ),
-      div(
-        label("Model"),
-        cascadingSelect(make)
-      ),
-      img(src := "/img/bars.svg", alt := "Result loading...", cls := "htmx-indicator")
-    )
+    html"""
+    <div>
+        <div>
+        <label for="make">Select a car make:</label>
+        <select id="make" name="make"
+                hx-get="/models"
+                hx-target="#models"
+                hx-swap="outerHTML"
+                hx-indicator=".htmx-indicator">
+          ${CarMake.values.map { make =>
+        html"<option value='${make}'>${make}</option>"
+      }}
+        </select>
+        </div>
+        <div>
+        <label for="models">Select a model:</label>
+        ${cascadingSelect(make)}
+        </div>
+        <img src="/img/bars.svg" alt="Result loading..." class="htmx-indicator">
+    </div>
+    """
   )
 
-  def cascadingSelect(make: CarMake) = select(id := "models", name := "model")(
-    make.models.map { model =>
-      option(value := model)(model)
-    }
-  )
+  def cascadingSelect(make: CarMake) =
+    html"""
+    <select id="models" name="model">
+      ${make.models.map { model =>
+        html"<option value='${model}'>${model}</option>"
+      }}
+    </select>
+    """
 
-  private def createPage(bodyContent: Frag, inlineStyle: String = "") = doctype("html")(
-    html(
-      head(
-        tag("style")(inlineStyle),
-        script(src := "https://unpkg.com/htmx.org@2.0.4")
-      ),
-      body(bodyContent)
-    )
-  )
+  private def createPage(bodyContent: Html, inlineStyle: String = "") =
+    html"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+        <style>
+        ${inlineStyle}
+        </style>
+    </head>
+    <body>
+    ${bodyContent}
+    </body>
+    </html>
+    """
 }

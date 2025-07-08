@@ -6,6 +6,9 @@ import play.twirl.api.{Html, Xml}
 // TODO move to common when published for native
 export play.twirl.api.StringInterpolation
 
+export play.twirl.api.Html
+export play.twirl.api.Xml
+
 // twirl HTML and XML
 given ResponseWritable[Html] with {
   override def write(value: Html, outputStream: OutputStream): Unit =

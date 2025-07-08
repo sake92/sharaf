@@ -1,11 +1,9 @@
 //> using scala "3.7.0"
-//> using dep ba.sake::sharaf-undertow:0.10.0
+//> using dep ba.sake::sharaf-undertow:0.12.1
 
 // https://htmx.org/examples/delete-row/
 
-import scalatags.Text.all.*
-import ba.sake.hepek.htmx.*
-import ba.sake.sharaf.*
+import ba.sake.sharaf.{*, given}
 import ba.sake.sharaf.undertow.UndertowSharafServer
 
 var allContacts = Seq(
@@ -29,33 +27,51 @@ case class Contact(id: String, name: String, email: String)
 
 object views {
 
-  def ContactsViewPage(contacts: Seq[Contact]) = doctype("html")(
-    html(
-      head(
-        tag("style")("""
-          tr.htmx-swapping td {
+  def ContactsViewPage(contacts: Seq[Contact]) =
+    html"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+        <style>
+        tr.htmx-swapping td {
             opacity: 0;
             transition: opacity 1s ease-out;
-          }
-        """),
-        script(src := "https://unpkg.com/htmx.org@2.0.4")
-      ),
-      body(
-        div(
-          h1("Delete Row example"),
-          table()(
-            thead(tr(th("Name"), th("Email"), th(""))),
-            tbody(hx.confirm := "Are you sure?", hx.target := "closest tr", hx.swap := "outerHTML swap:1s")(
-              contactsRows(contacts)
-            )
-          )
-        )
-      )
-    )
-  )
+        }
+        </style>
+    </head>
+    <body>
+        <div>
+            <h1>Delete Row example</h1>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody hx-confirm="Are you sure?" hx-target="closest tr" hx-swap="outerHTML swap:1s">
+                    ${contactsRows(contacts)}
+                </tbody>
+            </table>
+        </div>
+    </body>
+    </html>
+    """
 
-  def contactsRows(contacts: Seq[Contact]): Frag = contacts.map { contact =>
-    tr(td(contact.name), td(contact.email), td(button(hx.delete := s"/contacts/${contact.id}")("Delete")))
-  }
+  def contactsRows(contacts: Seq[Contact]) =
+    val contactsHtml = contacts.map { contact =>
+      html"""
+        <tr>
+            <td>${contact.name}</td>
+            <td>${contact.email}</td>
+            <td>
+                <button hx-delete="/contacts/${contact.id}">Delete</button>
+            </td>
+        </tr>
+        """
+    }
+    html"${contactsHtml}"
 
 }

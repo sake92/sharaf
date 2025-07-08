@@ -1,10 +1,10 @@
 //> using scala "3.7.0"
-//> using dep ba.sake::sharaf-undertow:0.10.0
+//> using dep ba.sake::sharaf-undertow:0.12.1
 
 // https://htmx.org/examples/active-search/
 
 import ba.sake.formson.FormDataRW
-import ba.sake.sharaf.*
+import ba.sake.sharaf.{*, given}
 import ba.sake.sharaf.undertow.UndertowSharafServer
 
 val routes = Routes:
@@ -12,6 +12,7 @@ val routes = Routes:
     Response.withBody(views.ContactsViewPage(Seq.empty))
   case POST -> Path("search") =>
     Thread.sleep(500) // simulate slow backend :)
+    case class SearchForm(search: String) derives FormDataRW
     val formData = Request.current.bodyForm[SearchForm]
     val contactsSlice = allContacts.filter(_.matches(formData.search))
     Response.withBody(views.contactsRows(contactsSlice))
@@ -20,52 +21,58 @@ UndertowSharafServer("localhost", 8181, routes).start()
 
 println("Server started at http://localhost:8181")
 
-case class SearchForm(search: String) derives FormDataRW
-
 object views {
-  import scalatags.Text.all.*
-  import ba.sake.hepek.htmx.*
 
-  def ContactsViewPage(contacts: Seq[Contact]) = doctype("html")(
-    html(
-      head(
-        script(src := "https://unpkg.com/htmx.org@2.0.4")
-      ),
-      body(
-        div(
-          h1("Active Search example"),
-          span(cls := "htmx-indicator")(
-            img(src := "/img/bars.svg"),
-            "Searching... "
-          ),
-          input(
-            tpe := "search",
-            name := "search",
-            placeholder := "Begin Typing To Search Users...",
-            hx.post := "/search",
-            hx.trigger := "input changed delay:500ms, search",
-            hx.target := "#search-results",
-            hx.indicator := ".htmx-indicator"
-          ),
-          table(
-            thead(tr(th("First Name"), th("Last Name"), th("Email"))),
-            tbody(id := "search-results")(
-              contactsRows(contacts)
-            )
-          )
-        )
-      )
-    )
-  )
+  def ContactsViewPage(contacts: Seq[Contact]) =
+    html"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+    </head>
+    <body>
+      <div class="htmx-indicator" >
+        <img src="/img/bars.svg" alt="Loading...">
+        Searching... 
+      </div>
+      <h1>Active Search example</h1>
+      <input
+        type="search"
+        name="search"
+        placeholder="Begin Typing To Search Users..."
+        hx-post="/search"
+        hx-trigger="input changed delay:500ms, search"
+        hx-target="#search-results"
+        hx-indicator=".htmx-indicator"
+      >
+      <table>
+        <thead>
+          <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Email</th>
+          </tr>
+        </thead>
+        <tbody id="search-results">
+          ${contactsRows(contacts)}
+        </tbody>
+      </table>
+    </body>
+    </html>
+  """
 
-  def contactsRows(contacts: Seq[Contact]): Frag =
-    contacts.zipWithIndex.map { case (contact, idx) =>
-      tr(
-        td(contact.firstName),
-        td(contact.lastName),
-        td(contact.email)
-      )
-    }
+  def contactsRows(contacts: Seq[Contact]) =
+    val contactsHtml = contacts.zipWithIndex
+      .map { case (contact, idx) =>
+        html"""
+        <tr>
+          <td>${contact.firstName}</td>
+          <td>${contact.lastName}</td>
+          <td>${contact.email}</td>
+        </tr>
+      """
+      }
+    html"${contactsHtml}"
 
 }
 

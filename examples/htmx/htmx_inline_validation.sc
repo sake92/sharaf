@@ -1,11 +1,10 @@
 //> using scala "3.7.0"
-//> using dep ba.sake::sharaf-undertow:0.10.0
+//> using dep ba.sake::sharaf-undertow:0.12.1
 
 // https://htmx.org/examples/inline-validation/
 
-import scalatags.Text.all.*
-import ba.sake.hepek.htmx.*
-import ba.sake.sharaf.*
+import play.twirl.api.Html
+import ba.sake.sharaf.{*, given}
 import ba.sake.sharaf.undertow.UndertowSharafServer
 import ba.sake.formson.FormDataRW
 
@@ -30,11 +29,13 @@ case class ContactForm(email: String, firstName: String, lastName: String) deriv
 object views {
 
   def IndexView(formData: ContactForm) = createPage(
-    div(
-      h3("Inline Validation example"),
-      p("Only valid email is test@test.com"),
-      contactForm(formData)
-    ),
+    html"""
+    <div>
+        <h3>HTMX Inline Validation Example</h3>
+        <p>Only valid email is test@test.com</p>
+        ${contactForm(formData)}
+    </div>
+    """,
     inlineStyle = """
       .error-message {
         color:red;
@@ -48,30 +49,50 @@ object views {
     """
   )
 
-  def contactForm(formData: ContactForm) = form(hx.post := "/contact", hx.swap := "outerHTML")(
-    emailField(formData.email, isError = false),
-    div(label("First Name")(input(name := "firstName", value := formData.firstName))),
-    div(label("Last Name")(input(name := "lastName", value := formData.lastName))),
-    button("Submit")
-  )
+  def contactForm(formData: ContactForm) =
+    html"""
+    <form hx-post="/contact" hx-swap="outerHTML">
+        ${emailField(formData.email, isError = false)}
+        <div>
+            <label>First Name</label>
+            <input name="firstName" value="${formData.firstName}">
+        </div>
+        <div>
+            <label>Last Name</label>
+            <input name="lastName" value="${formData.lastName}">
+        </div>
+        <button type="submit">Submit</button>
+    </form>
+    """
 
   def emailField(fieldValue: String, isError: Boolean) =
-    div(hx.target := "this", hx.swap := "outerHTML", Option.when(isError)(cls := "error"))(
-      label("Email Address")(
-        input(name := "email", value := fieldValue, hx.post := "/contact/email", hx.indicator := "#ind"),
-        img(id := "ind", src := "/img/bars.svg", cls := "htmx-indicator")
-      ),
-      span("This will trigger validation on input change!"),
-      Option.when(isError)(div(cls := "error-message")("That email is already taken.  Please enter another email."))
-    )
+    val cls = if (isError) "error" else ""
+    html"""
+    <div hx-target="this" hx-swap="outerHTML" class="${cls}">
+        <label>Email Address
+            <input name="email" value="${fieldValue}" hx-post="/contact/email" hx-indicator="#ind">
+            <img id="ind" src="/img/bars.svg" class="htmx-indicator">
+        </label>
+        <span>This will trigger validation on input change!</span>
+        ${Option.when(isError)(
+        html"""<div class="error-message">That email is already taken.  Please enter another email.</div>"""
+      )}
+    </div>
+    """
 
-  private def createPage(bodyContent: Frag, inlineStyle: String = "") = doctype("html")(
-    html(
-      head(
-        tag("style")(inlineStyle),
-        script(src := "https://unpkg.com/htmx.org@2.0.4")
-      ),
-      body(bodyContent)
-    )
-  )
+  private def createPage(bodyContent: Html, inlineStyle: String = "") =
+    html"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+        <style>
+        ${inlineStyle}
+        </style>
+    </head>
+    <body>
+    ${bodyContent}
+    </body>
+    </html>
+    """
 }

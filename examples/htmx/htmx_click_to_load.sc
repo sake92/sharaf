@@ -1,13 +1,12 @@
 //> using scala "3.7.0"
-//> using dep ba.sake::sharaf-undertow:0.10.0
+//> using dep ba.sake::sharaf-undertow:0.12.1
 
 // https://htmx.org/examples/click-to-load/
 
 import java.util.UUID
-import scalatags.Text.all.*
-import ba.sake.hepek.htmx.*
+import play.twirl.api.Html
 import ba.sake.querson.QueryStringRW
-import ba.sake.sharaf.*
+import ba.sake.sharaf.{*, given}
 import ba.sake.sharaf.undertow.UndertowSharafServer
 
 val PageSize = 5
@@ -38,43 +37,61 @@ object Contact:
 object views {
 
   def ContactsViewPage(contacts: Seq[Contact], page: Int) = createPage(
-    div(
-      h1("Click to Load example"),
-      table(
-        thead(tr(th("ID"), th("Name"), th("Email"))),
-        tbody(
-          contactsRowsWithButton(contacts, page)
-        )
-      )
-    )
+    html"""
+    <div>
+        <h1>Click to Load example</h1>
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+            </tr>
+            </thead>
+            <tbody>
+                ${contactsRowsWithButton(contacts, page)}
+            </tbody>
+        </table>
+    </div>
+    """
   )
 
-  def contactsRowsWithButton(contacts: Seq[Contact], page: Int) = frag(
-    contacts.map { contact =>
-      tr(td(contact.id), td(contact.name), td(contact.email))
-    },
-    tr(id := "replaceMe")(
-      td(colspan := "3")(
-        button(
-          hx.get := s"/contacts/?page=${page + 1}",
-          hx.target := "#replaceMe",
-          hx.swap := "outerHTML"
-        )(
-          "Load More Agents...",
-          img(src := "/img/bars.svg", cls := "htmx-indicator")
-        )
-      )
-    )
-  )
+  def contactsRowsWithButton(contacts: Seq[Contact], page: Int) = {
+    val contactsHtml = contacts.map { contact =>
+      html"""
+      <tr>
+        <td>${contact.id}</td>
+        <td>${contact.name}</td>
+        <td>${contact.email}</td>
+      </tr>
+      """
+    }
+    html"""
+    ${contactsHtml}
+    <tr id="replaceMe">
+      <td colspan="3">
+        <button hx-get="/contacts/?page=${page + 1}" hx-target="#replaceMe" hx-swap="outerHTML">
+          Load More Agents...
+          <img src="/img/bars.svg" class="htmx-indicator" alt="Loading...">
+        </button>
+      </td>
+    """
+  }
 
-  private def createPage(bodyContent: Frag, inlineStyle: String = "") = doctype("html")(
-    html(
-      head(
-        tag("style")(inlineStyle),
-        script(src := "https://unpkg.com/htmx.org@2.0.4")
-      ),
-      body(bodyContent)
-    )
-  )
+  private def createPage(bodyContent: Html, inlineStyle: String = "") =
+    html"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+        <style>
+        ${inlineStyle}
+        </style>
+    </head>
+    <body>
+    ${bodyContent}
+    </body>
+    </html>
+    """
 
 }

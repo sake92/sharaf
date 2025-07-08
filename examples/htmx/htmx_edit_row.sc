@@ -1,12 +1,11 @@
 //> using scala "3.7.0"
-//> using dep ba.sake::sharaf-undertow:0.10.0
+//> using dep ba.sake::sharaf-undertow:0.12.1
 
 // https://htmx.org/examples/edit-row/
 
-import scalatags.Text.all.*
-import ba.sake.hepek.htmx.*
+import play.twirl.api.Html
 import ba.sake.formson.FormDataRW
-import ba.sake.sharaf.*
+import ba.sake.sharaf.{*, given}
 import ba.sake.sharaf.undertow.UndertowSharafServer
 
 var allContacts = Seq(
@@ -48,59 +47,76 @@ case class ContactForm(name: String, email: String) derives FormDataRW
 object views {
 
   def ContactsViewPage(contacts: Seq[Contact]) = createPage(
-    div(
-      h1("Click to Edit example"),
-      table(
-        thead(tr(th("Name"), th("Email"), th())),
-        tbody(hx.target := "closest tr", hx.swap := "outerHTML")(
-          contacts.map(viewContactRow)
-        )
-      )
-    )
+    html"""
+    <div>
+        <h1>Click to Edit example</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody hx-target="closest tr" hx-swap="outerHTML">
+                ${contacts.map(viewContactRow)}
+            </tbody>
+        </table>
+    </div>
+    """
   )
 
-  def viewContactRow(contact: Contact) = tr(
-    td(contact.name),
-    td(contact.email),
-    td(
-      button(
-        hx.get := s"/contact/${contact.id}/edit",
-        hx.trigger := "edit",
-        onclick := """
-              let editing = document.querySelector('.editing')
-              if (editing) {
-                const doWant = confirm("You are already editing a row!  Do you want to cancel that edit and continue?");
-                if (doWant) {
-                  htmx.trigger(editing, 'cancel')
-                  htmx.trigger(this, 'edit')
-                }
-              } else {
-                htmx.trigger(this, 'edit')
-              }"""
-      )("Edit")
-    )
-  )
+  def viewContactRow(contact: Contact) =
+    html"""
+    <tr>
+        <td>${contact.name}</td>
+        <td>${contact.email}</td>
+        <td>
+            <button hx-get="/contact/${contact.id}/edit" hx-trigger="edit" 
+                onclick="
+                let editing = document.querySelector('.editing')
+                if (editing) {
+                    const doWant = confirm('You are already editing a row!  Do you want to cancel that edit and continue?');
+                    if (doWant) {
+                        htmx.trigger(editing, 'cancel');
+                        htmx.trigger(this, 'edit');
+                    }
+                } else {
+                    htmx.trigger(this, 'edit')
+                }"
+            >
+            Edit
+            </button>
+        </td>
+    </tr>
+    """
 
-  def editContact(contact: Contact) = tr(
-    hx.trigger := "cancel",
-    hx.get := s"/contact/${contact.id}"
-  )(
-    td(input(name := "name", value := contact.name, autofocus)),
-    td(input(name := "email", value := contact.email)),
-    td(
-      button(hx.get := s"/contact/${contact.id}")("Cancel"),
-      button(hx.put := s"/contact/${contact.id}", hx.include := "closest tr")("Save")
-    )
-  )
+  def editContact(contact: Contact) =
+    html"""
+    <tr hx-trigger="cancel" hx-get="/contact/${contact.id}">
+        <td><input name="name" value="${contact.name}" autofocus></td>
+        <td><input name="email" value="${contact.email}"></td>
+        <td>
+            <button hx-get="/contact/${contact.id}">Cancel</button>
+            <button hx-put="/contact/${contact.id}" hx-include="closest tr">Save</button>
+        </td>
+    </tr>
+    """
 
-  private def createPage(bodyContent: Frag, inlineStyle: String = "") = doctype("html")(
-    html(
-      head(
-        tag("style")(inlineStyle),
-        script(src := "https://unpkg.com/htmx.org@2.0.4")
-      ),
-      body(bodyContent)
-    )
-  )
+  private def createPage(bodyContent: Html, inlineStyle: String = "") =
+    html"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+        <style>
+        ${inlineStyle}
+        </style>
+    </head>
+    <body>
+    ${bodyContent}
+    </body>
+    </html>
+    """
 
 }

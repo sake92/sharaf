@@ -1,11 +1,10 @@
 //> using scala "3.7.0"
-//> using dep ba.sake::sharaf-undertow:0.10.0
+//> using dep ba.sake::sharaf-undertow:0.12.1
 
 // https://htmx.org/examples/animations/
 
-import scalatags.Text.all.*
-import ba.sake.hepek.htmx.*
-import ba.sake.sharaf.*
+import play.twirl.api.Html
+import ba.sake.sharaf.{*, given}
 import ba.sake.sharaf.undertow.UndertowSharafServer
 
 val routes = Routes:
@@ -34,7 +33,7 @@ val routes = Routes:
   case GET -> Path("request-in-flight") =>
     Response.withBody(views.RequestInFlightView)
   case POST -> Path("request-in-flight-name") =>
-    Thread.sleep(1000) // simulate sloww
+    Thread.sleep(2000) // simulate sloww
     Response.withBody("Submitted!")
 
 UndertowSharafServer("localhost", 8181, routes).start()
@@ -44,12 +43,14 @@ println("Server started at http://localhost:8181")
 object views {
 
   def IndexView = createPage(
-    ul(
-      li(a(href := "color-throb")("Color throb")),
-      li(a(href := "fade-out-on-swap")("Fade Out On Swap")),
-      li(a(href := "fade-in-on-addition")("Fade In On Addition")),
-      li(a(href := "request-in-flight")("Request In Flight"))
-    )
+    html"""
+    <ul>
+        <li><a href="color-throb">Color throb</a></li>
+        <li><a href="fade-out-on-swap">Fade Out On Swap</a></li>
+        <li><a href="fade-in-on-addition">Fade In On Addition</a></li>
+        <li><a href="request-in-flight">Request In Flight</a></li>
+    </ul>
+    """
   )
 
   def ColorThrobView = createPage(
@@ -61,21 +62,26 @@ object views {
     """
   )
 
-  def ColorThrobSnippet(color: String) = div(
-    id := "color-demo", // must stay same!
-    hx.get := "/colors",
-    hx.swap := "outerHTML",
-    hx.trigger := "every 1s",
-    cls := "smooth",
-    style := s"color:${color}"
-  )("Color Swap Demo")
+  def ColorThrobSnippet(color: String) =
+    // id must stay same!
+    html"""
+    <div id="color-demo"
+        hx-get="/colors"
+        hx-swap="outerHTML"
+        hx-trigger="every 1s"
+        class="smooth"
+        style="color:${color}">
+        Color Swap Demo
+    </div>
+    """
 
   def FadeOutOnSwapView = createPage(
-    button(
-      cls := "fade-me-out",
-      hx.delete := "/fade_out_demo",
-      hx.swap := "outerHTML swap:1s"
-    )("Fade Me Out"),
+    html"""
+    <button class="fade-me-out"
+      hx-delete="/fade_out_demo"
+      hx-swap="outerHTML swap:1s">
+      Fade Me Out
+    """,
     inlineStyle = """
       .fade-me-out.htmx-swapping {
         opacity: 0;
@@ -84,11 +90,12 @@ object views {
     """
   )
 
-  val theButton = button(
-    id := "fade-me-in",
-    hx.post := "/fade_in_demo",
-    hx.swap := "outerHTML settle:1s"
-  )("Fade Me In")
+  val theButton = html"""
+  <button id="fade-me-in"
+    hx-post="/fade_in_demo"
+    hx-swap="outerHTML settle:1s"
+  >Fade Me In</button>
+  """
 
   def FadeInOnAdditionView = createPage(
     theButton,
@@ -104,13 +111,15 @@ object views {
   )
 
   def RequestInFlightView = createPage(
-    form(
-      hx.post := "/request-in-flight-name",
-      hx.swap := "outerHTML"
-    )(
-      label("Name: ", input(name := "name")),
-      button("Submit")
-    ),
+    html"""
+    <form
+      hx-post="/request-in-flight-name"
+      hx-swap="outerHTML"
+      >
+      <label>Name: <input name="name"></label>
+      <button type="submit">Submit</button>
+    </form>
+    """,
     inlineStyle = """
       form.htmx-request {
         opacity: .5;
@@ -119,13 +128,19 @@ object views {
     """
   )
 
-  private def createPage(bodyContent: Frag, inlineStyle: String = "") = doctype("html")(
-    html(
-      head(
-        tag("style")(inlineStyle),
-        script(src := "https://unpkg.com/htmx.org@2.0.4")
-      ),
-      body(bodyContent)
-    )
-  )
+  private def createPage(bodyContent: Html, inlineStyle: String = "") =
+    html"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+        <style>
+        ${inlineStyle}
+        </style>
+    </head>
+    <body>
+    ${bodyContent}
+    </body>
+    </html>
+    """
 }

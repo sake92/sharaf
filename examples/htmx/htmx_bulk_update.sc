@@ -1,13 +1,12 @@
 //> using scala "3.7.0"
-//> using dep ba.sake::sharaf-undertow:0.10.0
+//> using dep ba.sake::sharaf-undertow:0.12.1
 
 // https://htmx.org/examples/bulk-update/
 
-import scalatags.Text.all.*
-import ba.sake.sharaf.*
+import play.twirl.api.Html
+import ba.sake.sharaf.{*, given}
 import ba.sake.sharaf.undertow.UndertowSharafServer
 import ba.sake.formson.FormDataRW
-import ba.sake.hepek.htmx.*
 
 val routes = Routes:
   case GET -> Path() =>
@@ -32,21 +31,30 @@ println("Server started at http://localhost:8181")
 object views {
 
   def ContactsViewPage(contacts: Seq[Contact]) = createPage(
-    div(
-      h1("Bulk Updating example"),
-      div(hx.include := "#checked-contacts", hx.target := "#tbody")(
-        button(hx.put := "/activate")("Activate"),
-        button(hx.put := "/deactivate")("Deactivate")
-      ),
-      form(id := "checked-contacts")(
-        table(
-          thead(tr(th(""), th("Name"), th("Email"), th("Status"))),
-          tbody(id := "tbody")(
-            contactsRows(contacts, AffectedContacts(Set.empty, false))
-          )
-        )
-      )
-    ),
+    html"""
+    <div>
+        <h1>Bulk Updating example</h1>
+        <div hx-include="#checked-contacts" hx-target="#tbody">
+            <button hx-put="/activate">Activate</button>
+            <button hx-put="/deactivate">Deactivate</button>
+        </div>
+        <form id="checked-contacts">
+            <table>
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody">
+                    ${contactsRows(contacts, AffectedContacts(Set.empty, false))}
+                </tbody>
+            </table>
+        </form>
+    </div>
+    """,
     inlineStyle = """
      .htmx-settling tr.deactivate td {
         background: lightcoral;
@@ -60,27 +68,36 @@ object views {
     """
   )
 
-  def contactsRows(contacts: Seq[Contact], affectedContacts: AffectedContacts): Frag = contacts.map { contact =>
-    val affectedClass = if affectedContacts.activated then "activate" else "deactivate"
-    tr(
-      Option.when(affectedContacts.ids(contact.id))(cls := affectedClass)
-    )(
-      td(input(name := "ids", value := contact.id, tpe := "checkbox")),
-      td(contact.name),
-      td(contact.email),
-      td(if contact.active then "Active" else "Inactive")
-    )
-  }
+  def contactsRows(contacts: Seq[Contact], affectedContacts: AffectedContacts): Html =
+    val contactsHtml = contacts
+      .map { contact =>
+        val affectedClass = if affectedContacts.activated then "activate" else "deactivate"
+        html"""
+        <tr ${Option.when(affectedContacts.ids(contact.id))(html"class=${affectedClass}")}>
+            <td><input name="ids" value="${contact.id}" type="checkbox"></td>
+            <td>${contact.name}</td>
+            <td>${contact.email}</td>
+            <td>${if contact.active then "Active" else "Inactive"}</td>
+        </tr>
+        """
+      }
+    html"${contactsHtml}"
 
-  private def createPage(bodyContent: Frag, inlineStyle: String = "") = doctype("html")(
-    html(
-      head(
-        tag("style")(inlineStyle),
-        script(src := "https://unpkg.com/htmx.org@2.0.4")
-      ),
-      body(bodyContent)
-    )
-  )
+  private def createPage(bodyContent: Html, inlineStyle: String = "") =
+    html"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+        <style>
+        ${inlineStyle}
+        </style>
+    </head>
+    <body>
+    ${bodyContent}
+    </body>
+    </html>
+    """
 
 }
 
