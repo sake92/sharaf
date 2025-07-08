@@ -4,7 +4,7 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.Paths
 import sttp.model.*
 import sttp.client4.quick.*
-import ba.sake.sharaf.*
+import ba.sake.sharaf.{*, given}
 import ba.sake.sharaf.undertow.{*, given}
 import ba.sake.sharaf.utils.NetworkUtils
 import ba.sake.tupson.JsonRW
@@ -44,8 +44,6 @@ class ResponseWritableTest extends munit.FunSuite {
       val res = div("this is a div")
       Response.withBody(res)
     case GET -> Path("twirl", "html") =>
-      import play.twirl.api.*
-      import ResponseWritableInstances.given
       Response.withBody(html"""
         <html>
           <head>
@@ -57,8 +55,6 @@ class ResponseWritableTest extends munit.FunSuite {
         </html>
       """)
     case GET -> Path("twirl", "xml") =>
-      import play.twirl.api.*
-      import ResponseWritableInstances.given
       Response.withBody(xml"""
         <?xml version="1.0" encoding="UTF-8"?>
         <note>
@@ -138,7 +134,9 @@ class ResponseWritableTest extends munit.FunSuite {
 
   test("Write response twirl HTML") {
     val res = quickRequest.get(uri"${baseUrl}/twirl/html").send()
-    assertEquals(res.body.trim, """
+    assertEquals(
+      res.body.trim,
+      """
         <html>
           <head>
             <title>Twirl HTML</title>
@@ -146,13 +144,16 @@ class ResponseWritableTest extends munit.FunSuite {
           <body>
             <h1>This is a Twirl HTML response</h1>
           </body>
-        </html> """.trim)
+        </html> """.trim
+    )
     assertEquals(res.headers(HeaderNames.ContentType), Seq("text/html; charset=utf-8"))
   }
 
   test("Write response twirl XML") {
     val res = quickRequest.get(uri"${baseUrl}/twirl/xml").send()
-    assertEquals(res.body.trim, """ 
+    assertEquals(
+      res.body.trim,
+      """ 
         <?xml version="1.0" encoding="UTF-8"?>
         <note>
         <to>Tove</to>
@@ -160,7 +161,8 @@ class ResponseWritableTest extends munit.FunSuite {
         <heading>Reminder</heading>
         <body>Don't forget me this weekend!</body>
         </note>
-     """.trim)
+     """.trim
+    )
     assertEquals(res.headers(HeaderNames.ContentType), Seq("application/xml; charset=utf-8"))
   }
 
