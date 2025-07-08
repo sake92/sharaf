@@ -1,5 +1,5 @@
 //> using scala "3.7.0"
-//> using dep ba.sake::sharaf-undertow:0.10.0
+//> using dep ba.sake::sharaf-undertow:0.12.1
 
 import ba.sake.querson.QueryStringRW
 import ba.sake.tupson.JsonRW
@@ -20,12 +20,9 @@ val routes = Routes:
     CarsDb.add(newCar)
     Response.withBody(newCar)
 
-UndertowSharafServer("localhost", 8181, routes)
-  .withExceptionMapper(ExceptionMapper.json)
-  .start()
+UndertowSharafServer("localhost", 8181, routes, exceptionMapper = ExceptionMapper.json).start()
 
 println("Server started at http://localhost:8181")
-
 
 object CarsDb {
   var db: Seq[Car] = Seq()

@@ -1,5 +1,5 @@
 //> using scala "3.7.0"
-//> using dep ba.sake::sharaf-undertow:0.10.0
+//> using dep ba.sake::sharaf-undertow:0.12.1
 
 import ba.sake.querson.QueryStringRW
 import ba.sake.tupson.JsonRW
@@ -16,12 +16,9 @@ val routes = Routes:
     val json = Request.current.bodyJsonValidated[Car]
     Response.withBody(CarApiResult(s"JSON body OK: ${json}"))
 
-UndertowSharafServer("localhost", 8181, routes)
-  .withExceptionMapper(ExceptionMapper.json)
-  .start()
+UndertowSharafServer("localhost", 8181, routes, exceptionMapper = ExceptionMapper.json).start()
 
 println(s"Server started at http://localhost:8181")
-
 
 case class Car(brand: String, model: String, quantity: Int) derives JsonRW
 object Car:

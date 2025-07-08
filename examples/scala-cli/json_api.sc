@@ -1,5 +1,5 @@
 //> using scala "3.7.0"
-//> using dep ba.sake::sharaf-undertow:0.10.0
+//> using dep ba.sake::sharaf-undertow:0.12.1
 
 import ba.sake.tupson.JsonRW
 import ba.sake.sharaf.*
@@ -14,7 +14,7 @@ object CarsDb {
   def add(car: Car): Unit = db = db.appended(car)
 }
 
-val routes = Routes:  
+val routes = Routes:
   case GET -> Path("cars") =>
     Response.withBody(CarsDb.findAll())
 
@@ -27,8 +27,6 @@ val routes = Routes:
     CarsDb.add(reqBody)
     Response.withBody(reqBody)
 
-UndertowSharafServer("localhost", 8181, routes)
-  .withExceptionMapper(ExceptionMapper.json)
-  .start()
+UndertowSharafServer("localhost", 8181, routes, exceptionMapper = ExceptionMapper.json).start()
 
 println("Server started at http://localhost:8181")
