@@ -1,6 +1,5 @@
 package ba.sake.sharaf.undertow
 
-import sttp.model.*
 import sttp.client4.quick.*
 import ba.sake.sharaf.*
 import ba.sake.sharaf.utils.NetworkUtils

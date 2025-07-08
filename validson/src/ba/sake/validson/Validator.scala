@@ -118,7 +118,7 @@ object Validator extends LowPriValidators {
           }
         }
 
-      case hmm => report.errorAndAbort("Sum types are not supported")
+      case _ => report.errorAndAbort("Sum types are not supported")
   }
 
   /* macro utils */
