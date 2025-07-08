@@ -43,6 +43,31 @@ class ResponseWritableTest extends munit.FunSuite {
       import scalatags.Text.all.*
       val res = div("this is a div")
       Response.withBody(res)
+    case GET -> Path("twirl", "html") =>
+      import play.twirl.api.*
+      import ResponseWritableInstances.given
+      Response.withBody(html"""
+        <html>
+          <head>
+            <title>Twirl HTML</title>
+          </head>
+          <body>
+            <h1>This is a Twirl HTML response</h1>
+          </body>
+        </html>
+      """)
+    case GET -> Path("twirl", "xml") =>
+      import play.twirl.api.*
+      import ResponseWritableInstances.given
+      Response.withBody(xml"""
+        <?xml version="1.0" encoding="UTF-8"?>
+        <note>
+        <to>Tove</to>
+        <from>Jani</from>
+        <heading>Reminder</heading>
+        <body>Don't forget me this weekend!</body>
+        </note>
+      """)
     case GET -> Path("scalatags", "doctype") =>
       import scalatags.Text.all.{title => _, *}
       import scalatags.Text.tags2.title
@@ -109,6 +134,34 @@ class ResponseWritableTest extends munit.FunSuite {
     val res = quickRequest.get(uri"${baseUrl}/json").send()
     assertEquals(res.body, """ {"name":"Meho","age":40} """.trim)
     assertEquals(res.headers(HeaderNames.ContentType), Seq("application/json; charset=utf-8"))
+  }
+
+  test("Write response twirl HTML") {
+    val res = quickRequest.get(uri"${baseUrl}/twirl/html").send()
+    assertEquals(res.body.trim, """
+        <html>
+          <head>
+            <title>Twirl HTML</title>
+          </head>
+          <body>
+            <h1>This is a Twirl HTML response</h1>
+          </body>
+        </html> """.trim)
+    assertEquals(res.headers(HeaderNames.ContentType), Seq("text/html; charset=utf-8"))
+  }
+
+  test("Write response twirl XML") {
+    val res = quickRequest.get(uri"${baseUrl}/twirl/xml").send()
+    assertEquals(res.body.trim, """ 
+        <?xml version="1.0" encoding="UTF-8"?>
+        <note>
+        <to>Tove</to>
+        <from>Jani</from>
+        <heading>Reminder</heading>
+        <body>Don't forget me this weekend!</body>
+        </note>
+     """.trim)
+    assertEquals(res.headers(HeaderNames.ContentType), Seq("application/xml; charset=utf-8"))
   }
 
   test("Write response scalatags Frag") {

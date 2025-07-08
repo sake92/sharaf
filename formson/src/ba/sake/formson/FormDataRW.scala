@@ -359,7 +359,7 @@ object FormDataRW {
                     try {
                       $tryBlock
                     } catch {
-                      case e: IllegalArgumentException =>
+                      case _: IllegalArgumentException =>
                         throw ParsingException(
                           ParseError(
                             path,
@@ -423,7 +423,7 @@ object FormDataRW {
           }
         }
 
-      case hmm => report.errorAndAbort(s"Sum types are not supported ")
+      case _ => report.errorAndAbort(s"Sum types are not supported ")
   }
 
   /* macro utils */

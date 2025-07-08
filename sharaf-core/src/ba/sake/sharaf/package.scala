@@ -7,6 +7,8 @@ import ba.sake.{formson, querson}
 import formson.*
 import querson.*
 
+export HttpMethod.*
+
 type ExceptionMapper = exceptions.ExceptionMapper
 val ExceptionMapper = exceptions.ExceptionMapper
 
@@ -19,12 +21,10 @@ object param:
   def unapply[T](str: String)(using fp: FromPathParam[T]): Option[T] =
     fp.parse(str)
 
-export HttpMethod.*
-
 // conversions to STTP
 extension [T](value: T)(using rw: formson.FormDataRW[T])
   def toSttpMultipart(config: formson.Config = formson.DefaultFormsonConfig): Seq[Part[BasicBodyPart]] =
-    val multiParts = value.toFormDataMap().flatMap { case (key, values) =>
+    val multiParts = value.toFormDataMap(config).flatMap { case (key, values) =>
       values.map {
         case formson.FormValue.Str(value)       => multipart(key, value)
         case formson.FormValue.File(value)      => multipartFile(key, value.toFile)
@@ -35,5 +35,5 @@ extension [T](value: T)(using rw: formson.FormDataRW[T])
 
 extension [T](value: T)(using rw: querson.QueryStringRW[T])
   def toSttpQuery(config: querson.Config = querson.DefaultQuersonConfig): QueryParams =
-    val params = value.toQueryStringMap().map { (k, vs) => k -> vs }
+    val params = value.toQueryStringMap(config).map { (k, vs) => k -> vs }
     QueryParams.fromMultiMap(params)

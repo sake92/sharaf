@@ -1,13 +1,10 @@
 package ba.sake.sharaf.snunit
 
 import java.nio.charset.StandardCharsets
-import scala.jdk.CollectionConverters.*
-import scala.jdk.StreamConverters.*
 import snunit.{Request as SnunitRequest, *}
 import ba.sake.formson.*
 import ba.sake.querson.*
 import ba.sake.sharaf.*
-import ba.sake.sharaf.exceptions.*
 
 class SnunitSharafRequest(underlyingRequest: SnunitRequest) extends Request {
 

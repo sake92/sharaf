@@ -1,7 +1,5 @@
 package ba.sake.sharaf.exceptions
 
-import java.net.URI
-import scala.jdk.CollectionConverters.*
 import sttp.model.StatusCode
 import ba.sake.tupson
 import ba.sake.formson

@@ -5,7 +5,7 @@ import scala.compiletime.uninitialized
 import sttp.model.*
 import sttp.client4.quick.*
 import ba.sake.formson.*
-import ba.sake.sharaf.{*, given}
+import ba.sake.sharaf.*
 import ba.sake.sharaf.utils.*
 
 class FullstackSuite extends munit.FunSuite {
