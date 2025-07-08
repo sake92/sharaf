@@ -1,10 +1,9 @@
 package userpassform
 
 import scala.jdk.CollectionConverters.*
-import ba.sake.sharaf.*
-import ba.sake.sharaf.undertow.SharafUndertowHandler
 import io.undertow.server.session.{InMemorySessionManager, SessionAttachmentHandler, SessionCookieConfig}
 import io.undertow.{Handlers, Undertow}
+import io.undertow.server.handlers.BlockingHandler
 import org.pac4j.core.client.Clients
 import org.pac4j.core.config.Config
 import org.pac4j.core.credentials.password.JBCryptPasswordEncoder
@@ -17,6 +16,8 @@ import org.pac4j.core.profile.service.InMemoryProfileService
 import org.pac4j.core.util.Pac4jConstants
 import org.pac4j.http.client.indirect.FormClient
 import org.pac4j.undertow.handler.{CallbackHandler, LogoutHandler, SecurityHandler}
+import ba.sake.sharaf.*
+import ba.sake.sharaf.undertow.*
 
 @main def main: Unit =
   val module = UserPassFormModule(8181)
@@ -53,7 +54,10 @@ class UserPassFormModule(port: Int) {
   val securityService = SecurityService(pac4jConfig)
   private val securityHandler =
     SecurityHandler.build(
-      SharafUndertowHandler(SharafHandler.routes(AppRoutes(callbackUrl, securityService).routes)),
+      UndertowExceptionHandler(
+        ExceptionMapper.default,
+        SharafUndertowHandler(SharafHandler.routes(AppRoutes(callbackUrl, securityService).routes))
+      ),
       pac4jConfig,
       clientNames.mkString(","),
       null,
@@ -67,7 +71,9 @@ class UserPassFormModule(port: Int) {
     .addPrefixPath("/", securityHandler)
 
   private val finalHandler =
-    SessionAttachmentHandler(pathHandler, InMemorySessionManager("SessionManager"), SessionCookieConfig())
+    new BlockingHandler(
+      SessionAttachmentHandler(pathHandler, InMemorySessionManager("SessionManager"), SessionCookieConfig())
+    )
 
   val server = Undertow
     .builder()

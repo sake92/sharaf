@@ -1,7 +1,6 @@
 package userpassform
 
-import scalatags.Text.all.*
-import ba.sake.sharaf.*
+import ba.sake.sharaf.{*, given}
 
 class AppRoutes(callbackUrl: String, securityService: SecurityService) {
   val routes = Routes {
@@ -19,50 +18,67 @@ class AppRoutes(callbackUrl: String, securityService: SecurityService) {
 }
 
 object views {
-  def index(currentUserOpt: Option[CustomUserProfile]) = doctype("html")(
-    html(
-      body(
-        a(href := "/protected-resource")("Protected resource"),
-        currentUserOpt.map { user =>
-          div(
-            s"Hello ${user.name} !",
-            div(
-              a(href := "/logout")("Logout")
-            )
-          )
-        }
-      )
-    )
-  )
+  def index(currentUserOpt: Option[CustomUserProfile]) = {
+    val currentUserHtml = currentUserOpt.map { user =>
+      html"""
+        <div>
+          Hello ${user.name} !
+          <div>
+            <a href="/logout">Logout</a>
+          </div>
+        </div>
+      """
+    }
+    html"""
+      <!DOCTYPE html>
+      <html>
+      <body>
+      <div>Hello there!</div>
+      <div>
+          <a href="/protected-resource">Protected resource</a>
+          ${currentUserHtml}
+      </div>
+      </body>
+      </html>
+    """
+  }
 
-  def protectedResource(using currentUser: CustomUserProfile) = doctype("html")(
-    html(
-      body(
-        a(href := "/")("Home"),
-        div(s"Hello ${currentUser.name}! You are logged in!")
-      )
-    )
-  )
+  def protectedResource(using currentUser: CustomUserProfile) =
+    html"""
+      <!DOCTYPE html>
+      <html>
+      <body>
+      <div>
+          <a href="/">Home</a>
+          <div>
+          Hello ${currentUser.name}! You are logged in!
+          </div>
+      </div>
+      </body>
+      </html>
+    """
 
-  def showForm(callbackUrl: String) = doctype("html")(
-    html(
-      body(
-        form(action := s"${callbackUrl}?client_name=FormClient", method := "POST")(
-          label(
-            "Username",
-            input(tpe := "text", name := "username")
-          ),
-          label(
-            "Password",
-            input(tpe := "text", name := "password")
-          ),
-          input(tpe := "submit", value := "Login")
-        )
-      ),
-      div(
-        "Use johndoe/johndoe as username/password to login."
-      )
-    )
-  )
+  def showForm(callbackUrl: String) =
+    html"""
+      <!DOCTYPE html>
+      <html>
+      <body>
+      <div>
+          <form action="${callbackUrl}?client_name=FormClient" method="POST">
+            <label>Username
+              <input type="text" name="username">
+            </label>
+            <label>Password
+              <input type="text" name="password">
+            </label>
+            <input type="submit" value="Login">
+          </form>
+          <div>
+          Use johndoe/johndoe as username/password to login.
+          </div>
+      </div>
+      </body>
+      </html>
+    """
 
 }
