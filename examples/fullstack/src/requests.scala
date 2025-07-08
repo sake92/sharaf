@@ -13,7 +13,7 @@ case class CreateCustomerForm(
 
 object CreateCustomerForm:
 
-  val empty = CreateCustomerForm("", Paths.get(""), Seq.empty)
+  val empty = CreateCustomerForm("", Paths.get(""), Seq(""))
 
   given Validator[CreateCustomerForm] = Validator
     .derived[CreateCustomerForm]

@@ -1,10 +1,10 @@
 package fullstack
 
-import ba.sake.validson.*
-import ba.sake.sharaf.*
-import ba.sake.sharaf.undertow.{*, given}
-import fullstack.views.*
 import sttp.model.StatusCode
+import ba.sake.validson.*
+import ba.sake.sharaf.{*, given}
+import ba.sake.sharaf.undertow.UndertowSharafServer
+import fullstack.views.*
 
 @main def main: Unit =
   val module = FullstackModule(8181)
