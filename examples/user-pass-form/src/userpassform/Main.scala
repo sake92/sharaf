@@ -2,7 +2,7 @@ package userpassform
 
 import scala.jdk.CollectionConverters.*
 import ba.sake.sharaf.*
-import ba.sake.sharaf.undertow.handlers.SharafHandler
+import ba.sake.sharaf.undertow.SharafUndertowHandler
 import io.undertow.server.session.{InMemorySessionManager, SessionAttachmentHandler, SessionCookieConfig}
 import io.undertow.{Handlers, Undertow}
 import org.pac4j.core.client.Clients
@@ -53,7 +53,7 @@ class UserPassFormModule(port: Int) {
   val securityService = SecurityService(pac4jConfig)
   private val securityHandler =
     SecurityHandler.build(
-      SharafHandler(AppRoutes(callbackUrl, securityService).routes),
+      SharafUndertowHandler(SharafHandler.routes(AppRoutes(callbackUrl, securityService).routes)),
       pac4jConfig,
       clientNames.mkString(","),
       null,

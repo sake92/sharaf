@@ -4,8 +4,8 @@ import io.undertow.Undertow
 import io.undertow.server.session.{InMemorySessionManager, SessionAttachmentHandler, SessionCookieConfig}
 import sttp.client4.quick.*
 import ba.sake.sharaf.*
-import ba.sake.sharaf.undertow.handlers.SharafHandler
 import ba.sake.sharaf.utils.NetworkUtils
+import io.undertow.server.handlers.BlockingHandler
 
 class SessionsTest extends munit.FunSuite {
   val port = NetworkUtils.getFreePort()
@@ -27,10 +27,12 @@ class SessionsTest extends munit.FunSuite {
     .builder()
     .addHttpListener(port, "localhost")
     .setHandler(
-      new SessionAttachmentHandler(
-        SharafHandler(routes),
-        new InMemorySessionManager("in-memory-session-manager"),
-        new SessionCookieConfig()
+      BlockingHandler(
+        new SessionAttachmentHandler(
+          SharafUndertowHandler(SharafHandler.routes(routes)),
+          new InMemorySessionManager("in-memory-session-manager"),
+          new SessionCookieConfig()
+        )
       )
     )
     .build()

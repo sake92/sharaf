@@ -10,7 +10,7 @@ class HelidonSharafServerTest extends munit.FunSuite {
     Response.withBody("Hello World!")
   }
   val port = NetworkUtils.getFreePort()
-  val server = HelidonSharafServer("localhost", port, routes)
+  val server = HelidonSharafServer("localhost", port, SharafHandler.routes(routes))
 
   override def beforeAll(): Unit = server.start()
 

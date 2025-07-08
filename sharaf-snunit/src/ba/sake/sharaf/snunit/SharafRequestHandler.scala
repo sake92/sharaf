@@ -5,24 +5,20 @@ import snunit.{Request as SnunitRequest, *}
 import ba.sake.sharaf.*
 import ba.sake.sharaf.routing.*
 
-class SharafRequestHandler(routes: Routes) extends RequestHandler {
+class SharafRequestHandler(sharafHandler: SharafHandler) extends RequestHandler {
   override def handleRequest(snunitRequest: SnunitRequest): Unit = {
-    given Request = SnunitSharafRequest.create(snunitRequest)
     val reqParams = fillReqParams(snunitRequest)
-    routes.definition.lift(reqParams) match {
-      case Some(res) =>
-        val headers = buildHeaders(res.headerUpdates)
-        res.body match {
-          case Some(body) =>
-            val aos = new ByteArrayOutputStream
-            res.rw.write(body, aos)
-            send(snunitRequest)(StatusCode(res.status.code), aos.toByteArray(), headers)
-          case None =>
-            send(snunitRequest)(StatusCode(res.status.code), "", headers)
-        }
+    val req = SnunitSharafRequest.create(snunitRequest)
+    val requestContext = RequestContext(reqParams, req)
+    val res = sharafHandler.handle(requestContext)
+    val headers = buildHeaders(res.headerUpdates)
+    res.body match {
+      case Some(body) =>
+        val aos = new ByteArrayOutputStream
+        res.rw.write(body, aos)
+        send(snunitRequest)(StatusCode(res.status.code), aos.toByteArray(), headers)
       case None =>
-        // will be catched by ExceptionHandler
-        throw exceptions.NotFoundException("route")
+        send(snunitRequest)(StatusCode(res.status.code), "", headers)
     }
   }
 

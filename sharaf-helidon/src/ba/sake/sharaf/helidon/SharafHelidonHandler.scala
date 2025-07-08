@@ -4,18 +4,14 @@ import io.helidon.webserver.http.{Handler, ServerRequest, ServerResponse}
 import ba.sake.sharaf.*
 import ba.sake.sharaf.routing.*
 
-class SharafHelidonHandler(routes: Routes) extends Handler {
+class SharafHelidonHandler(sharafHandler: SharafHandler) extends Handler {
 
   override def handle(helidonReq: ServerRequest, helidonRes: ServerResponse): Unit = {
-    given Request = HelidonSharafRequest.create(helidonReq)
     val reqParams = fillReqParams(helidonReq)
-    routes.definition.lift(reqParams) match {
-      case Some(res) =>
-        ResponseUtils.writeResponse(res, helidonRes)
-      case None =>
-        // will be catched by ExceptionHandler
-        throw exceptions.NotFoundException("route")
-    }
+    val req = HelidonSharafRequest.create(helidonReq)
+    val requestContext = RequestContext(reqParams, req)
+    val res = sharafHandler.handle(requestContext) 
+    ResponseUtils.writeResponse(res, helidonRes)
   }
 
   private def fillReqParams(req: ServerRequest): RequestParams = {

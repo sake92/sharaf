@@ -42,6 +42,5 @@ class JsonApiModule(port: Int) {
       Files.writeString(tmpFile, db.toJson)
       Response.withBody(tmpFile)
 
-  val server = UndertowSharafServer("localhost", port, routes)
-    .withExceptionMapper(ExceptionMapper.json)
+  val server = UndertowSharafServer("localhost", port, routes, exceptionMapper = ExceptionMapper.json)
 }

@@ -2,39 +2,73 @@ package ba.sake.sharaf.undertow
 
 import io.undertow.Undertow
 import ba.sake.sharaf.*
-import ba.sake.sharaf.undertow.handlers.SharafHandler
+import io.undertow.server.handlers.BlockingHandler
+import io.undertow.server.handlers.resource.ResourceHandler
+import io.undertow.server.handlers.resource.ClassPathResourceManager
+import io.undertow.server.HttpHandler
+import sttp.model.StatusCode
 
-class UndertowSharafServer private (host: String, port: Int, sharafHandler: SharafHandler) {
+class UndertowSharafServer(host: String, port: Int, handler: HttpHandler) {
 
   private val server = Undertow
     .builder()
     .addHttpListener(port, host)
-    .setHandler(sharafHandler)
+    .setHandler(handler)
     .build()
 
   def start(): Unit = server.start()
 
   def stop(): Unit = server.stop()
-
-  def withCorsSettings(corsSettings: CorsSettings): UndertowSharafServer =
-    val newHandler = sharafHandler.withCorsSettings(corsSettings)
-    copy(sharafHandler = newHandler)
-
-  def withExceptionMapper(exceptionMapper: ExceptionMapper): UndertowSharafServer =
-    val newHandler = sharafHandler.withExceptionMapper(exceptionMapper)
-    copy(sharafHandler = newHandler)
-
-  def withNotFoundHandler(notFoundHandler: Request => Response[?]): UndertowSharafServer =
-    val newHandler = sharafHandler.withNotFoundHandler(notFoundHandler)
-    copy(sharafHandler = newHandler)
-
-  private def copy(sharafHandler: SharafHandler = sharafHandler) = new UndertowSharafServer(host, port, sharafHandler)
 }
 
 object UndertowSharafServer {
-  def apply(host: String, port: Int, sharafHandler: SharafHandler): UndertowSharafServer =
-    new UndertowSharafServer(host, port, sharafHandler)
 
-  def apply(host: String, port: Int, routes: Routes): UndertowSharafServer =
-    apply(host, port, SharafHandler(routes))
+  private val defaultNotFoundResponse = Response.withBody("Not Found").withStatus(StatusCode.NotFound)
+
+  def apply(
+      host: String,
+      port: Int,
+      routes: Routes,
+      corsSettings: CorsSettings = CorsSettings.default,
+      exceptionMapper: ExceptionMapper = ExceptionMapper.default,
+      notFoundHandler: Request => Response[?] = _ => defaultNotFoundResponse
+  ): UndertowSharafServer = {
+    val notFoundRoutes = Routes { _ =>
+      notFoundHandler(Request.current)
+    }
+    val resourceHandler = ResourceHandler( // load from classpath in public/ folder
+      ClassPathResourceManager(getClass.getClassLoader, "public"), {
+        // or load from classpath in WebJars
+        val webJarHandler = new ResourceHandler(
+          ClassPathResourceManager(getClass.getClassLoader, "META-INF/resources/webjars"),
+          SharafUndertowHandler(SharafHandler.routes(notFoundRoutes)) // handle 404s at the end
+        )
+        // dont serve index.html etc from random webjars...
+        webJarHandler.setWelcomeFiles()
+        webJarHandler
+      }
+    )
+    val finalHandler =
+      BlockingHandler( // synchronous/blocking handler
+        UndertowExceptionHandler(
+          exceptionMapper,
+          next = SharafUndertowHandler(
+            SharafHandler.cors(
+              corsSettings,
+              SharafHandler.routes(routes)
+            ),
+            next = Some(resourceHandler)
+          )
+        )
+      )
+
+    new UndertowSharafServer(host, port, finalHandler)
+  }
+
+  def apply(host: String, port: Int, sharafHandler: SharafHandler): UndertowSharafServer =
+    new UndertowSharafServer(host, port, SharafUndertowHandler(sharafHandler))
+
+  // if need tweaking
+  def apply(host: String, port: Int, sharafUndertowHandler: SharafUndertowHandler): UndertowSharafServer =
+    new UndertowSharafServer(host, port, sharafUndertowHandler)
 }

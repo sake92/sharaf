@@ -11,7 +11,7 @@ import org.pac4j.undertow.handler.CallbackHandler
 import org.pac4j.undertow.handler.LogoutHandler
 import org.pac4j.undertow.handler.SecurityHandler
 import ba.sake.sharaf.*
-import ba.sake.sharaf.undertow.handlers.SharafHandler
+import ba.sake.sharaf.undertow.SharafUndertowHandler
 
 class AppModule(port: Int, clients: Clients) {
 
@@ -24,7 +24,7 @@ class AppModule(port: Int, clients: Clients) {
   private val httpHandler: HttpHandler = locally {
     val securityHandler =
       SecurityHandler.build(
-        SharafHandler(appRoutes.routes),
+        SharafUndertowHandler(SharafHandler.routes(appRoutes.routes)),
         securityConfig.pac4jConfig,
         securityConfig.clientNames.mkString(","),
         null,
