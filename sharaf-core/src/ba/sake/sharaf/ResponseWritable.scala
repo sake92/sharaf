@@ -3,7 +3,6 @@ package ba.sake.sharaf
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
 import java.io.{FileInputStream, InputStream, OutputStream}
-import scala.jdk.CollectionConverters.*
 import scala.util.Using
 import sttp.model.HeaderNames
 import scalatags.Text.all.doctype

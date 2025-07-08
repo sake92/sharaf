@@ -1,8 +1,7 @@
 package ba.sake.sharaf.handlers
 
-import scala.jdk.CollectionConverters.*
-import ba.sake.sharaf.*
 import sttp.model.HeaderNames
+import ba.sake.sharaf.*
 
 // https://www.moesif.com/blog/technical/cors/Authoritative-Guide-to-CORS-Cross-Origin-Resource-Sharing-for-REST-APIs/
 final class CorsHandler(corsSettings: CorsSettings, next: SharafHandler) extends SharafHandler {

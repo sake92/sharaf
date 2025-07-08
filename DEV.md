@@ -18,7 +18,7 @@ scala-cli compile examples\scala-cli
 ```sh
 
 # RELEASE
-$VERSION="0.12.0"
+$VERSION="0.12.1"
 git commit --allow-empty -m "Release $VERSION"
 git tag -a $VERSION -m "Release $VERSION"
 git push --atomic origin main $VERSION

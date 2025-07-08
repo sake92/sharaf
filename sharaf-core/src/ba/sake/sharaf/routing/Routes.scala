@@ -1,7 +1,6 @@
 package ba.sake.sharaf.routing
 
 import ba.sake.sharaf.{HttpMethod, Request, Response}
-import ba.sake.sharaf.exceptions.NotFoundException
 
 type RequestParams = (HttpMethod, Path)
 

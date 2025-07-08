@@ -63,7 +63,7 @@ object FromPathParam {
                   try {
                     Option($tryBlock)
                   } catch {
-                    case e: IllegalArgumentException =>
+                    case _: IllegalArgumentException =>
                       None
                   }
                 }
@@ -71,7 +71,7 @@ object FromPathParam {
           }
         }
 
-      case hmm => report.errorAndAbort("Not supported")
+      case _ => report.errorAndAbort("Not supported")
   }
 
   private def isSingletonCasesEnum[T: Type](using Quotes): Boolean =
