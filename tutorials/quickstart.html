@@ -59,27 +59,27 @@
    <p>Get started quickly with Sharaf framework.</p>
    <h2 id="mill">Mill<a href="#mill" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
    <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">ivyDeps</span> </span>= <span class="hljs-keyword">super</span>.ivyDeps() ++ <span class="hljs-type">Agg</span>(
-    <span class="hljs-string">ivy"ba.sake::sharaf-undertow:0.12.1"</span>
+    <span class="hljs-string">ivy"ba.sake::sharaf-undertow:0.13.0"</span>
 )
 <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">scalacOptions</span> </span>= <span class="hljs-keyword">super</span>.scalacOptions() ++ <span class="hljs-type">Seq</span>(<span class="hljs-string">"-Yretain-trees"</span>)
 </code></pre>
    <h2 id="sbt">Sbt<a href="#sbt" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
    <pre><code class="language-scala hljs" data-highlighted="yes">libraryDependencies ++= <span class="hljs-type">Seq</span>(
-    <span class="hljs-string">"ba.sake"</span> %% <span class="hljs-string">"sharaf-undertow"</span> % <span class="hljs-string">"0.12.1"</span>
+    <span class="hljs-string">"ba.sake"</span> %% <span class="hljs-string">"sharaf-undertow"</span> % <span class="hljs-string">"0.13.0"</span>
 ),
 scalacOptions ++= <span class="hljs-type">Seq</span>(<span class="hljs-string">"-Yretain-trees"</span>)
 </code></pre>
    <h2 id="scala-cli">Scala CLI<a href="#scala-cli" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
    <p>Create a file <code>my_script.sc</code> with the following content:</p>
-   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">ba.sake::sharaf-undertow:0.12.1</span>
+   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">ba.sake::sharaf-undertow:0.13.0</span>
 </code></pre>
    <p>and then run it with:</p>
    <pre><code class="language-bash hljs" data-highlighted="yes">scala my_script.sc --scala-option -Yretain-trees
 </code></pre>
    <h2 id="examples">Examples<a href="#examples" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
    <ul>
-    <li><a href="https://github.com/sake92/sharaf/tree/main/examples/scala-cli">scala examples</a>, standalone examples using scala-cli</li>
-    <li><a href="https://github.com/sake92/sharaf/tree/main/examples/htmx">scala HTMX examples</a>, standalone examples featuring HTMX</li>
+    <li><a href="https://github.com/sake92/sharaf/tree/main/examples/scala-cli">Scala CLI examples</a>, standalone examples using Scala CLI</li>
+    <li><a href="https://github.com/sake92/sharaf/tree/main/examples/htmx">Scala CLI HTMX examples</a>, standalone examples featuring HTMX</li>
     <li><a href="https://github.com/sake92/sharaf/tree/main/examples/api">API example</a> featuring JSON and validation</li>
     <li><a href="https://github.com/sake92/sharaf/tree/main/examples/fullstack">full-stack example</a> featuring HTML, static files and forms</li>
     <li><a href="https://github.com/sake92/sharaf-todo-backend">sharaf-todo-backend</a>, implementation of the <a href="http://todobackend.com/">todobackend.com</a> spec, featuring CORS handling</li>
