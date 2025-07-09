@@ -8,15 +8,20 @@ description: Sharaf How To NotFound
 How to customize 404 NotFound handler?
 
 
-Use the `withNotFoundHandler` on `UndertowSharafServer`:
+Use the `notFoundHandler` parameter of `UndertowSharafServer`:
 ```scala
-UndertowSharafServer(routes).withNotFoundHandler { req =>
+val customNotFoundHandler: Request => Response[?] = req =>
   Response.withBody(MyCustomNotFoundPage)
     .withStatus(StatusCode.NotFound)
-}
+
+val server = UndertowSharafServer(
+    "localhost",
+    port,
+    routes,
+    notFoundHandler = customNotFoundHandler
+  )
 ```
 
-The `withNotFoundHandler` accepts a `Request => Response[?]` parameter.  
 You can use the request if you need to dynamically decide on what to return.  
 Or ignore it and return a static not found response.
 

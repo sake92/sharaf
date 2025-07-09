@@ -7,7 +7,7 @@ description: Sharaf How To Exception Handler
 
 How to customize the Exception handler?
 
-Use the `withExceptionMapper` on `UndertowSharafServer`:
+Use the `exceptionMapper` parameter of `UndertowSharafServer`:
 ```scala
 val customExceptionMapper: ExceptionMapper = {
   case e: MyException =>
@@ -16,7 +16,13 @@ val customExceptionMapper: ExceptionMapper = {
       .withStatus(StatusCode.InternalServerError)
 }
 val finalExceptionMapper = customExceptionMapper.orElse(ExceptionMapper.default)
-val server = UndertowSharafServer(routes).withExceptionMapper(finalExceptionMapper)
+
+val server = UndertowSharafServer(
+    "localhost",
+    port,
+    routes,
+    exceptionMapper = finalExceptionMapper
+  )
 ```
 
 The `ExceptionMapper` is a partial function from an exception to `Response`.  
