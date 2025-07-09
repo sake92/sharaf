@@ -5,7 +5,7 @@ import java.nio.file.Paths
 import sttp.model.*
 import sttp.client4.quick.*
 import ba.sake.sharaf.{*, given}
-import ba.sake.sharaf.undertow.{*, given}
+import ba.sake.sharaf.undertow.UndertowSharafServer
 import ba.sake.sharaf.utils.NetworkUtils
 import ba.sake.tupson.JsonRW
 
@@ -39,10 +39,6 @@ class ResponseWritableTest extends munit.FunSuite {
       case class JsonCaseClass(name: String, age: Int) derives JsonRW
       val json = JsonCaseClass("Meho", 40)
       Response.withBody(json)
-    case GET -> Path("scalatags", "frag") =>
-      import scalatags.Text.all.*
-      val res = div("this is a div")
-      Response.withBody(res)
     case GET -> Path("twirl", "html") =>
       Response.withBody(html"""
         <html>
@@ -64,27 +60,6 @@ class ResponseWritableTest extends munit.FunSuite {
         <body>Don't forget me this weekend!</body>
         </note>
       """)
-    case GET -> Path("scalatags", "doctype") =>
-      import scalatags.Text.all.{title => _, *}
-      import scalatags.Text.tags2.title
-      val res = doctype("html")(
-        html(
-          head(
-            title("doctype title")
-          ),
-          body(
-            "this is doctype body"
-          )
-        )
-      )
-      Response.withBody(res)
-    case GET -> Path("hepek", "htmlpage") =>
-      import scalatags.Text.all.*
-      import ba.sake.hepek.html.HtmlPage
-      val page = new HtmlPage {
-        override def pageContent = div("this is body")
-      }
-      Response.withBody(page)
   }
 
   val server = UndertowSharafServer("localhost", port, routes)

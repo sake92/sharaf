@@ -8,14 +8,13 @@ import mill.vcs.VcsVersion
 
 object V:
   val tupson = "0.13.0"
-  val scalatags = "0.13.1"
   val hepek = "0.33.0"
 
 object `sharaf-core` extends Module:
   object jvm extends SharafCoreModule with ScalaJvmCommonModule:
     def moduleDeps = Seq(querson.jvm, formson.jvm, validson.jvm)
     def mvnDeps = super.mvnDeps() ++ Seq(
-      // TODO move to common when published for native, and remove scalatags
+      // TODO move to common when published for native
       mvn"org.playframework.twirl::twirl-api:2.1.0-M4"
     )
     object test extends ScalaTests with SharafTestModule
@@ -29,7 +28,6 @@ object `sharaf-core` extends Module:
     // all deps should be cross jvm/native
     def mvnDeps = super.mvnDeps() ++ Seq(
       mvn"ba.sake::tupson::${V.tupson}",
-      mvn"com.lihaoyi::scalatags::${V.scalatags}",
       mvn"com.lihaoyi::geny::1.1.1",
       mvn"com.softwaremill.sttp.client4::core::4.0.5"
     )
@@ -38,8 +36,7 @@ object `sharaf-undertow` extends SharafPublishModule:
   def artifactName = "sharaf-undertow"
   def mvnDeps = super.mvnDeps() ++ Seq(
     mvn"io.undertow:undertow-core:2.3.18.Final",
-    mvn"ba.sake::tupson-config:${V.tupson}",
-    mvn"ba.sake::hepek-components:${V.hepek}"
+    mvn"ba.sake::tupson-config:${V.tupson}"
   )
   def moduleDeps = Seq(`sharaf-core`.jvm)
   object test extends ScalaTests with SharafTestModule :
@@ -66,6 +63,18 @@ object `sharaf-snunit` extends ScalaNativeCommonModule with SharafPublishModule:
     mvn"com.github.lolgab::snunit::0.10.3"
   )
   def moduleDeps = Seq(`sharaf-core`.native)
+
+object `sharaf-hepek-components` extends Module:
+  object jvm extends SharafHepekComponentsCoreModule with ScalaJvmCommonModule:
+    def moduleDeps = Seq(`sharaf-core`.jvm)
+  //object native extends SharafHepekComponentsCoreModule with ScalaNativeCommonModule:
+   // def moduleDeps = Seq(`sharaf-core`.native)
+  
+  trait SharafHepekComponentsCoreModule extends SharafPublishModule with PlatformScalaModule:
+    def artifactName = "sharaf-hepek-components"
+    def mvnDeps = super.mvnDeps() ++ Seq(
+      mvn"ba.sake::hepek-components:${V.hepek}"
+    )
 
 object querson extends Module:
   object jvm extends QuersonModule with ScalaJvmCommonModule:

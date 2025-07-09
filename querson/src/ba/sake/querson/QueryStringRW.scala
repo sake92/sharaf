@@ -323,7 +323,7 @@ object QueryStringRW {
                   try {
                     $tryBlock
                   } catch {
-                    case e: IllegalArgumentException =>
+                    case _: IllegalArgumentException =>
                       throw ParsingException(
                         ParseError(
                           path,

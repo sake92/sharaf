@@ -5,8 +5,6 @@ import java.nio.file.Path
 import java.io.{FileInputStream, InputStream, OutputStream}
 import scala.util.Using
 import sttp.model.HeaderNames
-import scalatags.Text.all.doctype
-import scalatags.Text.Frag
 import ba.sake.tupson.{JsonRW, toJson}
 
 private val ContentTypeHttpString = HttpString(HeaderNames.ContentType)
@@ -52,23 +50,6 @@ object ResponseWritable extends LowPriResponseWritableInstances {
     override def headers(value: Path): Seq[(HttpString, Seq[String])] = Seq(
       ContentTypeHttpString -> Seq("application/octet-stream"),
       ContentDispositionHttpString -> Seq(s""" attachment; filename="${value.getFileName}" """.trim)
-    )
-  }
-
-  // really handy when working with HTMX !
-  given ResponseWritable[Frag] with {
-    override def write(value: Frag, outputStream: OutputStream): Unit =
-      ResponseWritable[String].write(value.render, outputStream)
-    override def headers(value: Frag): Seq[(HttpString, Seq[String])] = Seq(
-      ContentTypeHttpString -> Seq("text/html; charset=utf-8")
-    )
-  }
-
-  given ResponseWritable[doctype] with {
-    override def write(value: doctype, outputStream: OutputStream): Unit =
-      ResponseWritable[String].write(value.render, outputStream)
-    override def headers(value: doctype): Seq[(HttpString, Seq[String])] = Seq(
-      ContentTypeHttpString -> Seq("text/html; charset=utf-8")
     )
   }
 
