@@ -38,7 +38,7 @@ Create a file `html.sc` and paste this code into it:
 
 ```scala
 //> using scala "3.7.0"
-//> using dep ba.sake::sharaf-undertow:0.12.1
+//> using dep {{site.data.project.artifact.org}}::{{site.data.project.artifact.name}}:{{site.data.project.artifact.version}}
 
 import ba.sake.sharaf.{*, given}
 import ba.sake.sharaf.undertow.UndertowSharafServer

@@ -33,7 +33,7 @@ Create a file `sql_db.sc` and paste this code into it:
 //> using scala "3.7.0"
 //> using dep org.postgresql:postgresql:42.7.5
 //> using dep com.zaxxer:HikariCP:6.3.0
-//> using dep ba.sake::sharaf-undertow:0.12.1
+//> using dep {{site.data.project.artifact.org}}::{{site.data.project.artifact.name}}:{{site.data.project.artifact.version}}
 //> using dep ba.sake::squery:0.7.0
 
 import ba.sake.tupson.JsonRW

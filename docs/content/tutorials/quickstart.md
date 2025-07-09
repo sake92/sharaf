@@ -40,8 +40,8 @@ scala my_script.sc --scala-option -Yretain-trees
 
 ## Examples
 
-- [scala examples]({{site.data.project.gh.sourcesUrl}}/examples/scala-cli), standalone examples using scala-cli
-- [scala HTMX examples]({{site.data.project.gh.sourcesUrl}}/examples/htmx), standalone examples featuring HTMX
+- [Scala CLI examples]({{site.data.project.gh.sourcesUrl}}/examples/scala-cli), standalone examples using Scala CLI
+- [Scala CLI HTMX examples]({{site.data.project.gh.sourcesUrl}}/examples/htmx), standalone examples featuring HTMX
 - [API example]({{site.data.project.gh.sourcesUrl}}/examples/api) featuring JSON and validation
 - [full-stack example]({{site.data.project.gh.sourcesUrl}}/examples/fullstack) featuring HTML, static files and forms
 - [sharaf-todo-backend](https://github.com/sake92/sharaf-todo-backend), implementation of the [todobackend.com](http://todobackend.com/) spec, featuring CORS handling

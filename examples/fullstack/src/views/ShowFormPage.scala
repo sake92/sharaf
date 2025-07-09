@@ -3,7 +3,6 @@ package fullstack.views
 import ba.sake.validson.ValidationError
 import ba.sake.sharaf.*
 import fullstack.CreateCustomerForm
-import play.twirl.api.Html
 
 def ShowFormPage(formData: CreateCustomerForm, errors: Seq[ValidationError] = Seq.empty) = {
   // errors are returned as JSON Path, hence the $. prefix below!

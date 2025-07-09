@@ -9,5 +9,5 @@ gh:
 artifact:
   org: "ba.sake"
   name: "sharaf-undertow"
-  version: "0.12.1"
+  version: "0.13.0"
 
