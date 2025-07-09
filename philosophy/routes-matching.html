@@ -58,12 +58,13 @@
    </div>
    <h1 id="routes-matching">Routes Matching<a href="#routes-matching" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
    <h2 id="routes-matching-design">Routes matching design<a href="#routes-matching-design" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
-   <pre><code>Web frameworks do their routes matching with various mechanisms:
-- annotation + method param: [Spring](https://spring.io/guides/tutorials/rest/) and most other popular Java frameworks, [Cask](https://com-lihaoyi.github.io/cask/) etc
-- special route file DSL: [PlayFramework](https://www.playframework.com/documentation/2.9.x/ScalaRouting#The-routes-file-syntax), Ruby on Rails
-- in-language DSL: zio-http, akka-http
-- pattern matching: Sharaf, http4s
-</code></pre>
+   <p>Web frameworks do their routes matching with various mechanisms:</p>
+   <ul>
+    <li>annotation + method param: <a href="https://spring.io/guides/tutorials/rest/">Spring</a> and most other popular Java frameworks, <a href="https://com-lihaoyi.github.io/cask/">Cask</a> etc</li>
+    <li>special route file DSL: <a href="https://www.playframework.com/documentation/2.9.x/ScalaRouting#The-routes-file-syntax">PlayFramework</a>, Ruby on Rails</li>
+    <li>in-language DSL: zio-http, akka-http</li>
+    <li>pattern matching: Sharaf, http4s</li>
+   </ul>
    <h2 id="why-not-annotations">Why not annotations?<a href="#why-not-annotations" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
    <p>Let's see an example:</p>
    <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-meta">@GetMapping</span>(value = <span class="hljs-string">"/student/{studentId}"</span>)
