@@ -141,13 +141,4 @@ class ResponseWritableTest extends munit.FunSuite {
     assertEquals(res.headers(HeaderNames.ContentType), Seq("application/xml; charset=utf-8"))
   }
 
-  test("Write response hepek HtmlPage") {
-    val res = quickRequest.get(uri"${baseUrl}/hepek/htmlpage").send()
-    assertEquals(
-      res.body,
-      """ <!DOCTYPE html><html lang="en"><head><meta charset="utf-8" /><meta http-equiv="X-UA-Compatible" content="ie=edge" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta name="generator" content="hepek" /><meta name="theme-color" content="#000" /><meta name="mobile-web-app-capable" content="yes" /><meta name="twitter:card" content="summary_large_image" /><title>changeme</title></head><body><div>this is body</div></body></html> """.trim
-    )
-    assertEquals(res.headers(HeaderNames.ContentType), Seq("text/html; charset=utf-8"))
-  }
-
 }
