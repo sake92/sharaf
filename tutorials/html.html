@@ -40,10 +40,7 @@
       <summary>Table of Contents</summary>
       <div>
        <ul>
-        <li><a href="#html">HTML</a>
-         <ul>
-          <li><a href="#hepek-components">Hepek Components</a></li>
-         </ul></li>
+        <li><a href="#html">HTML</a></li>
        </ul>
       </div>
      </details>
@@ -53,16 +50,14 @@
     <div></div>
    </div>
    <h1 id="html">HTML<a href="#html" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
-   <p>You can return a scalatags <code>doctype</code> directly in the <code>Response.withBody()</code>.
-    <br>
-    Let's make a simple HTML page that greets the user.
+   <p>You can make an HTML snippet by using the <code>html""</code> interpolator. Then you return it directly in the <code>Response.withBody()</code>.</p>
+   <p>Let's make a simple HTML page that greets the user.
     <br>
     Create a file <code>html.sc</code> and paste this code into it:</p>
    <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">scala</span> <span class="hljs-string">"3.7.0"</span>
-<span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">ba.sake::sharaf-undertow:0.10.0</span>
+<span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">ba.sake::sharaf-undertow:0.12.1</span>
 
-<span class="hljs-keyword">import</span> scalatags.<span class="hljs-type">Text</span>.all.*
-<span class="hljs-keyword">import</span> ba.sake.sharaf.*
+<span class="hljs-keyword">import</span> ba.sake.sharaf.{*, <span class="hljs-keyword">given</span>}
 <span class="hljs-keyword">import</span> ba.sake.sharaf.undertow.<span class="hljs-type">UndertowSharafServer</span>
 
 <span class="hljs-keyword">val</span> routes = <span class="hljs-type">Routes</span>:
@@ -75,68 +70,33 @@
 
 println(<span class="hljs-string">s"Server started at http://localhost:8181"</span>)
 
-<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">IndexView</span> </span>= doctype(<span class="hljs-string">"html"</span>)(
-  html(
-    p(<span class="hljs-string">"Welcome!"</span>),
-    a(href := <span class="hljs-string">"/hello/Bob"</span>)(<span class="hljs-string">"Go to /hello/Bob"</span>)
-  )
-)
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">IndexView</span> </span>=
+  html&amp;quot;&amp;quot;&amp;quot;
+    &amp;lt;!<span class="hljs-type">DOCTYPE</span> html&amp;gt;
+    &amp;lt;html lang=&amp;quot;en&amp;quot;&amp;gt;
+    &amp;lt;body&amp;gt;
+    &amp;lt;div&amp;gt;
+        &amp;lt;p&amp;gt;<span class="hljs-type">Welcome</span>!&amp;lt;/p&amp;gt;
+        &amp;lt;a href=&amp;quot;/hello/<span class="hljs-type">Bob</span>&amp;quot;&amp;gt;<span class="hljs-type">Hello</span> world&amp;lt;/a&amp;gt;
+    &amp;lt;/div&amp;gt;
+    &amp;lt;/body&amp;gt;
+    &amp;lt;/html&amp;gt;
+  &amp;quot;&amp;quot;&amp;quot;
 
-<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">HelloView</span></span>(name: <span class="hljs-type">String</span>) = doctype(<span class="hljs-string">"html"</span>)(
-  html(
-    p(<span class="hljs-string">"Welcome!"</span>),
-    div(<span class="hljs-string">"Hello "</span>, b(name), <span class="hljs-string">"!"</span>)
-  )
-)
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">HelloView</span></span>(name: <span class="hljs-type">String</span>) =
+  html&amp;quot;&amp;quot;&amp;quot;
+    &amp;lt;!<span class="hljs-type">DOCTYPE</span> html&amp;gt;
+    &amp;lt;html lang=&amp;quot;en&amp;quot;&amp;gt;
+    &amp;lt;body&amp;gt;
+    &amp;lt;div&amp;gt;
+        <span class="hljs-type">Hello</span> &amp;lt;b&amp;gt;${name}&amp;lt;/b&amp;gt;!
+    &amp;lt;/div&amp;gt;
+    &amp;lt;/body&amp;gt;
+    &amp;lt;/html&amp;gt;
+  &amp;quot;&amp;quot;&amp;quot;
 </code></pre>
    <p>and run it like this:</p>
-   <pre><code class="language-sh hljs language-bash" data-highlighted="yes">scala-cli html.sc 
-</code></pre>
-   <p>Go to <a href="http://localhost:8181">http://localhost:8181</a>
-    <br>
-    to see how it works.</p>
-   <h3 id="hepek-components">Hepek Components<a href="#hepek-components" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h3>
-   <p>Sharaf supports the <a href="https://sake92.github.io/hepek/hepek/components/reference/bundle-reference.html">hepek-components</a> too.
-    <br>
-    Hepek wraps scalatags with helpful utilities like Bootstrap 5 templates, form helpers etc. so you can focus on the important stuff.
-    <br>
-    It is <em>plain scala code</em> as a "template engine", so there is no separate language you need to learn.</p>
-   <hr>
-   <p>Let's make a simple HTML page that greets the user.
-    <br>
-    Create a file <code>html.sc</code> and paste this code into it:</p>
-   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">scala</span> <span class="hljs-string">"3.7.0"</span>
-<span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">ba.sake::sharaf-undertow:0.10.0</span>
-
-<span class="hljs-keyword">import</span> scalatags.<span class="hljs-type">Text</span>.all.*
-<span class="hljs-keyword">import</span> ba.sake.hepek.html.<span class="hljs-type">HtmlPage</span>
-<span class="hljs-keyword">import</span> ba.sake.sharaf.*
-<span class="hljs-keyword">import</span> ba.sake.sharaf.undertow.{*, <span class="hljs-keyword">given</span>}
-
-<span class="hljs-keyword">val</span> routes = <span class="hljs-type">Routes</span>:
-  <span class="hljs-keyword">case</span> <span class="hljs-type">GET</span> -&gt; <span class="hljs-type">Path</span>() =&gt;
-    <span class="hljs-type">Response</span>.withBody(<span class="hljs-type">IndexView</span>)
-  <span class="hljs-keyword">case</span> <span class="hljs-type">GET</span> -&gt; <span class="hljs-type">Path</span>(<span class="hljs-string">"hello"</span>, name) =&gt;
-    <span class="hljs-type">Response</span>.withBody(<span class="hljs-type">HelloView</span>(name))
-
-<span class="hljs-type">UndertowSharafServer</span>(<span class="hljs-string">"localhost"</span>, <span class="hljs-number">8181</span>, routes).start()
-
-println(<span class="hljs-string">s"Server started at http://localhost:8181"</span>)
-
-
-<span class="hljs-class"><span class="hljs-keyword">object</span> <span class="hljs-title">IndexView</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">HtmlPage</span></span>:
-  <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">pageContent</span> </span>= div(
-    p(<span class="hljs-string">"Welcome!"</span>),
-    a(href := <span class="hljs-string">"/hello/Bob"</span>)(<span class="hljs-string">"Hello world"</span>)
-  )
-
-<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">HelloView</span>(<span class="hljs-params">name: <span class="hljs-type">String</span></span>) <span class="hljs-keyword">extends</span> <span class="hljs-title">HtmlPage</span></span>:
-  <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">pageContent</span> </span>=
-    div(<span class="hljs-string">"Hello "</span>, b(name), <span class="hljs-string">"!"</span>)
-
-</code></pre>
-   <p>and run it like this:</p>
-   <pre><code class="language-sh hljs language-bash" data-highlighted="yes">scala-cli html.sc 
+   <pre><code class="language-sh hljs language-bash" data-highlighted="yes">scala html.sc 
 </code></pre>
    <p>Go to <a href="http://localhost:8181">http://localhost:8181</a>
     <br>

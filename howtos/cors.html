@@ -53,12 +53,15 @@
    <p>By default, Sharaf sets no permitted origins.
     <br>
     This means you can only use the API/website from the same domain.</p>
-   <p>If you want to configure it to be available for other domains, use the <code>withCorsSettings</code> method and set desired config:</p>
-   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">import</span> ba.sake.sharaf.handlers.cors.<span class="hljs-type">CorsSettings</span>
-<span class="hljs-keyword">import</span> ba.sake.sharaf.*
+   <p>If you want it to be available for other domains, use the <code>corsSettings</code> parameter to set desired config:</p>
+   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">val</span> corsSettings = <span class="hljs-type">CorsSettings</span>.<span class="hljs-keyword">default</span>.withAllowedOrigins(<span class="hljs-type">Set</span>(<span class="hljs-string">"https://example.com"</span>))
 
-<span class="hljs-keyword">val</span> corsSettings = <span class="hljs-type">CorsSettings</span>.<span class="hljs-keyword">default</span>.withAllowedOrigins(<span class="hljs-type">Set</span>(<span class="hljs-string">"https://example.com"</span>))
-<span class="hljs-type">UndertowSharafServer</span>(routes).withCorsSettings(corsSettings)...
+<span class="hljs-keyword">val</span> server = <span class="hljs-type">UndertowSharafServer</span>(
+    <span class="hljs-string">"localhost"</span>,
+    port,
+    routes,
+    corsSettings = corsSettings
+  )
 </code></pre>
   </main>
   <footer class="pico container flex-centered">

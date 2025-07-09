@@ -51,7 +51,7 @@
    </div>
    <h1 id="exception-handler">Exception Handler<a href="#exception-handler" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
    <p>How to customize the Exception handler?</p>
-   <p>Use the <code>withExceptionMapper</code> on <code>UndertowSharafServer</code>:</p>
+   <p>Use the <code>exceptionMapper</code> parameter of <code>UndertowSharafServer</code>:</p>
    <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">val</span> customExceptionMapper: <span class="hljs-type">ExceptionMapper</span> = {
   <span class="hljs-keyword">case</span> e: <span class="hljs-type">MyException</span> =&gt;
     <span class="hljs-keyword">val</span> errorPage = <span class="hljs-type">MyErrorPage</span>(e.getMessage())
@@ -59,7 +59,13 @@
       .withStatus(<span class="hljs-type">StatusCode</span>.<span class="hljs-type">InternalServerError</span>)
 }
 <span class="hljs-keyword">val</span> finalExceptionMapper = customExceptionMapper.orElse(<span class="hljs-type">ExceptionMapper</span>.<span class="hljs-keyword">default</span>)
-<span class="hljs-keyword">val</span> server = <span class="hljs-type">UndertowSharafServer</span>(routes).withExceptionMapper(finalExceptionMapper)
+
+<span class="hljs-keyword">val</span> server = <span class="hljs-type">UndertowSharafServer</span>(
+    <span class="hljs-string">"localhost"</span>,
+    port,
+    routes,
+    exceptionMapper = finalExceptionMapper
+  )
 </code></pre>
    <p>The <code>ExceptionMapper</code> is a partial function from an exception to <code>Response</code>.
     <br>

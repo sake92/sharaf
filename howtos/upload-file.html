@@ -52,9 +52,9 @@
    <h1 id="upload-file">Upload File<a href="#upload-file" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
    <p>Uploading a file is usually done via <code>multipart/form-data</code> form submission.</p>
    <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">// 1. somewhere in a view, use enctype="multipart/form-data"</span>
-form(action := <span class="hljs-string">"/form-submit"</span>, method := <span class="hljs-string">"POST"</span>, enctype := <span class="hljs-string">"multipart/form-data"</span>)(
-    ...
-)
+&amp;lt;form action=&amp;quot;/form-submit&amp;quot; method=&amp;quot;<span class="hljs-type">POST</span>&amp;quot; enctype=&amp;quot;multipart/form-data&amp;quot;&amp;gt;
+...
+&amp;lt;/form&amp;gt;
 
 <span class="hljs-comment">// 2. define form data class with a NIO Path file</span>
 <span class="hljs-keyword">import</span> java.nio.file.<span class="hljs-type">Path</span>

@@ -55,17 +55,17 @@
     The <code>MyData</code> needs to have a <code>FormDataRW</code> given instance.</p>
    <p>Create a file <code>form_handling.sc</code> and paste this code into it:</p>
    <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">scala</span> <span class="hljs-string">"3.7.0"</span>
-<span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">ba.sake::sharaf-undertow:0.10.0</span>
+<span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">ba.sake::sharaf-undertow:0.12.1</span>
 
-<span class="hljs-keyword">import</span> scalatags.<span class="hljs-type">Text</span>.all.*
 <span class="hljs-keyword">import</span> ba.sake.formson.<span class="hljs-type">FormDataRW</span>
-<span class="hljs-keyword">import</span> ba.sake.sharaf.*
+<span class="hljs-keyword">import</span> ba.sake.sharaf.{*, <span class="hljs-keyword">given</span>}
 <span class="hljs-keyword">import</span> ba.sake.sharaf.undertow.<span class="hljs-type">UndertowSharafServer</span>
 
 <span class="hljs-keyword">val</span> routes = <span class="hljs-type">Routes</span>:
   <span class="hljs-keyword">case</span> <span class="hljs-type">GET</span> -&gt; <span class="hljs-type">Path</span>() =&gt;
     <span class="hljs-type">Response</span>.withBody(<span class="hljs-type">ContactUsView</span>)
   <span class="hljs-keyword">case</span> <span class="hljs-type">POST</span> -&gt; <span class="hljs-type">Path</span>(<span class="hljs-string">"handle-form"</span>) =&gt;
+    <span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ContactUsForm</span>(<span class="hljs-params">fullName: <span class="hljs-type">String</span>, email: <span class="hljs-type">String</span></span>) <span class="hljs-title">derives</span> <span class="hljs-title">FormDataRW</span></span>
     <span class="hljs-keyword">val</span> formData = <span class="hljs-type">Request</span>.current.bodyForm[<span class="hljs-type">ContactUsForm</span>]
     <span class="hljs-type">Response</span>.withBody(<span class="hljs-string">s"Got form data: <span class="hljs-subst">${formData}</span>"</span>)
 
@@ -73,28 +73,26 @@
 
 println(<span class="hljs-string">"Server started at http://localhost:8181"</span>)
 
-
-<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">ContactUsView</span> </span>= doctype(<span class="hljs-string">"html"</span>)(
-  html(
-    body(
-      form(action := <span class="hljs-string">"/handle-form"</span>, method := <span class="hljs-string">"POST"</span>)(
-        div(
-          label(<span class="hljs-string">"Full Name: "</span>, input(name := <span class="hljs-string">"fullName"</span>, autofocus))
-        ),
-        div(
-          label(<span class="hljs-string">"Email: "</span>, input(name := <span class="hljs-string">"email"</span>, tpe := <span class="hljs-string">"email"</span>))
-        ),
-        input(tpe := <span class="hljs-string">"Submit"</span>)
-      )
-    )
-  )
-)
-
-<span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ContactUsForm</span>(<span class="hljs-params">fullName: <span class="hljs-type">String</span>, email: <span class="hljs-type">String</span></span>) <span class="hljs-title">derives</span> <span class="hljs-title">FormDataRW</span></span>
-
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">ContactUsView</span> </span>=
+  html&amp;quot;&amp;quot;&amp;quot;
+    &amp;lt;!<span class="hljs-type">DOCTYPE</span> html&amp;gt;
+    &amp;lt;html&amp;gt;
+    &amp;lt;body&amp;gt;
+        &amp;lt;form action=&amp;quot;/handle-form&amp;quot; method=&amp;quot;<span class="hljs-type">POST</span>&amp;quot;&amp;gt;
+            &amp;lt;div&amp;gt;
+                &amp;lt;label&amp;gt;<span class="hljs-type">Full</span> <span class="hljs-type">Name</span>: &amp;lt;input <span class="hljs-class"><span class="hljs-keyword">type</span><span class="hljs-title">=&amp;quot</span></span>;text&amp;quot; name=&amp;quot;fullName&amp;quot; autofocus&amp;gt;&amp;lt;/label&amp;gt;
+            &amp;lt;/div&amp;gt;
+            &amp;lt;div&amp;gt;
+                &amp;lt;label&amp;gt;<span class="hljs-type">Email</span>: &amp;lt;input <span class="hljs-class"><span class="hljs-keyword">type</span><span class="hljs-title">=&amp;quot</span></span>;email&amp;quot; name=&amp;quot;email&amp;quot;&amp;gt;&amp;lt;/label&amp;gt;
+            &amp;lt;/div&amp;gt;
+            &amp;lt;input <span class="hljs-class"><span class="hljs-keyword">type</span><span class="hljs-title">=&amp;quot</span></span>;submit&amp;quot; value=&amp;quot;<span class="hljs-type">Submit</span>&amp;quot;&amp;gt;
+        &amp;lt;/form&amp;gt;
+    &amp;lt;/body&amp;gt;
+    &amp;lt;/html&amp;gt;
+  &amp;quot;&amp;quot;&amp;quot;
 </code></pre>
    <p>Then run it like this:</p>
-   <pre><code class="language-sh hljs language-bash" data-highlighted="yes">scala-cli form_handling.sc 
+   <pre><code class="language-sh hljs language-bash" data-highlighted="yes">scala form_handling.sc 
 </code></pre>
    <p>Now go to <a href="http://localhost:8181">http://localhost:8181</a> and fill in the page with some data.</p>
    <p>When you click the "Submit" button you will see a response like this:</p>

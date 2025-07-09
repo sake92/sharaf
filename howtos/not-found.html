@@ -51,15 +51,19 @@
    </div>
    <h1 id="notfound">NotFound<a href="#notfound" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
    <p>How to customize 404 NotFound handler?</p>
-   <p>Use the <code>withNotFoundHandler</code> on <code>UndertowSharafServer</code>:</p>
-   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-type">UndertowSharafServer</span>(routes).withNotFoundHandler { req =&gt;
+   <p>Use the <code>notFoundHandler</code> parameter of <code>UndertowSharafServer</code>:</p>
+   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">val</span> customNotFoundHandler: <span class="hljs-type">Request</span> =&gt; <span class="hljs-type">Response</span>[?] = req =&gt;
   <span class="hljs-type">Response</span>.withBody(<span class="hljs-type">MyCustomNotFoundPage</span>)
     .withStatus(<span class="hljs-type">StatusCode</span>.<span class="hljs-type">NotFound</span>)
-}
+
+<span class="hljs-keyword">val</span> server = <span class="hljs-type">UndertowSharafServer</span>(
+    <span class="hljs-string">"localhost"</span>,
+    port,
+    routes,
+    notFoundHandler = customNotFoundHandler
+  )
 </code></pre>
-   <p>The <code>withNotFoundHandler</code> accepts a <code>Request =&gt; Response[?]</code> parameter.
-    <br>
-    You can use the request if you need to dynamically decide on what to return.
+   <p>You can use the request if you need to dynamically decide on what to return.
     <br>
     Or ignore it and return a static not found response.</p>
   </main>
