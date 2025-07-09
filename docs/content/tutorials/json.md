@@ -12,7 +12,7 @@ Let's make a simple JSON API in scala-cli.
 Create a file `json_api.sc` and paste this code into it:
 ```scala
 //> using scala "3.7.0"
-//> using dep ba.sake::sharaf-undertow:0.10.0
+//> using dep ba.sake::sharaf-undertow:0.12.1
 
 import ba.sake.tupson.JsonRW
 import ba.sake.sharaf.*
@@ -63,16 +63,14 @@ Then we add it to the database.
 
 Finally, start up the server:
 ```scala
-UndertowSharafServer("localhost", 8181, routes)
-  .withExceptionMapper(ExceptionMapper.json)
-  .start()
+UndertowSharafServer("localhost", 8181, routes, exceptionMapper = ExceptionMapper.json).start()
 
 println("Server started at http://localhost:8181")
 ```
 
 and run it like this:
 ```sh
-scala-cli json_api.sc 
+scala json_api.sc 
 ```
 
 Then try the following requests:

@@ -9,6 +9,7 @@ val routes = Routes:
   case GET -> Path() =>
     Response.withBody(ContactUsView)
   case POST -> Path("handle-form") =>
+    case class ContactUsForm(fullName: String, email: String) derives FormDataRW
     val formData = Request.current.bodyForm[ContactUsForm]
     Response.withBody(s"Got form data: ${formData}")
 
@@ -33,5 +34,3 @@ def ContactUsView =
     </body>
     </html>
   """
-
-case class ContactUsForm(fullName: String, email: String) derives FormDataRW

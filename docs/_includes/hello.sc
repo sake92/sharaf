@@ -5,8 +5,8 @@ import ba.sake.sharaf.*
 import ba.sake.sharaf.undertow.UndertowSharafServer
 
 val routes = Routes:
-  case GET -> Path() =>
-    Response.withBody("Try /example.js")
+  case GET -> Path("hello", name) =>
+    Response.withBody(s"Hello $name")
 
 UndertowSharafServer("localhost", 8181, routes).start()
 

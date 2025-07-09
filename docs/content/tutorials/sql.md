@@ -33,7 +33,7 @@ Create a file `sql_db.sc` and paste this code into it:
 //> using scala "3.7.0"
 //> using dep org.postgresql:postgresql:42.7.5
 //> using dep com.zaxxer:HikariCP:6.3.0
-//> using dep ba.sake::sharaf-undertow:0.10.0
+//> using dep ba.sake::sharaf-undertow:0.12.1
 //> using dep ba.sake::squery:0.7.0
 
 import ba.sake.tupson.JsonRW
@@ -88,7 +88,7 @@ println(s"Server started at http://localhost:8181")
 
 and run it like this:
 ```sh
-scala-cli sql_db.sc 
+scala sql_db.sc 
 ```
 
 Then you can try the following requests:

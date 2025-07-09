@@ -9,27 +9,12 @@ Path parameters can be extracted from the `Path(segments: Seq[String])` argument
 
 Create a file `path_params.sc` and paste this code into it:
 ```scala
-//> using scala "3.7.0"
-//> using dep ba.sake::sharaf-undertow:0.10.0
-
-import ba.sake.sharaf.*
-import ba.sake.sharaf.undertow.UndertowSharafServer
-
-val routes = Routes:
-  case GET -> Path("string", x) =>
-    Response.withBody(s"string = ${x}")
-
-  case GET -> Path("int", param[Int](x)) =>
-    Response.withBody(s"int = ${x}")
-
-UndertowSharafServer("localhost", 8181, routes).start()
-
-println(s"Server started at http://localhost:8181")
+{% include "path_params.sc" %}
 ```
 
 Then run it like this:
 ```sh
-scala-cli path_params.sc 
+scala path_params.sc 
 ```
 
 ---
