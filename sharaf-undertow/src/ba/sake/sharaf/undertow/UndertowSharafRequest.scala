@@ -49,7 +49,7 @@ final class UndertowSharafRequest(val underlyingHttpServerExchange: HttpServerEx
         val uFormData = parser.parseBlocking()
         UndertowSharafRequest.undertowFormData2FormsonMap(uFormData)
 
-  override def toString(): String = 
+  override def toString(): String =
     s"UndertowSharafRequest(headers=${headers}, cookies=${cookies}, queryParamsRaw=${queryParamsRaw}, bodyString=...)"
 }
 

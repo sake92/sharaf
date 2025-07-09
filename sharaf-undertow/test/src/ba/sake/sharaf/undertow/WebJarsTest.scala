@@ -13,14 +13,14 @@ class WebJarsTest extends munit.FunSuite {
   val routes = Routes { case GET -> Path() =>
     Response.withBody("WebJars!")
   }
-  
+
   val server = UndertowSharafServer("localhost", port, routes)
-  
+
   override def beforeAll(): Unit = server.start()
 
   override def afterAll(): Unit = server.stop()
-  
-   // WebJars
+
+  // WebJars
   test("WebJars should work") {
     val res = quickRequest.get(uri"${baseUrl}/jquery/3.7.1/jquery.js").send()
     assertEquals(res.headers(HeaderNames.ContentType), Seq("application/javascript"))

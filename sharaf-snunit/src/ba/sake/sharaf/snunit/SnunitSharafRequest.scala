@@ -21,11 +21,13 @@ class SnunitSharafRequest(underlyingRequest: SnunitRequest) extends Request {
 
   /* *** QUERY *** */
   override lazy val queryParamsRaw: QueryStringMap =
-    underlyingRequest.query.split("&").flatMap( _.split("=") match {
-      case Array(key, value) => Seq(key -> Seq(value))
-      case _        => Seq.empty
-    })
-    .toMap
+    underlyingRequest.query
+      .split("&")
+      .flatMap(_.split("=") match {
+        case Array(key, value) => Seq(key -> Seq(value))
+        case _                 => Seq.empty
+      })
+      .toMap
 
   /* *** BODY *** */
   override lazy val bodyString: String =

@@ -1,7 +1,5 @@
 # TODO
 
-- some kind of middleware mechanism
-
 - MiMa bin compat
 
 - add more validators https://javaee.github.io/javaee-spec/javadocs/javax/validation/constraints/package-summary.html

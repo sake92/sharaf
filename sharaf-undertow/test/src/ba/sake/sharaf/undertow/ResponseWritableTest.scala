@@ -141,21 +141,6 @@ class ResponseWritableTest extends munit.FunSuite {
     assertEquals(res.headers(HeaderNames.ContentType), Seq("application/xml; charset=utf-8"))
   }
 
-  test("Write response scalatags Frag") {
-    val res = quickRequest.get(uri"${baseUrl}/scalatags/frag").send()
-    assertEquals(res.body, """ <div>this is a div</div> """.trim)
-    assertEquals(res.headers(HeaderNames.ContentType), Seq("text/html; charset=utf-8"))
-  }
-
-  test("Write response scalatags doctype") {
-    val res = quickRequest.get(uri"${baseUrl}/scalatags/doctype").send()
-    assertEquals(
-      res.body,
-      """ <!DOCTYPE html><html><head><title>doctype title</title></head><body>this is doctype body</body></html> """.trim
-    )
-    assertEquals(res.headers(HeaderNames.ContentType), Seq("text/html; charset=utf-8"))
-  }
-
   test("Write response hepek HtmlPage") {
     val res = quickRequest.get(uri"${baseUrl}/hepek/htmlpage").send()
     assertEquals(
