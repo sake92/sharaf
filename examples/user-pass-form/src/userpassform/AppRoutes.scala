@@ -1,11 +1,14 @@
 package userpassform
 
 import ba.sake.sharaf.{*, given}
+import ba.sake.querson.QueryStringRW
 
 class AppRoutes(callbackUrl: String, securityService: SecurityService) {
   val routes = Routes {
     case GET -> Path("login-form") =>
-      Response.withBody(views.showForm(callbackUrl))
+      case class QP(username: String = "", error: Option[String]) derives QueryStringRW
+      val qp = Request.current.queryParams[QP]
+      Response.withBody(views.showForm(callbackUrl, qp.error.nonEmpty, qp.username))
     case GET -> Path("protected-resource") =>
       securityService.withCurrentUser {
         Response.withBody(views.protectedResource)
@@ -58,7 +61,7 @@ object views {
       </html>
     """
 
-  def showForm(callbackUrl: String) =
+  def showForm(callbackUrl: String, isError: Boolean, username: String) =
     html"""
       <!DOCTYPE html>
       <html>
@@ -66,15 +69,16 @@ object views {
       <div>
           <form action="${callbackUrl}?client_name=FormClient" method="POST">
             <label>Username
-              <input type="text" name="username">
+              <input type="text" name="username" value="${username}" required minlength="3">
             </label>
             <label>Password
-              <input type="text" name="password">
+              <input type="text" name="password" required minlength="8">
             </label>
             <input type="submit" value="Login">
           </form>
+          ${if isError then html"<div style='background:orange'>Login failed, please try again.</div>" else ""}
           <div>
-          Use johndoe/johndoe as username/password to login.
+          Use john_doe/john_doe as username/password to login.
           </div>
       </div>
       </body>
