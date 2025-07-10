@@ -54,7 +54,7 @@
     <br>
     The <code>MyData</code> needs to have a <code>FormDataRW</code> given instance.</p>
    <p>Create a file <code>form_handling.sc</code> and paste this code into it:</p>
-   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">scala</span> <span class="hljs-string">"3.7.0"</span>
+   <pre>            <code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">scala</span> <span class="hljs-string">"3.7.0"</span>
 <span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">ba.sake::sharaf-undertow:0.13.0</span>
 
 <span class="hljs-keyword">import</span> ba.sake.formson.<span class="hljs-type">FormDataRW</span>
@@ -74,30 +74,34 @@
 println(<span class="hljs-string">"Server started at http://localhost:8181"</span>)
 
 <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">ContactUsView</span> </span>=
-  html&amp;quot;&amp;quot;&amp;quot;
-    &amp;lt;!<span class="hljs-type">DOCTYPE</span> html&amp;gt;
-    &amp;lt;html&amp;gt;
-    &amp;lt;body&amp;gt;
-        &amp;lt;form action=&amp;quot;/handle-form&amp;quot; method=&amp;quot;<span class="hljs-type">POST</span>&amp;quot;&amp;gt;
-            &amp;lt;div&amp;gt;
-                &amp;lt;label&amp;gt;<span class="hljs-type">Full</span> <span class="hljs-type">Name</span>: &amp;lt;input <span class="hljs-class"><span class="hljs-keyword">type</span><span class="hljs-title">=&amp;quot</span></span>;text&amp;quot; name=&amp;quot;fullName&amp;quot; autofocus&amp;gt;&amp;lt;/label&amp;gt;
-            &amp;lt;/div&amp;gt;
-            &amp;lt;div&amp;gt;
-                &amp;lt;label&amp;gt;<span class="hljs-type">Email</span>: &amp;lt;input <span class="hljs-class"><span class="hljs-keyword">type</span><span class="hljs-title">=&amp;quot</span></span>;email&amp;quot; name=&amp;quot;email&amp;quot;&amp;gt;&amp;lt;/label&amp;gt;
-            &amp;lt;/div&amp;gt;
-            &amp;lt;input <span class="hljs-class"><span class="hljs-keyword">type</span><span class="hljs-title">=&amp;quot</span></span>;submit&amp;quot; value=&amp;quot;<span class="hljs-type">Submit</span>&amp;quot;&amp;gt;
-        &amp;lt;/form&amp;gt;
-    &amp;lt;/body&amp;gt;
-    &amp;lt;/html&amp;gt;
-  &amp;quot;&amp;quot;&amp;quot;
-</code></pre>
+  <span class="hljs-string">html""</span><span class="hljs-string">"
+    &lt;!DOCTYPE html&gt;
+    &lt;html&gt;
+    &lt;body&gt;
+        &lt;form action="</span>/handle-<span class="hljs-string">form" method="</span><span class="hljs-type">POST</span><span class="hljs-string">"&gt;
+            &lt;div&gt;
+                &lt;label&gt;Full Name: &lt;input type="</span><span class="hljs-string">text" name="</span>fullN<span class="hljs-string">ame" autofocus&gt;&lt;/label&gt;
+            &lt;/div&gt;
+            &lt;div&gt;
+                &lt;label&gt;Email: &lt;input type="</span><span class="hljs-string">email" name="</span><span class="hljs-string">email"&gt;&lt;/label&gt;
+            &lt;/div&gt;
+            &lt;input type="</span><span class="hljs-string">submit" value="</span><span class="hljs-type">Submit</span><span class="hljs-string">"&gt;
+        &lt;/form&gt;
+    &lt;/body&gt;
+    &lt;/html&gt;
+  "</span><span class="hljs-string">""</span>
+
+</code>
+          </pre>
    <p>Then run it like this:</p>
-   <pre><code class="language-sh hljs language-bash" data-highlighted="yes">scala form_handling.sc 
-</code></pre>
+   <pre>            <code class="language-sh hljs language-bash" data-highlighted="yes">scala form_handling.sc 
+</code>
+          </pre>
    <p>Now go to <a href="http://localhost:8181">http://localhost:8181</a> and fill in the page with some data.</p>
    <p>When you click the "Submit" button you will see a response like this:</p>
-   <pre><code class="language- hljs language-less" data-highlighted="yes"><span class="hljs-selector-tag">Got</span> <span class="hljs-selector-tag">form</span> <span class="hljs-selector-tag">data</span>: <span class="hljs-selector-tag">ContactUsForm</span>(Bob,bob<span class="hljs-variable">@example</span>.com)
-</code></pre>
+   <pre>            <code class="language- hljs language-less" data-highlighted="yes"><span class="hljs-selector-tag">Got</span> <span class="hljs-selector-tag">form</span> <span class="hljs-selector-tag">data</span>: <span class="hljs-selector-tag">ContactUsForm</span>(Bob,bob<span class="hljs-variable">@example</span>.com)
+</code>
+          </pre>
   </main>
   <footer class="pico container flex-centered">
    <a href="https://github.com/sake92/sharaf"> <!--?xml version="1.0" encoding="utf-8"?--><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools --> 

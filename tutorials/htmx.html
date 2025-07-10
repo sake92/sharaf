@@ -60,7 +60,7 @@
    <p>Let's make a simple page that triggers a POST request to fetch a HTML snippet.
     <br>
     Create a file <code>htmx_load_snippet.sc</code> and paste this code into it:</p>
-   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">scala</span> <span class="hljs-string">"3.7.0"</span>
+   <pre>            <code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">scala</span> <span class="hljs-string">"3.7.0"</span>
 <span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">ba.sake::sharaf-undertow:0.13.0</span>
 
 <span class="hljs-keyword">import</span> ba.sake.sharaf.{*, <span class="hljs-keyword">given</span>}
@@ -71,34 +71,36 @@
     <span class="hljs-type">Response</span>.withBody(<span class="hljs-type">IndexView</span>)
   <span class="hljs-keyword">case</span> <span class="hljs-type">POST</span> -&gt; <span class="hljs-type">Path</span>(<span class="hljs-string">"html-snippet"</span>) =&gt;
     <span class="hljs-type">Response</span>.withBody:
-      html&amp;quot;&amp;quot;&amp;quot;
-        &amp;lt;div&amp;gt;
-        &amp;lt;b&amp;gt;<span class="hljs-type">WOW</span>, it works! 😲&amp;lt;/b&amp;gt;
-        &amp;lt;div&amp;gt;<span class="hljs-type">Look</span> ma, no <span class="hljs-type">JS</span>! 😎&amp;lt;/div&amp;gt;
-        &amp;lt;/div&amp;gt;
-      &amp;quot;&amp;quot;&amp;quot;
+      <span class="hljs-string">html""</span><span class="hljs-string">"
+        &lt;div&gt;
+        &lt;b&gt;WOW, it works! 😲&lt;/b&gt;
+        &lt;div&gt;Look ma, no JS! 😎&lt;/div&gt;
+        &lt;/div&gt;
+      "</span><span class="hljs-string">""</span>
 
 <span class="hljs-type">UndertowSharafServer</span>(<span class="hljs-string">"localhost"</span>, <span class="hljs-number">8181</span>, routes).start()
 
 println(<span class="hljs-string">s"Server started at http://localhost:8181"</span>)
 
 <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">IndexView</span> </span>=
-  html&amp;quot;&amp;quot;&amp;quot;
-    &amp;lt;!<span class="hljs-type">DOCTYPE</span> html&amp;gt;
-    &amp;lt;html&amp;gt;
-    &amp;lt;head&amp;gt;
-      &amp;lt;script src=&amp;quot;https:<span class="hljs-comment">//unpkg.com/htmx.org@2.0.4&amp;quot;&amp;gt;&amp;lt;/script&amp;gt;</span>
-    &amp;lt;/head&amp;gt;
-    &amp;lt;body&amp;gt;
-      &amp;lt;button hx-post=&amp;quot;/html-snippet&amp;quot; hx-swap=&amp;quot;outerHTML&amp;quot;&amp;gt;<span class="hljs-type">Click</span> here!&amp;lt;/button&amp;gt;
-    &amp;lt;/body&amp;gt;
-    &amp;lt;/html&amp;gt;
-  &amp;quot;&amp;quot;&amp;quot;
+  <span class="hljs-string">html""</span><span class="hljs-string">"
+    &lt;!DOCTYPE html&gt;
+    &lt;html&gt;
+    &lt;head&gt;
+      &lt;script src="</span>https:<span class="hljs-comment">//unpkg.com/htmx.org@2.0.4"&gt;&lt;/script&gt;</span>
+    &lt;/head&gt;
+    &lt;body&gt;
+      &lt;button hx-post=<span class="hljs-string">"/html-snippet"</span> hx-swap=<span class="hljs-string">"outerHTML"</span>&gt;<span class="hljs-type">Click</span> here!&lt;/button&gt;
+    &lt;/body&gt;
+    &lt;/html&gt;
+  <span class="hljs-string">"""
 
-</code></pre>
+</span></code>
+          </pre>
    <p>and run it like this:</p>
-   <pre><code class="language-sh hljs language-bash" data-highlighted="yes">scala html.sc 
-</code></pre>
+   <pre>            <code class="language-sh hljs language-bash" data-highlighted="yes">scala htmx_load_snippet.sc 
+</code>
+          </pre>
    <p>Go to <a href="http://localhost:8181">http://localhost:8181</a>
     <br>
     to see how it works.</p>

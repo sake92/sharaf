@@ -53,7 +53,7 @@
    <p>The <a href="https://github.com/lightbend/config">typesafe config</a> library is already included in Sharaf.
     <br>
     Also included is the <a href="https://sake92.github.io/tupson/tutorials/parsing-config.html#usage-1">tupson-config</a> which simplifies the process:</p>
-   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">import</span> java.net.<span class="hljs-type">URL</span>
+   <pre>            <code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">import</span> java.net.<span class="hljs-type">URL</span>
 <span class="hljs-keyword">import</span> com.typesafe.config.<span class="hljs-type">ConfigFactory</span>
 <span class="hljs-keyword">import</span> ba.sake.tupson.{<span class="hljs-keyword">given</span>, *}
 <span class="hljs-keyword">import</span> ba.sake.tupson.config.*
@@ -74,7 +74,8 @@
 
 <span class="hljs-keyword">val</span> myConf = rawConfig.parseConfig[<span class="hljs-type">MyConf</span>]
 <span class="hljs-comment">// MyConf(7777,http://example.com,str,List(a, b, c))</span>
-</code></pre>
+</code>
+          </pre>
   </main>
   <footer class="pico container flex-centered">
    <a href="https://github.com/sake92/sharaf"> <!--?xml version="1.0" encoding="utf-8"?--><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools --> 

@@ -53,7 +53,7 @@
    <p>Let's make a Hello World example with scala-cli.
     <br>
     Create a file <code>hello.sc</code> and paste this code into it:</p>
-   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">scala</span> <span class="hljs-string">"3.7.0"</span>
+   <pre>            <code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">scala</span> <span class="hljs-string">"3.7.0"</span>
 <span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">ba.sake::sharaf-undertow:0.13.0</span>
 
 <span class="hljs-keyword">import</span> ba.sake.sharaf.*
@@ -67,10 +67,12 @@
 
 println(<span class="hljs-string">s"Server started at http://localhost:8181"</span>)
 
-</code></pre>
+</code>
+          </pre>
    <p>Then run it like this:</p>
-   <pre><code class="language-sh hljs language-bash" data-highlighted="yes">scala hello.sc 
-</code></pre>
+   <pre>            <code class="language-sh hljs language-bash" data-highlighted="yes">scala hello.sc 
+</code>
+          </pre>
    <p>Go to <a href="http://localhost:8181/hello/Bob">http://localhost:8181/hello/Bob</a>.
     <br>
     You will see a "Hello Bob" text response.</p>

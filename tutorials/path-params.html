@@ -52,7 +52,7 @@
    <h1 id="path-params">Path Params<a href="#path-params" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
    <p>Path parameters can be extracted from the <code>Path(segments: Seq[String])</code> argument.</p>
    <p>Create a file <code>path_params.sc</code> and paste this code into it:</p>
-   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">scala</span> <span class="hljs-string">"3.7.0"</span>
+   <pre>            <code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">scala</span> <span class="hljs-string">"3.7.0"</span>
 <span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">ba.sake::sharaf-undertow:0.13.0</span>
 
 <span class="hljs-keyword">import</span> ba.sake.sharaf.*
@@ -69,10 +69,12 @@
 
 println(<span class="hljs-string">s"Server started at http://localhost:8181"</span>)
 
-</code></pre>
+</code>
+          </pre>
    <p>Then run it like this:</p>
-   <pre><code class="language-sh hljs language-bash" data-highlighted="yes">scala path_params.sc 
-</code></pre>
+   <pre>            <code class="language-sh hljs language-bash" data-highlighted="yes">scala path_params.sc 
+</code>
+          </pre>
    <hr>
    <p>Now go to <a href="http://localhost:8181/string/abc">http://localhost:8181/string/abc</a> and you will get the param returned: <code>string = abc</code>.</p>
    <p>When you go to <a href="http://localhost:8181/int/123">http://localhost:8181/int/123</a>,

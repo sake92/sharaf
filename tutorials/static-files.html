@@ -63,7 +63,7 @@
     <br>
     Put this text into it: <code>console.log('Hello Sharaf!');</code>.</p>
    <p>Now create a file <code>static_files.sc</code> and paste this code into it:</p>
-   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">scala</span> <span class="hljs-string">"3.7.0"</span>
+   <pre>            <code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">scala</span> <span class="hljs-string">"3.7.0"</span>
 <span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">ba.sake::sharaf-undertow:0.13.0</span>
 
 <span class="hljs-keyword">import</span> ba.sake.sharaf.*
@@ -77,10 +77,12 @@
 
 println(<span class="hljs-string">s"Server started at http://localhost:8181"</span>)
 
-</code></pre>
+</code>
+          </pre>
    <p>and run it like this:</p>
-   <pre><code class="language-sh hljs language-bash" data-highlighted="yes">scala static_files.sc  --resource-dir resources
-</code></pre>
+   <pre>            <code class="language-sh hljs language-bash" data-highlighted="yes">scala static_files.sc  --resource-dir resources
+</code>
+          </pre>
    <p>Go to <a href="http://localhost:8181/example.js">http://localhost:8181/example.js</a>.
     <br>
     You will see the <code>example.js</code> contents served.</p>

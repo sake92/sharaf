@@ -55,7 +55,6 @@ import Fuse from 'https://cdn.jsdelivr.net/npm/fuse.js@7.1.0/dist/fuse.mjs'
 
 const urlParams = new URLSearchParams(window.location.search);
 const qParam = urlParams.get('q');
-
     
 const entries = await fetch('https://sake92.github.io/sharaf/search/entries.json').then(r => r.json());
 console.log("All entries: ", entries);
@@ -63,12 +62,11 @@ console.log("All entries: ", entries);
 
 const fuse = new Fuse(entries, {
     keys: [
-        { name: 'title', weight: 2  },
-        { name: 'text',  weight: 1 }
+        { name: 'title' },
+        { name: 'text' }
     ],
     includeMatches: true,
-    minMatchCharLength: 2,
-    threshold: 0.5,
+    
 });
 
 const searchRes = fuse.search(qParam);

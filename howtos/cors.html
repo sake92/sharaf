@@ -54,7 +54,7 @@
     <br>
     This means you can only use the API/website from the same domain.</p>
    <p>If you want it to be available for other domains, use the <code>corsSettings</code> parameter to set desired config:</p>
-   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">val</span> corsSettings = <span class="hljs-type">CorsSettings</span>.<span class="hljs-keyword">default</span>.withAllowedOrigins(<span class="hljs-type">Set</span>(<span class="hljs-string">"https://example.com"</span>))
+   <pre>            <code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">val</span> corsSettings = <span class="hljs-type">CorsSettings</span>.<span class="hljs-keyword">default</span>.withAllowedOrigins(<span class="hljs-type">Set</span>(<span class="hljs-string">"https://example.com"</span>))
 
 <span class="hljs-keyword">val</span> server = <span class="hljs-type">UndertowSharafServer</span>(
     <span class="hljs-string">"localhost"</span>,
@@ -62,7 +62,8 @@
     routes,
     corsSettings = corsSettings
   )
-</code></pre>
+</code>
+          </pre>
   </main>
   <footer class="pico container flex-centered">
    <a href="https://github.com/sake92/sharaf"> <!--?xml version="1.0" encoding="utf-8"?--><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools --> 

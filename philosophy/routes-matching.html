@@ -67,7 +67,7 @@
    </ul>
    <h2 id="why-not-annotations">Why not annotations?<a href="#why-not-annotations" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
    <p>Let's see an example:</p>
-   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-meta">@GetMapping</span>(value = <span class="hljs-string">"/student/{studentId}"</span>)
+   <pre>            <code class="language-scala hljs" data-highlighted="yes"><span class="hljs-meta">@GetMapping</span>(value = <span class="hljs-string">"/student/{studentId}"</span>)
 public <span class="hljs-type">Student</span> studentData1(<span class="hljs-meta">@PathVariable</span> <span class="hljs-type">Integer</span> studentId) {}
 
 <span class="hljs-meta">@GetMapping</span>(value = <span class="hljs-string">"/student/{studentId}"</span>)
@@ -75,7 +75,8 @@ public <span class="hljs-type">Student</span> studentData2(<span class="hljs-met
 
 <span class="hljs-meta">@GetMapping</span>(value = <span class="hljs-string">"/student/umm"</span>)
 public <span class="hljs-type">Student</span> studentData3(<span class="hljs-meta">@PathVariable</span> <span class="hljs-type">Integer</span> studentId) {}
-</code></pre>
+</code>
+          </pre>
    <p>Issues:</p>
    <ul>
     <li>the <code>studentId</code> appears in 2 places, you can make a typo and nothing will work.</li>
@@ -96,17 +97,19 @@ public <span class="hljs-type">Student</span> studentData3(<span class="hljs-met
     Scala's pattern matching warns you when you have <em>duplicate routes</em>, or <em>impossible</em> routes.
     <br>
     For example, if you write this:</p>
-   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">case</span> <span class="hljs-type">GET</span> -&gt; <span class="hljs-type">Path</span>(<span class="hljs-string">"cars"</span>, brand) =&gt; ???
+   <pre>            <code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">case</span> <span class="hljs-type">GET</span> -&gt; <span class="hljs-type">Path</span>(<span class="hljs-string">"cars"</span>, brand) =&gt; ???
 <span class="hljs-keyword">case</span> <span class="hljs-type">GET</span> -&gt; <span class="hljs-type">Path</span>(<span class="hljs-string">"cars"</span>, model) =&gt; ??? <span class="hljs-comment">// Unreachable case</span>
 
 <span class="hljs-keyword">case</span> <span class="hljs-type">GET</span> -&gt; <span class="hljs-type">Path</span>(<span class="hljs-string">"files"</span>, segments*) =&gt; ???
 <span class="hljs-keyword">case</span> <span class="hljs-type">GET</span> -&gt; <span class="hljs-type">Path</span>(<span class="hljs-string">"files"</span>, <span class="hljs-string">"abc.txt"</span>) =&gt; ??? <span class="hljs-comment">// Unreachable case</span>
-</code></pre>
+</code>
+          </pre>
    <p>you will get nice warnings, thanks compiler!</p>
    <hr>
    <p>You can extract path variables with pattern matching:</p>
-   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">case</span> <span class="hljs-type">GET</span> -&gt; <span class="hljs-type">Path</span>(<span class="hljs-string">"cars"</span>, param[<span class="hljs-type">Int</span>](carId)) =&gt; ???
-</code></pre>
+   <pre>            <code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">case</span> <span class="hljs-type">GET</span> -&gt; <span class="hljs-type">Path</span>(<span class="hljs-string">"cars"</span>, param[<span class="hljs-type">Int</span>](carId)) =&gt; ???
+</code>
+          </pre>
    <p>Here, the <code>carId</code> is parsed as <code>Int</code> and it <em>mentioned only once</em>, unlike with the annotation approach.</p>
   </main>
   <footer class="pico container flex-centered">

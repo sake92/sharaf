@@ -61,30 +61,34 @@
    <p>Sharaf needs a <code>QueryStringRW[T]</code> instance for query params.
     <br>
     It can automatically derive an instance for singleton enums:</p>
-   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">enum</span> <span class="hljs-type">Cloud</span> derives <span class="hljs-type">QueryStringRW</span>:
+   <pre>            <code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">enum</span> <span class="hljs-type">Cloud</span> derives <span class="hljs-type">QueryStringRW</span>:
   <span class="hljs-keyword">case</span> aws, gcp, azure
 
 <span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyQueryParams</span>(<span class="hljs-params">
   cloud: <span class="hljs-type">Cloud</span>
 </span>) <span class="hljs-title">derives</span> <span class="hljs-title">QueryStringRW</span></span>
-</code></pre>
+</code>
+          </pre>
    <h2 id="how-to-bind-optional-query-parameter">How to bind optional query parameter?<a href="#how-to-bind-optional-query-parameter" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
    <p>The first option is to set the parameter to <code>Option[T]</code>:</p>
-   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyQP</span>(<span class="hljs-params">mandatory: <span class="hljs-type">String</span>, opt: <span class="hljs-type">Option</span>[<span class="hljs-type">Int</span>]</span>) <span class="hljs-title">derives</span> <span class="hljs-title">QueryStringRW</span></span>
-</code></pre>
+   <pre>            <code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyQP</span>(<span class="hljs-params">mandatory: <span class="hljs-type">String</span>, opt: <span class="hljs-type">Option</span>[<span class="hljs-type">Int</span>]</span>) <span class="hljs-title">derives</span> <span class="hljs-title">QueryStringRW</span></span>
+</code>
+          </pre>
    <p>If you make a request with params <code>?mandatory=abc</code>, <code>opt</code> will have value of <code>None</code>.</p>
    <hr>
    <p>The second option is to set the parameter to some default value:</p>
-   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyQP2</span>(<span class="hljs-params">mandatory: <span class="hljs-type">String</span>, opt: <span class="hljs-type">Int</span> = 42</span>) <span class="hljs-title">derives</span> <span class="hljs-title">QueryStringRW</span></span>
-</code></pre>
+   <pre>            <code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyQP2</span>(<span class="hljs-params">mandatory: <span class="hljs-type">String</span>, opt: <span class="hljs-type">Int</span> = 42</span>) <span class="hljs-title">derives</span> <span class="hljs-title">QueryStringRW</span></span>
+</code>
+          </pre>
    <p>Here if you make a request with params <code>?mandatory=abc</code> the <code>opt</code> will have value of <code>42</code>.</p>
    <blockquote>
     <p>Note that you need the <code>-Yretain-trees</code> scalac flag turned on, otherwise it won't work!</p>
    </blockquote>
    <h2 id="how-to-bind-sequence-query-parameter">How to bind sequence query parameter?<a href="#how-to-bind-sequence-query-parameter" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
    <p>Set the parameter to <code>Seq[T]</code>:</p>
-   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyQP</span>(<span class="hljs-params">seq: <span class="hljs-type">Seq</span>[<span class="hljs-type">Int</span>]</span>) <span class="hljs-title">derives</span> <span class="hljs-title">QueryStringRW</span></span>
-</code></pre>
+   <pre>            <code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyQP</span>(<span class="hljs-params">seq: <span class="hljs-type">Seq</span>[<span class="hljs-type">Int</span>]</span>) <span class="hljs-title">derives</span> <span class="hljs-title">QueryStringRW</span></span>
+</code>
+          </pre>
    <p>Let's consider a few possible requests with these query params:</p>
    <ul>
     <li><code>?</code> (empty) -&gt; <code>seq</code> will be empty <code>Seq()</code></li>
@@ -94,9 +98,10 @@
    </ul>
    <h2 id="how-to-bind-composite-query-parameter">How to bind composite query parameter?<a href="#how-to-bind-composite-query-parameter" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
    <p>You can make a common query params class and use it in multiple top-level query params, or standalone:</p>
-   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">PageQP</span>(<span class="hljs-params">page: <span class="hljs-type">Int</span>, size: <span class="hljs-type">Int</span></span>) <span class="hljs-title">derives</span> <span class="hljs-title">QueryStringRW</span></span>
+   <pre>            <code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">PageQP</span>(<span class="hljs-params">page: <span class="hljs-type">Int</span>, size: <span class="hljs-type">Int</span></span>) <span class="hljs-title">derives</span> <span class="hljs-title">QueryStringRW</span></span>
 <span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyQP</span>(<span class="hljs-params">q: <span class="hljs-type">String</span>, p: <span class="hljs-type">PageQP</span></span>) <span class="hljs-title">derives</span> <span class="hljs-title">QueryStringRW</span></span>
-</code></pre>
+</code>
+          </pre>
    <p>Sharaf is quite lenient when parsing the query parameters, so all these combinations will work:</p>
    <ul>
     <li><code>?q=abc&amp;p.page=0&amp;p.size=10</code> -&gt; object style</li>
@@ -105,7 +110,7 @@
    </ul>
    <h2 id="how-to-bind-a-custom-query-parameter">How to bind a custom query parameter?<a href="#how-to-bind-a-custom-query-parameter" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
    <p>When you want to handle a custom <em>scalar</em> value in query params, you need to implement a <code>QueryStringRW[T]</code> instance manually:</p>
-   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">import</span> ba.sake.querson.*
+   <pre>            <code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">import</span> ba.sake.querson.*
 
 <span class="hljs-keyword">given</span> <span class="hljs-type">QueryStringRW</span>[<span class="hljs-type">MyType</span>] <span class="hljs-keyword">with</span> {
   <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">write</span></span>(path: <span class="hljs-type">String</span>, value: <span class="hljs-type">MyType</span>): <span class="hljs-type">QueryStringData</span> =
@@ -118,12 +123,14 @@
 
 <span class="hljs-keyword">private</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">typeError</span></span>(path: <span class="hljs-type">String</span>, tpe: <span class="hljs-type">String</span>, value: <span class="hljs-type">Any</span>): <span class="hljs-type">Nothing</span> =
   <span class="hljs-keyword">throw</span> <span class="hljs-type">ParsingException</span>(<span class="hljs-type">ParseError</span>(path, <span class="hljs-string">s"invalid \$tpe"</span>, <span class="hljs-type">Some</span>(value)))
-</code></pre>
+</code>
+          </pre>
    <p>Then you can use it:</p>
-   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyQueryParams</span>(<span class="hljs-params">
+   <pre>            <code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyQueryParams</span>(<span class="hljs-params">
   myType: <span class="hljs-type">MyType</span>
 </span>) <span class="hljs-title">derives</span> <span class="hljs-title">QueryStringRW</span></span>
-</code></pre>
+</code>
+          </pre>
    <hr>
    <p>Note that Sharaf can automatically derive an instance for singleton enums.</p>
   </main>

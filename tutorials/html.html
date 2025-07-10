@@ -54,7 +54,7 @@
    <p>Let's make a simple HTML page that greets the user.
     <br>
     Create a file <code>html.sc</code> and paste this code into it:</p>
-   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">scala</span> <span class="hljs-string">"3.7.0"</span>
+   <pre>            <code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">scala</span> <span class="hljs-string">"3.7.0"</span>
 <span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">ba.sake::sharaf-undertow:0.13.0</span>
 
 <span class="hljs-keyword">import</span> ba.sake.sharaf.{*, <span class="hljs-keyword">given</span>}
@@ -71,33 +71,36 @@
 println(<span class="hljs-string">s"Server started at http://localhost:8181"</span>)
 
 <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">IndexView</span> </span>=
-  html&amp;quot;&amp;quot;&amp;quot;
-    &amp;lt;!<span class="hljs-type">DOCTYPE</span> html&amp;gt;
-    &amp;lt;html lang=&amp;quot;en&amp;quot;&amp;gt;
-    &amp;lt;body&amp;gt;
-    &amp;lt;div&amp;gt;
-        &amp;lt;p&amp;gt;<span class="hljs-type">Welcome</span>!&amp;lt;/p&amp;gt;
-        &amp;lt;a href=&amp;quot;/hello/<span class="hljs-type">Bob</span>&amp;quot;&amp;gt;<span class="hljs-type">Hello</span> world&amp;lt;/a&amp;gt;
-    &amp;lt;/div&amp;gt;
-    &amp;lt;/body&amp;gt;
-    &amp;lt;/html&amp;gt;
-  &amp;quot;&amp;quot;&amp;quot;
+  <span class="hljs-string">html""</span><span class="hljs-string">"
+    &lt;!DOCTYPE html&gt;
+    &lt;html lang="</span><span class="hljs-string">en"&gt;
+    &lt;body&gt;
+    &lt;div&gt;
+        &lt;p&gt;Welcome!&lt;/p&gt;
+        &lt;a href="</span>/hello/<span class="hljs-type">Bob</span><span class="hljs-string">"&gt;Hello world&lt;/a&gt;
+    &lt;/div&gt;
+    &lt;/body&gt;
+    &lt;/html&gt;
+  "</span><span class="hljs-string">""</span>
 
 <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">HelloView</span></span>(name: <span class="hljs-type">String</span>) =
-  html&amp;quot;&amp;quot;&amp;quot;
-    &amp;lt;!<span class="hljs-type">DOCTYPE</span> html&amp;gt;
-    &amp;lt;html lang=&amp;quot;en&amp;quot;&amp;gt;
-    &amp;lt;body&amp;gt;
-    &amp;lt;div&amp;gt;
-        <span class="hljs-type">Hello</span> &amp;lt;b&amp;gt;${name}&amp;lt;/b&amp;gt;!
-    &amp;lt;/div&amp;gt;
-    &amp;lt;/body&amp;gt;
-    &amp;lt;/html&amp;gt;
-  &amp;quot;&amp;quot;&amp;quot;
-</code></pre>
+  <span class="hljs-string">html""</span><span class="hljs-string">"
+    &lt;!DOCTYPE html&gt;
+    &lt;html lang="</span><span class="hljs-string">en"&gt;
+    &lt;body&gt;
+    &lt;div&gt;
+        Hello &lt;b&gt;<span class="hljs-subst">${name}</span>&lt;/b&gt;!
+    &lt;/div&gt;
+    &lt;/body&gt;
+    &lt;/html&gt;
+  "</span><span class="hljs-string">""</span>
+
+</code>
+          </pre>
    <p>and run it like this:</p>
-   <pre><code class="language-sh hljs language-bash" data-highlighted="yes">scala html.sc 
-</code></pre>
+   <pre>            <code class="language-sh hljs language-bash" data-highlighted="yes">scala html.sc 
+</code>
+          </pre>
    <p>Go to <a href="http://localhost:8181">http://localhost:8181</a>
     <br>
     to see how it works.</p>

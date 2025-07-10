@@ -55,18 +55,20 @@
    <p>Let's say you have a <code>MyXML</code> class, and you want to use it as a response body.
     <br>
     You would write something like this:</p>
-   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">given</span> <span class="hljs-type">ResponseWritable</span>[<span class="hljs-type">MyXML</span>] <span class="hljs-keyword">with</span> {
+   <pre>            <code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">given</span> <span class="hljs-type">ResponseWritable</span>[<span class="hljs-type">MyXML</span>] <span class="hljs-keyword">with</span> {
     <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">write</span></span>(value: <span class="hljs-type">MyXML</span>, exchange: <span class="hljs-type">HttpServerExchange</span>): <span class="hljs-type">Unit</span> =
       exchange.getResponseSender.send(value.asString)
     <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">headers</span></span>(value: <span class="hljs-type">String</span>): <span class="hljs-type">Seq</span>[(<span class="hljs-type">HttpString</span>, <span class="hljs-type">Seq</span>[<span class="hljs-type">String</span>])] = <span class="hljs-type">Seq</span>(
       <span class="hljs-type">HttpString</span>(<span class="hljs-type">HeaderNames</span>.<span class="hljs-type">ContentType</span>) -&gt; <span class="hljs-type">Seq</span>(<span class="hljs-string">"text/xml"</span>)
     )
 }
-</code></pre>
+</code>
+          </pre>
    <p>Now you can use <code>MyXML</code> as a response body:</p>
-   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">val</span> myXml = <span class="hljs-type">MyXML</span>(...)
+   <pre>            <code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">val</span> myXml = <span class="hljs-type">MyXML</span>(...)
 <span class="hljs-type">Response</span>.withBody(myXml)
-</code></pre>
+</code>
+          </pre>
   </main>
   <footer class="pico container flex-centered">
    <a href="https://github.com/sake92/sharaf"> <!--?xml version="1.0" encoding="utf-8"?--><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools --> 

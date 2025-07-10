@@ -87,7 +87,7 @@
     <br>
     This is because it is easy to forget to deny something, and it is hard to remember everything that should be denied.</p>
    <p>Concretely in pac4j, you can use <code>PathMatcher()</code>, to exclude certain paths from authentication:</p>
-   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">val</span> publicRoutesMatcher = <span class="hljs-type">PathMatcher</span>()
+   <pre>            <code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">val</span> publicRoutesMatcher = <span class="hljs-type">PathMatcher</span>()
 publicRoutesMatcher.excludePaths(<span class="hljs-string">"/"</span>, <span class="hljs-string">"/login-form"</span>)
 pac4jConfig.addMatcher(<span class="hljs-string">"publicRoutesMatcher"</span>, publicRoutesMatcher)
 ..
@@ -99,7 +99,8 @@ pac4jConfig.addMatcher(<span class="hljs-string">"publicRoutesMatcher"</span>, p
     <span class="hljs-string">"securityheaders,publicRoutesMatcher"</span>, <span class="hljs-comment">// use publicRoutesMatcher here!</span>
     <span class="hljs-type">DefaultSecurityLogic</span>()
 )
-</code></pre>
+</code>
+          </pre>
    <p>There are also:</p>
    <ul>
     <li><code>excludeBranch("/somepath")</code> to exclude all paths starting with "/somepath"</li>
