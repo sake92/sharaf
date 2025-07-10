@@ -14,15 +14,11 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-java@v3
-        with:
-          distribution: temurin
-          java-version: 21
       - name: Build
         env: 
           FLATMARK_BASE_URL: https://sake92.github.io/sharaf
         run: |
-            FLATMARK_VERSION=0.0.24
+            FLATMARK_VERSION=0.0.25
             curl -L https://github.com/sake92/flatmark/releases/download/v${FLATMARK_VERSION}/flatmark-1.0.0.pkg -o flatmark.pkg
             sudo installer -verbose -pkg flatmark.pkg -target /
             flatmark build -i docs

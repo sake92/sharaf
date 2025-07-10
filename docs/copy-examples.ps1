@@ -6,7 +6,10 @@ $examplesList = @(
     "examples/scala-cli/query_params.sc",
     "examples/scala-cli/static_files.sc",
     "examples/scala-cli/json_api.test.scala",
-    "examples/scala-cli/validation.sc"
+    "examples/scala-cli/validation.sc",
+    "examples/scala-cli/html.sc",
+    "examples/scala-cli/form_handling.sc",
+    "examples/htmx/htmx_load_snippet.sc"
 )
 
 $targetFolder = "docs/_includes"

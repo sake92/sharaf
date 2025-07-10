@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+    
+{% block title %}Search Results{% endblock %}
+
+{% block content %}
+    <div id="search-results-content"></div>
+{% endblock %}
+
+
+{% block scripts %}
+
+<script type="module">
+import Fuse from 'https://cdn.jsdelivr.net/npm/fuse.js@7.1.0/dist/fuse.mjs'
+
+const urlParams = new URLSearchParams(window.location.search);
+const qParam = urlParams.get('q');
+    
+const entries = await fetch('{{ site.base_url }}/search/entries.json').then(r => r.json());
+console.log("All entries: ", entries);
+
+
+const fuse = new Fuse(entries, {
+    keys: [
+        { name: 'title' },
+        { name: 'text' }
+    ],
+    includeMatches: true,
+    
+});
+
+const searchRes = fuse.search(qParam);
+console.log("Search results for:", qParam, searchRes);
+const searchResultsContentElem = document.getElementById("search-results-content");
+if (searchRes.length === 0) {
+    document.getElementById("search-results-content").innerHTML = `<p>No results found for <strong>${qParam}</strong>.</p>`;
+} else {
+    searchResultsContentElem.innerHTML = searchRes.map(r => {
+    const page = r.item;
+    const highlightedTitle = highlightMatches(page.title, r.matches.filter(m => m.key === "title"));
+    return `<div class="search-result-item">
+        <h2><a href="${page.url}">${highlightedTitle}</a></h2>
+        <p>${page.text.substring(0, 200)}</p>
+      </div>`;
+    }).join("");
+}
+
+{# TODO highlight all matches, not just the first one #}
+{# TODO highlight matches in the text as well #}
+function highlightMatches(text, matches) {
+   if (matches.length === 0) return text;
+   // only the first match is highlighted
+   const matchIndices = matches[0].indices[0];
+   const start = matchIndices[0];
+   const end = matchIndices[1] + 1;
+   const beforeMatchText = text.substring(0, start);
+   const matchText = text.substring(start, end);
+   const afterMatchText = text.substring(end, text.length);
+      console.log({text, matches, matchIndices, start, end, beforeMatchText, matchText, afterMatchText});
+   return beforeMatchText + `<mark>${matchText}</mark>` + afterMatchText;
+}
+</script>
+
+{% endblock %} 

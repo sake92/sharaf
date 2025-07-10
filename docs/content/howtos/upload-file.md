@@ -7,15 +7,13 @@ description: Sharaf How To Upload File
 
 Uploading a file is usually done via `multipart/form-data` form submission.  
 
-{%
-set form_snippet = '<form action="/form-submit" method="POST" enctype="multipart/form-data">
-...
-</form>'
-%}
-
 ```scala
 // 1. somewhere in a view, use enctype="multipart/form-data"
-{{ form_snippet | e }}
+html"""
+    <form action="/form-submit" method="POST" enctype="multipart/form-data">
+    ...
+    </form>
+"""
 
 // 2. define form data class with a NIO Path file
 import java.nio.file.Path
