@@ -1,14 +1,12 @@
 package jwt
 
+import java.util.Optional
 import scala.jdk.CollectionConverters.*
 import io.undertow.Undertow
 import org.pac4j.core.client.Clients
 import org.pac4j.core.config.Config
 import org.pac4j.http.client.direct.HeaderClient
 import org.pac4j.undertow.handler.SecurityHandler
-import ba.sake.sharaf.*
-import ba.sake.sharaf.undertow.*
-import com.nimbusds.jwt.JWTClaimsSet
 import org.pac4j.core.context.WebContext
 import org.pac4j.core.context.session.SessionStore
 import org.pac4j.core.matching.matcher.{DefaultMatchers, PathMatcher}
@@ -16,8 +14,10 @@ import org.pac4j.core.profile.BasicUserProfile
 import org.pac4j.jwt.config.signature.SecretSignatureConfiguration
 import org.pac4j.jwt.credentials.authenticator.JwtAuthenticator
 import org.pac4j.jwt.profile.JwtGenerator
+import ba.sake.sharaf.*
+import ba.sake.sharaf.undertow.*
 
-import java.util.Optional
+// TODO add a test
 
 @main def main(): Unit =
   val module = JwtModule(8181)

@@ -45,6 +45,9 @@ scala my_script.sc --scala-option -Yretain-trees
 - [API example]({{site.data.project.gh.sourcesUrl}}/examples/api) featuring JSON and validation
 - [full-stack example]({{site.data.project.gh.sourcesUrl}}/examples/fullstack) featuring HTML, static files and forms
 - [sharaf-todo-backend](https://github.com/sake92/sharaf-todo-backend), implementation of the [todobackend.com](http://todobackend.com/) spec, featuring CORS handling
-- [OAuth2 login]({{site.data.project.gh.sourcesUrl}}/examples/oauth2) with [Pac4J library](https://www.pac4j.org/)
+- [Username+Password form login]({{site.data.project.gh.sourcesUrl}}/examples/user-pass-form) with [Pac4J](https://www.pac4j.org/)
+- [JWT auth]({{site.data.project.gh.sourcesUrl}}/examples/jwt) with [Pac4J](https://www.pac4j.org/)
+- [OAuth2 login]({{site.data.project.gh.sourcesUrl}}/examples/oauth2) with [Pac4J](https://www.pac4j.org/)
+- [Snunit]({{site.data.project.gh.sourcesUrl}}/examples/snunit) demo app
 - [PetClinic](https://github.com/sake92/sharaf-petclinic) implementation, featuring full-stack app with Postgres db, config, integration tests etc.
 - [Giter8 template for fullstack app](https://github.com/sake92/sharaf-fullstack.g8)
