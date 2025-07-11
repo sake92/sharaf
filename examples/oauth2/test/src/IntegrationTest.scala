@@ -16,28 +16,24 @@ object TestData {
 
 trait IntegrationTest extends munit.FunSuite {
 
-  protected val moduleFixture = new Fixture[AppModule]("AppModule") {
+  protected val moduleFixture: Fixture[AppModule] = new Fixture[AppModule]("AppModule") {
 
     private var mockOauth2server: MockOAuth2Server = uninitialized
-
     private var module: AppModule = uninitialized
 
-    def apply() = module
+    def apply(): AppModule = module
 
     override def beforeEach(context: BeforeEach): Unit =
-
       // mock OAuth2 server
       mockOauth2server = MockOAuth2Server()
       mockOauth2server.start()
-
       val issuerId = "fakeOAuthIssuer"
-
       // set user that gets logged in
       mockOauth2server.enqueueCallback(
         DefaultOAuth2TokenCallback(
           issuerId,
           TestData.username,
-          JOSEObjectType.JWT.getType(),
+          JOSEObjectType.JWT.getType,
           null,
           Map(
             "id" -> "123",
@@ -47,19 +43,16 @@ trait IntegrationTest extends munit.FunSuite {
         )
       )
 
-      // start real server
       val client = GenericOAuth20Client()
       client.setKey("fakeKey")
       client.setSecret("fakeSecret")
-      client.setAuthUrl(mockOauth2server.authorizationEndpointUrl(issuerId).toString())
+      client.setAuthUrl(mockOauth2server.authorizationEndpointUrl(issuerId).toString)
       client.setScope("openid whatever")
-      client.setTokenUrl(mockOauth2server.tokenEndpointUrl(issuerId).toString())
-      client.setProfileUrl(mockOauth2server.userInfoUrl(issuerId).toString())
+      client.setTokenUrl(mockOauth2server.tokenEndpointUrl(issuerId).toString)
+      client.setProfileUrl(mockOauth2server.userInfoUrl(issuerId).toString)
 
       val port = NetworkUtils.getFreePort()
       val clients = Clients(s"http://localhost:${port}/callback", client)
-
-      // assign fixture
       module = AppModule(port, clients)
       module.server.start()
 
@@ -68,5 +61,5 @@ trait IntegrationTest extends munit.FunSuite {
       mockOauth2server.shutdown()
   }
 
-  override def munitFixtures = List(moduleFixture)
+  override def munitFixtures: Seq[Fixture[AppModule]] = List(moduleFixture)
 }

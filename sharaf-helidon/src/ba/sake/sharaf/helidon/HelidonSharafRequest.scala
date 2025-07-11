@@ -7,7 +7,6 @@ import io.helidon.webserver.http.ServerRequest
 import ba.sake.formson.*
 import ba.sake.querson.*
 import ba.sake.sharaf.*
-import ba.sake.sharaf.exceptions.*
 
 class HelidonSharafRequest(underlyingRequest: ServerRequest) extends Request {
 

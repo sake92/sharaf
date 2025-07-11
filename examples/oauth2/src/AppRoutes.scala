@@ -25,7 +25,7 @@ def IndexPage(userOpt: Option[CustomUserProfile]) =
         <body>
         <div>Hello there!</div>
         <div>
-            <a href="/login?provider=GitHubClient">Login with GitHub</a>
+            <a href="/login?force_client=GitHubClient">Login with GitHub</a>
         </div>
         </body>
         </html>

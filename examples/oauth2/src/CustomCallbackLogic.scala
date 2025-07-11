@@ -1,25 +1,23 @@
 package demo
 
 import org.pac4j.core.config.Config
-import org.pac4j.core.context.WebContext
-import org.pac4j.core.context.session.SessionStore
 import org.pac4j.core.engine.DefaultCallbackLogic
 import org.pac4j.core.profile.UserProfile
 import org.pac4j.oauth.profile.github.GitHubProfile
 import org.pac4j.oauth.profile.OAuth20Profile
+import org.pac4j.core.context.CallContext
 
 class CustomCallbackLogic() extends DefaultCallbackLogic {
 
-  override def saveUserProfile(
-      context: WebContext,
-      sessionStore: SessionStore,
+  override protected def saveUserProfile(
+      context: CallContext,
       config: Config,
       userProfile: UserProfile,
       saveProfileInSession: Boolean,
       multiProfile: Boolean,
       renewSession: Boolean
   ): Unit = {
-    super.saveUserProfile(context, sessionStore, config, userProfile, saveProfileInSession, multiProfile, renewSession)
+    super.saveUserProfile(context, config, userProfile, saveProfileInSession, multiProfile, renewSession)
 
     userProfile match
       case profile: GitHubProfile =>
@@ -30,6 +28,5 @@ class CustomCallbackLogic() extends DefaultCallbackLogic {
         println(s"Saving TEST profile to database: $profile")
       case other =>
         throw RuntimeException(s"Cant handle Pac4jUserProfile: $other")
-
   }
 }

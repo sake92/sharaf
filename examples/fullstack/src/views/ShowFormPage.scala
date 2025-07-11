@@ -29,7 +29,7 @@ def ShowFormPage(formData: CreateCustomerForm, errors: Seq[ValidationError] = Se
     </label>
     """
   }
-  val hobbiesInputs = formData.hobbies.zipWithIndex.map { case (hobby, idx) =>
+  val hobbiesInputs = formData.hobbies.zipWithIndex.map { case (_, idx) =>
     withInputErrors(s"hobbies[${idx}]", _.hobbies.applyOrElse(idx, _ => "")) {
       case (fieldName, fieldValue, fieldErrors) =>
         html"""
