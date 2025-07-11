@@ -1,35 +1,30 @@
 //| mill-version: 1.0.0
 package build
 
-import mill._
-import mill.scalalib._, scalajslib._, scalanativelib._
-import mill.scalalib.publish._
+import mill.*
+import mill.scalalib.*, scalajslib.*, scalanativelib.*
+import mill.scalalib.publish.*
 import mill.javalib.SonatypeCentralPublishModule
 import mill.util.VcsVersion
 
 object V:
   val tupson = "0.13.0"
-  val hepek = "0.33.0"
 
 object `sharaf-core` extends Module:
   object jvm extends SharafCoreModule with ScalaJvmCommonModule:
     def moduleDeps = Seq(querson.jvm, formson.jvm, validson.jvm)
-
     def mvnDeps = super.mvnDeps() ++ Seq(
       // TODO move to common when published for native
       mvn"org.playframework.twirl::twirl-api:2.1.0-M4"
     )
-
     object test extends ScalaTests with SharafTestModule
 
   object native extends SharafCoreModule with ScalaNativeCommonModule:
     def moduleDeps = Seq(querson.native, formson.native, validson.native)
-
     object test extends ScalaNativeTests with SharafTestModule
 
   trait SharafCoreModule extends SharafPublishModule with PlatformScalaModule:
     def artifactName = "sharaf-core"
-
     // all deps should be cross jvm/native
     def mvnDeps = super.mvnDeps() ++ Seq(
       mvn"ba.sake::tupson::${V.tupson}",
@@ -39,14 +34,11 @@ object `sharaf-core` extends Module:
 
 object `sharaf-undertow` extends SharafPublishModule:
   def artifactName = "sharaf-undertow"
-
   def mvnDeps = super.mvnDeps() ++ Seq(
     mvn"io.undertow:undertow-core:2.3.18.Final",
     mvn"ba.sake::tupson-config:${V.tupson}"
   )
-
   def moduleDeps = Seq(`sharaf-core`.jvm)
-
   object test extends ScalaTests with SharafTestModule:
     def mvnDeps = super.mvnDeps() ++ Seq(
       mvn"org.webjars:jquery:3.7.1"
@@ -54,14 +46,11 @@ object `sharaf-undertow` extends SharafPublishModule:
 
 object `sharaf-helidon` extends SharafPublishModule:
   def artifactName = "sharaf-helidon"
-
   def mvnDeps = super.mvnDeps() ++ Seq(
     mvn"io.helidon.webserver:helidon-webserver:4.2.2",
     mvn"io.helidon.config:helidon-config-yaml:4.2.2"
   )
-
   def moduleDeps = Seq(`sharaf-core`.jvm)
-
   object test extends ScalaTests with SharafTestModule:
     def mvnDeps = super.mvnDeps() ++ Seq(
       mvn"com.lihaoyi::requests:0.9.0"
@@ -70,86 +59,13 @@ object `sharaf-helidon` extends SharafPublishModule:
 
 object `sharaf-snunit` extends ScalaNativeCommonModule with SharafPublishModule:
   def artifactName = "sharaf-snunit"
-
   def mvnDeps = super.mvnDeps() ++ Seq(
     mvn"com.github.lolgab::snunit::0.10.3"
   )
-
   def moduleDeps = Seq(`sharaf-core`.native)
-
-object `sharaf-hepek-components` extends Module:
-  object jvm extends SharafHepekComponentsCoreModule with ScalaJvmCommonModule:
-    def moduleDeps = Seq(`sharaf-core`.jvm)
-  //object native extends SharafHepekComponentsCoreModule with ScalaNativeCommonModule:
-  // def moduleDeps = Seq(`sharaf-core`.native)
-
-  trait SharafHepekComponentsCoreModule extends SharafPublishModule with PlatformScalaModule:
-    def artifactName = "sharaf-hepek-components"
-
-    def mvnDeps = super.mvnDeps() ++ Seq(
-      mvn"ba.sake::hepek-components:${V.hepek}"
-    )
-
-object querson extends Module:
-  object jvm extends QuersonModule with ScalaJvmCommonModule:
-    object test extends ScalaTests with SharafTestModule
-
-  object js extends QuersonModule with ScalaJSCommonModule:
-    object test extends ScalaJSTests with SharafTestModule
-
-  object native extends QuersonModule with ScalaNativeCommonModule:
-    object test extends ScalaNativeTests with SharafTestModule
-
-  trait QuersonModule extends SharafPublishModule with PlatformScalaModule:
-    def artifactName = "querson"
-
-    def pomSettings = super.pomSettings().copy(description = "Sharaf query params library")
-
-    def mvnDeps = super.mvnDeps() ++ Seq(
-      mvn"com.lihaoyi::fastparse::3.1.1"
-    )
-
-object formson extends Module:
-  object jvm extends FormsonModule with ScalaJvmCommonModule:
-    object test extends ScalaTests with SharafTestModule
-
-  //object js extends FormsonModule with ScalaJSCommonModule: // java.nio.Path not supported
-  // object test extends ScalaJSTests with SharafTestModule
-  object native extends FormsonModule with ScalaNativeCommonModule:
-    object test extends ScalaNativeTests with SharafTestModule
-
-  trait FormsonModule extends SharafPublishModule with PlatformScalaModule:
-    def artifactName = "formson"
-
-    def pomSettings = super.pomSettings().copy(description = "Sharaf form binding library")
-
-    def mvnDeps = super.mvnDeps() ++ Seq(
-      mvn"com.lihaoyi::fastparse::3.1.1"
-    )
-
-
-object validson extends Module:
-  object jvm extends ValidsonModule with ScalaJvmCommonModule:
-    object test extends ScalaTests with SharafTestModule
-
-  object js extends ValidsonModule with ScalaJSCommonModule:
-    object test extends ScalaJSTests with SharafTestModule
-
-  object native extends ValidsonModule with ScalaNativeCommonModule:
-    object test extends ScalaNativeTests with SharafTestModule
-
-  trait ValidsonModule extends SharafPublishModule with PlatformScalaModule:
-    def artifactName = "validson"
-
-    def pomSettings = super.pomSettings().copy(description = "Sharaf validation library")
-
-    def mvnDeps = super.mvnDeps() ++ Seq(
-      mvn"com.lihaoyi::sourcecode::0.4.2"
-    )
 
 trait SharafPublishModule extends SharafCommonModule with SonatypeCentralPublishModule:
   def publishVersion = VcsVersion.vcsState().format()
-
   def pomSettings = PomSettings(
     organization = "ba.sake",
     url = "https://github.com/sake92/sharaf",
@@ -164,14 +80,12 @@ trait SharafPublishModule extends SharafCommonModule with SonatypeCentralPublish
 
 trait SharafCommonModule extends ScalaModule:
   def scalaVersion = "3.7.1"
-
   def scalacOptions = super.scalacOptions() ++ Seq(
     "-Yretain-trees", // needed for default parameters
     "-deprecation",
     "-Wunused:all",
     "-explain"
   )
-
   override def runClasspath: T[Seq[PathRef]] = Task {
     localClasspath() ++
       transitiveLocalClasspath() ++
@@ -183,14 +97,12 @@ trait ScalaJvmCommonModule extends ScalaModule
 
 trait ScalaJSCommonModule extends ScalaJSModule:
   def scalaJSVersion = "1.19.0"
-
   def mvnDeps = super.mvnDeps() ++ Seq(
     mvn"io.github.cquiroz::scala-java-time::2.6.0"
   )
 
 trait ScalaNativeCommonModule extends ScalaNativeModule:
   def scalaNativeVersion = "0.5.7"
-
   def mvnDeps = super.mvnDeps() ++ Seq(
     mvn"io.github.cquiroz::scala-java-time::2.6.0"
   )
@@ -200,47 +112,3 @@ trait SharafTestModule extends TestModule.Munit:
   def mvnDeps = Seq(
     mvn"org.scalameta::munit::1.1.0"
   )
-
-//////////////////// examples
-trait SharafExampleModule extends SharafCommonModule:
-  def mvnDeps = Seq(
-    mvn"ch.qos.logback:logback-classic:1.4.6"
-  )
-
-object examples extends mill.Module:
-  object api extends SharafExampleModule:
-    def moduleDeps = Seq(`sharaf-undertow`)
-
-    object test extends ScalaTests with SharafTestModule
-
-  object fullstack extends SharafExampleModule:
-    def moduleDeps = Seq(`sharaf-undertow`)
-
-    object test extends ScalaTests with SharafTestModule
-
-  object `user-pass-form` extends SharafExampleModule:
-    def moduleDeps = Seq(`sharaf-undertow`)
-
-    def mvnDeps = super.mvnDeps() ++ Seq(
-      mvn"org.pac4j:undertow-pac4j:6.0.0",
-      mvn"org.pac4j:pac4j-http:6.1.2",
-      mvn"org.mindrot:jbcrypt:0.4"
-    )
-
-    object test extends ScalaTests with SharafTestModule
-
-  object oauth2 extends SharafExampleModule:
-    def moduleDeps = Seq(`sharaf-undertow`)
-
-    def mvnDeps = super.mvnDeps() ++ Seq(
-      mvn"org.pac4j:undertow-pac4j:6.0.0",
-      mvn"org.pac4j:pac4j-oauth:6.1.2",
-      mvn"com.google.guava:guava:33.4.6-jre"
-    )
-    object test extends ScalaTests with SharafTestModule:
-      def mvnDeps = super.mvnDeps() ++ Seq(
-        mvn"no.nav.security:mock-oauth2-server:0.5.10"
-      )
-  object snunit extends SharafExampleModule with ScalaNativeCommonModule:
-    def moduleDeps = Seq(`sharaf-snunit`)
-end examples

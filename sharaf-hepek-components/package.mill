@@ -1,0 +1,19 @@
+package build.`sharaf-hepek-components`
+
+import mill.*
+import mill.scalalib.*
+import build.{SharafPublishModule, ScalaJvmCommonModule, ScalaJSCommonModule, ScalaNativeCommonModule, SharafTestModule}
+import build.`sharaf-core`
+
+object `package` extends Module:
+  object jvm extends SharafHepekComponentsCoreModule with ScalaJvmCommonModule:
+    def moduleDeps = Seq(`sharaf-core`.jvm)
+  //object native extends SharafHepekComponentsCoreModule with ScalaNativeCommonModule:
+  // def moduleDeps = Seq(`sharaf-core`.native)
+
+  trait SharafHepekComponentsCoreModule extends SharafPublishModule with PlatformScalaModule:
+    def artifactName = "sharaf-hepek-components"
+    def mvnDeps = super.mvnDeps() ++ Seq(
+      mvn"ba.sake::hepek-components:0.33.0"
+    )
+end `package`

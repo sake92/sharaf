@@ -1,0 +1,46 @@
+package build.examples
+  
+import mill.*
+import mill.scalalib.*
+import build.{SharafCommonModule, ScalaNativeCommonModule, SharafTestModule}
+import build.`sharaf-undertow`
+import build.`sharaf-snunit`
+
+trait SharafExampleModule extends SharafCommonModule:
+  def mvnDeps = Seq(
+    mvn"ch.qos.logback:logback-classic:1.4.6"
+  )
+
+object `package` extends Module:
+  object api extends SharafExampleModule:
+    def moduleDeps = Seq(`sharaf-undertow`)
+    object test extends ScalaTests with SharafTestModule
+
+  object fullstack extends SharafExampleModule:
+    def moduleDeps = Seq(`sharaf-undertow`)
+    object test extends ScalaTests with SharafTestModule
+
+  object `user-pass-form` extends SharafExampleModule:
+    def moduleDeps = Seq(`sharaf-undertow`)
+    def mvnDeps = super.mvnDeps() ++ Seq(
+      mvn"org.pac4j:undertow-pac4j:6.0.0",
+      mvn"org.pac4j:pac4j-http:6.1.2",
+      mvn"org.mindrot:jbcrypt:0.4"
+    )
+    object test extends ScalaTests with SharafTestModule
+
+  object oauth2 extends SharafExampleModule:
+    def moduleDeps = Seq(`sharaf-undertow`)
+    def mvnDeps = super.mvnDeps() ++ Seq(
+      mvn"org.pac4j:undertow-pac4j:6.0.0",
+      mvn"org.pac4j:pac4j-oauth:6.1.2",
+      mvn"com.google.guava:guava:33.4.6-jre"
+    )
+    object test extends ScalaTests with SharafTestModule:
+      def mvnDeps = super.mvnDeps() ++ Seq(
+        mvn"no.nav.security:mock-oauth2-server:0.5.10"
+      )
+
+  object snunit extends SharafExampleModule with ScalaNativeCommonModule:
+    def moduleDeps = Seq(`sharaf-snunit`)
+end `package`
