@@ -16,8 +16,22 @@ class SnunitSharafRequest(underlyingRequest: SnunitRequest) extends Request {
         HttpString(headerName) -> Seq(headerValue)
       }
 
-  def cookies: Seq[Cookie] = ??? // TODO
-  // underlyingHttpServerExchange.requestCookies().asScala.map(CookieUtils.fromUndertow).toSeq
+  def cookies: Seq[Cookie] =
+    val builder = Seq.newBuilder[Cookie]
+    val underlyingHeaders = underlyingRequest.headers
+    // TODO: Use underlyingRequest.cookieFieldIndex when available
+    underlyingHeaders.foreach {
+      case ("Cookie", cookieString) =>
+        cookieString.split(';').foreach {
+          case s"$n=$v" =>
+            val name = n.trim()
+            val value = v.trim()
+            result += Cookie(name = name, value = value)
+          case _ =>
+        }
+      case _ =>
+    }
+    builder.result()
 
   /* *** QUERY *** */
   override lazy val queryParamsRaw: QueryStringMap =
