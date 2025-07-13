@@ -26,8 +26,7 @@ set tutorials = [
 
 %}
 
-{% for tut in tutorials %}
-- [{{ tut.label }}]({{ tut.url}})
+{% for tut in tutorials %}- [{{ tut.label }}]({{ tut.url}})
 {% endfor %}
 
 
