@@ -22,7 +22,7 @@ class SnunitSharafRequest(underlyingRequest: SnunitRequest) extends Request {
     // TODO: Use underlyingRequest.cookieFieldIndex when available
     underlyingHeaders.foreach {
       case ("Cookie", cookieString) =>
-        cookieString.split('=').foreach {
+        cookieString.split(';').foreach {
           case s"$n=$v" =>
             val name = n.trim()
             val value = v.trim()
