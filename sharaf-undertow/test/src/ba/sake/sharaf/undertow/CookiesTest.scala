@@ -27,7 +27,7 @@ class CookiesTest extends munit.FunSuite {
     val javaClient = java.net.http.HttpClient.newBuilder().cookieHandler(cookieHandler).build()
     val statefulBackend = sttp.client4.httpclient.HttpClientSyncBackend.usingClient(javaClient)
     quickRequest.get(uri"${baseUrl}/settingCookie").send(statefulBackend)
-    val cookie = cookieHandler.getCookieStore.get(uri"${baseUrl}/getopt-session-value".toJavaUri).getFirst
+    val cookie = cookieHandler.getCookieStore.get(uri"${baseUrl}/getopt-session-value".toJavaUri).iterator().next()
     assertEquals(cookie.getValue, "cookie1Value")
     assertEquals(cookie.getMaxAge, -1L) // does not expire
   }
