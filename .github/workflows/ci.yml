@@ -19,4 +19,7 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: 21
-      - run: ./mill -i __.test
+      - name: Compile
+        run: ./mill -i __.compile
+      - name: Test
+        run: ./mill -i __.test

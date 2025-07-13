@@ -26,7 +26,7 @@ class SnunitSharafRequest(underlyingRequest: SnunitRequest) extends Request {
           case s"$n=$v" =>
             val name = n.trim()
             val value = v.trim()
-            result += Cookie(name = name, value = value)
+            builder += Cookie(name = name, value = value)
           case _ =>
         }
       case _ =>
