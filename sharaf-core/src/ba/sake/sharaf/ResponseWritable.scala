@@ -9,6 +9,9 @@ import ba.sake.tupson.{JsonRW, toJson}
 
 private val ContentTypeHttpString = HttpString(HeaderNames.ContentType)
 private val ContentDispositionHttpString = HttpString(HeaderNames.ContentDisposition)
+private val CacheControlHttpString = HttpString(HeaderNames.CacheControl)
+private val ConnectionHttpString = HttpString(HeaderNames.Connection)
+
 
 trait ResponseWritable[-T]:
   def write(value: T, outputStream: OutputStream): Unit
@@ -61,6 +64,22 @@ object ResponseWritable extends LowPriResponseWritableInstances {
     )
   }
 
+  given ResponseWritable[geny.Generator[ServerSentEvent]] with {
+    override def write(value: geny.Generator[ServerSentEvent], outputStream: OutputStream): Unit = {
+      value.foreach { event =>
+        println(s"Writing '${event.sseString}'")
+        outputStream.write(event.sseBytes)
+        outputStream.flush()
+      }
+      println(s"ALL DONE")
+    }
+
+    override def headers(value: geny.Generator[ServerSentEvent]): Seq[(HttpString, Seq[String])] = Seq(
+      ContentTypeHttpString -> Seq("text/event-stream"),
+      CacheControlHttpString -> Seq("no-cache"),
+      ConnectionHttpString -> Seq("keep-alive")
+    )
+  }
 }
 
 trait LowPriResponseWritableInstances {
