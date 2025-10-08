@@ -16,10 +16,13 @@ enum ServerSentEvent {
     case ServerSentEvent.Comment(value) =>
       s":${value}\n\n"
     case msg: ServerSentEvent.Message =>
+      val dataStrings = msg.data.split("\n").map { dataLine =>
+        s"data: ${dataLine}"
+      }
       val msgStr = List(
         msg.id.map(i => s"id: ${i}"),
         msg.event.map(e => s"event: ${e}"),
-        Some(s"data: ${msg.data}"),
+        Some(dataStrings.mkString("\n")),
         msg.retry.map(r => s"retry: ${r}")
       ).flatten.mkString("\n")
       s"${msgStr}\n\n"
