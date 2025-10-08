@@ -64,17 +64,18 @@ object ResponseWritable extends LowPriResponseWritableInstances {
     )
   }
 
-  given ResponseWritable[geny.Generator[ServerSentEvent]] with {
-    override def write(value: geny.Generator[ServerSentEvent], outputStream: OutputStream): Unit = {
-      value.foreach { event =>
-        println(s"Writing '${event.sseString}'")
+  given ResponseWritable[SseSender] with {
+    override def write(value: SseSender, outputStream: OutputStream): Unit = {
+      var done = false
+      while !done do {
+        val event = value.queue.take()
+        done = event.isInstanceOf[ServerSentEvent.Done]
         outputStream.write(event.sseBytes)
         outputStream.flush()
       }
-      println(s"ALL DONE")
     }
 
-    override def headers(value: geny.Generator[ServerSentEvent]): Seq[(HttpString, Seq[String])] = Seq(
+    override def headers(value: SseSender): Seq[(HttpString, Seq[String])] = Seq(
       ContentTypeHttpString -> Seq("text/event-stream"),
       CacheControlHttpString -> Seq("no-cache"),
       ConnectionHttpString -> Seq("keep-alive")

@@ -10,6 +10,7 @@ enum ServerSentEvent {
       event: Option[String] = None,
       retry: Option[Int] = None
   )
+  case Done(event: String = "stop")
 
   def sseString: String = this match {
     case ServerSentEvent.Comment(value) =>
@@ -22,7 +23,16 @@ enum ServerSentEvent {
         msg.retry.map(r => s"retry: ${r}")
       ).flatten.mkString("\n")
       s"${msgStr}\n\n"
+    case Done(event) =>
+      s"""event: ${event}
+         |data:\n\n""".stripMargin
   }
 
   def sseBytes: Array[Byte] = sseString.getBytes(StandardCharsets.UTF_8)
+}
+
+class SseSender {
+  private[sharaf] val queue = java.util.concurrent.LinkedBlockingQueue[ServerSentEvent]
+  def send(event: ServerSentEvent): Unit =
+    queue.put(event)
 }
