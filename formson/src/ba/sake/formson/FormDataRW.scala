@@ -79,6 +79,15 @@ object FormDataRW {
       str.toDoubleOption.getOrElse(typeError(path, "Double", str))
   }
 
+  given FormDataRW[Boolean] with {
+    override def write(path: String, value: Boolean): FormData =
+      FormDataRW[String].write(path, if value then "true" else "false")
+
+    override def parse(path: String, formData: FormData): Boolean =
+      val str = FormDataRW[String].parse(path, formData)
+      str.toBooleanOption.getOrElse(typeError(path, "Boolean", str))
+  }
+
   given FormDataRW[UUID] with {
     override def write(path: String, value: UUID): FormData =
       FormDataRW[String].write(path, value.toString)
