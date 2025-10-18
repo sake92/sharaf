@@ -49,5 +49,6 @@ scala my_script.sc --scala-option -Yretain-trees
 - [JWT auth]({{site.data.project.gh.sourcesUrl}}/examples/jwt) with [Pac4J](https://www.pac4j.org/)
 - [OAuth2 login]({{site.data.project.gh.sourcesUrl}}/examples/oauth2) with [Pac4J](https://www.pac4j.org/)
 - [Snunit]({{site.data.project.gh.sourcesUrl}}/examples/snunit) demo app
+- [Http4s]({{site.data.project.gh.sourcesUrl}}/examples/http4s) demo app
 - [PetClinic](https://github.com/sake92/sharaf-petclinic) implementation, featuring full-stack app with Postgres db, config, integration tests etc.
 - [Giter8 template for fullstack app](https://github.com/sake92/sharaf-fullstack.g8)
