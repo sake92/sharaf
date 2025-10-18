@@ -20,9 +20,10 @@ class FormDataParseSuite extends munit.FunSuite {
           "int" -> Seq("42").map(FormValue.Str.apply),
           "uuid" -> Seq(uuid.toString).map(FormValue.Str.apply),
           "file" -> Seq(FormValue.File(file)),
-          "bytes" -> Seq(FormValue.ByteArray(byteArray))
+          "bytes" -> Seq(FormValue.ByteArray(byteArray)),
+          "bool" -> Seq(FormValue.Str("true"))
         ),
-        FormSimple("text", None, 42, uuid, file, byteArray)
+        FormSimple("text", None, 42, uuid, file, byteArray, true)
       )
     ).foreach { case (fdMap, expected) =>
       val res = fdMap.parseFormDataMap[FormSimple]
@@ -171,7 +172,8 @@ class FormDataParseSuite extends munit.FunSuite {
           ParseError("int", "is missing", None),
           ParseError("uuid", "is missing", None),
           ParseError("file", "is missing", None),
-          ParseError("bytes", "is missing", None)
+          ParseError("bytes", "is missing", None),
+          ParseError("bool", "is missing", None)
         )
       )
     }
@@ -183,7 +185,8 @@ class FormDataParseSuite extends munit.FunSuite {
           "int" -> Seq("not_an_int").map(FormValue.Str.apply),
           "uuid" -> Seq("uuidddd_NOT").map(FormValue.Str.apply),
           "file" -> Seq(),
-          "bytes" -> Seq()
+          "bytes" -> Seq(),
+          "bool" -> Seq()
         )
           .parseFormDataMap[FormSimple]
       }
@@ -194,7 +197,8 @@ class FormDataParseSuite extends munit.FunSuite {
           ParseError("int", "invalid Int", Some("not_an_int")),
           ParseError("uuid", "invalid UUID", Some("uuidddd_NOT")),
           ParseError("file", "is missing", None),
-          ParseError("bytes", "is missing", None)
+          ParseError("bytes", "is missing", None),
+          ParseError("bool", "is missing", None)
         )
       )
     }

@@ -21,24 +21,26 @@ class FormDataWriteSuite extends munit.FunSuite {
   test("toFormDataMap should write simple case class") {
     Seq[(FormSimple, FormDataMap)](
       (
-        FormSimple("text", None, 42, uuid, file, byteArray),
+        FormSimple("text", None, 42, uuid, file, byteArray, true),
         SeqMap(
           "str" -> Seq("text").map(FormValue.Str.apply),
           "int" -> Seq("42").map(FormValue.Str.apply),
           "uuid" -> Seq(uuid.toString).map(FormValue.Str.apply),
           "file" -> Seq(FormValue.File(file)),
-          "bytes" -> Seq(FormValue.ByteArray(byteArray))
+          "bytes" -> Seq(FormValue.ByteArray(byteArray)),
+          "bool" -> Seq(FormValue.Str("true"))
         )
       ),
       (
-        FormSimple("text", Some("strOptVal"), 42, uuid, file, byteArray),
+        FormSimple("text", Some("strOptVal"), 42, uuid, file, byteArray, true),
         SeqMap(
           "str" -> Seq("text").map(FormValue.Str.apply),
           "strOpt" -> Seq("strOptVal").map(FormValue.Str.apply),
           "int" -> Seq("42").map(FormValue.Str.apply),
           "uuid" -> Seq(uuid.toString).map(FormValue.Str.apply),
           "file" -> Seq(FormValue.File(file)),
-          "bytes" -> Seq(FormValue.ByteArray(byteArray))
+          "bytes" -> Seq(FormValue.ByteArray(byteArray)),
+          "bool" -> Seq(FormValue.Str("true"))
         )
       )
     ).foreach { case (data, expected) =>
