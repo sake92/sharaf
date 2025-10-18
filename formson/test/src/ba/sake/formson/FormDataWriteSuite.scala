@@ -27,7 +27,8 @@ class FormDataWriteSuite extends munit.FunSuite {
           "int" -> Seq("42").map(FormValue.Str.apply),
           "uuid" -> Seq(uuid.toString).map(FormValue.Str.apply),
           "file" -> Seq(FormValue.File(file)),
-          "bytes" -> Seq(FormValue.ByteArray(byteArray))
+          "bytes" -> Seq(FormValue.ByteArray(byteArray)),
+          "bool" -> Seq(FormValue.Str("true"))
         )
       ),
       (
@@ -38,7 +39,8 @@ class FormDataWriteSuite extends munit.FunSuite {
           "int" -> Seq("42").map(FormValue.Str.apply),
           "uuid" -> Seq(uuid.toString).map(FormValue.Str.apply),
           "file" -> Seq(FormValue.File(file)),
-          "bytes" -> Seq(FormValue.ByteArray(byteArray))
+          "bytes" -> Seq(FormValue.ByteArray(byteArray)),
+          "bool" -> Seq(FormValue.Str("true"))
         )
       )
     ).foreach { case (data, expected) =>
