@@ -1,4 +1,4 @@
-//| mill-version: 1.0.0
+//| mill-version: 1.0.6
 package build
 
 import mill.*
@@ -44,6 +44,23 @@ object `sharaf-undertow` extends SharafPublishModule:
       mvn"org.webjars:jquery:3.7.1"
     )
 
+object `sharaf-http4s` extends Module:
+  object jvm extends SharafHttp4sModule with PlatformScalaModule:
+    def moduleDeps = Seq(`sharaf-core`.jvm)
+    object test extends TestModule
+  // object native extends SharafHttp4sModule with ScalaNativeCommonModule with PlatformScalaModule:
+  //   def moduleDeps = Seq(`sharaf-core`.native)
+  //   object test extends ScalaNativeTests with TestModule
+  trait SharafHttp4sModule extends SharafPublishModule:
+    def artifactName = "sharaf-https"
+    def mvnDeps = super.mvnDeps() ++ Seq(
+      mvn"org.http4s::http4s-server::0.23.32"
+    )
+    trait TestModule extends ScalaTests with SharafTestModule:
+      def mvnDeps = super.mvnDeps() ++ Seq(
+        mvn"org.http4s::http4s-client::0.23.32"
+      )
+
 object `sharaf-helidon` extends SharafPublishModule:
   def artifactName = "sharaf-helidon"
   def mvnDeps = super.mvnDeps() ++ Seq(
@@ -79,7 +96,7 @@ trait SharafPublishModule extends SharafCommonModule with SonatypeCentralPublish
 
 
 trait SharafCommonModule extends ScalaModule:
-  def scalaVersion = "3.7.1"
+  def scalaVersion = "3.7.3"
   def scalacOptions = super.scalacOptions() ++ Seq(
     "-Yretain-trees", // needed for default parameters
     "-deprecation",
@@ -102,7 +119,7 @@ trait ScalaJSCommonModule extends ScalaJSModule:
   )
 
 trait ScalaNativeCommonModule extends ScalaNativeModule:
-  def scalaNativeVersion = "0.5.7"
+  def scalaNativeVersion = "0.5.9"
   def mvnDeps = super.mvnDeps() ++ Seq(
     mvn"io.github.cquiroz::scala-java-time::2.6.0"
   )
