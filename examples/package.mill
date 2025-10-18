@@ -52,4 +52,14 @@ object `package` extends Module:
 
   object snunit extends SharafExampleModule with ScalaNativeCommonModule:
     def moduleDeps = Seq(`sharaf-snunit`)
+  object http4s extends Module:
+    trait HttpsModule extends SharafExampleModule:
+      def mvnDeps = super.mvnDeps() ++ Seq(
+        mvn"org.http4s::http4s-ember-server::0.23.32"
+      )
+
+    object jvm extends HttpsModule with PlatformScalaModule:
+      def moduleDeps = Seq(build.`sharaf-http4s`.jvm)
+    // object native extends HttpsModule with ScalaNativeCommonModule with PlatformScalaModule:
+    //   def moduleDeps = Seq(build.`sharaf-http4s`.native)
 end `package`
