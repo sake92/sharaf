@@ -414,15 +414,15 @@ object QueryStringRW extends LowPriorityQueryStringRWInstances {
 }
 
 private[querson] object LowPriorityQueryStringRWInstances {
-  
-  private def deriveNamedTupleTC[T](fieldNames: Seq[String], tcInstances: Seq[QueryStringRW[Any]]) = 
+
+  private def deriveNamedTupleTC[T](fieldNames: Seq[String], tcInstances: Seq[QueryStringRW[Any]]) =
     new QueryStringRW[T] {
       override def write(path: String, value: T): QueryStringData =
         val fieldValues = value.asInstanceOf[Tuple].productIterator.asInstanceOf[Iterator[Any]]
-        val jsonFields = fieldNames.zip(fieldValues).zip(tcInstances).map { case ((name, v), rw) =>
+        val qsFields = fieldNames.zip(fieldValues).zip(tcInstances).map { case ((name, v), rw) =>
           name -> rw.write(s"$path.$name", v)
         }
-        QueryStringData.Obj(jsonFields.toMap)
+        QueryStringData.Obj(qsFields.toMap)
 
       override def parse(path: String, qsData: QueryStringData): T = qsData match {
         case QueryStringData.Obj(fields) =>
@@ -448,8 +448,14 @@ private[querson] trait LowPriorityQueryStringRWInstances {
   inline given autoderiveNamedTuple[T <: AnyNamedTuple](using ct: ClassTag[T]): QueryStringRW[T] = {
     val fieldNames = compiletime.constValueTuple[Names[T]].productIterator.asInstanceOf[Iterator[String]].toSeq
     val tcInstances =
-      compiletime.summonAll[Tuple.Map[DropNames[T], QueryStringRW]].productIterator.asInstanceOf[Iterator[QueryStringRW[Any]]].toSeq
-    namedTupleTCsCache.getOrElseUpdate(ct, LowPriorityQueryStringRWInstances.deriveNamedTupleTC[T](fieldNames, tcInstances)).asInstanceOf[QueryStringRW[T]]
+      compiletime
+        .summonAll[Tuple.Map[DropNames[T], QueryStringRW]]
+        .productIterator
+        .asInstanceOf[Iterator[QueryStringRW[Any]]]
+        .toSeq
+    namedTupleTCsCache
+      .getOrElseUpdate(ct, LowPriorityQueryStringRWInstances.deriveNamedTupleTC[T](fieldNames, tcInstances))
+      .asInstanceOf[QueryStringRW[T]]
   }
 
 }

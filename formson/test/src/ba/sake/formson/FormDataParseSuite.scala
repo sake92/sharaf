@@ -242,4 +242,10 @@ class FormDataParseSuite extends munit.FunSuite {
       )
     }
   }
+
+  test("parseFormDataMap named tuple") {
+    val res = SeqMap("q" -> Seq("searchme").map(FormValue.Str.apply), "page" -> Seq("42").map(FormValue.Str.apply))
+      .parseFormDataMap[(q: String, page: Int)]
+    assertEquals(res, (q = "searchme", page = 42))
+  }
 }

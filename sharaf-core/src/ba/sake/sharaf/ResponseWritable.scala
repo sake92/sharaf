@@ -12,7 +12,6 @@ private val ContentDispositionHttpString = HttpString(HeaderNames.ContentDisposi
 private val CacheControlHttpString = HttpString(HeaderNames.CacheControl)
 private val ConnectionHttpString = HttpString(HeaderNames.Connection)
 
-
 trait ResponseWritable[-T]:
   def write(value: T, outputStream: OutputStream): Unit
   def headers(value: T): Seq[(HttpString, Seq[String])]

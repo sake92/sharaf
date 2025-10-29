@@ -5,6 +5,13 @@ import java.nio.file.Path
 import java.time.*
 import java.util.UUID
 import scala.deriving.*
+import scala.quoted.*
+import scala.compiletime.summonInline
+import NamedTuple.AnyNamedTuple
+import NamedTuple.Names
+import NamedTuple.DropNames
+import NamedTuple.NamedTuple
+import NamedTuple.withNames
 import scala.compiletime.*
 import scala.quoted.*
 import scala.reflect.ClassTag
@@ -37,7 +44,7 @@ trait FormDataRW[T] {
     }
 }
 
-object FormDataRW {
+object FormDataRW extends LowPriorityFormDataRWInstances {
 
   def apply[T](using instance: FormDataRW[T]): FormDataRW[T] = instance
 
@@ -495,4 +502,51 @@ object FormDataRW {
 
   private def parseError(path: String, msg: String): Nothing =
     throw ParsingException(ParseError(path, msg))
+}
+
+private[formson] object LowPriorityFormDataRWInstances {
+
+  private def deriveNamedTupleTC[T](fieldNames: Seq[String], tcInstances: Seq[FormDataRW[Any]]) =
+    new FormDataRW[T] {
+      override def write(path: String, value: T): FormData =
+        val fieldValues = value.asInstanceOf[Tuple].productIterator.asInstanceOf[Iterator[Any]]
+        val fdFields = fieldNames.zip(fieldValues).zip(tcInstances).map { case ((name, v), rw) =>
+          name -> rw.write(s"$path.$name", v)
+        }
+        FormData.Obj(SeqMap.from(fdFields))
+
+      override def parse(path: String, qsData: FormData): T = qsData match {
+        case FormData.Obj(fields) =>
+          val fieldMap = fields.toMap
+          val parsedValues = fieldNames.zip(tcInstances).map { case (name, rw) =>
+            fieldMap.get(name) match {
+              case Some(jv) => rw.parse(s"$path.$name", jv)
+              case None     => throw FormsonException(s"Missing field '$name' at path '$path'")
+            }
+          }
+          val tupleValue = Tuple.fromArray(parsedValues.toArray)
+          withNames(tupleValue).asInstanceOf[T]
+        case _ =>
+          throw FormsonException(s"Expected object at path '$path', found: $qsData")
+      }
+    }
+}
+
+private[formson] trait LowPriorityFormDataRWInstances {
+  // cache instances
+  private val namedTupleTCsCache = scala.collection.mutable.Map.empty[ClassTag[?], FormDataRW[?]]
+
+  inline given autoderiveNamedTuple[T <: AnyNamedTuple](using ct: ClassTag[T]): FormDataRW[T] = {
+    val fieldNames = compiletime.constValueTuple[Names[T]].productIterator.asInstanceOf[Iterator[String]].toSeq
+    val tcInstances =
+      compiletime
+        .summonAll[Tuple.Map[DropNames[T], FormDataRW]]
+        .productIterator
+        .asInstanceOf[Iterator[FormDataRW[Any]]]
+        .toSeq
+    namedTupleTCsCache
+      .getOrElseUpdate(ct, LowPriorityFormDataRWInstances.deriveNamedTupleTC[T](fieldNames, tcInstances))
+      .asInstanceOf[FormDataRW[T]]
+  }
+
 }

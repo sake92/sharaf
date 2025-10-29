@@ -112,4 +112,9 @@ class FormDataWriteSuite extends munit.FunSuite {
     )
   }
 
+  test("toFormDataMap should write named tuple to string") {
+    val res1 = (q = "searchme", page = 42).toFormDataMap()
+    assertEquals(res1, SeqMap("q" -> Seq(FormValue.Str("searchme")), "page" -> Seq(FormValue.Str("42"))))
+  }
+
 }

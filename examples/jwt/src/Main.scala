@@ -63,7 +63,7 @@ class JwtModule(port: Int) {
       pac4jConfig,
       clientNames.mkString(","),
       null,
-      s"${DefaultMatchers.SECURITYHEADERS},${publicRoutesMatcherName}",
+      s"${DefaultMatchers.SECURITYHEADERS},${publicRoutesMatcherName}"
     )
 
   val server = Undertow
@@ -77,7 +77,8 @@ class JwtModule(port: Int) {
 class NoopSessionStore extends SessionStore {
   override def getTrackableSession(context: WebContext): Optional[AnyRef] = Optional.empty()
 
-  override def buildFromTrackableSession(context: WebContext, trackableSession: Any): Optional[SessionStore] = Optional.empty()
+  override def buildFromTrackableSession(context: WebContext, trackableSession: Any): Optional[SessionStore] =
+    Optional.empty()
 
   override def getSessionId(context: WebContext, createSession: Boolean): Optional[String] = Optional.empty()
 
