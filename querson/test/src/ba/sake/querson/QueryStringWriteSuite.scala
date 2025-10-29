@@ -67,4 +67,9 @@ class QueryStringWriteSuite extends munit.FunSuite {
     assertEquals(res1, "q=default")
   }
 
+  test("toQueryString should write named tuple to string") {
+    val res1 = (q = "searchme", page = 42).toQueryString()
+    assertEquals(res1, "q=searchme&page=42")
+  }
+
 }

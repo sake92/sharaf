@@ -38,4 +38,6 @@ class SseSender {
   private[sharaf] val queue = java.util.concurrent.LinkedBlockingQueue[ServerSentEvent]
   def send(event: ServerSentEvent): Unit =
     queue.put(event)
+
+  // TODO add onComplete, onError
 }

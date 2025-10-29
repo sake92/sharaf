@@ -6,6 +6,13 @@ import java.util.UUID
 
 import scala.deriving.*
 import scala.quoted.*
+import scala.compiletime.summonInline
+import NamedTuple.AnyNamedTuple
+import NamedTuple.Names
+import NamedTuple.DropNames
+import NamedTuple.NamedTuple
+import NamedTuple.withNames
+import scala.deriving.Mirror
 import scala.reflect.ClassTag
 import scala.collection.mutable.ArrayDeque
 import scala.util.Try
@@ -36,7 +43,7 @@ trait QueryStringRW[T] {
     }
 }
 
-object QueryStringRW {
+object QueryStringRW extends LowPriorityQueryStringRWInstances {
 
   def apply[T](using instance: QueryStringRW[T]): QueryStringRW[T] = instance
 
@@ -404,4 +411,45 @@ object QueryStringRW {
 
   private def parseError(path: String, msg: String): Nothing =
     throw ParsingException(ParseError(path, msg))
+}
+
+private[querson] object LowPriorityQueryStringRWInstances {
+  
+  private def deriveNamedTupleTC[T](fieldNames: Seq[String], tcInstances: Seq[QueryStringRW[Any]]) = 
+    new QueryStringRW[T] {
+      override def write(path: String, value: T): QueryStringData =
+        val fieldValues = value.asInstanceOf[Tuple].productIterator.asInstanceOf[Iterator[Any]]
+        val jsonFields = fieldNames.zip(fieldValues).zip(tcInstances).map { case ((name, v), rw) =>
+          name -> rw.write(s"$path.$name", v)
+        }
+        QueryStringData.Obj(jsonFields.toMap)
+
+      override def parse(path: String, qsData: QueryStringData): T = qsData match {
+        case QueryStringData.Obj(fields) =>
+          val fieldMap = fields.toMap
+          val parsedValues = fieldNames.zip(tcInstances).map { case (name, rw) =>
+            fieldMap.get(name) match {
+              case Some(jv) => rw.parse(s"$path.$name", jv)
+              case None     => throw QuersonException(s"Missing field '$name' at path '$path'")
+            }
+          }
+          val tupleValue = Tuple.fromArray(parsedValues.toArray)
+          withNames(tupleValue).asInstanceOf[T]
+        case _ =>
+          throw QuersonException(s"Expected object at path '$path', found: $qsData")
+      }
+    }
+}
+
+private[querson] trait LowPriorityQueryStringRWInstances {
+  // cache instances
+  private val namedTupleTCsCache = scala.collection.mutable.Map.empty[ClassTag[?], QueryStringRW[?]]
+
+  inline given autoderiveNamedTuple[T <: AnyNamedTuple](using ct: ClassTag[T]): QueryStringRW[T] = {
+    val fieldNames = compiletime.constValueTuple[Names[T]].productIterator.asInstanceOf[Iterator[String]].toSeq
+    val tcInstances =
+      compiletime.summonAll[Tuple.Map[DropNames[T], QueryStringRW]].productIterator.asInstanceOf[Iterator[QueryStringRW[Any]]].toSeq
+    namedTupleTCsCache.getOrElseUpdate(ct, LowPriorityQueryStringRWInstances.deriveNamedTupleTC[T](fieldNames, tcInstances)).asInstanceOf[QueryStringRW[T]]
+  }
+
 }

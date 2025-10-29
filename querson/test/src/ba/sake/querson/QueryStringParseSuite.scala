@@ -237,6 +237,11 @@ class QueryStringParseSuite extends munit.FunSuite {
     assertEquals(res, other_package.PageReq(42))
   }
 
+  test("parse named tuple") {
+    val res = Map("q" -> Seq("searchme"), "page" -> Seq("42")).parseQueryStringMap[(q: String, page: Int)]
+    assertEquals(res, (q = "searchme", page = 42))
+  }
+
 }
 
 package other_package_givens {
