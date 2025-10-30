@@ -533,10 +533,10 @@ private[formson] object LowPriorityFormDataRWInstances {
 }
 
 private[formson] trait LowPriorityFormDataRWInstances {
-  // cache instances
-  private val namedTupleTCsCache = scala.collection.mutable.Map.empty[ClassTag[?], FormDataRW[?]]
+  // TODO cache instances
+  //private val namedTupleTCsCache = scala.collection.mutable.Map.empty[String, FormDataRW[?]]
 
-  inline given autoderiveNamedTuple[T <: AnyNamedTuple](using ct: ClassTag[T]): FormDataRW[T] = {
+  inline given autoderiveNamedTuple[T <: AnyNamedTuple]: FormDataRW[T] = {
     val fieldNames = compiletime.constValueTuple[Names[T]].productIterator.asInstanceOf[Iterator[String]].toSeq
     val tcInstances =
       compiletime
@@ -544,9 +544,10 @@ private[formson] trait LowPriorityFormDataRWInstances {
         .productIterator
         .asInstanceOf[Iterator[FormDataRW[Any]]]
         .toSeq
-    namedTupleTCsCache
-      .getOrElseUpdate(ct, LowPriorityFormDataRWInstances.deriveNamedTupleTC[T](fieldNames, tcInstances))
-      .asInstanceOf[FormDataRW[T]]
+    LowPriorityFormDataRWInstances.deriveNamedTupleTC[T](fieldNames, tcInstances)
+    /*namedTupleTCsCache
+      .getOrElseUpdate(cacheKey, LowPriorityFormDataRWInstances.deriveNamedTupleTC[T](fieldNames, tcInstances))
+      .asInstanceOf[FormDataRW[T]]*/
   }
 
 }

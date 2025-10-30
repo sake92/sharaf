@@ -242,6 +242,28 @@ class QueryStringParseSuite extends munit.FunSuite {
     assertEquals(res, (q = "searchme", page = 42))
   }
 
+  test("parse union type") {
+    locally {
+      val res = Map("id" -> Seq("myid1")).parseQueryStringMap[(id: String | Int)]
+      assertEquals(res, (id = "myid1"))
+    }
+    locally {
+      val res = Map("stuff" -> Seq("true")).parseQueryStringMap[(stuff: Int | Boolean)]
+      assertEquals(res, (stuff = true))
+    }
+    locally { // combining named tuples with a union
+      val res1 = Map("color" -> Seq("Red")).parseQueryStringMap[QueryEnum | QuerySeq]
+      assertEquals(res1, QueryEnum(Color.Red))
+      val res2 = Map("a" -> Seq("Red")).parseQueryStringMap[QueryEnum | QuerySeq]
+      assertEquals(res2, QuerySeq(Seq("Red")))
+    }
+    locally { // combining named tuples with a union
+      // TODO fails with "Tuple element types must be known at compile time"
+      // val res = Map("firstname" -> Seq("Mujo")).parseQueryStringMap[(firstname: String) | (lastname: String)]
+      // assertEquals(res, (firstname = "Mujo"))
+    }
+  }
+
 }
 
 package other_package_givens {

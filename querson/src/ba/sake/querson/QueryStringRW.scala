@@ -4,13 +4,11 @@ import java.net.*
 import java.time.*
 import java.util.UUID
 
-import scala.deriving.*
 import scala.quoted.*
 import scala.compiletime.summonInline
 import NamedTuple.AnyNamedTuple
 import NamedTuple.Names
 import NamedTuple.DropNames
-import NamedTuple.NamedTuple
 import NamedTuple.withNames
 import scala.deriving.Mirror
 import scala.reflect.ClassTag
@@ -415,7 +413,7 @@ object QueryStringRW extends LowPriorityQueryStringRWInstances {
 
 private[querson] object LowPriorityQueryStringRWInstances {
 
-  private def deriveNamedTupleTC[T](fieldNames: Seq[String], tcInstances: Seq[QueryStringRW[Any]]) =
+  def deriveNamedTupleTC[T](fieldNames: Seq[String], tcInstances: Seq[QueryStringRW[Any]]) =
     new QueryStringRW[T] {
       override def write(path: String, value: T): QueryStringData =
         val fieldValues = value.asInstanceOf[Tuple].productIterator.asInstanceOf[Iterator[Any]]
@@ -439,13 +437,44 @@ private[querson] object LowPriorityQueryStringRWInstances {
           throw QuersonException(s"Expected object at path '$path', found: $qsData")
       }
     }
+
+  def deriveUnionTC[T: Type](using Quotes): Expr[QueryStringRW[T]] = {
+    import quotes.reflect.*
+    TypeRepr.of[T] match {
+      case OrType(left, right) =>
+        left.asType match {
+          case '[l] =>
+            right.asType match {
+              case '[r] =>
+                '{
+                  new QueryStringRW[T] {
+                    override def write(path: String, value: T): QueryStringData = value match {
+                      case a: l => summonInline[QueryStringRW[l]].write(path, a)
+                      case b: r => summonInline[QueryStringRW[r]].write(path, b)
+                    }
+                    override def parse(path: String, qsData: QueryStringData): T = try {
+                      summonInline[QueryStringRW[l]].parse(path, qsData).asInstanceOf[T]
+                    } catch {
+                      case _: QuersonException =>
+                        summonInline[QueryStringRW[r]].parse(path, qsData).asInstanceOf[T]
+                    }
+                  }
+                }
+            }
+        }
+      case _ =>
+        report.errorAndAbort(s"Cannot automatically derive QueryStringRW for non-union type ${Type.show[T]}")
+    }
+  }
 }
 
 private[querson] trait LowPriorityQueryStringRWInstances {
-  // cache instances
-  private val namedTupleTCsCache = scala.collection.mutable.Map.empty[ClassTag[?], QueryStringRW[?]]
+  // TODO cache instances
+  //private val namedTupleTCsCache = scala.collection.mutable.Map.empty[String, QueryStringRW[?]]
 
-  inline given autoderiveNamedTuple[T <: AnyNamedTuple](using ct: ClassTag[T]): QueryStringRW[T] = {
+  inline given autoderiveUnion[T]: QueryStringRW[T] = ${ LowPriorityQueryStringRWInstances.deriveUnionTC[T] }
+
+  inline given autoderiveNamedTuple[T <: AnyNamedTuple]: QueryStringRW[T] = {
     val fieldNames = compiletime.constValueTuple[Names[T]].productIterator.asInstanceOf[Iterator[String]].toSeq
     val tcInstances =
       compiletime
@@ -453,9 +482,12 @@ private[querson] trait LowPriorityQueryStringRWInstances {
         .productIterator
         .asInstanceOf[Iterator[QueryStringRW[Any]]]
         .toSeq
-    namedTupleTCsCache
-      .getOrElseUpdate(ct, LowPriorityQueryStringRWInstances.deriveNamedTupleTC[T](fieldNames, tcInstances))
-      .asInstanceOf[QueryStringRW[T]]
+    LowPriorityQueryStringRWInstances.deriveNamedTupleTC[T](fieldNames, tcInstances)
+    //val cacheKey = fieldNames.zip(fieldTypes).map { case (n, t) => s"$n:$t" }.mkString("|")
+    //namedTupleTCsCache
+    //  .getOrElseUpdate(cacheKey, LowPriorityQueryStringRWInstances.deriveNamedTupleTC[T](fieldNames, tcInstances))
+     // .asInstanceOf[QueryStringRW[T]]
   }
+
 
 }
