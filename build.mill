@@ -8,7 +8,7 @@ import mill.javalib.SonatypeCentralPublishModule
 import mill.util.VcsVersion
 
 object V:
-  val tupson = "0.13.0"
+  val tupson = "0.16.1"
 
 object `sharaf-core` extends Module:
   object jvm extends SharafCoreModule with ScalaJvmCommonModule:

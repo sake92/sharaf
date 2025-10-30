@@ -249,7 +249,7 @@ class FormDataParseSuite extends munit.FunSuite {
     assertEquals(res, (q = "searchme", page = 42))
   }
 
-   test("parse union type") {
+  test("parse union type") {
     locally {
       val res = SeqMap("id" -> Seq("myid1").map(FormValue.Str.apply)).parseFormDataMap[(id: String | Int)]
       assertEquals(res, (id = "myid1"))
