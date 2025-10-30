@@ -251,7 +251,7 @@ class QueryStringParseSuite extends munit.FunSuite {
       val res = Map("stuff" -> Seq("true")).parseQueryStringMap[(stuff: Int | Boolean)]
       assertEquals(res, (stuff = true))
     }
-    locally { // combining named tuples with a union
+    locally {
       val res1 = Map("color" -> Seq("Red")).parseQueryStringMap[QueryEnum | QuerySeq]
       assertEquals(res1, QueryEnum(Color.Red))
       val res2 = Map("a" -> Seq("Red")).parseQueryStringMap[QueryEnum | QuerySeq]

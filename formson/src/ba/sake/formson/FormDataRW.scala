@@ -5,12 +5,10 @@ import java.nio.file.Path
 import java.time.*
 import java.util.UUID
 import scala.deriving.*
-import scala.quoted.*
 import scala.compiletime.summonInline
 import NamedTuple.AnyNamedTuple
 import NamedTuple.Names
 import NamedTuple.DropNames
-import NamedTuple.NamedTuple
 import NamedTuple.withNames
 import scala.compiletime.*
 import scala.quoted.*
@@ -515,26 +513,59 @@ private[formson] object LowPriorityFormDataRWInstances {
         }
         FormData.Obj(SeqMap.from(fdFields))
 
-      override def parse(path: String, qsData: FormData): T = qsData match {
+      override def parse(path: String, formData: FormData): T = formData match {
         case FormData.Obj(fields) =>
           val fieldMap = fields.toMap
           val parsedValues = fieldNames.zip(tcInstances).map { case (name, rw) =>
             fieldMap.get(name) match {
               case Some(jv) => rw.parse(s"$path.$name", jv)
-              case None     => throw FormsonException(s"Missing field '$name' at path '$path'")
+              case None     => throw ParsingException(ParseError(s"$path.$name", "is missing"))
             }
           }
           val tupleValue = Tuple.fromArray(parsedValues.toArray)
           withNames(tupleValue).asInstanceOf[T]
         case _ =>
-          throw FormsonException(s"Expected object at path '$path', found: $qsData")
+          throw ParsingException(
+            ParseError(path, s"should be Object but it is ${formData.tpe}")
+          )
       }
     }
+
+  def deriveUnionTC[T: Type](using Quotes): Expr[FormDataRW[T]] = {
+    import quotes.reflect.*
+    TypeRepr.of[T] match {
+      case OrType(left, right) =>
+        left.asType match {
+          case '[l] =>
+            right.asType match {
+              case '[r] =>
+                '{
+                  new FormDataRW[T] {
+                    override def write(path: String, value: T): FormData = value match {
+                      case a: l => summonInline[FormDataRW[l]].write(path, a)
+                      case b: r => summonInline[FormDataRW[r]].write(path, b)
+                    }
+                    override def parse(path: String, formData: FormData): T = try {
+                      summonInline[FormDataRW[l]].parse(path, formData).asInstanceOf[T]
+                    } catch {
+                      case _: FormsonException =>
+                        summonInline[FormDataRW[r]].parse(path, formData).asInstanceOf[T]
+                    }
+                  }
+                }
+            }
+        }
+      case _ =>
+        report.errorAndAbort(s"Cannot automatically derive FormDataRW for non-union type ${Type.show[T]}")
+    }
+  }
 }
 
 private[formson] trait LowPriorityFormDataRWInstances {
   // TODO cache instances
-  //private val namedTupleTCsCache = scala.collection.mutable.Map.empty[String, FormDataRW[?]]
+  // private val namedTupleTCsCache = scala.collection.mutable.Map.empty[String, FormDataRW[?]]
+
+  inline given autoderiveUnion[T]: FormDataRW[T] = ${ LowPriorityFormDataRWInstances.deriveUnionTC[T] }
 
   inline given autoderiveNamedTuple[T <: AnyNamedTuple]: FormDataRW[T] = {
     val fieldNames = compiletime.constValueTuple[Names[T]].productIterator.asInstanceOf[Iterator[String]].toSeq

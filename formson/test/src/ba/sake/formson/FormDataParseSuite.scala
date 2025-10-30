@@ -248,4 +248,26 @@ class FormDataParseSuite extends munit.FunSuite {
       .parseFormDataMap[(q: String, page: Int)]
     assertEquals(res, (q = "searchme", page = 42))
   }
+
+   test("parse union type") {
+    locally {
+      val res = SeqMap("id" -> Seq("myid1").map(FormValue.Str.apply)).parseFormDataMap[(id: String | Int)]
+      assertEquals(res, (id = "myid1"))
+    }
+    locally {
+      val res = SeqMap("stuff" -> Seq("true").map(FormValue.Str.apply)).parseFormDataMap[(stuff: Int | Boolean)]
+      assertEquals(res, (stuff = true))
+    }
+    locally {
+      val res1 = SeqMap("color" -> Seq("Red").map(FormValue.Str.apply)).parseFormDataMap[FormEnum | FormSeq]
+      assertEquals(res1, FormEnum(Color.Red))
+      val res2 = SeqMap("a" -> Seq("Red").map(FormValue.Str.apply)).parseFormDataMap[FormEnum | FormSeq]
+      assertEquals(res2, FormSeq(Seq("Red")))
+    }
+    locally { // combining named tuples with a union
+      // TODO fails with "Tuple element types must be known at compile time"
+      // val res = SeqMap("firstname" -> Seq("Mujo")).parseFormDataMap[(firstname: String) | (lastname: String)]
+      // assertEquals(res, (firstname = "Mujo"))
+    }
+  }
 }
