@@ -80,9 +80,7 @@ object ResponseWritable extends LowPriResponseWritableInstances {
       ConnectionHttpString -> Seq("keep-alive")
     )
   }
-}
-
-trait LowPriResponseWritableInstances {
+  
   given ResponseWritable[geny.Writable] with {
     override def write(value: geny.Writable, outputStream: OutputStream): Unit =
       value.writeBytesTo(outputStream)
@@ -94,3 +92,5 @@ trait LowPriResponseWritableInstances {
       )
   }
 }
+
+trait LowPriResponseWritableInstances {}
