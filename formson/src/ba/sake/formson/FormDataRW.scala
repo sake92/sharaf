@@ -440,6 +440,37 @@ object FormDataRW extends LowPriorityFormDataRWInstances {
       case _ => report.errorAndAbort(s"Sum types are not supported ")
   }
 
+  inline given autoderiveUnion[T: IsUnion]: FormDataRW[T] = ${ deriveUnionTC[T] }
+
+  private def deriveUnionTC[T: Type](using Quotes): Expr[FormDataRW[T]] = {
+    import quotes.reflect.*
+    TypeRepr.of[T] match {
+      case OrType(left, right) =>
+        left.asType match {
+          case '[l] =>
+            right.asType match {
+              case '[r] =>
+                '{
+                  new FormDataRW[T] {
+                    override def write(path: String, value: T): FormData = value match {
+                      case a: l => summonInline[FormDataRW[l]].write(path, a)
+                      case b: r => summonInline[FormDataRW[r]].write(path, b)
+                    }
+                    override def parse(path: String, formData: FormData): T = try {
+                      summonInline[FormDataRW[l]].parse(path, formData).asInstanceOf[T]
+                    } catch {
+                      case _: FormsonException =>
+                        summonInline[FormDataRW[r]].parse(path, formData).asInstanceOf[T]
+                    }
+                  }
+                }
+            }
+        }
+      case _ =>
+        report.errorAndAbort(s"Cannot automatically derive FormDataRW for non-union type ${Type.show[T]}")
+    }
+  }
+
   /* macro utils */
   private def summonInstances[T: Type, Elems: Type](using Quotes): List[Expr[FormDataRW[?]]] =
     Type.of[Elems] match
@@ -502,7 +533,18 @@ object FormDataRW extends LowPriorityFormDataRWInstances {
     throw ParsingException(ParseError(path, msg))
 }
 
-private[formson] object LowPriorityFormDataRWInstances {
+private[formson] trait LowPriorityFormDataRWInstances {
+
+  inline given autoderiveNamedTuple[T <: AnyNamedTuple]: FormDataRW[T] = {
+    val fieldNames = compiletime.constValueTuple[Names[T]].productIterator.asInstanceOf[Iterator[String]].toSeq
+    val tcInstances =
+      compiletime
+        .summonAll[Tuple.Map[DropNames[T], FormDataRW]]
+        .productIterator
+        .asInstanceOf[Iterator[FormDataRW[Any]]]
+        .toSeq
+    deriveNamedTupleTC[T](fieldNames, tcInstances)
+  }
 
   private def deriveNamedTupleTC[T](fieldNames: Seq[String], tcInstances: Seq[FormDataRW[Any]]) =
     new FormDataRW[T] {
@@ -530,55 +572,5 @@ private[formson] object LowPriorityFormDataRWInstances {
           )
       }
     }
-
-  def deriveUnionTC[T: Type](using Quotes): Expr[FormDataRW[T]] = {
-    import quotes.reflect.*
-    TypeRepr.of[T] match {
-      case OrType(left, right) =>
-        left.asType match {
-          case '[l] =>
-            right.asType match {
-              case '[r] =>
-                '{
-                  new FormDataRW[T] {
-                    override def write(path: String, value: T): FormData = value match {
-                      case a: l => summonInline[FormDataRW[l]].write(path, a)
-                      case b: r => summonInline[FormDataRW[r]].write(path, b)
-                    }
-                    override def parse(path: String, formData: FormData): T = try {
-                      summonInline[FormDataRW[l]].parse(path, formData).asInstanceOf[T]
-                    } catch {
-                      case _: FormsonException =>
-                        summonInline[FormDataRW[r]].parse(path, formData).asInstanceOf[T]
-                    }
-                  }
-                }
-            }
-        }
-      case _ =>
-        report.errorAndAbort(s"Cannot automatically derive FormDataRW for non-union type ${Type.show[T]}")
-    }
-  }
-}
-
-private[formson] trait LowPriorityFormDataRWInstances {
-  // TODO cache instances
-  // private val namedTupleTCsCache = scala.collection.mutable.Map.empty[String, FormDataRW[?]]
-
-  inline given autoderiveUnion[T]: FormDataRW[T] = ${ LowPriorityFormDataRWInstances.deriveUnionTC[T] }
-
-  inline given autoderiveNamedTuple[T <: AnyNamedTuple]: FormDataRW[T] = {
-    val fieldNames = compiletime.constValueTuple[Names[T]].productIterator.asInstanceOf[Iterator[String]].toSeq
-    val tcInstances =
-      compiletime
-        .summonAll[Tuple.Map[DropNames[T], FormDataRW]]
-        .productIterator
-        .asInstanceOf[Iterator[FormDataRW[Any]]]
-        .toSeq
-    LowPriorityFormDataRWInstances.deriveNamedTupleTC[T](fieldNames, tcInstances)
-    /*namedTupleTCsCache
-      .getOrElseUpdate(cacheKey, LowPriorityFormDataRWInstances.deriveNamedTupleTC[T](fieldNames, tcInstances))
-      .asInstanceOf[FormDataRW[T]]*/
-  }
 
 }
