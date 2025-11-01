@@ -41,7 +41,11 @@
       <summary>Table of Contents</summary>
       <div>
        <ul>
-        <li><a href="#forms">Forms</a></li>
+        <li><a href="#forms">Forms</a>
+         <ul>
+          <li><a href="#named-tuples">Named Tuples</a></li>
+          <li><a href="#union-types">Union Types</a></li>
+         </ul></li>
        </ul>
       </div>
      </details>
@@ -103,6 +107,19 @@ println(<span class="hljs-string">"Server started at http://localhost:8181"</spa
    <pre>            <code class="language- hljs language-less" data-highlighted="yes"><span class="hljs-selector-tag">Got</span> <span class="hljs-selector-tag">form</span> <span class="hljs-selector-tag">data</span>: <span class="hljs-selector-tag">ContactUsForm</span>(Bob,bob<span class="hljs-variable">@example</span>.com)
 </code>
           </pre>
+   <h2 id="named-tuples">Named Tuples<a href="#named-tuples" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+   <p>You can also use named tuples to parse form params: <code>Request.current.bodyForm[(fullName: String, email: String)]</code>. In this case you don't even need to define a separate class!</p>
+   <blockquote>
+    <p>Note that you can't use <a href="https://sake92.github.io/sharaf/tutorials/validation.html">Validation</a> with named tuples</p>
+   </blockquote>
+   <h2 id="union-types">Union Types<a href="#union-types" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+   <p>Union Types are also handy sometimes. Say you have a filter functionality, where a user can submit a "firstName" or "lastName". You can write: <code>Request.current.bodyForm[(firstName: String) | (lastName: String)]</code>.</p>
+   <p>Here we are combining 2 named tuples together with into a union type. You could use any other type of course.</p>
+   <hr>
+   <p>You can also write <code>Request.current.bodyForm[(id: Int | String)]</code>, but we would not recommend it.
+    <br>
+    Of course, if you need it, go for it!</p>
+   <p>In this case, it will first try to parse an <code>Int</code> and if that fails it will parse a <code>String</code>.</p>
   </main>
   <footer class="pico container flex-centered">
    <a href="https://github.com/sake92/sharaf"> <!--?xml version="1.0" encoding="utf-8"?--><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools --> 

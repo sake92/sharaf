@@ -45,6 +45,8 @@
          <ul>
           <li><a href="#raw">Raw</a></li>
           <li><a href="#typed">Typed</a></li>
+          <li><a href="#named-tuples">Named Tuples</a></li>
+          <li><a href="#union-types">Union Types</a></li>
          </ul></li>
        </ul>
       </div>
@@ -105,6 +107,19 @@ println(<span class="hljs-string">s"Server started at http://localhost:8181"</sp
    <pre>            <code class="language- hljs language-ini" data-highlighted="yes"><span class="hljs-attr">params</span> = SearchParams(what,<span class="hljs-number">10</span>)
 </code>
           </pre>
+   <h2 id="named-tuples">Named Tuples<a href="#named-tuples" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+   <p>You can also use named tuples to parse query params: <code>Request.current.queryParams[(q: String, perPage: Int)]</code>. In this case you don't even need to define a separate class!</p>
+   <blockquote>
+    <p>Note that you can't use <a href="https://sake92.github.io/sharaf/tutorials/validation.html">Validation</a> with named tuples</p>
+   </blockquote>
+   <h2 id="union-types">Union Types<a href="#union-types" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+   <p>Union Types are also handy sometimes. Say you have a filter functionality, where a user can filter by "firstName" or by "lastName". You can write: <code>Request.current.queryParams[(firstName: String) | (lastName: String)]</code>.</p>
+   <p>Here we are combining 2 named tuples together with into a union type. You could use any other type of course.</p>
+   <hr>
+   <p>You can also write <code>Request.current.queryParams[(id: Int | String)]</code>, but we would not recommend it.
+    <br>
+    Of course, if you need it, go for it!</p>
+   <p>In this case, it will first try to parse an <code>Int</code> and if that fails it will parse a <code>String</code>.</p>
   </main>
   <footer class="pico container flex-centered">
    <a href="https://github.com/sake92/sharaf"> <!--?xml version="1.0" encoding="utf-8"?--><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools --> 
