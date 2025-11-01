@@ -21,7 +21,8 @@ set tutorials = [
     { label: "Validation", url: "/tutorials/validation.html" },
     { label: "SQL", url: "/tutorials/sql.html" },
     { label: "Tests", url: "/tutorials/tests.html" },
-    { label: "HTMX", url: "/tutorials/htmx.html" }
+    { label: "HTMX", url: "/tutorials/htmx.html" },
+    { label: "Server Sent Events", url: "/tutorials/sse.html" }
 ]
 
 %}
