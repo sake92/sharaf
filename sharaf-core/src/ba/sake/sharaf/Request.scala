@@ -1,5 +1,6 @@
 package ba.sake.sharaf
 
+import scala.NamedTuple.AnyNamedTuple
 import ba.sake.tupson.*
 import ba.sake.formson.*
 import ba.sake.querson.*
@@ -18,11 +19,11 @@ trait Request {
   def queryParamsRaw: QueryStringMap
 
   // must be a Product (case class)
-  def queryParams[T <: Product: QueryStringRW]: T =
+  def queryParams[T <: Product | AnyNamedTuple: QueryStringRW]: T =
     try queryParamsRaw.parseQueryStringMap
     catch case e: QuersonException => throw RequestHandlingException(e)
 
-  def queryParamsValidated[T <: Product: QueryStringRW: Validator]: T =
+  def queryParamsValidated[T <: Product | AnyNamedTuple: QueryStringRW: Validator]: T =
     try queryParams[T].validateOrThrow
     catch case e: ValidsonException => throw RequestHandlingException(e)
 
@@ -44,11 +45,11 @@ trait Request {
   def bodyFormRaw: FormDataMap
 
   // must be a Product (case class)
-  def bodyForm[T <: Product: FormDataRW]: T =
+  def bodyForm[T <: Product | AnyNamedTuple: FormDataRW]: T =
     try bodyFormRaw.parseFormDataMap[T]
     catch case e: FormsonException => throw RequestHandlingException(e)
 
-  def bodyFormValidated[T <: Product: FormDataRW: Validator]: T =
+  def bodyFormValidated[T <: Product | AnyNamedTuple: FormDataRW: Validator]: T =
     try bodyForm[T].validateOrThrow
     catch case e: ValidsonException => throw RequestHandlingException(e)
 
