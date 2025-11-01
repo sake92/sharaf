@@ -18,7 +18,7 @@ scala-cli compile examples\scala-cli
 ```sh
 
 # RELEASE
-./scripts/release.sh 0.14.0
+./scripts/release.sh 0.14.1
 
 ```
 
