@@ -23,7 +23,7 @@ UndertowSharafServer("localhost", 8181, routes).start()
 
 ## Cheatsheet
 
-### Route matching
+### Route Matching
 
 ```scala
 // matches /hello/world
@@ -54,7 +54,7 @@ val userIdRegex = "user_id_(\\d+)".r
 case GET -> Path("hello", userIdRegex(userId)) =>
 ```
 
-### Query Params
+### Handling Query Params
 
 ```scala
 // raw map of query params: Map[String, Seq[String]]
@@ -83,7 +83,7 @@ val qp = Request.current.queryParams[(firstName: String) | (lastName: String)]
 
 
 
-### Form Data
+### Handling Form Data
 
 ```scala
 // raw map of form data: SeqMap[String, Seq[FormValue]]
@@ -111,7 +111,7 @@ val formData = Request.current.bodyForm[(firstName: String) | (lastName: String)
 ```
 
 
-### JSON Data
+### Handling JSON Data
 
 ```scala
 // raw map of JSON data: JValue
@@ -136,6 +136,28 @@ val jsonData = Request.current.bodyJson[(id: Int | String)]
 
 // JSON parsed into a union of named tuples
 val jsonData = Request.current.bodyJson[(firstName: String) | (lastName: String)]
+```
+
+### Returning HTML
+
+```scala
+case GET -> Path() =>
+  Response.withBody(IndexView)
+...
+// use safe html"" interpolator
+// works very well in combo with HTMX
+def IndexView =
+  html"""
+    <!DOCTYPE html>
+    <html lang="en">
+    <body>
+    <div>
+        <p>Welcome!</p>
+        <a href="/hello/Bob">Hello world</a>
+    </div>
+    </body>
+    </html>
+  """
 ```
 
 ### Server Sent Events
