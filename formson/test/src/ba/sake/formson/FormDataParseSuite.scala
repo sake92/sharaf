@@ -111,6 +111,20 @@ class FormDataParseSuite extends munit.FunSuite {
     }
   }
 
+  test("parseFormDataMap should parse nested fields of sequences") {
+    locally {
+      val data = FormNestedSeq("text", Seq(Page(3, 50), Page(4, 60)))
+      val formDataMap = SeqMap(
+        "search" -> Seq("text").map(FormValue.Str.apply),
+        "pages[0][number]" -> Seq("3").map(FormValue.Str.apply),
+        "pages[0][size]" -> Seq("50").map(FormValue.Str.apply),
+        "pages[1][number]" -> Seq("4").map(FormValue.Str.apply),
+        "pages[1][size]" -> Seq("60").map(FormValue.Str.apply)
+      )
+      assertEquals(formDataMap.parseFormDataMap[FormNestedSeq], data)
+    }
+  }
+
   test("parseFormDataMap should parse falling back to defaults") {
     Seq[(FormDataMap, FormDefaults)](
       (
