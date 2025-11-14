@@ -36,6 +36,7 @@ case class FormEnum(color: Color) derives FormDataRW
 case class FormSeq(a: Seq[String]) derives FormDataRW
 case class FormSeqSeq(a: Seq[Seq[String]]) derives FormDataRW
 
+case class FormNestedSeq(search: String, pages: Seq[Page]) derives FormDataRW
 case class FormNested(search: String, p: Page) derives FormDataRW
 case class Page(number: Int, size: Int) derives FormDataRW
 

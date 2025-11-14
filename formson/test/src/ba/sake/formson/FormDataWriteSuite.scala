@@ -49,6 +49,20 @@ class FormDataWriteSuite extends munit.FunSuite {
     }
   }
 
+  test("toFormDataMap should write nested fields of sequences") {
+    locally {
+      val data = FormNestedSeq("text", Seq(Page(3, 50), Page(4, 60)))
+      val formDataMap = SeqMap(
+        "search" -> Seq("text").map(FormValue.Str.apply),
+        "pages[0][number]" -> Seq("3").map(FormValue.Str.apply),
+        "pages[0][size]" -> Seq("50").map(FormValue.Str.apply),
+        "pages[1][number]" -> Seq("4").map(FormValue.Str.apply),
+        "pages[1][size]" -> Seq("60").map(FormValue.Str.apply)
+      )
+      assertEquals(data.toFormDataMap(), formDataMap)
+    }
+  }
+
   test("toFormDataMap should write nested fields") {
     locally {
       val data = FormNested("text", Page(3, 50))

@@ -46,7 +46,7 @@ private[formson] class FormsonParser(formDataMap: FormDataMap) {
   private def merge(acc: FormDataInternal, second: FormDataInternal): FormDataInternal = (acc, second) match {
 
     case (Simple(_), Simple(_)) =>
-      // - if we get many values we juts merge them into a sequence
+      // - if we get many values we just merge them into a sequence
       // - this could happen when you have a=a1 & a[]=a2 for example
       // both should be considered as part of the same Seq..
       Sequence(SortedMap(0 -> Seq(acc, second)))
@@ -68,7 +68,9 @@ private[formson] class FormsonParser(formDataMap: FormDataMap) {
         seqAcc.get(idx) match
           case None => seqAcc(idx) = values
           case Some(existingValues) =>
-            seqAcc(idx) = existingValues ++ values
+            val allValues = existingValues ++ values
+            val (objects, nonObjects) = allValues.partition(_.isInstanceOf[Obj])
+            seqAcc(idx) = nonObjects ++ objects.reduceOption(merge)
       }
       Sequence(seqAcc.to(SortedMap))
 
