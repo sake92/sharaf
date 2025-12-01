@@ -49,9 +49,14 @@ object `package` extends Module:
       def mvnDeps = super.mvnDeps() ++ Seq(
         mvn"no.nav.security:mock-oauth2-server:0.5.10"
       )
+  
+  object `jdk-httpserver` extends SharafExampleModule:
+    def moduleDeps = Seq(build.`sharaf-jdk-httpserver`)
+    object test extends ScalaTests with SharafTestModule
 
   object snunit extends SharafExampleModule with ScalaNativeCommonModule:
     def moduleDeps = Seq(`sharaf-snunit`)
+
   object http4s extends Module:
     trait HttpsModule extends SharafExampleModule:
       def mvnDeps = super.mvnDeps() ++ Seq(
