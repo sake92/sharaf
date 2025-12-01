@@ -7,8 +7,10 @@ trait SharafHandler:
   def handle(context: RequestContext): Response[?]
 
 object SharafHandler:
-  def routes(routes: Routes): SharafHandler =
-    RoutesHandler(routes)
+  def routes(routess: Routes): SharafHandler =
+    routes(routess, None)
+  def routes(routess: Routes, notFoundHandler: Option[Request => Response[?]]): SharafHandler =
+    RoutesHandler(routess, notFoundHandler)
 
   def exceptions(next: SharafHandler): SharafHandler =
     exceptions(ExceptionMapper.default, next)

@@ -5,6 +5,7 @@ import io.undertow.server.HttpHandler
 import io.undertow.server.HttpServerExchange
 import ba.sake.sharaf.exceptions.ExceptionMapper
 
+// TODO figure out how to remove this one :/
 final class UndertowExceptionHandler(exceptionMapper: ExceptionMapper, next: HttpHandler) extends HttpHandler {
 
   override def handleRequest(exchange: HttpServerExchange): Unit =
