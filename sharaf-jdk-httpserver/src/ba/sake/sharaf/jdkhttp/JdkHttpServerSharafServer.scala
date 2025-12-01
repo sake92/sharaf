@@ -30,22 +30,16 @@ object JdkHttpServerSharafServer {
       exceptionMapper: ExceptionMapper = ExceptionMapper.default,
       notFoundHandler: Request => Response[?] = _ => defaultNotFoundResponse
   ): JdkHttpServerSharafServer = {
-    val notFoundRoutes = Routes { _ =>
-      notFoundHandler(Request.current)
-    }
-    val finalHandler = JdkHttpExceptionHandler(
+    val finalHandler = SharafHandler.exceptions(
       exceptionMapper,
-      next = SharafJdkHttpHandler(
-        SharafHandler.cors(
-          corsSettings,
-          SharafHandler.routes(routes)
-        ),
-        next = Some(
-          SharafJdkHttpHandler(SharafHandler.routes(notFoundRoutes))
+      next = SharafHandler.cors(
+        corsSettings,
+        SharafHandler.routes(
+          routes, Some(notFoundHandler)
         )
       )
     )
-    new JdkHttpServerSharafServer(host, port, finalHandler)
+    new JdkHttpServerSharafServer(host, port, SharafJdkHttpHandler(finalHandler))
   }
 
   def apply(host: String, port: Int, sharafHandler: SharafHandler): JdkHttpServerSharafServer =

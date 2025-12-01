@@ -36,6 +36,7 @@ object UndertowSharafServer {
     val notFoundRoutes = Routes { _ =>
       notFoundHandler(Request.current)
     }
+    // TODO manually implement serving static files from public/ folder and webjars
     val resourceHandler = ResourceHandler( // load from classpath in public/ folder
       ClassPathResourceManager(getClass.getClassLoader, "public"), {
         // or load from classpath in WebJars
@@ -55,7 +56,7 @@ object UndertowSharafServer {
           next = SharafUndertowHandler(
             SharafHandler.cors(
               corsSettings,
-              SharafHandler.routes(routes)
+              SharafHandler.routes(routes, None)
             ),
             next = Some(resourceHandler)
           )
