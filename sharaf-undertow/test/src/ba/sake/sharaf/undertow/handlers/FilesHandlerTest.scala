@@ -22,7 +22,7 @@ class FilesHandlerTest extends munit.FunSuite {
     filesHandler
   )
   val port = NetworkUtils.getFreePort()
-  val server = UndertowSharafServer("localhost", port, SharafHandler.exceptions(ExceptionMapper.default, routesHandler))
+  val server = UndertowSharafServer("localhost", port, SharafHandler.exceptions(routesHandler, ExceptionMapper.default))
 
   override def beforeAll(): Unit = server.start()
 

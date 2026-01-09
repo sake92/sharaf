@@ -2,8 +2,6 @@ package ba.sake.sharaf.undertow
 
 import io.undertow.Undertow
 import io.undertow.server.handlers.BlockingHandler
-import io.undertow.server.handlers.resource.ResourceHandler
-import io.undertow.server.handlers.resource.ClassPathResourceManager
 import ba.sake.sharaf.*
 
 class UndertowSharafServer(host: String, port: Int, handler: SharafUndertowHandler) {
@@ -33,28 +31,18 @@ object UndertowSharafServer {
       exceptionMapper: ExceptionMapper = ExceptionMapper.default,
       notFoundHandler: SharafHandler = SharafHandler.DefaultNotFoundHandler
   ): UndertowSharafServer = {
-    // TODO manually implement serving static files from public/ folder and webjars
-    val resourceHandler = ResourceHandler( // load from classpath in public/ folder
-      ClassPathResourceManager(getClass.getClassLoader, "public"), {
-        // or load from classpath in WebJars
-        val webJarHandler = new ResourceHandler(
-          ClassPathResourceManager(getClass.getClassLoader, "META-INF/resources/webjars"),
-          SharafUndertowHandler(notFoundHandler) // handle 404s at the end
-        )
-        // dont serve index.html etc from random webjars...
-        webJarHandler.setWelcomeFiles()
-        webJarHandler
-      }
+    val cpResHandler = SharafHandler.classpathResources(
+      "public",
+      SharafHandler.classpathResources("META-INF/resources/webjars", notFoundHandler)
     )
     val finalHandler = SharafUndertowHandler(
       SharafHandler.exceptions(
-        exceptionMapper,
         SharafHandler.cors(
-          corsSettings,
-          SharafHandler.routes(routes, notFoundHandler)
-        )
-      ),
-      notFoundHandler = Some(resourceHandler)
+          SharafHandler.routes(routes, cpResHandler),
+          corsSettings
+        ),
+        exceptionMapper
+      )
     )
     new UndertowSharafServer(host, port, finalHandler)
   }

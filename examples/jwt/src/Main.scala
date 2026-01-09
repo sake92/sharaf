@@ -51,15 +51,12 @@ class JwtModule(port: Int) {
   pac4jConfig.addMatcher(publicRoutesMatcherName, publicRoutesMatcher)
   private val securityHandler =
     SecurityHandler.build(
-      UndertowExceptionHandler(
-        ExceptionMapper.default,
-        SharafUndertowHandler(SharafHandler.routes(Routes {
-          case GET -> Path() =>
-            Response.withBody("Hello there! This is a public endpoint. Try accessing localhost:8181/protected.")
-          case GET -> Path("protected") =>
-            Response.withBody("This is a protected resource. You are authenticated.")
-        }))
-      ),
+      SharafUndertowHandler(SharafHandler.routes(Routes {
+        case GET -> Path() =>
+          Response.withBody("Hello there! This is a public endpoint. Try accessing localhost:8181/protected.")
+        case GET -> Path("protected") =>
+          Response.withBody("This is a protected resource. You are authenticated.")
+      })),
       pac4jConfig,
       clientNames.mkString(","),
       null,
