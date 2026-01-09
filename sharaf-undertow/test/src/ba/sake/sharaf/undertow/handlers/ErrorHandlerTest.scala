@@ -51,8 +51,8 @@ class ErrorHandlerTest extends munit.FunSuite {
           BlockingHandler(
             SharafUndertowHandler(
               SharafHandler.exceptions(
-                ExceptionMapper.json,
-                SharafHandler.routes(routes)
+                SharafHandler.routes(routes),
+                ExceptionMapper.json
               )
             )
           )

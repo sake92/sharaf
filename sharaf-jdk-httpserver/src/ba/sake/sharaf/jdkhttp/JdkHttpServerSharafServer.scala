@@ -27,15 +27,16 @@ object JdkHttpServerSharafServer {
       exceptionMapper: ExceptionMapper = ExceptionMapper.default,
       notFoundHandler: SharafHandler = SharafHandler.DefaultNotFoundHandler
   ): JdkHttpServerSharafServer = {
+    val cpResHandler = SharafHandler.classpathResources(
+      "public",
+      SharafHandler.classpathResources("META-INF/resources/webjars", notFoundHandler)
+    )
     val finalHandler = SharafHandler.exceptions(
-      exceptionMapper,
       SharafHandler.cors(
-        corsSettings,
-        SharafHandler.routes(
-          routes,
-          notFoundHandler
-        )
-      )
+        SharafHandler.routes(routes, cpResHandler),
+        corsSettings
+      ),
+      exceptionMapper
     )
     new JdkHttpServerSharafServer(host, port, SharafJdkHttpHandler(finalHandler))
   }

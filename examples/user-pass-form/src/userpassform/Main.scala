@@ -54,10 +54,7 @@ class UserPassFormModule(port: Int) {
   val securityService = SecurityService(pac4jConfig)
   private val securityHandler =
     SecurityHandler.build(
-      UndertowExceptionHandler(
-        ExceptionMapper.default,
-        SharafUndertowHandler(SharafHandler.routes(AppRoutes(callbackUrl, securityService).routes))
-      ),
+      SharafUndertowHandler(SharafHandler.routes(AppRoutes(callbackUrl, securityService).routes)),
       pac4jConfig,
       clientNames.mkString(","),
       null,

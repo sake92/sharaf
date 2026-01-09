@@ -7,6 +7,7 @@ import ba.sake.querson
 import ba.sake.validson
 import ba.sake.sharaf.*
 import ProblemDetails.ArgumentProblem
+import scala.util.control.NonFatal
 
 /*
 Why not HTTP content negotiation?
@@ -52,12 +53,21 @@ object ExceptionMapper {
         case None =>
           se.printStackTrace()
           Response.withBody("Server error").withStatus(StatusCode.InternalServerError)
+    case NonFatal(unknown) =>
+      unknown.printStackTrace()
+      Response.withBody("Server error").withStatus(StatusCode.InternalServerError)
   }
 
   val json: ExceptionMapper = {
     case e: NotFoundException =>
       val problemDetails = ProblemDetails(StatusCode.NotFound.code, "Not Found", e.getMessage)
       Response.withBody(problemDetails).withStatus(StatusCode.NotFound)
+    case e: RejectedException =>
+      val problemDetails = ProblemDetails(StatusCode.Forbidden.code, "Forbidden", e.getMessage)
+      Response.withBody(problemDetails).withStatus(StatusCode.Forbidden)
+    case e: MethodNotAllowedException =>
+      val problemDetails = ProblemDetails(StatusCode.MethodNotAllowed.code, "Method Not Allowed", e.getMessage)
+      Response.withBody(problemDetails).withStatus(StatusCode.MethodNotAllowed)
     case se: SharafException =>
       Option(se.getCause) match
         case Some(cause) =>
@@ -100,6 +110,11 @@ object ExceptionMapper {
           Response
             .withBody(ProblemDetails(StatusCode.InternalServerError.code, "Server error", ""))
             .withStatus(StatusCode.InternalServerError)
+    case NonFatal(unknown) =>
+      unknown.printStackTrace()
+      Response
+        .withBody(ProblemDetails(StatusCode.InternalServerError.code, "Server error", ""))
+        .withStatus(StatusCode.InternalServerError)
   }
 
 }

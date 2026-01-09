@@ -20,18 +20,23 @@ object SharafHandler:
 
   def files(
       directoryPath: java.nio.file.Path,
-      next: SharafHandler = DefaultNotFoundHandler
+      notFoundHandler: SharafHandler = DefaultNotFoundHandler
   ): SharafHandler =
-    FilesHandler(directoryPath, next)
+    FilesHandler(directoryPath, notFoundHandler)
 
-  def exceptions(wrappedHandler: SharafHandler): SharafHandler =
-    exceptions(ExceptionMapper.default, wrappedHandler)
-  def exceptions(exceptionMapper: ExceptionMapper, wrappedHandler: SharafHandler): SharafHandler =
+  def classpathResources(
+      rootPath: String,
+      notFoundHandler: SharafHandler = DefaultNotFoundHandler
+  ): SharafHandler =
+    ClasspathResourcesHandler(rootPath, notFoundHandler)
+
+  def exceptions(
+      wrappedHandler: SharafHandler,
+      exceptionMapper: ExceptionMapper = ExceptionMapper.default
+  ): SharafHandler =
     ExceptionHandler(exceptionMapper, wrappedHandler)
 
-  def cors(next: SharafHandler): SharafHandler =
-    cors(CorsSettings.default, next)
-  def cors(corsSettings: CorsSettings, next: SharafHandler): SharafHandler =
+  def cors(next: SharafHandler, corsSettings: CorsSettings = CorsSettings.default): SharafHandler =
     CorsHandler(corsSettings, next)
 
 case class RequestContext(
