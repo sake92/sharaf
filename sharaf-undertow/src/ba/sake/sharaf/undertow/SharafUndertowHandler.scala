@@ -7,7 +7,7 @@ import ba.sake.sharaf.routing.*
 import ba.sake.sharaf.undertow.*
 import ba.sake.sharaf.exceptions.NotFoundException
 
-final class SharafUndertowHandler(sharafHandler: SharafHandler, next: Option[HttpHandler] = None) extends HttpHandler {
+final class SharafUndertowHandler(sharafHandler: SharafHandler, notFoundHandler: Option[HttpHandler] = None) extends HttpHandler {
 
   override def handleRequest(exchange: HttpServerExchange): Unit =
     val reqParams = fillReqParams(exchange)
@@ -18,7 +18,7 @@ final class SharafUndertowHandler(sharafHandler: SharafHandler, next: Option[Htt
       ResponseUtils.writeResponse(res, exchange)
     } catch {
       case e: NotFoundException =>
-        next match {
+        notFoundHandler match {
           case Some(handler) => handler.handleRequest(exchange)
           case None          => throw e
         }

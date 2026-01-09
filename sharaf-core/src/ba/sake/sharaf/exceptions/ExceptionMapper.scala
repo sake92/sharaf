@@ -25,6 +25,10 @@ object ExceptionMapper {
   val default: ExceptionMapper = {
     case e: NotFoundException =>
       Response.withBody(e.getMessage).withStatus(StatusCode.NotFound)
+    case e: RejectedException =>
+      Response.withBody(e.getMessage).withStatus(StatusCode.Forbidden)
+    case e: MethodNotAllowedException =>
+      Response.withBody(e.getMessage).withStatus(StatusCode.MethodNotAllowed)
     case se: SharafException =>
       Option(se.getCause) match
         case Some(cause) =>

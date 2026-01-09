@@ -1,16 +1,11 @@
 package ba.sake.sharaf.handlers
 
 import ba.sake.sharaf.*
-import ba.sake.sharaf.exceptions.NotFoundException
 
-class RoutesHandler(routes: Routes, notFoundHandler: Option[Request => Response[?]]) extends SharafHandler:
+class RoutesHandler(routes: Routes, notFoundHandler: SharafHandler) extends SharafHandler:
   override def handle(context: RequestContext): Response[?] =
     given Request = context.request
     val routesDefinition = routes.definition
     routesDefinition.lift(context.params) match
       case Some(response) => response
-      case None           => notFoundHandler match
-        case None => throw NotFoundException("Route not found")
-        case Some(value) => value(context.request)
-      
-
+      case None           => notFoundHandler.handle(context)

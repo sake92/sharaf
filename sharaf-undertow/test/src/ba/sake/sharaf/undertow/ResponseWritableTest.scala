@@ -33,7 +33,7 @@ class ResponseWritableTest extends munit.FunSuite {
         .write("hello".getBytes(StandardCharsets.UTF_8))
       Response.default
     case GET -> Path("file") =>
-      val file = testFileResourceDir.resolve("text_file.txt")
+      val file = testFileResourceDir.resolve("myfiles/text_file.txt")
       Response.withBody(file)
     case GET -> Path("json") =>
       case class JsonCaseClass(name: String, age: Int) derives JsonRW
