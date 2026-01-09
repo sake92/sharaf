@@ -4,10 +4,10 @@ import scala.util.control.NonFatal
 import ba.sake.sharaf.*
 import ba.sake.sharaf.exceptions.ExceptionMapper
 
-final class ExceptionHandler(exceptionMapper: ExceptionMapper, next: SharafHandler) extends SharafHandler {
+final class ExceptionHandler(exceptionMapper: ExceptionMapper, wrappedHandler: SharafHandler) extends SharafHandler {
 
   override def handle(context: RequestContext): Response[?] =
-    try next.handle(context)
+    try wrappedHandler.handle(context)
     catch {
       case NonFatal(e) =>
         val errResponseOpt = exceptionMapper.lift(e)

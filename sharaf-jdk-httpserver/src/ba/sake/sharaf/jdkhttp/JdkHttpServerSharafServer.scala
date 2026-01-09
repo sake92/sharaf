@@ -4,7 +4,6 @@ import java.net.InetSocketAddress
 import java.util.concurrent.Executors
 import com.sun.net.httpserver.{HttpServer, HttpHandler}
 import ba.sake.sharaf.*
-import sttp.model.StatusCode
 
 class JdkHttpServerSharafServer(host: String, port: Int, handler: HttpHandler) {
 
@@ -20,22 +19,21 @@ class JdkHttpServerSharafServer(host: String, port: Int, handler: HttpHandler) {
 
 object JdkHttpServerSharafServer {
 
-  private val defaultNotFoundResponse = Response.withBody("Not Found").withStatus(StatusCode.NotFound)
-
   def apply(
       host: String,
       port: Int,
       routes: Routes,
       corsSettings: CorsSettings = CorsSettings.default,
       exceptionMapper: ExceptionMapper = ExceptionMapper.default,
-      notFoundHandler: Request => Response[?] = _ => defaultNotFoundResponse
+      notFoundHandler: SharafHandler = SharafHandler.DefaultNotFoundHandler
   ): JdkHttpServerSharafServer = {
     val finalHandler = SharafHandler.exceptions(
       exceptionMapper,
-      next = SharafHandler.cors(
+      SharafHandler.cors(
         corsSettings,
         SharafHandler.routes(
-          routes, Some(notFoundHandler)
+          routes,
+          notFoundHandler
         )
       )
     )

@@ -5,6 +5,7 @@ import sttp.client4.quick.*
 import ba.sake.sharaf.*
 import ba.sake.sharaf.routing.*
 import ba.sake.sharaf.utils.*
+import ba.sake.sharaf.exceptions.NotFoundException
 
 class WebJarsTest extends munit.FunSuite {
 
@@ -14,16 +15,24 @@ class WebJarsTest extends munit.FunSuite {
     Response.withBody("WebJars!")
   }
 
-  val server = UndertowSharafServer("localhost", port, routes)
+  // let SharafUndertowHandler do its thing.. for now!
+  // TODO wont be needed once Sharaf handles classpath resources directly
+  val customEm: ExceptionMapper = {
+    case e: NotFoundException =>
+      throw e
+    case e => ExceptionMapper.default(e)
+  }
+  val nfHandler: SharafHandler = _ => throw NotFoundException("Resource not found")
+
+  val server = UndertowSharafServer("localhost", port, routes, exceptionMapper = customEm, notFoundHandler = nfHandler)
 
   override def beforeAll(): Unit = server.start()
 
   override def afterAll(): Unit = server.stop()
 
-  // WebJars
   test("WebJars should work") {
     val res = quickRequest.get(uri"${baseUrl}/jquery/3.7.1/jquery.js").send()
-    assertEquals(res.headers(HeaderNames.ContentType), Seq("application/javascript"))
     assert(res.body.length > 100)
+    assertEquals(res.headers(HeaderNames.ContentType), Seq("application/javascript"))
   }
 }

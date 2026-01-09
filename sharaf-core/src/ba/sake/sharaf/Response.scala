@@ -12,6 +12,10 @@ final class Response[T] private (
   def withStatus(status: StatusCode): Response[T] =
     copy(status = status)
 
+  def settingHeaders(headers: Seq[(HttpString, Seq[String])]): Response[T] =
+    headers.foldLeft(this) { case (res, (name, values)) =>
+      res.settingHeader(name, values)
+    }
   def settingHeader(name: HttpString, values: Seq[String]): Response[T] =
     copy(headerUpdates = headerUpdates.setting(name, values))
   def settingHeader(name: String, values: Seq[String]): Response[T] =
