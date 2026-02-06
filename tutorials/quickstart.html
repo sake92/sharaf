@@ -59,28 +59,24 @@
    <h1 id="quickstart">Quickstart<a href="#quickstart" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
    <p>Get started quickly with Sharaf framework.</p>
    <h2 id="mill">Mill<a href="#mill" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
-   <pre>            <code class="language-scala hljs" data-highlighted="yes"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">ivyDeps</span> </span>= <span class="hljs-keyword">super</span>.ivyDeps() ++ <span class="hljs-type">Agg</span>(
+   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">ivyDeps</span> </span>= <span class="hljs-keyword">super</span>.ivyDeps() ++ <span class="hljs-type">Agg</span>(
     <span class="hljs-string">ivy"ba.sake::sharaf-undertow:0.13.0"</span>
 )
 <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">scalacOptions</span> </span>= <span class="hljs-keyword">super</span>.scalacOptions() ++ <span class="hljs-type">Seq</span>(<span class="hljs-string">"-Yretain-trees"</span>)
-</code>
-          </pre>
+</code></pre>
    <h2 id="sbt">Sbt<a href="#sbt" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
-   <pre>            <code class="language-scala hljs" data-highlighted="yes">libraryDependencies ++= <span class="hljs-type">Seq</span>(
+   <pre><code class="language-scala hljs" data-highlighted="yes">libraryDependencies ++= <span class="hljs-type">Seq</span>(
     <span class="hljs-string">"ba.sake"</span> %% <span class="hljs-string">"sharaf-undertow"</span> % <span class="hljs-string">"0.13.0"</span>
 ),
 scalacOptions ++= <span class="hljs-type">Seq</span>(<span class="hljs-string">"-Yretain-trees"</span>)
-</code>
-          </pre>
+</code></pre>
    <h2 id="scala-cli">Scala CLI<a href="#scala-cli" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
    <p>Create a file <code>my_script.sc</code> with the following content:</p>
-   <pre>            <code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">ba.sake::sharaf-undertow:0.13.0</span>
-</code>
-          </pre>
+   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">ba.sake::sharaf-undertow:0.13.0</span>
+</code></pre>
    <p>and then run it with:</p>
-   <pre>            <code class="language-bash hljs" data-highlighted="yes">scala my_script.sc --scala-option -Yretain-trees
-</code>
-          </pre>
+   <pre><code class="language-bash hljs" data-highlighted="yes">scala my_script.sc --scala-option -Yretain-trees
+</code></pre>
    <h2 id="examples">Examples<a href="#examples" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
    <ul>
     <li><a href="https://github.com/sake92/sharaf/tree/main/examples/scala-cli">Scala CLI examples</a>, standalone examples using Scala CLI</li>

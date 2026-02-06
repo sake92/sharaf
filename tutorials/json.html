@@ -60,7 +60,7 @@
    <p>Let's make a simple JSON API in scala-cli.
     <br>
     Create a file <code>json_api.sc</code> and paste this code into it:</p>
-   <pre>            <code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">scala</span> <span class="hljs-string">"3.7.0"</span>
+   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">scala</span> <span class="hljs-string">"3.7.0"</span>
 <span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">ba.sake::sharaf-undertow:0.13.0</span>
 
 <span class="hljs-keyword">import</span> ba.sake.tupson.<span class="hljs-type">JsonRW</span>
@@ -75,15 +75,14 @@
   <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">findByBrand</span></span>(brand: <span class="hljs-type">String</span>): <span class="hljs-type">Seq</span>[<span class="hljs-type">Car</span>] = db.filter(_.brand == brand)
   <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">add</span></span>(car: <span class="hljs-type">Car</span>): <span class="hljs-type">Unit</span> = db = db.appended(car)
 }
-</code>
-          </pre>
+</code></pre>
    <p>Here we defined a <code>Car</code> model, which <code>derives JsonRW</code>, so we can use the JSON support from Sharaf.</p>
    <p>We also use a <code>var db: Seq[Car]</code> to store our data.
     <br>
     (don't do this for real projects)</p>
    <h2 id="routes-definition">Routes definition<a href="#routes-definition" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
    <p>Next step is to define a few routes for getting and adding cars:</p>
-   <pre>            <code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">val</span> routes = <span class="hljs-type">Routes</span>:  
+   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">val</span> routes = <span class="hljs-type">Routes</span>:  
   <span class="hljs-keyword">case</span> <span class="hljs-type">GET</span> -&gt; <span class="hljs-type">Path</span>(<span class="hljs-string">"cars"</span>) =&gt;
     <span class="hljs-type">Response</span>.withBody(<span class="hljs-type">CarsDb</span>.findAll())
 
@@ -95,8 +94,7 @@
     <span class="hljs-keyword">val</span> reqBody = <span class="hljs-type">Request</span>.current.bodyJson[<span class="hljs-type">Car</span>]
     <span class="hljs-type">CarsDb</span>.add(reqBody)
     <span class="hljs-type">Response</span>.withBody(reqBody)
-</code>
-          </pre>
+</code></pre>
    <p>The first route returns all data in the database.</p>
    <p>The second route does some filtering on the database.</p>
    <p>The third route binds the JSON body from the HTTP request.
@@ -104,17 +102,15 @@
     Then we add it to the database.</p>
    <h2 id="running-the-server">Running the server<a href="#running-the-server" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
    <p>Finally, start up the server:</p>
-   <pre>            <code class="language-scala hljs" data-highlighted="yes"><span class="hljs-type">UndertowSharafServer</span>(<span class="hljs-string">"localhost"</span>, <span class="hljs-number">8181</span>, routes, exceptionMapper = <span class="hljs-type">ExceptionMapper</span>.json).start()
+   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-type">UndertowSharafServer</span>(<span class="hljs-string">"localhost"</span>, <span class="hljs-number">8181</span>, routes, exceptionMapper = <span class="hljs-type">ExceptionMapper</span>.json).start()
 
 println(<span class="hljs-string">"Server started at http://localhost:8181"</span>)
-</code>
-          </pre>
+</code></pre>
    <p>and run it like this:</p>
-   <pre>            <code class="language-sh hljs language-bash" data-highlighted="yes">scala json_api.sc 
-</code>
-          </pre>
+   <pre><code class="language-sh hljs language-bash" data-highlighted="yes">scala json_api.sc 
+</code></pre>
    <p>Then try the following requests:</p>
-   <pre>            <code class="language-sh hljs language-bash" data-highlighted="yes"><span class="hljs-comment"># get all cars</span>
+   <pre><code class="language-sh hljs language-bash" data-highlighted="yes"><span class="hljs-comment"># get all cars</span>
 curl http://localhost:8181/cars
 
 <span class="hljs-comment"># add a car</span>
@@ -128,8 +124,7 @@ curl --request POST \
 
 <span class="hljs-comment"># get cars by brand</span>
 curl http://localhost:8181/cars/Mercedes
-</code>
-          </pre>
+</code></pre>
   </main>
   <footer class="pico container flex-centered">
    <a href="https://github.com/sake92/sharaf"> <!--?xml version="1.0" encoding="utf-8"?--><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools --> 

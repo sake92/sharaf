@@ -52,7 +52,7 @@
    </div>
    <h1 id="upload-file">Upload File<a href="#upload-file" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
    <p>Uploading a file is usually done via <code>multipart/form-data</code> form submission.</p>
-   <pre>            <code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">// 1. somewhere in a view, use enctype="multipart/form-data"</span>
+   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">// 1. somewhere in a view, use enctype="multipart/form-data"</span>
 <span class="hljs-string">html""</span><span class="hljs-string">"
     &lt;form action="</span>/form-<span class="hljs-string">submit" method="</span><span class="hljs-type">POST</span><span class="hljs-string">" enctype="</span>multipart/form-<span class="hljs-string">data"&gt;
     ...
@@ -69,8 +69,7 @@
 <span class="hljs-keyword">case</span> <span class="hljs-type">POST</span> -&gt; <span class="hljs-type">Path</span>(<span class="hljs-string">"form-submit"</span>) =&gt;
   <span class="hljs-keyword">val</span> formData = <span class="hljs-type">Request</span>.current.bodyForm[<span class="hljs-type">MyData</span>]
   <span class="hljs-keyword">val</span> fileAsString = <span class="hljs-type">Files</span>.readString(formData.file)
-</code>
-          </pre>
+</code></pre>
    <p>You can find a working example in the <a href="https://github.com/sake92/sharaf/tree/main/examples/fullstack">repo</a>.</p>
   </main>
   <footer class="pico container flex-centered">

@@ -61,66 +61,58 @@
    <h1 id="routes">Routes<a href="#routes" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
    <h2 id="how-to-match-on-multiple-methods">How to match on multiple methods?<a href="#how-to-match-on-multiple-methods" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
    <p>You can use the <code>|</code> operator in a pattern match:</p>
-   <pre>            <code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">case</span> (<span class="hljs-type">GET</span> | <span class="hljs-type">POST</span>) -&gt; <span class="hljs-type">Path</span>() =&gt;
+   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">case</span> (<span class="hljs-type">GET</span> | <span class="hljs-type">POST</span>) -&gt; <span class="hljs-type">Path</span>() =&gt;
 ...
-</code>
-          </pre>
+</code></pre>
    <p>You can always check the <a href="https://docs.scala-lang.org/scala3/book/control-structures.html#handling-multiple-possible-matches-on-one-line">Scala docs</a> for more help.</p>
    <hr>
    <p>If you want to handle all possible methods, just don't use any extractors:</p>
-   <pre>            <code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">case</span> method -&gt; <span class="hljs-type">Path</span>() =&gt;
+   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">case</span> method -&gt; <span class="hljs-type">Path</span>() =&gt;
 ...
-</code>
-          </pre>
+</code></pre>
    <h2 id="how-to-match-on-multiple-paths">How to match on multiple paths?<a href="#how-to-match-on-multiple-paths" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
    <p>You can use the <code>|</code> operator in a pattern match:</p>
-   <pre>            <code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">case</span> <span class="hljs-type">GET</span> -&gt; (<span class="hljs-type">Path</span>(<span class="hljs-string">"hello"</span>) | <span class="hljs-type">Path</span>(<span class="hljs-string">"hello-world"</span>)) =&gt;
+   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">case</span> <span class="hljs-type">GET</span> -&gt; (<span class="hljs-type">Path</span>(<span class="hljs-string">"hello"</span>) | <span class="hljs-type">Path</span>(<span class="hljs-string">"hello-world"</span>)) =&gt;
     ...
-</code>
-          </pre>
+</code></pre>
    <p>You can always check the <a href="https://docs.scala-lang.org/scala3/book/control-structures.html#handling-multiple-possible-matches-on-one-line">Scala docs</a> for more help.</p>
    <hr>
    <p>If you want to handle all paths that start with "my-prefix/":</p>
-   <pre>            <code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">case</span> <span class="hljs-type">GET</span> -&gt; <span class="hljs-type">Path</span>(<span class="hljs-string">"my-prefix"</span>, segments*) =&gt;
+   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">case</span> <span class="hljs-type">GET</span> -&gt; <span class="hljs-type">Path</span>(<span class="hljs-string">"my-prefix"</span>, segments*) =&gt;
     ...
-</code>
-          </pre>
+</code></pre>
    <hr>
    <p>If you want to handle all possible paths:</p>
-   <pre>            <code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">case</span> <span class="hljs-type">GET</span> -&gt; <span class="hljs-type">Path</span>(segments*) =&gt;
+   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">case</span> <span class="hljs-type">GET</span> -&gt; <span class="hljs-type">Path</span>(segments*) =&gt;
     ...
-</code>
-          </pre>
+</code></pre>
    <h2 id="how-to-bind-path-parameter-as-an-enum">How to bind path parameter as an enum?<a href="#how-to-bind-path-parameter-as-an-enum" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
    <p>Sharaf needs a <code>FromPathParam[T]</code> instance for the <code>param[T]</code> extractor.
     <br>
     It can automatically derive an instance for singleton enums:</p>
-   <pre>            <code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">enum</span> <span class="hljs-type">Cloud</span> derives <span class="hljs-type">FromPathParam</span>:
+   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">enum</span> <span class="hljs-type">Cloud</span> derives <span class="hljs-type">FromPathParam</span>:
   <span class="hljs-keyword">case</span> aws, gcp, azure
 
 <span class="hljs-keyword">val</span> routes = <span class="hljs-type">Routes</span>:
   <span class="hljs-keyword">case</span> <span class="hljs-type">GET</span> -&gt; <span class="hljs-type">Path</span>(<span class="hljs-string">"pricing"</span>, param[<span class="hljs-type">Cloud</span>](cloud)) =&gt;
     <span class="hljs-type">Response</span>.withBody(<span class="hljs-string">s"cloud = <span class="hljs-subst">${cloud}</span>"</span>)
-</code>
-          </pre>
+</code></pre>
    <h2 id="how-to-bind-path-parameter-as-a-regex">How to bind path parameter as a regex?<a href="#how-to-bind-path-parameter-as-a-regex" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
-   <pre>            <code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">val</span> userIdRegex = <span class="hljs-string">"user_id_(\\d+)"</span>.r
+   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">val</span> userIdRegex = <span class="hljs-string">"user_id_(\\d+)"</span>.r
 
 <span class="hljs-keyword">val</span> routes = <span class="hljs-type">Routes</span>:
   <span class="hljs-keyword">case</span> <span class="hljs-type">GET</span> -&gt; <span class="hljs-type">Path</span>(<span class="hljs-string">"pricing"</span>, userIdRegex(userId)) =&gt;
     <span class="hljs-type">Response</span>.withBody(<span class="hljs-string">s"userId = <span class="hljs-subst">${userId}</span>"</span>)
-</code>
-          </pre>
+</code></pre>
    <p>Note that the <code>userId</code> is bound as a <code>String</code>.</p>
    <p>You could further match on it, for example:</p>
-   <pre>            <code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">val</span> routes = <span class="hljs-type">Routes</span>:
+   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">val</span> routes = <span class="hljs-type">Routes</span>:
   <span class="hljs-keyword">case</span> <span class="hljs-type">GET</span> -&gt; <span class="hljs-type">Path</span>(<span class="hljs-string">"pricing"</span>, userIdRegex(param[<span class="hljs-type">Int</span>](userId))) =&gt;
-</code>
-          </pre>
+</code></pre>
    <p>would extract <code>userId</code> as an <code>Int</code>.</p>
    <h2 id="how-to-bind-a-custom-path-parameter">How to bind a custom path parameter?<a href="#how-to-bind-a-custom-path-parameter" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
    <p>Sharaf needs a <code>FromPathParam[T]</code> instance available:</p>
-   <pre>            <code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">import</span> ba.sake.sharaf.routing.*
+   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">import</span> ba.sake.sharaf.routing.*
 
 <span class="hljs-keyword">given</span> <span class="hljs-type">FromPathParam</span>[<span class="hljs-type">MyType</span>] <span class="hljs-keyword">with</span> {
   <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">parse</span></span>(str: <span class="hljs-type">String</span>): <span class="hljs-type">Option</span>[<span class="hljs-type">MyType</span>] =
@@ -130,21 +122,19 @@
 <span class="hljs-keyword">val</span> routes = <span class="hljs-type">Routes</span>:
   <span class="hljs-keyword">case</span> <span class="hljs-type">GET</span> -&gt; <span class="hljs-type">Path</span>(<span class="hljs-string">"pricing"</span>, param[<span class="hljs-type">MyType</span>](myType)) =&gt;
     <span class="hljs-type">Response</span>.withBody(<span class="hljs-string">s"myType = <span class="hljs-subst">${myType}</span>"</span>)
-</code>
-          </pre>
+</code></pre>
    <h2 id="how-to-split-routes">How to split Routes?<a href="#how-to-split-routes" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
    <p>When you have lots of routes, you will want to split them into multiple <code>Routes</code> handlers.
     <br>
     Combining them is done with <code>Routes.merge</code>.
     <br>
     The order of routes is preserved, of course:</p>
-   <pre>            <code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">val</span> routes: <span class="hljs-type">Seq</span>[<span class="hljs-type">Routes</span>] = <span class="hljs-type">Seq</span>(routes1, routes2, ... )
+   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">val</span> routes: <span class="hljs-type">Seq</span>[<span class="hljs-type">Routes</span>] = <span class="hljs-type">Seq</span>(routes1, routes2, ... )
 
 <span class="hljs-keyword">val</span> allRoutes: <span class="hljs-type">Routes</span> = <span class="hljs-type">Routes</span>.merge(routes)
-</code>
-          </pre>
+</code></pre>
    <p>You can also <code>extend SharafController</code> instead of <code>Routes</code> directly.</p>
-   <pre>            <code class="language-scala hljs" data-highlighted="yes"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyController1</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">SharafController</span></span>:
+   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyController1</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">SharafController</span></span>:
   <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">routes</span></span>: <span class="hljs-type">Routes</span> = <span class="hljs-type">Routes</span>:
     <span class="hljs-keyword">case</span> ...
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyController2</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">SharafController</span></span>:
@@ -154,8 +144,7 @@
 <span class="hljs-keyword">val</span> server = <span class="hljs-type">UndertowSharafServer</span>(
   <span class="hljs-keyword">new</span> <span class="hljs-type">MyController1</span>, <span class="hljs-keyword">new</span> <span class="hljs-type">MyController2</span>
 )
-</code>
-          </pre>
+</code></pre>
   </main>
   <footer class="pico container flex-centered">
    <a href="https://github.com/sake92/sharaf"> <!--?xml version="1.0" encoding="utf-8"?--><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools --> 

@@ -60,21 +60,18 @@
     <li>for request/session-scoped instances: use scala 3 <em>context functions</em> (implicit functions).</li>
    </ul>
    <p>If you ever used PlayFramework, Slick 2 and similar, you might have used this pattern:</p>
-   <pre>            <code class="language-scala hljs" data-highlighted="yes">someFunction { <span class="hljs-keyword">implicit</span> ctx =&gt;
+   <pre><code class="language-scala hljs" data-highlighted="yes">someFunction { <span class="hljs-keyword">implicit</span> ctx =&gt;
     <span class="hljs-comment">// some code that needs an implicit Ctx</span>
 }
-</code>
-          </pre>
+</code></pre>
    <p>In Scala 3 there is a new concept called "context function" which represents the pattern from above with a type:</p>
-   <pre>            <code class="language-scala hljs" data-highlighted="yes"><span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">ContextualAction</span> </span>= <span class="hljs-type">Ctx</span> ?=&gt; <span class="hljs-type">Unit</span>
-</code>
-          </pre>
+   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-class"><span class="hljs-keyword">type</span> <span class="hljs-title">ContextualAction</span> </span>= <span class="hljs-type">Ctx</span> ?=&gt; <span class="hljs-type">Unit</span>
+</code></pre>
    <p>Now, instead of manually writing <code>implicit ctx</code> we can skip it:</p>
-   <pre>            <code class="language-scala hljs" data-highlighted="yes">someFunction {
+   <pre><code class="language-scala hljs" data-highlighted="yes">someFunction {
     <span class="hljs-comment">// some code that needs an implicit Ctx</span>
 }
-</code>
-          </pre>
+</code></pre>
    <p>and compiler will fill it in for us.
     <br>
     The <code>Ctx</code> parameter is implicitly/contextually available (only) in the function body.
@@ -87,10 +84,9 @@
    <p>If you need a request-scoped instance (a-la <code>@RequestScoped @Bean</code> in Spring),
     <br>
     you need to define a function that is <code>using Request</code>:</p>
-   <pre>            <code class="language-scala hljs" data-highlighted="yes"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">currentUser</span></span>(<span class="hljs-keyword">using</span> req: <span class="hljs-type">Request</span>): <span class="hljs-type">User</span> =
+   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">currentUser</span></span>(<span class="hljs-keyword">using</span> req: <span class="hljs-type">Request</span>): <span class="hljs-type">User</span> =
     <span class="hljs-comment">// extract stuff from request</span>
-</code>
-          </pre>
+</code></pre>
    <p>Same as <code>Request.current</code>, you can only use the <code>currentUser</code> function in a context of a request!</p>
    <hr>
    <p>By using context functions, you avoid <a href="https://stackoverflow.com/questions/26305295/how-is-the-requestscoped-bean-instance-provided-to-sessionscoped-bean-in-runti">banging your head against the wall</a> while trying to figure out how-the-hell can you inject a request-scoped-thing into a singleton/session-scoped thing...

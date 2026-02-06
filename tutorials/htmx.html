@@ -61,7 +61,7 @@
    <p>Let's make a simple page that triggers a POST request to fetch a HTML snippet.
     <br>
     Create a file <code>htmx_load_snippet.sc</code> and paste this code into it:</p>
-   <pre>            <code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">scala</span> <span class="hljs-string">"3.7.0"</span>
+   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">scala</span> <span class="hljs-string">"3.7.0"</span>
 <span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">ba.sake::sharaf-undertow:0.13.0</span>
 
 <span class="hljs-keyword">import</span> ba.sake.sharaf.{*, <span class="hljs-keyword">given</span>}
@@ -96,12 +96,10 @@ println(<span class="hljs-string">s"Server started at http://localhost:8181"</sp
     &lt;/html&gt;
   <span class="hljs-string">"""
 
-</span></code>
-          </pre>
+</span></code></pre>
    <p>and run it like this:</p>
-   <pre>            <code class="language-sh hljs language-bash" data-highlighted="yes">scala htmx_load_snippet.sc 
-</code>
-          </pre>
+   <pre><code class="language-sh hljs language-bash" data-highlighted="yes">scala htmx_load_snippet.sc 
+</code></pre>
    <p>Go to <a href="http://localhost:8181">http://localhost:8181</a>
     <br>
     to see how it works.</p>

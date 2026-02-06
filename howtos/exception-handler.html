@@ -53,7 +53,7 @@
    <h1 id="exception-handler">Exception Handler<a href="#exception-handler" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
    <p>How to customize the Exception handler?</p>
    <p>Use the <code>exceptionMapper</code> parameter of <code>UndertowSharafServer</code>:</p>
-   <pre>            <code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">val</span> customExceptionMapper: <span class="hljs-type">ExceptionMapper</span> = {
+   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">val</span> customExceptionMapper: <span class="hljs-type">ExceptionMapper</span> = {
   <span class="hljs-keyword">case</span> e: <span class="hljs-type">MyException</span> =&gt;
     <span class="hljs-keyword">val</span> errorPage = <span class="hljs-type">MyErrorPage</span>(e.getMessage())
     <span class="hljs-type">Response</span>.withBody(errorPage)
@@ -67,8 +67,7 @@
     routes,
     exceptionMapper = finalExceptionMapper
   )
-</code>
-          </pre>
+</code></pre>
    <p>The <code>ExceptionMapper</code> is a partial function from an exception to <code>Response</code>.
     <br>
     Here we need to chain our custom exception mapper before the default one.</p>

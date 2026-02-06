@@ -53,7 +53,7 @@
    <h1 id="notfound">NotFound<a href="#notfound" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
    <p>How to customize 404 NotFound handler?</p>
    <p>Use the <code>notFoundHandler</code> parameter of <code>UndertowSharafServer</code>:</p>
-   <pre>            <code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">val</span> customNotFoundHandler: <span class="hljs-type">Request</span> =&gt; <span class="hljs-type">Response</span>[?] = req =&gt;
+   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">val</span> customNotFoundHandler: <span class="hljs-type">Request</span> =&gt; <span class="hljs-type">Response</span>[?] = req =&gt;
   <span class="hljs-type">Response</span>.withBody(<span class="hljs-type">MyCustomNotFoundPage</span>)
     .withStatus(<span class="hljs-type">StatusCode</span>.<span class="hljs-type">NotFound</span>)
 
@@ -63,8 +63,7 @@
     routes,
     notFoundHandler = customNotFoundHandler
   )
-</code>
-          </pre>
+</code></pre>
    <p>You can use the request if you need to dynamically decide on what to return.
     <br>
     Or ignore it and return a static not found response.</p>

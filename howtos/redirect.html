@@ -52,10 +52,9 @@
    </div>
    <h1 id="redirect">Redirect<a href="#redirect" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
    <p>Use the <code>Response.redirect</code> function:</p>
-   <pre>            <code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">case</span> <span class="hljs-type">GET</span> -&gt; <span class="hljs-type">Path</span>(<span class="hljs-string">"a-deprecated-route"</span>) =&gt;
+   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">case</span> <span class="hljs-type">GET</span> -&gt; <span class="hljs-type">Path</span>(<span class="hljs-string">"a-deprecated-route"</span>) =&gt;
     <span class="hljs-type">Response</span>.redirect(<span class="hljs-string">"/this-other-place"</span>)
-</code>
-          </pre>
+</code></pre>
    <p>This will redirect the request to "/this-other-place",
     <br>
     with status <code>301 MOVED_PERMANENTLY</code></p>

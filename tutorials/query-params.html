@@ -71,7 +71,7 @@
     and then use it like this: <code>Request.current.queryParams[MyParams]</code></p>
    <hr>
    <p>Create a file <code>query_params.sc</code> and paste this code into it:</p>
-   <pre>            <code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">scala</span> <span class="hljs-string">"3.7.0"</span>
+   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">scala</span> <span class="hljs-string">"3.7.0"</span>
 <span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">ba.sake::sharaf-undertow:0.13.0</span>
 
 <span class="hljs-keyword">import</span> ba.sake.querson.<span class="hljs-type">QueryStringRW</span>
@@ -92,21 +92,17 @@
 
 println(<span class="hljs-string">s"Server started at http://localhost:8181"</span>)
 
-</code>
-          </pre>
+</code></pre>
    <p>Then run it like this:</p>
-   <pre>            <code class="language-sh hljs language-bash" data-highlighted="yes">scala query_params.sc 
-</code>
-          </pre>
+   <pre><code class="language-sh hljs language-bash" data-highlighted="yes">scala query_params.sc 
+</code></pre>
    <hr>
    <p>Now go to <a href="http://localhost:8181/raw?q=what&amp;perPage=10">http://localhost:8181/raw?q=what&amp;perPage=10</a> and you will get the raw query params map:</p>
-   <pre>            <code class="language- hljs language-stylus" data-highlighted="yes">params = <span class="hljs-built_in">Map</span>(perPage -&gt; <span class="hljs-built_in">List</span>(<span class="hljs-number">10</span>), <span class="hljs-selector-tag">q</span> -&gt; <span class="hljs-built_in">List</span>(what))
-</code>
-          </pre>
+   <pre><code class="language- hljs language-stylus" data-highlighted="yes">params = <span class="hljs-built_in">Map</span>(perPage -&gt; <span class="hljs-built_in">List</span>(<span class="hljs-number">10</span>), <span class="hljs-selector-tag">q</span> -&gt; <span class="hljs-built_in">List</span>(what))
+</code></pre>
    <p>and if you go to <a href="http://localhost:8181/typed?q=what&amp;perPage=10">http://localhost:8181/typed?q=what&amp;perPage=10</a> you will get a type-safe, parsed query params object:</p>
-   <pre>            <code class="language- hljs language-ini" data-highlighted="yes"><span class="hljs-attr">params</span> = SearchParams(what,<span class="hljs-number">10</span>)
-</code>
-          </pre>
+   <pre><code class="language- hljs language-ini" data-highlighted="yes"><span class="hljs-attr">params</span> = SearchParams(what,<span class="hljs-number">10</span>)
+</code></pre>
    <h2 id="named-tuples">Named Tuples<a href="#named-tuples" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
    <p>You can also use named tuples to parse query params: <code>Request.current.queryParams[(q: String, perPage: Int)]</code>. In this case you don't even need to define a separate class!</p>
    <blockquote>

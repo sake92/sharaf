@@ -61,7 +61,7 @@
    <p>Let's make a simple page that sends 5 SSE events and then a "stop" message.
     <br>
     Create a file <code>sse.sc</code> and paste this code into it:</p>
-   <pre>            <code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">scala</span> <span class="hljs-string">3.7.3</span>
+   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">scala</span> <span class="hljs-string">3.7.3</span>
 <span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">ba.sake::sharaf-undertow:0.14.0</span>
 
 <span class="hljs-keyword">import</span> ba.sake.sharaf.{*, <span class="hljs-keyword">given</span>}
@@ -103,12 +103,10 @@
 
 UndertowSharafServer("localhost", 8181, routes).start()
 println(s"Server started at http://localhost:8181")
-</span></code>
-          </pre>
+</span></code></pre>
    <p>and run it like this:</p>
-   <pre>            <code class="language-sh hljs language-bash" data-highlighted="yes">scala sse.sc 
-</code>
-          </pre>
+   <pre><code class="language-sh hljs language-bash" data-highlighted="yes">scala sse.sc 
+</code></pre>
    <p>Go to <a href="http://localhost:8181">http://localhost:8181</a>
     <br>
     to see how it works.</p>

@@ -59,7 +59,7 @@
     <br>
     The <code>MyData</code> needs to have a <code>FormDataRW</code> given instance.</p>
    <p>Create a file <code>form_handling.sc</code> and paste this code into it:</p>
-   <pre>            <code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">scala</span> <span class="hljs-string">"3.7.0"</span>
+   <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">scala</span> <span class="hljs-string">"3.7.0"</span>
 <span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">ba.sake::sharaf-undertow:0.13.0</span>
 
 <span class="hljs-keyword">import</span> ba.sake.formson.<span class="hljs-type">FormDataRW</span>
@@ -96,17 +96,14 @@ println(<span class="hljs-string">"Server started at http://localhost:8181"</spa
     &lt;/html&gt;
   "</span><span class="hljs-string">""</span>
 
-</code>
-          </pre>
+</code></pre>
    <p>Then run it like this:</p>
-   <pre>            <code class="language-sh hljs language-bash" data-highlighted="yes">scala form_handling.sc 
-</code>
-          </pre>
+   <pre><code class="language-sh hljs language-bash" data-highlighted="yes">scala form_handling.sc 
+</code></pre>
    <p>Now go to <a href="http://localhost:8181">http://localhost:8181</a> and fill in the page with some data.</p>
    <p>When you click the "Submit" button you will see a response like this:</p>
-   <pre>            <code class="language- hljs language-less" data-highlighted="yes"><span class="hljs-selector-tag">Got</span> <span class="hljs-selector-tag">form</span> <span class="hljs-selector-tag">data</span>: <span class="hljs-selector-tag">ContactUsForm</span>(Bob,bob<span class="hljs-variable">@example</span>.com)
-</code>
-          </pre>
+   <pre><code class="language- hljs language-less" data-highlighted="yes"><span class="hljs-selector-tag">Got</span> <span class="hljs-selector-tag">form</span> <span class="hljs-selector-tag">data</span>: <span class="hljs-selector-tag">ContactUsForm</span>(Bob,bob<span class="hljs-variable">@example</span>.com)
+</code></pre>
    <h2 id="named-tuples">Named Tuples<a href="#named-tuples" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
    <p>You can also use named tuples to parse form params: <code>Request.current.bodyForm[(fullName: String, email: String)]</code>. In this case you don't even need to define a separate class!</p>
    <blockquote>
