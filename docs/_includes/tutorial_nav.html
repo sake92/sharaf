@@ -1,31 +1,31 @@
-{%- set currentUrl = page.url -%}
-{%- set tutorials = site.data.project.tutorials -%}
-{%- set ns = namespace(prevTut=none, nextTut=none) -%}
+{% set currentUrl = page.url %}
+{% set tutorials = site.data.project.tutorials %}
+{% set ns = namespace(prevTut=none, nextTut=none) %}
 
-{%- for tut in tutorials -%}
-  {%- if tut.url == currentUrl -%}
-    {%- if loop.index0 > 0 -%}
-      {%- set ns.prevTut = tutorials[loop.index0 - 1] -%}
-    {%- endif -%}
-    {%- if loop.index0 < (tutorials | length) - 1 -%}
-      {%- set ns.nextTut = tutorials[loop.index0 + 1] -%}
-    {%- endif -%}
-  {%- endif -%}
-{%- endfor -%}
+{% for tut in tutorials %}
+  {% if tut.url == currentUrl %}
+    {% if loop.index0 > 0 %}
+      {% set ns.prevTut = tutorials[loop.index0 - 1] %}
+    {% endif %}
+    {% if loop.index0 < (tutorials | length) - 1 %}
+      {% set ns.nextTut = tutorials[loop.index0 + 1] %}
+    {% endif %}
+  {% endif %}
+{% endfor %}
 
-{%- if ns.prevTut or ns.nextTut -%}
+{% if ns.prevTut or ns.nextTut %}
 <div style="margin-top: 2em; padding-top: 1em; border-top: 1px solid #ccc;">
   <div style="display: flex; justify-content: space-between;">
     <div>
-      {%- if ns.prevTut -%}
+      {% if ns.prevTut %}
       <a href="{{ ns.prevTut.url }}">← {{ ns.prevTut.label }}</a>
-      {%- endif -%}
+      {% endif %}
     </div>
     <div>
-      {%- if ns.nextTut -%}
+      {% if ns.nextTut %}
       <a href="{{ ns.nextTut.url }}">{{ ns.nextTut.label }} →</a>
-      {%- endif -%}
+      {% endif %}
     </div>
   </div>
 </div>
-{%- endif -%}
+{% endif %}
