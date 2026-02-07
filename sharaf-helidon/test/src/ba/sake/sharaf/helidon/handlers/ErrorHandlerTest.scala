@@ -36,4 +36,3 @@ class ErrorHandlerTest extends AbstractErrorHandlerTest {
   def startServer(): Unit = server.start()
   def stopServer(): Unit = server.stop()
 }
-
