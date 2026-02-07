@@ -76,3 +76,5 @@ Otherwise the browser would constantly try to reconnect.
 
 Of course, the sending of events is usually much more complicated.  
 The coordination of threads and which events to send to which browser is on you to implement.
+
+{% include "tutorial_nav.html" %}

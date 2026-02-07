@@ -28,4 +28,6 @@ scala htmx_load_snippet.sc
 Go to [http://localhost:8181](http://localhost:8181)  
 to see how it works.
 
+{% include "tutorial_nav.html" %}
+
 

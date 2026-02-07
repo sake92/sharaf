@@ -24,4 +24,6 @@ and you will get the param returned: `string = abc`.
 When you go to [http://localhost:8181/int/123](http://localhost:8181/int/123),  
 Sharaf will *try to extract* an `Int` from the path parameter.  
 If it doesn't match, it will fall through, try the next route.
+
+{% include "tutorial_nav.html" %}
     

@@ -24,3 +24,5 @@ The most interesting part is the `Routes` definition.
 Here we pattern match on `(HttpMethod, Path)`.  
 The `Path` contains a `Seq[String]`, which are the parts of the URL you can match on.
 
+{% include "tutorial_nav.html" %}
+

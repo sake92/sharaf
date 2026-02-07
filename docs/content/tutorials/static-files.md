@@ -29,3 +29,5 @@ scala static_files.sc  --resource-dir resources
 Go to http://localhost:8181/example.js.  
 You will see the `example.js` contents served.
 
+{% include "tutorial_nav.html" %}
+

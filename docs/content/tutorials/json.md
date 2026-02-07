@@ -91,3 +91,5 @@ curl --request POST \
 curl http://localhost:8181/cars/Mercedes
 ```
 
+{% include "tutorial_nav.html" %}
+
