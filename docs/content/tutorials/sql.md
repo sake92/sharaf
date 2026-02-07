@@ -103,3 +103,5 @@ curl --request POST \
     "name": "Bob"
     }'
 ```
+
+{% include "tutorial_nav.html" %}

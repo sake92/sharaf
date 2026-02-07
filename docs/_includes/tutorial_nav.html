@@ -1,0 +1,32 @@
+{%- set currentUrl = page.url -%}
+{%- set tutorials = site.data.project.tutorials -%}
+{%- set prevTut = null -%}
+{%- set nextTut = null -%}
+
+{%- for tut in tutorials -%}
+  {%- if tut.url == currentUrl -%}
+    {%- if loop.index0 > 0 -%}
+      {%- set prevTut = tutorials[loop.index0 - 1] -%}
+    {%- endif -%}
+    {%- if loop.index0 < (tutorials | length) - 1 -%}
+      {%- set nextTut = tutorials[loop.index0 + 1] -%}
+    {%- endif -%}
+  {%- endif -%}
+{%- endfor -%}
+
+{%- if prevTut or nextTut -%}
+<div style="margin-top: 2em; padding-top: 1em; border-top: 1px solid #ccc;">
+  <div style="display: flex; justify-content: space-between;">
+    <div>
+      {%- if prevTut -%}
+      <a href="{{ prevTut.url }}">← {{ prevTut.label }}</a>
+      {%- endif -%}
+    </div>
+    <div>
+      {%- if nextTut -%}
+      <a href="{{ nextTut.url }}">{{ nextTut.label }} →</a>
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+{%- endif -%}
