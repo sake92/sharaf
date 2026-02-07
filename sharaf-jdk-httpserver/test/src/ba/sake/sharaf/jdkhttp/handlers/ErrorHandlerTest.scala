@@ -2,10 +2,11 @@ package ba.sake.sharaf.jdkhttp.handlers
 
 import java.net.InetSocketAddress
 import java.util.concurrent.Executors
-import com.sun.net.httpserver.HttpServer
+import com.sun.net.httpserver.{HttpServer, HttpExchange, HttpHandler}
 import ba.sake.sharaf.*
+import ba.sake.sharaf.routing.*
 import ba.sake.sharaf.handlers.AbstractErrorHandlerTest
-import ba.sake.sharaf.jdkhttp.SharafJdkHttpHandler
+import ba.sake.sharaf.jdkhttp.{SharafJdkHttpHandler, JdkHttpServerSharafRequest}
 import ba.sake.sharaf.utils.NetworkUtils
 
 class ErrorHandlerTest extends AbstractErrorHandlerTest {
@@ -18,9 +19,33 @@ class ErrorHandlerTest extends AbstractErrorHandlerTest {
   val defaultHandler = SharafHandler.exceptions(SharafHandler.routes(routes))
   val jsonHandler = SharafHandler.exceptions(SharafHandler.routes(routes), ExceptionMapper.json)
   
+  // Custom handler that strips the prefix
+  class PrefixStrippingHandler(prefix: String, handler: SharafHandler) extends HttpHandler {
+    override def handle(exchange: HttpExchange): Unit = {
+      val reqParams = fillReqParams(exchange, prefix)
+      val req = JdkHttpServerSharafRequest.create(exchange)
+      val requestContext = RequestContext(reqParams, req)
+      val res = handler.handle(requestContext)
+      ba.sake.sharaf.jdkhttp.ResponseUtils.writeResponse(res, exchange)
+    }
+
+    private def fillReqParams(exchange: HttpExchange, prefix: String): RequestParams = {
+      val method = HttpMethod.valueOf(exchange.getRequestMethod)
+      val fullPath = exchange.getRequestURI.getPath
+      val pathAfterPrefix = if (fullPath.startsWith(prefix)) fullPath.drop(prefix.length) else fullPath
+      val relPath = if (pathAfterPrefix.startsWith("/")) pathAfterPrefix.drop(1) else pathAfterPrefix
+      val pathSegments = relPath.split("/")
+      val path =
+        if (pathSegments.size == 1 && pathSegments.head == "")
+        then Path()
+        else Path(pathSegments*)
+      (method, path)
+    }
+  }
+  
   // Register handlers at different contexts
-  httpServer.createContext("/default", SharafJdkHttpHandler(defaultHandler))
-  httpServer.createContext("/json", SharafJdkHttpHandler(jsonHandler))
+  httpServer.createContext("/default", PrefixStrippingHandler("/default", defaultHandler))
+  httpServer.createContext("/json", PrefixStrippingHandler("/json", jsonHandler))
   httpServer.setExecutor(Executors.newFixedThreadPool(10))
 
   def startServer(): Unit = httpServer.start()
