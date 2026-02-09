@@ -16,7 +16,7 @@
 {% if ns.prevTut or ns.nextTut %}
 <div role="group">
 {% if ns.prevTut %}<a role="button" href="{{ ns.prevTut.url }}">⬅️ {{ ns.prevTut.label }}</a>{% else %}<span></span>{% endif %}
-{% if ns.prevTut and ns.nextTut %}<span></span>{% endif %}
+<span></span>
 {% if ns.nextTut %}<a role="button" href="{{ ns.nextTut.url }}">{{ ns.nextTut.label }} ➡️</a>{% else %}<span></span>{% endif %}
 </div>
 {% endif %}
