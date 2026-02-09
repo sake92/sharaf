@@ -28,3 +28,4 @@ jobs:
         with:
           folder: docs/_site
           force: true
+          clean: true
