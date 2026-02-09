@@ -20,7 +20,7 @@ jobs:
         run: |
             FLATMARK_VERSION=0.0.28
             #curl -L https://github.com/sake92/flatmark/releases/download/v${FLATMARK_VERSION}/flatmark-1.0.0.pkg -o flatmark.pkg
-            sudo installer -verbose -pkg flatmark.pkg -target /
+            #sudo installer -verbose -pkg flatmark.pkg -target /
             curl -L https://github.com/sake92/flatmark/releases/download/v${FLATMARK_VERSION}/flatmark_${FLATMARK_VERSION}_amd64.deb -o flatmark.deb
             sudo dpkg -i flatmark.deb
             flatmark build -i docs
