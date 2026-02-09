@@ -23,6 +23,8 @@ jobs:
             sudo dpkg -i flatmark.deb
             flatmark build -i docs
             tree -h docs/_site
+            git status
+            git diff
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
         with:
