@@ -4,17 +4,20 @@ import java.nio.file.Paths
 import sttp.client4.quick.*
 import sttp.model.{HeaderNames, StatusCode}
 import ba.sake.sharaf.*
+import ba.sake.sharaf.utils.NetworkUtils
 
 abstract class AbstractFilesHandlerTest extends munit.FunSuite {
 
-  def port: Int
-  def testResourcesDir = Paths.get(sys.env("MILL_TEST_RESOURCE_DIR"))
+  val port: Int = NetworkUtils.getFreePort()
+  def baseUrl: String = s"http://localhost:${port}"
 
-  // Abstract method to start the server - implementations must provide this
   def startServer(): Unit
-
-  // Abstract method to stop the server - implementations must provide this
   def stopServer(): Unit
+
+  override def beforeAll(): Unit = startServer()
+  override def afterAll(): Unit = stopServer()
+
+  def testResourcesDir = Paths.get(sys.env("MILL_TEST_RESOURCE_DIR"))
 
   val filesHandler = SharafHandler.files(
     testResourcesDir.resolve("myfiles")
@@ -25,10 +28,6 @@ abstract class AbstractFilesHandlerTest extends munit.FunSuite {
     },
     filesHandler
   )
-
-  override def beforeAll(): Unit = startServer()
-
-  override def afterAll(): Unit = stopServer()
 
   test("GET text_file.txt should work") {
     val res = quickRequest.get(uri"http://localhost:${port}/text_file.txt").send()

@@ -4,13 +4,9 @@ import io.undertow.{Handlers, Undertow}
 import io.undertow.server.handlers.BlockingHandler
 import ba.sake.sharaf.*
 import ba.sake.sharaf.handlers.AbstractErrorHandlerTest
-import ba.sake.sharaf.utils.*
 import ba.sake.sharaf.undertow.SharafUndertowHandler
 
 class ErrorHandlerTest extends AbstractErrorHandlerTest {
-
-  val port = NetworkUtils.getFreePort()
-
   val server = Undertow
     .builder()
     .addHttpListener(port, "localhost")

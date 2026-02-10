@@ -6,12 +6,9 @@ import com.sun.net.httpserver.{HttpServer, HttpExchange, HttpHandler}
 import ba.sake.sharaf.*
 import ba.sake.sharaf.routing.*
 import ba.sake.sharaf.handlers.AbstractErrorHandlerTest
-import ba.sake.sharaf.jdkhttp.{SharafJdkHttpHandler, JdkHttpServerSharafRequest}
-import ba.sake.sharaf.utils.NetworkUtils
+import ba.sake.sharaf.jdkhttp.JdkHttpServerSharafRequest
 
 class ErrorHandlerTest extends AbstractErrorHandlerTest {
-
-  val port = NetworkUtils.getFreePort()
 
   private val httpServer = HttpServer.create(new InetSocketAddress("localhost", port), 0)
   
@@ -48,6 +45,8 @@ class ErrorHandlerTest extends AbstractErrorHandlerTest {
   httpServer.createContext("/json", PrefixStrippingHandler("/json", jsonHandler))
   httpServer.setExecutor(Executors.newFixedThreadPool(10))
 
-  def startServer(): Unit = httpServer.start()
-  def stopServer(): Unit = httpServer.stop(0)
+  override def startServer(): Unit = httpServer.start()
+  override def stopServer(): Unit = httpServer.stop(0)
+
+  override def supportsForms: Boolean = false // TODO
 }

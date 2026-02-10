@@ -40,6 +40,7 @@ object `sharaf-undertow` extends SharafPublishModule:
   )
   def moduleDeps = Seq(`sharaf-core`.jvm)
   object test extends ScalaTests with SharafTestModule:
+    def moduleDeps = super.moduleDeps ++ Seq(`sharaf-core`.jvm.test)
     def mvnDeps = super.mvnDeps() ++ Seq(
       mvn"org.webjars:jquery:3.7.1"
     )
@@ -68,12 +69,14 @@ object `sharaf-helidon` extends SharafPublishModule:
     mvn"io.helidon.config:helidon-config-yaml:4.2.2"
   )
   def moduleDeps = Seq(`sharaf-core`.jvm)
-  object test extends ScalaTests with SharafTestModule
+  object test extends ScalaTests with SharafTestModule:
+    def moduleDeps = super.moduleDeps ++ Seq(`sharaf-core`.jvm.test)
 
 object `sharaf-jdk-httpserver` extends SharafPublishModule:
   def artifactName = "sharaf-jdk-httpserver"
   def moduleDeps = Seq(`sharaf-core`.jvm)
-  object test extends ScalaTests with SharafTestModule
+  object test extends ScalaTests with SharafTestModule:
+    def moduleDeps = super.moduleDeps ++ Seq(`sharaf-core`.jvm.test)
 
 object `sharaf-snunit` extends ScalaNativeCommonModule with SharafPublishModule:
   def artifactName = "sharaf-snunit"

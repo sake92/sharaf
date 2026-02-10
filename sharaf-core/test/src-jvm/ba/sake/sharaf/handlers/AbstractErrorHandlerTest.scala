@@ -8,19 +8,21 @@ import ba.sake.tupson.JsonRW
 import ba.sake.validson.Validator
 import ba.sake.sharaf.*
 import ba.sake.sharaf.routing.*
+import ba.sake.sharaf.utils.NetworkUtils
 
 abstract class AbstractErrorHandlerTest extends munit.FunSuite {
 
-  def port: Int
-  def baseUrl: String = s"http://localhost:$port"
+  val port: Int = NetworkUtils.getFreePort()
+  def baseUrl: String = s"http://localhost:${port}"
 
-  // Abstract method to start the server - implementations must provide this
   def startServer(): Unit
-
-  // Abstract method to stop the server - implementations must provide this
   def stopServer(): Unit
+  def supportsForms: Boolean = true
 
-  val routes = Routes {
+  override def beforeAll(): Unit = startServer()
+  override def afterAll(): Unit = stopServer()
+
+  def routes = Routes {
     case GET -> Path("query") =>
       val qp = Request.current.queryParamsValidated[TestQuery]
       Response.withBody(qp.toString)
@@ -33,10 +35,6 @@ abstract class AbstractErrorHandlerTest extends munit.FunSuite {
     case GET -> Path() =>
       Response.withBody("OK")
   }
-
-  override def beforeAll(): Unit = startServer()
-
-  override def afterAll(): Unit = stopServer()
 
   // default (plain string) error mapper
   test("Default error mapper handles query parsing failure") {
@@ -53,12 +51,14 @@ abstract class AbstractErrorHandlerTest extends munit.FunSuite {
   }
 
   test("Default error mapper handles form parsing failure") {
+    assume(supportsForms, "Forms not supported by this server")
     val res = quickRequest.post(uri"${baseUrl}/default/form").multipartBody(multipart("bla", "")).send()
     assertEquals(res.code, StatusCode.BadRequest)
     assertEquals(res.body, "Form parsing error: Key 'name' is missing")
     assertEquals(res.headers(HeaderNames.ContentType), Seq("text/plain; charset=utf-8"))
   }
   test("Default error mapper handles form validation failure") {
+    assume(supportsForms, "Forms not supported by this server")
     val res = quickRequest.post(uri"${baseUrl}/default/form").multipartBody(TestForm("").toSttpMultipart()).send()
     assertEquals(res.code, StatusCode.UnprocessableEntity)
     assertEquals(res.body, "Validation errors: [ValidationError($.name,must be >= 3,)]")
@@ -99,6 +99,7 @@ abstract class AbstractErrorHandlerTest extends munit.FunSuite {
   }
 
   test("JSON error mapper handles form parsing failure") {
+    assume(supportsForms, "Forms not supported by this server")
     val res = quickRequest.post(uri"${baseUrl}/json/form").multipartBody(multipart("bla", "")).send()
     assertEquals(res.code, StatusCode.BadRequest)
     assertEquals(
@@ -108,6 +109,7 @@ abstract class AbstractErrorHandlerTest extends munit.FunSuite {
     assertEquals(res.headers(HeaderNames.ContentType), Seq("application/json; charset=utf-8"))
   }
   test("JSON error mapper handles form validation failure") {
+    assume(supportsForms, "Forms not supported by this server")
     val res = quickRequest.post(uri"${baseUrl}/json/form").multipartBody(TestForm("").toSttpMultipart()).send()
     assertEquals(res.code, StatusCode.UnprocessableEntity)
     assertEquals(
