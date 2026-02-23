@@ -1,0 +1,193 @@
+//amends "https://sake92.github.io/deder/config/DederProject.pkl"
+amends "/home/sake/projects/sake92/deder/config/DederProject.pkl"
+
+local const template: ScalaModule = new {
+  scalaVersion = "3.7.3"
+  scalacOptions = new Listing<String> {
+    "-Yretain-trees" // needed for default parameters
+    "-deprecation"
+    "-Wunused:all"
+    "-explain"
+  }
+  deps {
+    "com.lihaoyi::fastparse::3.1.1"
+  }
+}
+
+local const testTemplate = (template.asTest()) {
+  deps {
+    "org.scalameta::munit::1.1.0"
+  }
+}
+
+local const jsTemplate = (template.asJs()) {
+  scalaJSVersion = "1.19.0"
+  deps {
+    "io.github.cquiroz::scala-java-time::2.6.0"
+  }
+}
+
+local const nativeTemplate = (template.asNative()) {
+  scalaNativeVersion = "0.5.9"
+  deps {
+    "io.github.cquiroz::scala-java-time::2.6.0"
+  }
+}
+
+local const validsonModules =
+  new CreateCrossModules {
+    _root = "validson"
+    _template = template
+    _testTemplate = testTemplate
+    _jsTemplate = jsTemplate
+    _nativeTemplate = nativeTemplate
+  }.get
+
+local const quersonModules =
+  new CreateCrossModules {
+    _root = "querson"
+    _template = template
+    _testTemplate = testTemplate
+    _jsTemplate = jsTemplate
+    _nativeTemplate = nativeTemplate
+  }.get
+
+local const formsonModules =
+  new CreateCrossModules {
+    _root = "formson"
+    _template = template
+    _testTemplate = testTemplate
+    _jsTemplate = jsTemplate
+    _nativeTemplate = nativeTemplate
+  }.get
+
+local const sharafCoreTemplate = (template) {
+  deps {
+    "ba.sake::tupson::0.18.0"
+    "com.lihaoyi::geny::1.1.1"
+    "com.softwaremill.sttp.client4::core::4.0.5"
+  }
+}
+local const sharafCoreModules =
+  new CreateCrossModules {
+    _root = "sharaf-core"
+    _template = (sharafCoreTemplate) {
+      moduleDeps {
+        validsonModules.jvm
+        quersonModules.jvm
+        formsonModules.jvm
+      }
+      deps {
+        "org.playframework.twirl::twirl-api:2.1.0-M4"
+      }
+    }
+    _testTemplate = testTemplate
+    _jsTemplate = jsTemplate
+    _nativeTemplate = (nativeTemplate) {
+      deps = sharafCoreTemplate.deps
+      moduleDeps {
+        validsonModules.native
+        quersonModules.native
+        formsonModules.native
+      }
+    }
+  }.get
+
+local const sharafUndertowModules =
+  new CreateScalaModules {
+    _root = "sharaf-undertow"
+    _template = (template) {
+      moduleDeps {
+        sharafCoreModules.jvm
+      }
+      deps {
+        "io.undertow:undertow-core:2.3.18.Final"
+        "ba.sake::tupson-config:0.18.0"
+      }
+    }
+    _testTemplate = (testTemplate) {
+      moduleDeps {
+        sharafCoreModules.jvm_test
+      }
+      deps {
+        "org.webjars:jquery:3.7.1"
+      }
+    }
+  }.get
+
+local const sharafHttp4sModules =
+  new CreateScalaModules {
+    _root = "sharaf-http4s"
+    _template = (template) {
+      moduleDeps {
+        sharafCoreModules.jvm
+      }
+      deps {
+        "org.http4s::http4s-server::0.23.32"
+      }
+    }
+    _testTemplate = (testTemplate) {
+      deps {
+        "org.http4s::http4s-client::0.23.32"
+      }
+    }
+  }.get
+
+local const sharafHelidonModules =
+  new CreateScalaModules {
+    _root = "sharaf-helidon"
+    _template = (template) {
+      moduleDeps {
+        sharafCoreModules.jvm
+      }
+      deps {
+        "io.helidon.webserver:helidon-webserver:4.2.2"
+        "io.helidon.config:helidon-config-yaml:4.2.2"
+      }
+    }
+    _testTemplate = (testTemplate) {
+      moduleDeps {
+        sharafCoreModules.jvm_test
+      }
+    }
+  }.get
+
+local const sharafJdkHttpserverModules =
+  new CreateScalaModules {
+    _root = "sharaf-jdk-httpserver"
+    _template = (template) {
+      moduleDeps {
+        sharafCoreModules.jvm
+      }
+    }
+    _testTemplate = (testTemplate) {
+      moduleDeps {
+        sharafCoreModules.jvm_test
+      }
+    }
+  }.get
+
+local const sharafSnunit = (nativeTemplate) {
+  id = "sharaf-snunit"
+  root = "sharaf-snunit"
+  moduleDeps {
+    sharafCoreModules.native
+  }
+  deps {
+    "com.github.lolgab::snunit::0.10.3"
+  }
+}
+
+modules {
+  ...validsonModules.all
+  ...quersonModules.all
+  ...formsonModules.all
+  sharafCoreModules.jvm
+  sharafCoreModules.jvm_test
+  sharafCoreModules.native
+  ...sharafUndertowModules.all
+  ...sharafHttp4sModules.all
+  ...sharafHelidonModules.all
+  ...sharafJdkHttpserverModules.all
+  sharafSnunit
+}

@@ -1,6 +1,6 @@
 package ba.sake.sharaf.handlers
 
-import java.nio.file.Paths
+import java.nio.file.{Path => NioPath, Paths}
 import sttp.client4.quick.*
 import sttp.model.{HeaderNames, StatusCode}
 import ba.sake.sharaf.*
@@ -17,7 +17,7 @@ abstract class AbstractFilesHandlerTest extends munit.FunSuite {
   override def beforeAll(): Unit = startServer()
   override def afterAll(): Unit = stopServer()
 
-  def testResourcesDir = Paths.get(sys.env("MILL_TEST_RESOURCE_DIR"))
+  def testResourcesDir: NioPath
 
   val filesHandler = SharafHandler.files(
     testResourcesDir.resolve("myfiles")

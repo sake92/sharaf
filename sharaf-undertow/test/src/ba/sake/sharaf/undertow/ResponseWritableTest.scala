@@ -11,7 +11,7 @@ import ba.sake.tupson.JsonRW
 
 class ResponseWritableTest extends munit.FunSuite {
 
-  val testFileResourceDir = Paths.get(sys.env("MILL_TEST_RESOURCE_DIR"))
+  val testFileResourceDir = java.nio.file.Paths.get("sharaf-undertow/test/resources")
 
   val port = NetworkUtils.getFreePort()
   val baseUrl = s"http://localhost:$port"
