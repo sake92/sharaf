@@ -36,7 +36,7 @@ jobs:
           distribution: 'temurin'
           java-version: 21
       - name: Set up Homebrew
-        uses: Homebrew/actions/setup-homebrew@v4
+        uses: Homebrew/actions/setup-homebrew@main
       - name: Install deder
         run: |
           brew install sake92/tap/deder
