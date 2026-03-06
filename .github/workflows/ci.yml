@@ -41,6 +41,8 @@ jobs:
         run: |
           brew install sake92/tap/deder
       - name: Compile
-        run: deder exec -t compile
+        run: |
+          deder exec -t compile
+          cat .deder/logs/server.log
       - name: Test Deder
         run: deder exec -t test
