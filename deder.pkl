@@ -1,5 +1,33 @@
-//amends "https://sake92.github.io/deder/config/DederProject.pkl"
-amends "/home/sake/projects/sake92/deder/config/DederProject.pkl"
+amends "https://sake92.github.io/deder/config/DederProject.pkl"
+
+local const function pomSettings(
+  _artifactId: String,
+  _name: String,
+  _description: String,
+): PomSettings = new {
+  groupId = "ba.sake"
+  artifactId = _artifactId
+  version = "0.17.0-SNAPSHOT"
+  name = _name
+  description = _description
+  url = "https://github.com/sake92/sharaf"
+  licenses {
+    new PomLicense {
+      name = "Apache License 2.0"
+      url = "https://opensource.org/license/apache-2-0"
+    }
+  }
+  developers {
+    new PomDeveloper {
+      id = "sake92"
+      name = "Sakib Hadžiavdić"
+      email = "sakib@sake.ba"
+    }
+  }
+  scm {
+    url = "git@github.com:sake92/sharaf.git"
+  }
+}
 
 local const template: ScalaModule = new {
   scalaVersion = "3.7.3"
@@ -9,19 +37,17 @@ local const template: ScalaModule = new {
     "-Wunused:all"
     "-explain"
   }
-  deps {
-    "com.lihaoyi::fastparse::3.1.1"
-  }
 }
 
 local const testTemplate = (template.asTest()) {
   deps {
     "org.scalameta::munit::1.1.0"
   }
+  publish = false
 }
 
 local const jsTemplate = (template.asJs()) {
-  scalaJSVersion = "1.19.0"
+  scalaJsVersion = "1.19.0"
   deps {
     "io.github.cquiroz::scala-java-time::2.6.0"
   }
@@ -37,28 +63,58 @@ local const nativeTemplate = (template.asNative()) {
 local const validsonModules =
   new CreateCrossModules {
     _root = "validson"
-    _template = template
+    local const _pomSettings = pomSettings("validson", "Validson", "Sharaf validation library")
+    _template = (template) {
+      pomSettings = _pomSettings
+      deps { "com.lihaoyi::sourcecode::0.4.2" }
+    }
     _testTemplate = testTemplate
-    _jsTemplate = jsTemplate
-    _nativeTemplate = nativeTemplate
+    _jsTemplate = (jsTemplate) {
+      pomSettings = _pomSettings
+      deps { "com.lihaoyi::sourcecode::0.4.2" }
+    }
+    _nativeTemplate = (nativeTemplate) {
+      pomSettings = _pomSettings
+      deps { "com.lihaoyi::sourcecode::0.4.2" }
+    }
   }.get
 
 local const quersonModules =
   new CreateCrossModules {
     _root = "querson"
-    _template = template
+    local const _pomSettings = pomSettings("querson", "Querson", "Sharaf query params library")
+    _template = (template) {
+      pomSettings = _pomSettings
+      deps { "com.lihaoyi::fastparse::3.1.1" }
+    }
     _testTemplate = testTemplate
-    _jsTemplate = jsTemplate
-    _nativeTemplate = nativeTemplate
+    _jsTemplate = (jsTemplate) {
+      pomSettings = _pomSettings
+      deps { "com.lihaoyi::fastparse::3.1.1" }
+    }
+    _nativeTemplate = (nativeTemplate) {
+      pomSettings = _pomSettings
+      deps { "com.lihaoyi::fastparse::3.1.1" }
+    }
   }.get
 
 local const formsonModules =
   new CreateCrossModules {
     _root = "formson"
-    _template = template
+    local const _pomSettings = pomSettings("formson", "Formson", "Sharaf form binding library")
+    _template = (template) {
+      pomSettings = _pomSettings
+      deps { "com.lihaoyi::fastparse::3.1.1" }
+    }
     _testTemplate = testTemplate
-    _jsTemplate = jsTemplate
-    _nativeTemplate = nativeTemplate
+    _jsTemplate = (jsTemplate) {
+      pomSettings = _pomSettings
+      deps { "com.lihaoyi::fastparse::3.1.1" }
+    }
+    _nativeTemplate = (nativeTemplate) {
+      pomSettings = _pomSettings
+      deps { "com.lihaoyi::fastparse::3.1.1" }
+    }
   }.get
 
 local const sharafCoreTemplate = (template) {
@@ -72,6 +128,7 @@ local const sharafCoreModules =
   new CreateCrossModules {
     _root = "sharaf-core"
     _template = (sharafCoreTemplate) {
+      pomSettings = pomSettings("sharaf-core", "Sharaf Core", "Core library for Sharaf")
       moduleDeps {
         validsonModules.jvm
         quersonModules.jvm
@@ -84,6 +141,7 @@ local const sharafCoreModules =
     _testTemplate = testTemplate
     _jsTemplate = jsTemplate
     _nativeTemplate = (nativeTemplate) {
+      pomSettings = pomSettings("sharaf-core", "Sharaf Core", "Core library for Sharaf")
       deps = sharafCoreTemplate.deps
       moduleDeps {
         validsonModules.native
@@ -97,6 +155,12 @@ local const sharafUndertowModules =
   new CreateScalaModules {
     _root = "sharaf-undertow"
     _template = (template) {
+      pomSettings =
+        pomSettings(
+          "sharaf-undertow",
+          "Sharaf Undertow",
+          "Sharaf integration with Undertow",
+        )
       moduleDeps {
         sharafCoreModules.jvm
       }
@@ -119,6 +183,7 @@ local const sharafHttp4sModules =
   new CreateScalaModules {
     _root = "sharaf-http4s"
     _template = (template) {
+      pomSettings = pomSettings("sharaf-http4s", "Sharaf Http4s", "Sharaf integration with Http4s")
       moduleDeps {
         sharafCoreModules.jvm
       }
@@ -137,6 +202,8 @@ local const sharafHelidonModules =
   new CreateScalaModules {
     _root = "sharaf-helidon"
     _template = (template) {
+      pomSettings =
+        pomSettings("sharaf-helidon", "Sharaf Helidon", "Sharaf integration with Helidon")
       moduleDeps {
         sharafCoreModules.jvm
       }
@@ -156,6 +223,12 @@ local const sharafJdkHttpserverModules =
   new CreateScalaModules {
     _root = "sharaf-jdk-httpserver"
     _template = (template) {
+      pomSettings =
+        pomSettings(
+          "sharaf-jdk-httpserver",
+          "Sharaf JDK HttpServer",
+          "Sharaf integration with JDK HttpServer",
+        )
       moduleDeps {
         sharafCoreModules.jvm
       }
@@ -170,6 +243,7 @@ local const sharafJdkHttpserverModules =
 local const sharafSnunit = (nativeTemplate) {
   id = "sharaf-snunit"
   root = "sharaf-snunit"
+  pomSettings = pomSettings("sharaf-snunit", "Sharaf Snunit", "Sharaf integration with Snunit")
   moduleDeps {
     sharafCoreModules.native
   }
