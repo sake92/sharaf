@@ -7,7 +7,6 @@ local const function pomSettings(
 ): PomSettings = new {
   groupId = "ba.sake"
   artifactId = _artifactId
-  version = "0.17.0-SNAPSHOT"
   name = _name
   description = _description
   url = "https://github.com/sake92/sharaf"
