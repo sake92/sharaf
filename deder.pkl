@@ -197,6 +197,9 @@ local const sharafHepekComponents = (baseTemplate) {
   root = "sharaf-hepek-components"
   pomSettings =
     pomSettings(root, "Sharaf Hepek Components", "Sharaf integration with hepek-components")
+  moduleDeps {
+    sharafCoreModules.jvm
+  }
   deps { "ba.sake::hepek-components:0.34.0" }
 }
 
@@ -293,10 +296,120 @@ local const sharafSnunit = (baseTemplate.asNative()) {
   moduleDeps {
     sharafCoreModules.native
   }
-  deps {
-    "com.github.lolgab::snunit::0.10.3"
-  }
+  deps { "com.github.lolgab::snunit::0.10.3" }
 }
+
+// examples
+local const baseExampleTemplate = (baseTemplate) {
+  deps { "ch.qos.logback:logback-classic:1.4.6" }
+}
+
+local const apiExampleModules =
+  new CreateScalaModules {
+    root = "examples/api"
+    template = (baseExampleTemplate) {
+      moduleDeps { sharafUndertowModules.main }
+    }
+    testTemplate = (baseExampleTemplate.asTest()) {
+      deps { "org.scalameta::munit::1.1.0" }
+    }
+  }.get
+
+local const fullstackExampleModules =
+  new CreateScalaModules {
+    root = "examples/fullstack"
+    template = (baseExampleTemplate) {
+      moduleDeps { sharafUndertowModules.main }
+    }
+    testTemplate = (baseExampleTemplate.asTest()) {
+      deps { "org.scalameta::munit::1.1.0" }
+    }
+  }.get
+
+local const userPassFormExampleModules =
+  new CreateScalaModules {
+    root = "examples/user-pass-form"
+    template = (baseExampleTemplate) {
+      moduleDeps { sharafUndertowModules.main }
+      deps {
+        "org.pac4j:undertow-pac4j:6.0.0"
+        "org.pac4j:pac4j-http:6.1.2"
+        "org.mindrot:jbcrypt:0.4"
+      }
+    }
+    testTemplate = (baseExampleTemplate.asTest()) {
+      deps { "org.scalameta::munit::1.1.0" }
+    }
+  }.get
+
+local const jwtExampleModules =
+  new CreateScalaModules {
+    root = "examples/jwt"
+    template = (baseExampleTemplate) {
+      moduleDeps { sharafUndertowModules.main }
+      deps {
+        "org.pac4j:undertow-pac4j:6.0.0"
+        "org.pac4j:pac4j-http:6.1.2"
+        "org.pac4j:pac4j-jwt:6.1.2"
+      }
+    }
+    testTemplate = (baseExampleTemplate.asTest()) {
+      deps { "org.scalameta::munit::1.1.0" }
+    }
+  }.get
+
+local const oauth2ExampleModules =
+  new CreateScalaModules {
+    root = "examples/oauth2"
+    template = (baseExampleTemplate) {
+      moduleDeps { sharafUndertowModules.main }
+      deps {
+        "org.pac4j:undertow-pac4j:6.0.0"
+        "org.pac4j:pac4j-oauth:6.1.2"
+        "com.google.guava:guava:33.4.6-jre"
+      }
+    }
+    testTemplate = (baseExampleTemplate.asTest()) {
+      deps {
+        "org.scalameta::munit::1.1.0"
+        "no.nav.security:mock-oauth2-server:0.5.10"
+      }
+    }
+  }.get
+
+local const jdkHttpserverExampleModules =
+  new CreateScalaModules {
+    root = "examples/jdk-httpserver"
+    template = (baseExampleTemplate) {
+      moduleDeps { sharafJdkHttpserverModules.main }
+    }
+    testTemplate = (baseExampleTemplate.asTest()) {
+      deps { "org.scalameta::munit::1.1.0" }
+    }
+  }.get
+
+local const snunitExampleModules =
+  new CreateScalaModules {
+    root = "examples/snunit"
+    template = (baseExampleTemplate) {
+      moduleDeps { sharafSnunit }
+    }
+    testTemplate = (baseExampleTemplate.asTest()) {
+      deps { "org.scalameta::munit::1.1.0" }
+    }
+  }.get
+
+local const http4sExampleModules =
+  new CreateScalaModules {
+    root = "examples/http4s"
+    template = (baseExampleTemplate) {
+      moduleDeps { sharafHttp4sModules.main }
+      deps { "org.http4s::http4s-ember-server::0.23.32" }
+    }
+    testTemplate = (baseExampleTemplate.asTest()) {
+      deps { "org.scalameta::munit::1.1.0" }
+    }
+  }.get
 
 modules {
   ...validsonModules.all
@@ -316,4 +429,12 @@ modules {
   ...sharafHelidonModules.all
   ...sharafJdkHttpserverModules.all
   sharafSnunit
+  ...apiExampleModules.all
+  ...fullstackExampleModules.all
+  ...userPassFormExampleModules.all
+  ...jwtExampleModules.all
+  ...oauth2ExampleModules.all
+  ...jdkHttpserverExampleModules.all
+  ...snunitExampleModules.all
+  ...http4sExampleModules.all
 }
