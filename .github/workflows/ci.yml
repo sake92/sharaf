@@ -12,25 +12,12 @@ jobs:
     name: test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
-      - uses: actions/setup-java@v3
+      - uses: coursier/cache-action@v7
         with:
-          distribution: 'temurin'
-          java-version: 21
-      - name: Compile
-        run: ./mill -i __.compile
-      - name: Test
-        run: ./mill -i __.test
-  test-deder:
-    name: test-deder
-    runs-on: ubuntu-latest
-    continue-on-error: true # just playing for now
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+          extraFiles: deder.pkl
       - uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
@@ -38,11 +25,8 @@ jobs:
       - name: Set up Homebrew
         uses: Homebrew/actions/setup-homebrew@main
       - name: Install deder
-        run: |
-          brew install sake92/tap/deder
+        run: brew install sake92/tap/deder
       - name: Compile
-        run: |
-          deder exec -t compile
-          cat .deder/logs/server.log
+        run: deder exec -t compile
       - name: Test Deder
         run: deder exec -t test
