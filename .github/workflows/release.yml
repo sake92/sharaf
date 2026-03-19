@@ -29,3 +29,10 @@ jobs:
         run: brew install sake92/tap/deder
       - name: Publish
         run: deder exec -t publish
+      - name: Deder output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deder-logs
+          path: |
+            .deder/logs/server.log
