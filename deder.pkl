@@ -192,6 +192,14 @@ local const sharafCoreModules =
     }
   }.get
 
+local const sharafHepekComponents = (baseTemplate) {
+  id = "sharaf-hepek-components"
+  root = "sharaf-hepek-components"
+  pomSettings =
+    pomSettings(root, "Sharaf Hepek Components", "Sharaf integration with hepek-components")
+  deps { "ba.sake::hepek-components:0.34.0" }
+}
+
 local const sharafUndertowModules =
   new CreateScalaModules {
     root = "sharaf-undertow"
@@ -298,6 +306,7 @@ modules {
   // java.nio.Path not supported in Scala.js
   formsonModules.native
   formsonModules.native_test
+  sharafHepekComponents
   sharafCoreModules.jvm
   sharafCoreModules.jvm_test
   sharafCoreModules.native
