@@ -5,7 +5,7 @@ Run from repo root:
 
 ```scala
 
-./mill examples.http4s.jvm.run
+deder exec -t run -m examples-http4s
 
 ```
 

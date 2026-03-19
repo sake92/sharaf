@@ -9,7 +9,7 @@ Run from repo root:
 
 ```scala
 
-./mill examples.api.run
+deder exec -t run -m examples-api
 
 ```
 

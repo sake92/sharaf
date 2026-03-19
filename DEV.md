@@ -1,21 +1,20 @@
 
 ```sh
 
-./mill clean
+deder clean
 
-./mill -i mill.scalalib.scalafmt/
+deder -t test
 
-./mill __.test
+deder exec -t runMvnApp fmt
+
+deder exec -t test
 
 scala-cli compile examples\scala-cli
 
-./mill examples.runMain bla
+deder exec -t run -m examples-api
 
 # for local dev/test
-./mill __.publishLocal
-```
-
-```sh
+deder exec -t publishLocal
 
 # RELEASE
 ./scripts/release.sh 0.16.0

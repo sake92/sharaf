@@ -5,7 +5,9 @@ The following steps are done from root of this git repo.
 Build the app:
 
 ```shell
-./mill -i examples.snunit.nativeLink
+
+deder exec -t nativeLink -m examples-oauth2
+
 ```
 
 

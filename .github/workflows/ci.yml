@@ -28,5 +28,5 @@ jobs:
         run: brew install sake92/tap/deder
       - name: Compile
         run: deder exec -t compile
-      - name: Test Deder
+      - name: Test
         run: deder exec -t test

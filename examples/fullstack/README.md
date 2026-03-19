@@ -12,7 +12,7 @@ Run from repo root:
 
 ```scala
 
-./mill examples.fullstack.run
+deder exec -t run -m examples-fullstack
 
 ```
 

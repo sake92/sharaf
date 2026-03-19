@@ -15,7 +15,7 @@ Run from repo root:
 
 ```scala
 
-./mill examples.oauth2.run
+deder exec -t run -m examples-oauth2
 
 ```
 
