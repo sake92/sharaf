@@ -21,8 +21,6 @@ final class ClasspathResourcesHandler(
   private val normalizedRoot = rootPath.stripPrefix("/").stripSuffix("/")
   if normalizedRoot.isEmpty then throw IllegalArgumentException("Root path cannot be empty")
 
-  println(s"Serving resources from: $normalizedRoot")
-
   override def handle(context: RequestContext): Response[?] =
     given Request = context.request
     val (method, path) = context.params
@@ -35,11 +33,9 @@ final class ClasspathResourcesHandler(
       catch {
         case _: NotFoundException => notFoundHandler.handle(context)
         case other =>
-          println("SOME OTHER EXCEPTION IN CLASSPATH RESOURCES HANDLER:")
           other.printStackTrace()
           throw other
       }
-    println(s"ClasspathResourcesHandler response: $res")
     res
 
   private def serve(relativePath: String, withBody: Boolean)(using Request): Response[?] = {
@@ -68,7 +64,6 @@ final class ClasspathResourcesHandler(
         validateResourceUrl(url, resourcePath)
         url
       case None =>
-        println(s"Resource not found: $resourcePath")
         throw NotFoundException("Resource")
     }
 
@@ -85,7 +80,6 @@ final class ClasspathResourcesHandler(
   private def serveResource(resourceUrl: URL, resourcePath: String, withBody: Boolean)(using
       request: Request
   ): Response[?] = boundary {
-    println(s"Serving resource: $resourceUrl ; $resourcePath")
     val connection = resourceUrl.openConnection()
     connection.setUseCaches(false)
     val contentLength = connection.getContentLengthLong
@@ -122,7 +116,6 @@ final class ClasspathResourcesHandler(
       lastModified: Instant,
       withBody: Boolean
   ): Response[?] = {
-    println(s"serveFullResource: $resourceUrl")
     var headers = Seq(
       "Content-Type" -> mimeType,
       "Last-Modified" -> formatHttpDate(lastModified)
@@ -136,8 +129,6 @@ final class ClasspathResourcesHandler(
     else headers = headers.appended("Cache-Control" -> "no-cache, no-store, must-revalidate")
 
     val finalHeaders = headers.map((k, v) => (HttpString(k), Seq(v)))
-
-    println(s"Final headers: $finalHeaders")
 
     if withBody then Response.withBody(resourceUrl.openStream).settingHeaders(finalHeaders)
     else Response.default.settingHeaders(finalHeaders)

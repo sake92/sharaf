@@ -21,7 +21,6 @@ abstract class AbstractSharafHandlerTest extends munit.FunSuite {
   }
 
   test("/does-not-exist returns a 404") {
-    println(s"Testing 404 on ${baseUrl}/does-not-exist")
     val res = quickRequest.get(uri"${baseUrl}/does-not-exist").send()
     assertEquals(res.code, StatusCode.NotFound)
     assertEquals(res.body, "Not Found")

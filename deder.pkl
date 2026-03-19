@@ -1,0 +1,310 @@
+amends "https://sake92.github.io/deder/config/DederProject.pkl"
+
+local const function pomSettings(
+  _artifactId: String,
+  _name: String,
+  _description: String,
+): PomSettings = new {
+  groupId = "ba.sake"
+  artifactId = _artifactId
+  version = "0.17.0-SNAPSHOT"
+  name = _name
+  description = _description
+  url = "https://github.com/sake92/sharaf"
+  licenses {
+    new PomLicense {
+      name = "Apache License 2.0"
+      url = "https://opensource.org/license/apache-2-0"
+    }
+  }
+  developers {
+    new PomDeveloper {
+      id = "sake92"
+      name = "Sakib Hadžiavdić"
+      email = "sakib@sake.ba"
+    }
+  }
+  scm {
+    url = "git@github.com:sake92/sharaf.git"
+  }
+}
+
+local const baseTemplate: ScalaModule = new {
+  scalaVersion = "3.7.3"
+  scalacOptions = new Listing<String> {
+    "-Yretain-trees" // needed for default parameters
+    "-deprecation"
+    "-Wunused:all"
+    "-explain"
+  }
+}
+
+local const versions = new {
+  scalaJsVersion = "1.19.0"
+  scalaNativeVersion = "0.5.9"
+}
+
+local const validsonModules =
+  new CreateCrossModules {
+    root = "validson"
+    local const _pomSettings = pomSettings("validson", "Validson", "Sharaf validation library")
+    template = (baseTemplate) {
+      pomSettings = _pomSettings
+      deps { "com.lihaoyi::sourcecode::0.4.2" }
+    }
+    testTemplate = (baseTemplate.asTest()) {
+      deps { "org.scalameta::munit::1.1.0" }
+    }
+    jsTemplate = (baseTemplate.asJs()) {
+      scalaJsVersion = versions.scalaJsVersion
+      pomSettings = _pomSettings
+      deps {
+        "com.lihaoyi::sourcecode::0.4.2"
+        "io.github.cquiroz::scala-java-time::2.6.0"
+      }
+    }
+    jsTestTemplate = (jsTemplate.asTest()) {
+      deps { "org.scalameta::munit::1.1.0" }
+    }
+    nativeTemplate = (baseTemplate.asNative()) {
+      scalaNativeVersion = versions.scalaNativeVersion
+      pomSettings = _pomSettings
+      deps {
+        "com.lihaoyi::sourcecode::0.4.2"
+        "io.github.cquiroz::scala-java-time::2.6.0"
+      }
+    }
+    nativeTestTemplate = (nativeTemplate.asTest()) {
+      deps { "org.scalameta::munit::1.1.0" }
+    }
+  }.get
+
+local const quersonModules =
+  new CreateCrossModules {
+    root = "querson"
+    local const _pomSettings = pomSettings("querson", "Querson", "Sharaf query params library")
+    template = (baseTemplate) {
+      pomSettings = _pomSettings
+      deps { "com.lihaoyi::fastparse::3.1.1" }
+    }
+    testTemplate = (baseTemplate.asTest()) {
+      deps { "org.scalameta::munit::1.1.0" }
+    }
+    jsTemplate = (baseTemplate.asJs()) {
+      scalaJsVersion = versions.scalaJsVersion
+      pomSettings = _pomSettings
+      deps {
+        "com.lihaoyi::fastparse::3.1.1"
+        "io.github.cquiroz::scala-java-time::2.6.0"
+      }
+    }
+    jsTestTemplate = (jsTemplate.asTest()) {
+      deps { "org.scalameta::munit::1.1.0" }
+    }
+    nativeTemplate = (baseTemplate.asNative()) {
+      scalaNativeVersion = versions.scalaNativeVersion
+      pomSettings = _pomSettings
+      deps {
+        "com.lihaoyi::fastparse::3.1.1"
+        "io.github.cquiroz::scala-java-time::2.6.0"
+      }
+    }
+    nativeTestTemplate = (nativeTemplate.asTest()) {
+      deps { "org.scalameta::munit::1.1.0" }
+    }
+  }.get
+
+local const formsonModules =
+  new CreateCrossModules {
+    root = "formson"
+    local const _pomSettings = pomSettings("formson", "Formson", "Sharaf form binding library")
+    template = (baseTemplate) {
+      pomSettings = _pomSettings
+      deps { "com.lihaoyi::fastparse::3.1.1" }
+    }
+    testTemplate = (baseTemplate.asTest()) {
+      deps { "org.scalameta::munit::1.1.0" }
+    }
+    jsTemplate = (baseTemplate.asJs()) {
+      scalaJsVersion = versions.scalaJsVersion
+      pomSettings = _pomSettings
+      deps {
+        "com.lihaoyi::fastparse::3.1.1"
+        "io.github.cquiroz::scala-java-time::2.6.0"
+      }
+    }
+    jsTestTemplate = (jsTemplate.asTest()) {
+      deps { "org.scalameta::munit::1.1.0" }
+    }
+    nativeTemplate = (baseTemplate.asNative()) {
+      scalaNativeVersion = versions.scalaNativeVersion
+      pomSettings = _pomSettings
+      deps {
+        "com.lihaoyi::fastparse::3.1.1"
+        "io.github.cquiroz::scala-java-time::2.6.0"
+      }
+    }
+    nativeTestTemplate = (nativeTemplate.asTest()) {
+      deps { "org.scalameta::munit::1.1.0" }
+    }
+  }.get
+
+local const sharafCoreTemplate = (baseTemplate) {
+  pomSettings = pomSettings("sharaf-core", "Sharaf Core", "Core library for Sharaf")
+  deps {
+    "ba.sake::tupson::0.18.0"
+    "com.lihaoyi::geny::1.1.1"
+    "com.softwaremill.sttp.client4::core::4.0.5"
+  }
+}
+local const sharafCoreModules =
+  new CreateCrossModules {
+    root = "sharaf-core"
+    template = (sharafCoreTemplate) {
+      moduleDeps {
+        validsonModules.jvm
+        quersonModules.jvm
+        formsonModules.jvm
+      }
+      deps {
+        "org.playframework.twirl::twirl-api:2.1.0-M4"
+      }
+    }
+    testTemplate = (sharafCoreTemplate.asTest()) {
+      deps { "org.scalameta::munit::1.1.0" }
+    }
+    jsTemplate = (sharafCoreTemplate.asJs()) {
+      scalaJsVersion = versions.scalaJsVersion
+    }
+    jsTestTemplate = (jsTemplate.asTest()) {
+      deps { "org.scalameta::munit::1.1.0" }
+    }
+    nativeTemplate = (sharafCoreTemplate.asNative()) {
+      scalaNativeVersion = versions.scalaNativeVersion
+      moduleDeps {
+        validsonModules.native
+        quersonModules.native
+        formsonModules.native
+      }
+    }
+    nativeTestTemplate = (nativeTemplate.asTest()) {
+      deps { "org.scalameta::munit::1.1.0" }
+    }
+  }.get
+
+local const sharafUndertowModules =
+  new CreateScalaModules {
+    root = "sharaf-undertow"
+    template = (baseTemplate) {
+      pomSettings =
+        pomSettings("sharaf-undertow", "Sharaf Undertow", "Sharaf integration with Undertow")
+      moduleDeps {
+        sharafCoreModules.jvm
+      }
+      deps {
+        "io.undertow:undertow-core:2.3.18.Final"
+        "ba.sake::tupson-config:0.18.0"
+      }
+    }
+    testTemplate = (baseTemplate.asTest()) {
+      moduleDeps {
+        sharafCoreModules.jvm_test
+      }
+      deps {
+        "org.scalameta::munit::1.1.0"
+        "org.webjars:jquery:3.7.1"
+      }
+    }
+  }.get
+
+local const sharafHttp4sModules =
+  new CreateScalaModules {
+    root = "sharaf-http4s"
+    template = (baseTemplate) {
+      pomSettings = pomSettings("sharaf-http4s", "Sharaf Http4s", "Sharaf integration with Http4s")
+      moduleDeps {
+        sharafCoreModules.jvm
+      }
+      deps { "org.http4s::http4s-server::0.23.32" }
+    }
+    testTemplate = (baseTemplate.asTest()) {
+      deps {
+        "org.scalameta::munit::1.1.0"
+        "org.http4s::http4s-client::0.23.32"
+      }
+    }
+  }.get
+
+local const sharafHelidonModules =
+  new CreateScalaModules {
+    root = "sharaf-helidon"
+    template = (baseTemplate) {
+      pomSettings =
+        pomSettings("sharaf-helidon", "Sharaf Helidon", "Sharaf integration with Helidon")
+      moduleDeps {
+        sharafCoreModules.jvm
+      }
+      deps {
+        "io.helidon.webserver:helidon-webserver:4.2.2"
+        "io.helidon.config:helidon-config-yaml:4.2.2"
+      }
+    }
+    testTemplate = (baseTemplate.asTest()) {
+      moduleDeps {
+        sharafCoreModules.jvm_test
+      }
+    }
+  }.get
+
+local const sharafJdkHttpserverModules =
+  new CreateScalaModules {
+    root = "sharaf-jdk-httpserver"
+    template = (baseTemplate) {
+      pomSettings =
+        pomSettings(
+          "sharaf-jdk-httpserver",
+          "Sharaf JDK HttpServer",
+          "Sharaf integration with JDK HttpServer",
+        )
+      moduleDeps {
+        sharafCoreModules.jvm
+      }
+    }
+    testTemplate = (baseTemplate.asTest()) {
+      moduleDeps {
+        sharafCoreModules.jvm_test
+      }
+    }
+  }.get
+
+local const sharafSnunit = (baseTemplate.asNative()) {
+  id = "sharaf-snunit"
+  root = "sharaf-snunit"
+  scalaNativeVersion = versions.scalaNativeVersion
+  pomSettings = pomSettings("sharaf-snunit", "Sharaf Snunit", "Sharaf integration with Snunit")
+  moduleDeps {
+    sharafCoreModules.native
+  }
+  deps {
+    "com.github.lolgab::snunit::0.10.3"
+  }
+}
+
+modules {
+  ...validsonModules.all
+  ...quersonModules.all
+  formsonModules.jvm
+  formsonModules.jvm_test
+  // java.nio.Path not supported in Scala.js
+  formsonModules.native
+  formsonModules.native_test
+  sharafCoreModules.jvm
+  sharafCoreModules.jvm_test
+  sharafCoreModules.native
+  sharafCoreModules.native_test
+  ...sharafUndertowModules.all
+  ...sharafHttp4sModules.all
+  ...sharafHelidonModules.all
+  ...sharafJdkHttpserverModules.all
+  sharafSnunit
+}

@@ -7,6 +7,7 @@ import ba.sake.sharaf.helidon.HelidonSharafServer
 class FilesHandlerTest extends AbstractFilesHandlerTest {
   // this can't use just routes
   // because we serve static files, which are not handled by default, just the classpath..
+  def testResourcesDir = java.nio.file.Paths.get("sharaf-helidon/test/resources")
   val server = HelidonSharafServer("localhost", port, SharafHandler.exceptions(routesHandler, ExceptionMapper.default))
   def startServer(): Unit = server.start()
   def stopServer(): Unit = server.stop()

@@ -133,3 +133,4 @@ trait SharafTestModule extends TestModule.Munit:
   def mvnDeps = Seq(
     mvn"org.scalameta::munit::1.1.0"
   )
+  def testSandboxWorkingDir = false

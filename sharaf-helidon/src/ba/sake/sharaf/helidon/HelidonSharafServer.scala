@@ -7,11 +7,13 @@ import ba.sake.sharaf.*
 
 class HelidonSharafServer(host: String, port: Int, sharafHelidonHandler: SharafHelidonHandler) {
 
-  System.setProperty("server.host", host)
-  System.setProperty("server.port", port.toString)
+ // System.setProperty("server.host", host)
+ // System.setProperty("server.port", port.toString)
 
   private val server = WebServer
     .builder()
+    .host(host)
+    .port(port)
     .config(Config.create().get("server"))
     .routing { (builder: HttpRouting.Builder) =>
       builder.any(sharafHelidonHandler)
