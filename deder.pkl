@@ -301,6 +301,7 @@ local const sharafSnunit = (baseTemplate.asNative()) {
 
 // examples
 local const baseExampleTemplate = (baseTemplate) {
+  publish = false
   deps { "ch.qos.logback:logback-classic:1.4.6" }
 }
 
