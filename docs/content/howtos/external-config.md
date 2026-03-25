@@ -1,4 +1,5 @@
 ---
+layout: howto.html
 title: External Config
 description: Sharaf How To External Config
 ---

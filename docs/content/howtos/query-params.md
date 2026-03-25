@@ -1,4 +1,5 @@
 ---
+layout: howto.html
 title: Query Parameters
 description: Sharaf How To Query Parameters
 ---

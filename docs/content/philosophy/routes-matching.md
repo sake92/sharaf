@@ -1,4 +1,5 @@
 ---
+layout: philosophy.html
 title: Routes Matching
 description: Sharaf Routes Matching
 ---

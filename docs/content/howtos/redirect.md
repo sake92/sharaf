@@ -1,4 +1,5 @@
 ---
+layout: howto.html
 title: Redirect
 description: Sharaf How To Redirect
 ---

@@ -1,4 +1,5 @@
 ---
+layout: howto.html
 title: CORS
 description: Sharaf How To CORS
 ---

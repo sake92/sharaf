@@ -1,4 +1,5 @@
 ---
+layout: howto.html
 title: Exception Handler
 description: Sharaf How To Exception Handler
 ---

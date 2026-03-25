@@ -2,7 +2,7 @@
 title: Philosophy
 description: Sharaf Philosophy
 pagination:
-  sort_by: title
+  enabled: false
 ---
 
 # {{ page.title }}
@@ -31,3 +31,6 @@ You can use any of above separately in your projects.
 
 Šaraf means "a screw" in Bosnian, which reminds me of scala spiral logo.  
 It's a germanism I think.
+
+{% for p in site.data.project.philosophies %}- [{{ p.label }}]({{ p.url}})
+{% endfor %}

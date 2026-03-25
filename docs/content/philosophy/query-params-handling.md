@@ -1,4 +1,5 @@
 ---
+layout: philosophy.html
 title: Query Params Handling
 description: Sharaf Query Params Handling
 ---

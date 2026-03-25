@@ -1,8 +1,9 @@
 ---
+layout: howto.html
 title: How Tos
 description: Sharaf How Tos
 pagination:
-  sort_by: title
+  enabled: false
 ---
 
 # {{ page.title }}
@@ -10,3 +11,5 @@ pagination:
 
 Here are some common questions and answers you might have when using Sharaf.
 
+{% for h in site.data.project.howtos %}- [{{ h.label }}]({{ h.url}})
+{% endfor %}

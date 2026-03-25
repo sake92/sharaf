@@ -1,4 +1,5 @@
 ---
+layout: philosophy.html
 title: Dependency Injection
 description: Sharaf Dependency Injection
 ---

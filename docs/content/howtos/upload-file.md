@@ -1,4 +1,5 @@
 ---
+layout: howto.html
 title: Upload File
 description: Sharaf How To Upload File
 ---

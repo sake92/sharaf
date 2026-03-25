@@ -1,4 +1,5 @@
 ---
+layout: philosophy.html
 title: Alternatives
 description: Sharaf Alternatives
 ---

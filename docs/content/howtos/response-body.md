@@ -1,4 +1,5 @@
 ---
+layout: howto.html
 title: Response Body
 description: Sharaf How To Response Body
 ---
