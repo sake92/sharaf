@@ -1,4 +1,5 @@
 ---
+layout: tutorial.html
 title: Quickstart
 description: Sharaf Tutorial Quickstart
 ---
@@ -54,4 +55,3 @@ scala my_script.sc --scala-option -Yretain-trees
 - [Giter8 template for fullstack app](https://github.com/sake92/sharaf-fullstack.g8)
 
 
-{% include "tutorial_nav.html" %}

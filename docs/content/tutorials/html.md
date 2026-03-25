@@ -1,4 +1,5 @@
 ---
+layout: tutorial.html
 title: HTML
 description: Sharaf Tutorial HTML
 ---
@@ -22,5 +23,3 @@ scala html.sc
 
 Go to http://localhost:8181  
 to see how it works.
-
-{% include "tutorial_nav.html" %}

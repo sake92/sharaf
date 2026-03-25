@@ -1,4 +1,5 @@
 ---
+layout: tutorial.html
 title: Tests
 description: Sharaf Tutorial Tests
 ---
@@ -24,5 +25,4 @@ and then run the tests in another shell:
 scala test json_api.test.scala
 ```
 
-{% include "tutorial_nav.html" %}
 

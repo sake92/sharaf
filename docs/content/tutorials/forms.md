@@ -1,4 +1,5 @@
 ---
+layout: tutorial.html
 title: Forms
 description: Sharaf Tutorial Forms
 ---
@@ -48,5 +49,3 @@ You can also write `Request.current.bodyForm[(id: Int | String)]`, but we would 
 Of course, if you need it, go for it!
 
 In this case, it will first try to parse an `Int` and if that fails it will parse a `String`.
-
-{% include "tutorial_nav.html" %}

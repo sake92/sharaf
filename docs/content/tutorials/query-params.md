@@ -1,4 +1,5 @@
 ---
+layout: tutorial.html
 title: Query Params
 description: Sharaf Tutorial Query Params
 ---
@@ -61,4 +62,3 @@ Of course, if you need it, go for it!
 
 In this case, it will first try to parse an `Int` and if that fails it will parse a `String`.
 
-{% include "tutorial_nav.html" %}

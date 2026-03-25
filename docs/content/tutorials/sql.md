@@ -1,4 +1,5 @@
 ---
+layout: tutorial.html
 title: SQL
 description: Sharaf Tutorial SQL
 ---
@@ -104,4 +105,3 @@ curl --request POST \
     }'
 ```
 
-{% include "tutorial_nav.html" %}

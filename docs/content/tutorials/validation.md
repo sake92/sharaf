@@ -1,4 +1,5 @@
 ---
+layout: tutorial.html
 title: Validation
 description: Sharaf Tutorial Validation
 ---
@@ -97,4 +98,3 @@ you will get these errors:
 }
 ```
 
-{% include "tutorial_nav.html" %}

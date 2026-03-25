@@ -1,4 +1,5 @@
 ---
+layout: tutorial.html
 title: Hello World
 description: Sharaf Tutorial Hello World
 ---
@@ -23,6 +24,3 @@ You will see a "Hello Bob" text response.
 The most interesting part is the `Routes` definition.  
 Here we pattern match on `(HttpMethod, Path)`.  
 The `Path` contains a `Seq[String]`, which are the parts of the URL you can match on.
-
-{% include "tutorial_nav.html" %}
-

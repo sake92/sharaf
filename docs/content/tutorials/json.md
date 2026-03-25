@@ -1,4 +1,5 @@
 ---
+layout: tutorial.html
 title: JSON
 description: Sharaf Tutorial JSON
 ---
@@ -90,6 +91,4 @@ curl --request POST \
 # get cars by brand
 curl http://localhost:8181/cars/Mercedes
 ```
-
-{% include "tutorial_nav.html" %}
 
