@@ -30,3 +30,15 @@ jobs:
         run: deder exec -t compile
       - name: Test
         run: deder exec -t test
+  compile-scala-cli-examples:
+    runs-on: ubuntu-latest
+    continue-on-error: true # not critical
+    steps:
+      - uses: actions/checkout@v5
+      - uses: VirtusLab/scala-cli-setup@main
+        with:
+          jvm: temurin:21
+      - name: Compile Scala CLI examples
+        run: |
+          ./scripts/compile-scala-cli-examples.sh examples/scala-cli
+          ./scripts/compile-scala-cli-examples.sh examples/htmx

@@ -1,9 +1,9 @@
-//> using scala "3.7.0"
-//> using dep ba.sake::sharaf-undertow:0.13.0
-import java.util.concurrent.TimeUnit
+//> using scala 3.7.0
+//> using dep ba.sake::sharaf-undertow:0.17.0
 
 // https://htmx.org/examples/progress-bar/
 
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.Executors
 import ba.sake.sharaf.{*, given}
 import ba.sake.sharaf.undertow.UndertowSharafServer

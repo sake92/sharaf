@@ -9,7 +9,8 @@ deder exec -t runMvnApp fmt
 
 deder exec -t test
 
-scala-cli compile examples\scala-cli
+scala compile examples/scala-cli
+scala compile examples/htmx
 
 deder exec -t run -m examples-api
 

@@ -1,5 +1,5 @@
-//> using scala "3.7.0"
-//> using dep ba.sake::sharaf-undertow:0.13.0
+//> using scala 3.7.0
+//> using dep ba.sake::sharaf-undertow:0.17.0
 
 // https://htmx.org/examples/value-select/
 
