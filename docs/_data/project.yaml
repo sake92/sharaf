@@ -68,3 +68,7 @@ philosophies:
     url: "/philosophy/query-params-handling.html"
   - label: "Routes Matching"
     url: "/philosophy/routes-matching.html"
+references:
+  - label: "API Reference"
+    url: "https://javadoc.io/doc/ba.sake/sharaf-core_3/latest/index."
+
