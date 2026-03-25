@@ -10,5 +10,5 @@ fi
 cd $FOLDER
 for example in *.sc; do
   echo "Compiling $example"
-  scala compile "$example"
+  scala-cli compile "$example"
 done
