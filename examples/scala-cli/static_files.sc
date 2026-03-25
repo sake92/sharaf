@@ -1,12 +1,12 @@
 //> using scala "3.7.0"
-//> using dep ba.sake::sharaf-undertow:0.13.0
+//> using dep ba.sake::sharaf-undertow:0.17.0
 
 import ba.sake.sharaf.*
 import ba.sake.sharaf.undertow.UndertowSharafServer
 
 val routes = Routes:
   case GET -> Path() =>
-    Response.withBody("Try /example.js")
+    Response.withBody("Try http://localhost:8181/example.js")
 
 UndertowSharafServer("localhost", 8181, routes).start()
 

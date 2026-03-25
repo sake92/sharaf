@@ -1,10 +1,12 @@
 //> using scala "3.7.0"
-//> using dep ba.sake::sharaf-undertow:0.13.0
+//> using dep ba.sake::sharaf-undertow:0.17.0
+//> using dep ba.sake::sharaf-hepek-components:0.17.0
 
 import scalatags.Text.all.*
 import ba.sake.hepek.html.HtmlPage
 import ba.sake.sharaf.*
-import ba.sake.sharaf.undertow.{*, given}
+import ba.sake.sharaf.hepek.given
+import ba.sake.sharaf.undertow.*
 
 val routes = Routes:
   case GET -> Path() =>

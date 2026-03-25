@@ -1,20 +1,25 @@
-//> using scala "3.7.0"
-//> using dep org.postgresql:postgresql:42.7.5
-//> using dep com.zaxxer:HikariCP:6.3.0
-//> using dep ba.sake::sharaf-undertow:0.13.0
-//> using dep ba.sake::squery:0.7.0
+//> using scala 3.7.0
+//> using dep com.h2database:h2:2.4.240
+//> using dep ba.sake::sharaf-undertow:0.17.0
+//> using dep ba.sake::squery:0.8.2
 
 import ba.sake.tupson.JsonRW
 import ba.sake.squery.{*, given}
 import ba.sake.sharaf.*
 import ba.sake.sharaf.undertow.UndertowSharafServer
 
-val ds = com.zaxxer.hikari.HikariDataSource()
-ds.setJdbcUrl("jdbc:postgresql://localhost:5432/postgres")
-ds.setUsername("postgres")
-ds.setPassword("mysecretpassword")
+val ds = org.h2.jdbcx.JdbcDataSource()
+ds.setUrl("jdbc:h2:mem:mydb;DB_CLOSE_DELAY=-1")
 
 val ctx = new SqueryContext(ds)
+ctx.runTransaction {
+  sql"""
+    CREATE TABLE customers(
+      id SERIAL PRIMARY KEY,
+      name VARCHAR
+    )
+  """.update()
+}
 
 case class Customer(name: String) derives JsonRW
 
@@ -34,6 +39,9 @@ val routes = Routes:
       """.insert()
     }
     Response.withBody(customer)
+
+  case GET -> _ =>
+    Response.withBody("Try http://localhost:8181/customers with GET or POST")
 
 UndertowSharafServer("localhost", 8181, routes).start()
 

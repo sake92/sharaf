@@ -1,5 +1,6 @@
 //> using scala "3.7.0"
-//> using dep ba.sake::sharaf-undertow:0.13.0
+//> using dep ba.sake::sharaf-undertow:0.17.0
+//> using dep com.lihaoyi::scalatags:0.13.1
 
 import scalatags.Text.all.*
 import ba.sake.sharaf.*
