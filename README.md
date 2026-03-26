@@ -8,7 +8,7 @@ Documentation at https://sake92.github.io/sharaf/
 Hello world example:
 ```scala
 //> using scala 3.7.3
-//> using dep ba.sake::sharaf-undertow:0.14.1
+//> using dep ba.sake::sharaf-undertow:0.17.0
 
 import ba.sake.sharaf.*
 import ba.sake.sharaf.undertow.UndertowSharafServer

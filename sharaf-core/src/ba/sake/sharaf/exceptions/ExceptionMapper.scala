@@ -39,13 +39,11 @@ object ExceptionMapper {
               Response
                 .withBody(s"Validation errors: $fieldValidationErrors")
                 .withStatus(StatusCode.UnprocessableEntity)
-            case e: querson.ParsingException =>
-              Response.withBody(e.getMessage).withStatus(StatusCode.BadRequest)
-            case e: tupson.ParsingException =>
+            case e: querson.QuersonException =>
               Response.withBody(e.getMessage).withStatus(StatusCode.BadRequest)
             case e: tupson.TupsonException =>
               Response.withBody(e.getMessage).withStatus(StatusCode.BadRequest)
-            case e: formson.ParsingException =>
+            case e: formson.FormsonException =>
               Response.withBody(e.getMessage).withStatus(StatusCode.BadRequest)
             case other =>
               other.printStackTrace()
@@ -82,20 +80,35 @@ object ExceptionMapper {
                   invalidArguments = fieldValidationErrors
                 )
               Response.withBody(problemDetails).withStatus(StatusCode.UnprocessableEntity)
+            case e: querson.QuersonException =>
+              val parsingErrors = List(ArgumentProblem("", e.getMessage, None))
+              val problemDetails =
+                ProblemDetails(StatusCode.BadRequest.code, "Invalid query parameters", invalidArguments = parsingErrors)
+              Response.withBody(problemDetails).withStatus(StatusCode.BadRequest)
             case e: querson.ParsingException =>
               val parsingErrors = e.errors.map(err => ArgumentProblem(err.path, err.msg, err.value.map(_.toString)))
               val problemDetails =
                 ProblemDetails(StatusCode.BadRequest.code, "Invalid query parameters", invalidArguments = parsingErrors)
               Response.withBody(problemDetails).withStatus(StatusCode.BadRequest)
+            case e: tupson.TupsonException =>
+              val parsingErrors = List(ArgumentProblem("", e.getMessage, None))
+              val problemDetails =
+                ProblemDetails(StatusCode.BadRequest.code, "JSON parsing errors", invalidArguments = parsingErrors)
+              Response.withBody(problemDetails).withStatus(StatusCode.BadRequest)
             case e: tupson.ParsingException =>
               val parsingErrors = e.errors.map(err => ArgumentProblem(err.path, err.msg, err.value.map(_.toString)))
               val problemDetails =
-                ProblemDetails(StatusCode.BadRequest.code, "JSON Parsing errors", invalidArguments = parsingErrors)
+                ProblemDetails(StatusCode.BadRequest.code, "JSON parsing errors", invalidArguments = parsingErrors)
               Response.withBody(problemDetails).withStatus(StatusCode.BadRequest)
             case e: tupson.TupsonException =>
               Response
                 .withBody(ProblemDetails(StatusCode.BadRequest.code, "JSON parsing error", e.getMessage))
                 .withStatus(StatusCode.BadRequest)
+            case e: formson.FormsonException =>
+              val parsingErrors = List(ArgumentProblem("", e.getMessage, None))
+              val problemDetails =
+                ProblemDetails(StatusCode.BadRequest.code, "Form parsing errors", invalidArguments = parsingErrors)
+              Response.withBody(problemDetails).withStatus(StatusCode.BadRequest)
             case e: formson.ParsingException =>
               Response
                 .withBody(ProblemDetails(StatusCode.BadRequest.code, "Form parsing error", e.getMessage))
