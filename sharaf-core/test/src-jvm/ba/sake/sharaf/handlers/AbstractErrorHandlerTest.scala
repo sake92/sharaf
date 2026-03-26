@@ -104,7 +104,7 @@ abstract class AbstractErrorHandlerTest extends munit.FunSuite {
     assertEquals(res.code, StatusCode.BadRequest)
     assertEquals(
       res.body,
-      """{"instance":null,"invalidArguments":[],"detail":"Form parsing error: Key 'name' is missing","type":null,"title":"Form parsing error","status":400}"""
+      """{"instance":null,"invalidArguments":[{"reason":"is missing","path":"name","value":null}],"detail":"","type":null,"title":"Form parsing errors","status":400}"""
     )
     assertEquals(res.headers(HeaderNames.ContentType), Seq("application/json; charset=utf-8"))
   }
