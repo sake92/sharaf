@@ -65,6 +65,6 @@ object `package` extends Module:
 
     object jvm extends HttpsModule with PlatformScalaModule:
       def moduleDeps = Seq(build.`sharaf-http4s`.jvm)
-    // object native extends HttpsModule with ScalaNativeCommonModule with PlatformScalaModule:
-    //   def moduleDeps = Seq(build.`sharaf-http4s`.native)
+    object native extends HttpsModule with ScalaNativeCommonModule with PlatformScalaModule:
+      def moduleDeps = Seq(build.`sharaf-http4s`.native)
 end `package`

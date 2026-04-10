@@ -48,17 +48,17 @@ object `sharaf-http4s` extends Module:
   object jvm extends SharafHttp4sModule with PlatformScalaModule:
     def moduleDeps = Seq(`sharaf-core`.jvm)
     object test extends TestModule
-  // object native extends SharafHttp4sModule with ScalaNativeCommonModule with PlatformScalaModule:
-  //   def moduleDeps = Seq(`sharaf-core`.native)
-  //   object test extends ScalaNativeTests with TestModule
+  object native extends SharafHttp4sModule with ScalaNativeCommonModule with PlatformScalaModule:
+    def moduleDeps = Seq(`sharaf-core`.native)
+    object test extends ScalaNativeTests with TestModule
   trait SharafHttp4sModule extends SharafPublishModule:
     def artifactName = "sharaf-https"
     def mvnDeps = super.mvnDeps() ++ Seq(
-      mvn"org.http4s::http4s-server::0.23.32"
+      mvn"org.http4s::http4s-server::0.23.34"
     )
     trait TestModule extends ScalaTests with SharafTestModule:
       def mvnDeps = super.mvnDeps() ++ Seq(
-        mvn"org.http4s::http4s-client::0.23.32"
+        mvn"org.http4s::http4s-client::0.23.34"
       )
 
 object `sharaf-helidon` extends SharafPublishModule:
