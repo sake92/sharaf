@@ -30,12 +30,16 @@ def SharafHttpApp(sharafHandler: SharafHandler) =
           Seq.empty // TODO: remove header
       }))
 
-      body <- IO.pure(response.body match {
+      body <- response.body match {
         case Some(body) =>
-          fs2.io.readOutputStream(4096)(outputStream => IO.blocking(response.rw.write(body, outputStream)))
+          IO.blocking {
+            val baos = new java.io.ByteArrayOutputStream()
+            response.rw.write(body, baos)
+            fs2.Stream.emits[IO, Byte](baos.toByteArray())
+          }
         case None =>
-          fs2.Stream.empty[IO]
-      })
+          IO.pure(fs2.Stream.empty[IO])
+      }
 
       response <- IO.pure(
         Http4sResponse[IO](
