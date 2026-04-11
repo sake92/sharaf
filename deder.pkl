@@ -1,4 +1,4 @@
-amends "https://sake92.github.io/deder/config/v0.2.1/DederProject.pkl"
+amends "https://sake92.github.io/deder/config/v0.2.2/DederProject.pkl"
 
 local const function pomSettings(
   _artifactId: String,
@@ -170,12 +170,6 @@ local const sharafCoreModules =
       }
     }
     testTemplate = (sharafCoreTemplate.asTest()) {
-      deps { "org.scalameta::munit::1.1.0" }
-    }
-    jsTemplate = (sharafCoreTemplate.asJs()) {
-      scalaJsVersion = versions.scalaJsVersion
-    }
-    jsTestTemplate = (jsTemplate.asTest()) {
       deps { "org.scalameta::munit::1.1.0" }
     }
     nativeTemplate = (sharafCoreTemplate.asNative()) {
