@@ -30,6 +30,13 @@ jobs:
         run: deder exec -t compile
       - name: Test
         run: deder exec -t test
+      - name: Deder output
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deder-logs
+          path: |
+            .deder/logs/server.log
   compile-scala-cli-examples:
     runs-on: ubuntu-latest
     continue-on-error: true # not critical
