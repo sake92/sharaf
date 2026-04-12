@@ -1,4 +1,4 @@
-amends "https://sake92.github.io/deder/config/v0.2.2/DederProject.pkl"
+amends "https://sake92.github.io/deder/config/early-access/DederProject.pkl"
 
 local const function pomSettings(
   _artifactId: String,
