@@ -75,7 +75,6 @@ class JsonApiSuite extends munit.FunSuite {
     }
 
     // filtering GET
-    // TODO reenable
     locally {
       val queryParams = ProductsQuery(Set("Chocolate"), Option(1)).toSttpQuery()
       val res = quickRequest.get(uri"$baseUrl/products".withParams(queryParams)).send()

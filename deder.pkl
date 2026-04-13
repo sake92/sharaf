@@ -1,4 +1,4 @@
-amends "https://sake92.github.io/deder/config/DederProject.pkl"
+amends "https://sake92.github.io/deder/config/v0.2.3/DederProject.pkl"
 
 local const function pomSettings(
   _artifactId: String,
@@ -172,12 +172,6 @@ local const sharafCoreModules =
     testTemplate = (sharafCoreTemplate.asTest()) {
       deps { "org.scalameta::munit::1.1.0" }
     }
-    jsTemplate = (sharafCoreTemplate.asJs()) {
-      scalaJsVersion = versions.scalaJsVersion
-    }
-    jsTestTemplate = (jsTemplate.asTest()) {
-      deps { "org.scalameta::munit::1.1.0" }
-    }
     nativeTemplate = (sharafCoreTemplate.asNative()) {
       scalaNativeVersion = versions.scalaNativeVersion
       moduleDeps {
@@ -228,19 +222,36 @@ local const sharafUndertowModules =
   }.get
 
 local const sharafHttp4sModules =
-  new CreateScalaModules {
+  new CreateCrossModules {
     root = "sharaf-http4s"
+    local const _pomSettings =
+      pomSettings("sharaf-http4s", "Sharaf Http4s", "Sharaf integration with Http4s")
     template = (baseTemplate) {
-      pomSettings = pomSettings("sharaf-http4s", "Sharaf Http4s", "Sharaf integration with Http4s")
-      moduleDeps {
-        sharafCoreModules.jvm
-      }
-      deps { "org.http4s::http4s-server::0.23.32" }
+      pomSettings = _pomSettings
+      moduleDeps { sharafCoreModules.jvm }
+      deps { "org.http4s::http4s-server::0.23.34" }
     }
     testTemplate = (baseTemplate.asTest()) {
       deps {
         "org.scalameta::munit::1.1.0"
-        "org.http4s::http4s-client::0.23.32"
+        "org.http4s::http4s-client::0.23.34"
+      }
+    }
+    nativeTemplate = (baseTemplate.asNative()) {
+      scalaNativeVersion = versions.scalaNativeVersion
+      pomSettings = _pomSettings
+      moduleDeps { sharafCoreModules.native }
+      deps {
+        "org.http4s::http4s-server::0.23.34"
+        "com.lihaoyi::sourcecode::0.4.2"
+        "io.github.cquiroz::scala-java-time::2.6.0"
+      }
+    }
+    nativeTestTemplate = (nativeTemplate.asTest()) {
+      multithreading = true
+      deps {
+        "org.scalameta::munit::1.1.0"
+        "org.http4s::http4s-client::0.23.34"
       }
     }
   }.get
@@ -403,7 +414,7 @@ local const http4sExampleModules =
   new CreateScalaModules {
     root = "examples/http4s"
     template = (baseExampleTemplate) {
-      moduleDeps { sharafHttp4sModules.main }
+      moduleDeps { sharafHttp4sModules.jvm }
       deps { "org.http4s::http4s-ember-server::0.23.32" }
     }
     testTemplate = (baseExampleTemplate.asTest()) {
@@ -425,7 +436,10 @@ modules {
   sharafCoreModules.native
   sharafCoreModules.native_test
   ...sharafUndertowModules.all
-  ...sharafHttp4sModules.all
+  sharafHttp4sModules.jvm
+  sharafHttp4sModules.jvm_test
+  sharafHttp4sModules.native
+  sharafHttp4sModules.native_test
   ...sharafHelidonModules.all
   ...sharafJdkHttpserverModules.all
   sharafSnunit
@@ -438,3 +452,4 @@ modules {
   ...snunitExampleModules.all
   ...http4sExampleModules.all
 }
+
