@@ -248,6 +248,7 @@ local const sharafHttp4sModules =
       }
     }
     nativeTestTemplate = (nativeTemplate.asTest()) {
+      multithreading = true
       deps {
         "org.scalameta::munit::1.1.0"
         "org.http4s::http4s-client::0.23.34"
