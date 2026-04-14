@@ -30,6 +30,8 @@ jobs:
         run: deder exec -t compile
       - name: Test
         run: deder exec -t test
+      - name: Publish
+        run: deder exec -t publish -m formson%
       - name: Deder output
         if: failure()
         uses: actions/upload-artifact@v4
