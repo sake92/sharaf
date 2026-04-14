@@ -1,6 +1,11 @@
 package ba.sake.sharaf
 
-/** Global session holder for Scala Native (SNUnit is single-threaded per worker). */
+/** Global session holder for Scala Native.
+  *
+  * SNUnit processes requests one at a time per worker process (single-threaded event loop),
+  * so a plain mutable variable is safe here. This must not be used in a multi-threaded
+  * environment.
+  */
 private[sharaf] object SessionHolder {
 
   private var _session: Option[Session] = None

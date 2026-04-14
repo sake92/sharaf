@@ -14,7 +14,9 @@ import ba.sake.tupson.{*, given}
   * The cookie value has the format: `<base64url(json)>.<base64url(hmac)>`
   *
   * @param secretKey
-  *   Secret key used for HMAC-SHA256 signing. Must be kept confidential.
+  *   Secret key used for HMAC-SHA256 signing. Must be kept confidential and should be a
+  *   cryptographically random value of at least 32 bytes (e.g. a Base64-encoded 256-bit
+  *   random string). Reusing or weakening this key compromises session integrity.
   * @param config
   *   Session configuration (timeouts, cookie flags, etc.)
   */
@@ -87,13 +89,9 @@ final class CookieSessionStore(secretKey: String, config: SessionConfig) extends
     Base64.getUrlEncoder.withoutPadding.encodeToString(hmacBytes)
   }
 
-  /** Constant-time string comparison to prevent timing attacks. */
-  private def constantTimeEquals(a: String, b: String): Boolean = {
-    if a.length != b.length then return false
-    var result = 0
-    for i <- a.indices do result |= a(i) ^ b(i)
-    result == 0
-  }
+  /** Constant-time byte comparison to prevent timing attacks. */
+  private def constantTimeEquals(a: String, b: String): Boolean =
+    java.security.MessageDigest.isEqual(a.getBytes("UTF-8"), b.getBytes("UTF-8"))
 }
 
 object CookieSessionStore:
