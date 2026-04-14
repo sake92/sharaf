@@ -30,8 +30,9 @@ jobs:
         uses: Homebrew/actions/setup-homebrew@main
       - name: Install deder
         run: brew install sake92/tap/deder
+      # explicitly publish non-example modules
       - name: Publish
-        run: deder exec -t publish
+        run: deder exec -t publish -m formson% -m querson% -m validson% -m sharaf%
       - name: Deder output
         if: always()
         uses: actions/upload-artifact@v4
