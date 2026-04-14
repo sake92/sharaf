@@ -20,5 +20,4 @@ _site/
 .flatmark-cache
 
 
-**/.deder/**
-!**/.deder/server.properties
+.deder/
