@@ -1,4 +1,5 @@
 
+# TODO integrate into CI
 # a one off script to copy some examples to the docs folder
 $examplesList = @(
     "examples/scala-cli/hello.sc",

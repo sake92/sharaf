@@ -9,7 +9,7 @@ gh:
 artifact:
   org: "ba.sake"
   name: "sharaf-undertow"
-  version: "0.13.0"
+  version: "0.18.0"
 
 tutorials:
   - label: "Quickstart"

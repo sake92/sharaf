@@ -1,5 +1,5 @@
 //> using scala 3.7.3
-//> using dep ba.sake::sharaf-undertow:0.17.0
+//> using dep ba.sake::sharaf-undertow:0.18.0
 
 import ba.sake.sharaf.{*, given}
 import ba.sake.sharaf.undertow.UndertowSharafServer
