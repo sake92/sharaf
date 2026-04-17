@@ -65,6 +65,7 @@ object ResponseWritable extends LowPriResponseWritableInstances {
 
   given ResponseWritable[SseSender] with {
     override def write(value: SseSender, outputStream: OutputStream): Unit = {
+      value.initPingThread()
       try {
         var done = false
         while !done do {
