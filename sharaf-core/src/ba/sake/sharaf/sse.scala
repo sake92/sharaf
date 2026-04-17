@@ -36,8 +36,23 @@ enum ServerSentEvent {
 
 class SseSender {
   private[sharaf] val queue = java.util.concurrent.LinkedBlockingQueue[ServerSentEvent]
+
+  @volatile private var _onComplete: () => Unit = () => ()
+  @volatile private var _onError: Throwable => Unit = _ => ()
+
   def send(event: ServerSentEvent): Unit =
     queue.put(event)
 
-  // TODO add onComplete, onError
+  /** Called when all events have been sent successfully (after a [[ServerSentEvent.Done]] is delivered).
+   *  Should be set before passing the [[SseSender]] to [[Response.withBody]].
+   */
+  def onComplete(callback: () => Unit): this.type = { _onComplete = callback; this }
+
+  /** Called when an error occurs while sending events, e.g. when the client disconnects.
+   *  Should be set before passing the [[SseSender]] to [[Response.withBody]].
+   */
+  def onError(callback: Throwable => Unit): this.type = { _onError = callback; this }
+
+  private[sharaf] def invokeOnComplete(): Unit = _onComplete()
+  private[sharaf] def invokeOnError(e: Throwable): Unit = _onError(e)
 }

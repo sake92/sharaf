@@ -65,12 +65,17 @@ object ResponseWritable extends LowPriResponseWritableInstances {
 
   given ResponseWritable[SseSender] with {
     override def write(value: SseSender, outputStream: OutputStream): Unit = {
-      var done = false
-      while !done do {
-        val event = value.queue.take()
-        done = event.isInstanceOf[ServerSentEvent.Done]
-        outputStream.write(event.sseBytes)
-        outputStream.flush()
+      try {
+        var done = false
+        while !done do {
+          val event = value.queue.take()
+          done = event.isInstanceOf[ServerSentEvent.Done]
+          outputStream.write(event.sseBytes)
+          outputStream.flush()
+        }
+        value.invokeOnComplete()
+      } catch {
+        case e: Exception => value.invokeOnError(e)
       }
     }
 
