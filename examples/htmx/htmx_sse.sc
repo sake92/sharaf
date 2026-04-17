@@ -34,6 +34,8 @@ val routes = Routes {
     )
   case GET -> Path("sse-events") =>
     val sseSender = SseSender()
+      .onComplete(() => println("SSE stream completed"))
+      .onError(e => println(s"SSE error (client disconnected?): ${e.getMessage}"))
     new Thread(() => {
       for i <- 1 to 5 do
         sseSender.send(
