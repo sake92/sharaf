@@ -1,6 +1,7 @@
 package ba.sake.sharaf
 
 import java.nio.charset.StandardCharsets
+import scala.concurrent.duration.FiniteDuration
 
 enum ServerSentEvent {
   case Comment(value: String)
@@ -39,6 +40,8 @@ class SseSender {
 
   @volatile private var _onComplete: () => Unit = () => ()
   @volatile private var _onError: Throwable => Unit = _ => ()
+  @volatile private var _isDone: Boolean = false
+  @volatile private var _pingThread: Thread = null
 
   def send(event: ServerSentEvent): Unit =
     queue.put(event)
@@ -53,6 +56,39 @@ class SseSender {
    */
   def onError(callback: Throwable => Unit): this.type = { _onError = callback; this }
 
-  private[sharaf] def invokeOnComplete(): Unit = _onComplete()
-  private[sharaf] def invokeOnError(e: Throwable): Unit = _onError(e)
+  /** Starts a background daemon thread that sends a [[ServerSentEvent.Comment]] ping every [[interval]].
+   *  This allows detecting client disconnections even when no regular events are being sent.
+   *  The first ping is sent after one [[interval]] has elapsed.
+   *  The ping thread stops automatically when the sender completes or errors.
+   *  Should be called before passing the [[SseSender]] to [[Response.withBody]].
+   */
+  def startPing(interval: FiniteDuration): this.type = {
+    require(_pingThread == null, "startPing has already been called")
+    val t = new Thread(() => {
+      try {
+        while !_isDone do {
+          Thread.sleep(interval.toMillis)
+          queue.put(ServerSentEvent.Comment("ping"))
+        }
+      } catch {
+        case _: InterruptedException => () // stop cleanly
+      }
+    })
+    t.setDaemon(true)
+    _pingThread = t  // assign before start to avoid race with invokeOnComplete/invokeOnError
+    t.start()
+    this
+  }
+
+  private[sharaf] def invokeOnComplete(): Unit = {
+    _isDone = true
+    if _pingThread != null then _pingThread.interrupt()
+    _onComplete()
+  }
+
+  private[sharaf] def invokeOnError(e: Throwable): Unit = {
+    _isDone = true
+    if _pingThread != null then _pingThread.interrupt()
+    _onError(e)
+  }
 }
