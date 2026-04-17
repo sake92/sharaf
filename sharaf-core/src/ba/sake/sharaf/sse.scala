@@ -2,6 +2,7 @@ package ba.sake.sharaf
 
 import java.nio.charset.StandardCharsets
 import scala.concurrent.duration.FiniteDuration
+import scala.concurrent.duration.DurationInt
 
 enum ServerSentEvent {
   case Comment(value: String)
@@ -67,12 +68,9 @@ class SseSender private (
    *  no regular events are being sent.  The first ping is sent after one [[interval]] has elapsed.
    *  The ping thread stops automatically when the sender completes or errors.
    *  Should be called before passing the [[SseSender]] to [[Response.withBody]].
-   *  Throws [[IllegalArgumentException]] if called more than once on the same chain.
    */
-  def startPing(interval: FiniteDuration): SseSender = {
-    require(_pingInterval.isEmpty, "startPing has already been called")
+  def withPingInterval(interval: FiniteDuration): SseSender =
     new SseSender(queue, _onComplete, _onError, Some(interval))
-  }
 
   /** Starts the ping thread if a ping interval was configured.  Called by [[ResponseWritable]]
    *  when streaming begins.  Idempotent — safe to call more than once.
@@ -113,6 +111,6 @@ object SseSender {
     new java.util.concurrent.LinkedBlockingQueue[ServerSentEvent],
     () => (),
     _ => (),
-    None
+    Some(1.second)
   )
 }
