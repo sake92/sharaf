@@ -52,8 +52,10 @@ def ShowFormPage(formData: CreateCustomerForm, errors: Seq[ValidationError] = Se
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="/styles/classless.css">
+        <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/htmx-ext-sse@2.2.4"></script>
     </head>
-    <body>
+    <body hx-ext="sse">
         <div>${message}</div>
         <form action="/form-submit" method="POST" enctype="multipart/form-data">
             ${nameInput}
@@ -63,6 +65,7 @@ def ShowFormPage(formData: CreateCustomerForm, errors: Seq[ValidationError] = Se
             </label>
             <input type="submit" value="Submit">
         </form>
+        <div sse-connect="/sse-events" sse-swap="message" sse-close="stop" hx-target="this" hx-swap="beforeend"></div>
     </body>
     </html>
   """

@@ -6,6 +6,7 @@ import java.io.{FileInputStream, InputStream, OutputStream}
 import scala.util.Using
 import sttp.model.HeaderNames
 import ba.sake.tupson.{JsonRW, toJson}
+import java.util.concurrent.TimeUnit
 
 private val ContentTypeHttpString = HttpString(HeaderNames.ContentType)
 private val ContentDispositionHttpString = HttpString(HeaderNames.ContentDisposition)
@@ -68,13 +69,15 @@ object ResponseWritable extends LowPriResponseWritableInstances {
       value.initPingThread()
       try {
         var done = false
-        while !done do {
-          val event = value.queue.take()
-          done = event.isInstanceOf[ServerSentEvent.Done]
-          outputStream.write(event.sseBytes)
-          outputStream.flush()
+        while !done && !value._isDone do {
+          val event = value.queue.poll(50, TimeUnit.MILLISECONDS)
+          if event != null then {
+            done = event.isInstanceOf[ServerSentEvent.Done]
+            outputStream.write(event.sseBytes)
+            outputStream.flush()
+          }
         }
-        value.invokeOnComplete()
+        if !value._isDone then value.invokeOnComplete()
       } catch {
         case e: Exception => value.invokeOnError(e)
       }
@@ -86,7 +89,7 @@ object ResponseWritable extends LowPriResponseWritableInstances {
       ConnectionHttpString -> Seq("keep-alive")
     )
   }
-  
+
   given ResponseWritable[geny.Writable] with {
     override def write(value: geny.Writable, outputStream: OutputStream): Unit =
       value.writeBytesTo(outputStream)

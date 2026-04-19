@@ -27,6 +27,22 @@ class FullstackModule(port: Int) {
           Response.withBody(SucessPage(formData))
         case errors =>
           Response.withBody(ShowFormPage(formData, errors)).withStatus(StatusCode.Ok)
+    
+    case GET -> Path("sse-events") =>
+      val sseSender = SseSender()
+        .onComplete(() => println("SSE stream completed"))
+        .onError(e => println(s"SSE error (client disconnected?): ${e.getMessage}"))
+      new Thread(() => {
+        for i <- 1 to 5 do
+          sseSender.send(
+            ServerSentEvent.Message(
+              data = html"""<div class="fade-me-in">event${i}</div>""".toString
+            )
+          )
+          Thread.sleep(1_000)
+        sseSender.send(ServerSentEvent.Done())
+      }).start()
+      Response.withBody(sseSender)
 
   val server = UndertowSharafServer("localhost", port, routes)
 }
