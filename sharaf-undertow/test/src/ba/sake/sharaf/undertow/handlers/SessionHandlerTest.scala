@@ -9,7 +9,10 @@ class SessionHandlerTest extends AbstractSessionHandlerTest {
   val server = UndertowSharafServer(
     "localhost",
     port,
-    SharafHandler.sessions(SharafHandler.routes(routes))
+    SharafHandler.sessions(
+      SharafHandler.routes(routes),
+      config = SessionConfig.default.withSecure(false)
+    )
   )
 
   def startServer(): Unit = server.start()

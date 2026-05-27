@@ -1,6 +1,7 @@
 package ba.sake.sharaf.handlers
 
 import sttp.client4.quick.*
+import sttp.client4.httpclient.HttpClientSyncBackend
 import ba.sake.sharaf.*
 import ba.sake.sharaf.utils.NetworkUtils
 
@@ -35,61 +36,50 @@ abstract class AbstractSessionHandlerTest extends munit.FunSuite {
       Response.withBody(Session.current.id)
   }
 
-  /** Extracts the raw `name=value` token from a `Set-Cookie` header value. */
-  private def sessionCookie(setCookieHeader: String): String =
-    setCookieHeader.split(";").head.trim
-
-  /** Sends a request with no cookie and returns (body, cookie). */
-  private def sendAndGetCookie(path: String): (String, Option[String]) = {
-    val res = quickRequest.get(uri"${baseUrl}/$path").send()
-    val cookie = res.header("Set-Cookie").map(sessionCookie)
-    (res.body, cookie)
+  private def withStatefulBackend[T](f: HttpClientSyncBackend => T): T = {
+    val cookieHandler = new java.net.CookieManager()
+    val javaClient = java.net.http.HttpClient.newBuilder().cookieHandler(cookieHandler).build()
+    val statefulBackend = HttpClientSyncBackend.usingClient(javaClient)
+    f(statefulBackend)
   }
 
-  /** Sends a request carrying the given cookie and returns (body, new cookie). */
-  private def sendWithCookie(path: String, cookie: String): (String, Option[String]) = {
-    val res = quickRequest.get(uri"${baseUrl}/$path").header("Cookie", cookie).send()
-    val newCookie = res.header("Set-Cookie").map(sessionCookie)
-    (res.body, newCookie)
-  }
+  private def send(path: String, backend: HttpClientSyncBackend): String =
+    quickRequest.get(uri"${baseUrl}/$path").send(backend).body
 
   test("getOpt returns 'not found' when key is absent") {
-    val (body, _) = sendAndGetCookie("getopt-session-value")
-    assertEquals(body, "not found")
+    withStatefulBackend { backend =>
+      assertEquals(send("getopt-session-value", backend), "not found")
+    }
   }
 
   test("set then get session value across requests") {
-    val (_, cookie1) = sendAndGetCookie("getopt-session-value")
-    val cookie = cookie1.getOrElse(fail("expected session cookie"))
-    locally {
-      sendWithCookie("set-session-value/value1", cookie)
+    withStatefulBackend { backend =>
+      send("getopt-session-value", backend)
+      send("set-session-value/value1", backend)
+      val body = send("get-session-value", backend)
+      assertEquals(body, "value1")
     }
-    val (body, _) = sendWithCookie("get-session-value", cookie)
-    assertEquals(body, "value1")
   }
 
   test("invalidate clears session data") {
-    val (_, cookie1) = sendAndGetCookie("set-session-value/value1")
-    val cookie = cookie1.getOrElse(fail("expected session cookie"))
-    locally {
-      sendWithCookie("get-session-value", cookie)
+    withStatefulBackend { backend =>
+      send("set-session-value/value1", backend)
+      send("get-session-value", backend)
+      send("invalidate-session", backend)
+      val body = send("getopt-session-value", backend)
+      assertEquals(body, "not found")
     }
-    // Invalidate the session
-    val (_, _) = sendWithCookie("invalidate-session", cookie)
-    // Old cookie is no longer valid — getOpt should return "not found"
-    val (body, _) = sendWithCookie("getopt-session-value", cookie)
-    assertEquals(body, "not found")
   }
 
   test("regenerate preserves data but issues a new session ID") {
-    val (_, cookie1) = sendAndGetCookie("set-session-value/myValue")
-    val cookie = cookie1.getOrElse(fail("expected session cookie"))
-    val (idBefore, _) = sendWithCookie("session-id", cookie)
-    val (_, newCookie1) = sendWithCookie("regenerate-session", cookie)
-    val newCookie = newCookie1.getOrElse(fail("expected new session cookie after regenerate"))
-    val (idAfter, _) = sendWithCookie("session-id", newCookie)
-    assertNotEquals(idBefore, idAfter)
-    val (data, _) = sendWithCookie("get-session-value", newCookie)
-    assertEquals(data, "myValue")
+    withStatefulBackend { backend =>
+      send("set-session-value/myValue", backend)
+      val idBefore = send("session-id", backend)
+      send("regenerate-session", backend)
+      val idAfter = send("session-id", backend)
+      assertNotEquals(idBefore, idAfter)
+      val data = send("get-session-value", backend)
+      assertEquals(data, "myValue")
+    }
   }
 }
