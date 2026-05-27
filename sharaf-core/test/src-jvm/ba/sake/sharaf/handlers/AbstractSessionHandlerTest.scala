@@ -1,8 +1,6 @@
 package ba.sake.sharaf.handlers
 
 import sttp.client4.quick.*
-import sttp.client4.WebSocketSyncBackend
-import sttp.client4.httpclient.HttpClientSyncBackend
 import ba.sake.sharaf.*
 import ba.sake.sharaf.utils.NetworkUtils
 
@@ -37,49 +35,58 @@ abstract class AbstractSessionHandlerTest extends munit.FunSuite {
       Response.withBody(Session.current.id)
   }
 
-  private def withStatefulBackend[T](f: WebSocketSyncBackend => T): T = {
-    val cookieHandler = new java.net.CookieManager()
-    val javaClient = java.net.http.HttpClient.newBuilder().cookieHandler(cookieHandler).build()
-    val statefulBackend = HttpClientSyncBackend.usingClient(javaClient)
-    f(statefulBackend)
+  private final class StatefulClient {
+    private var sessionCookie: Option[String] = None
+
+    def send(path: String): String = {
+      val request = sessionCookie
+        .fold(quickRequest.get(uri"${baseUrl}/$path")) { cookieHeader =>
+          quickRequest.get(uri"${baseUrl}/$path").header("Cookie", cookieHeader)
+        }
+      val response = request.send()
+      response.header("Set-Cookie").foreach { setCookieHeader =>
+        sessionCookie = Some(setCookieHeader.takeWhile(_ != ';'))
+      }
+      response.body
+    }
   }
 
-  private def send(path: String, backend: WebSocketSyncBackend): String =
-    quickRequest.get(uri"${baseUrl}/$path").send(backend).body
+  private def withStatefulClient[T](f: StatefulClient => T): T =
+    f(new StatefulClient)
 
   test("getOpt returns 'not found' when key is absent") {
-    withStatefulBackend { backend =>
-      assertEquals(send("getopt-session-value", backend), "not found")
+    withStatefulClient { client =>
+      assertEquals(client.send("getopt-session-value"), "not found")
     }
   }
 
   test("set then get session value across requests") {
-    withStatefulBackend { backend =>
-      send("getopt-session-value", backend)
-      send("set-session-value/value1", backend)
-      val body = send("get-session-value", backend)
+    withStatefulClient { client =>
+      client.send("getopt-session-value")
+      client.send("set-session-value/value1")
+      val body = client.send("get-session-value")
       assertEquals(body, "value1")
     }
   }
 
   test("invalidate clears session data") {
-    withStatefulBackend { backend =>
-      send("set-session-value/value1", backend)
-      send("get-session-value", backend)
-      send("invalidate-session", backend)
-      val body = send("getopt-session-value", backend)
+    withStatefulClient { client =>
+      client.send("set-session-value/value1")
+      client.send("get-session-value")
+      client.send("invalidate-session")
+      val body = client.send("getopt-session-value")
       assertEquals(body, "not found")
     }
   }
 
   test("regenerate preserves data but issues a new session ID") {
-    withStatefulBackend { backend =>
-      send("set-session-value/myValue", backend)
-      val idBefore = send("session-id", backend)
-      send("regenerate-session", backend)
-      val idAfter = send("session-id", backend)
+    withStatefulClient { client =>
+      client.send("set-session-value/myValue")
+      val idBefore = client.send("session-id")
+      client.send("regenerate-session")
+      val idAfter = client.send("session-id")
       assertNotEquals(idBefore, idAfter)
-      val data = send("get-session-value", backend)
+      val data = client.send("get-session-value")
       assertEquals(data, "myValue")
     }
   }
