@@ -1,6 +1,7 @@
 package ba.sake.sharaf.routing
 
 import java.util.UUID
+import scala.compiletime.summonInline
 import scala.deriving.*
 import scala.quoted.*
 import scala.util.Try
@@ -15,9 +16,34 @@ object FromPathParam {
       Option.when(str == v.value.toString)(v.value)
   }
 
-  given [L, R](using lfp: FromPathParam[L], rfp: FromPathParam[R]): FromPathParam[L | R] with {
-    override def parse(str: String): Option[L | R] =
-      lfp.parse(str).orElse(rfp.parse(str))
+  inline given autoderiveUnion[T: IsUnion]: FromPathParam[T] = ${ deriveUnionTC[T] }
+
+  private def deriveUnionTC[T: Type](using Quotes): Expr[FromPathParam[T]] = {
+    import quotes.reflect.*
+    TypeRepr.of[T] match {
+      case OrType(left, right) =>
+        left.asType match {
+          case '[l] =>
+            right.asType match {
+              case '[r] =>
+                '{
+                  new FromPathParam[T] {
+                    override def parse(str: String): Option[T] =
+                      summonInline[FromPathParam[l]]
+                        .parse(str)
+                        .asInstanceOf[Option[T]]
+                        .orElse(
+                          summonInline[FromPathParam[r]].parse(str).asInstanceOf[Option[T]]
+                        )
+                  }
+                }
+            }
+        }
+      case _ =>
+        report.errorAndAbort(
+          s"Cannot automatically derive FromPathParam for non-union type ${Type.show[T]}"
+        )
+    }
   }
 
   given FromPathParam[Int] with {
