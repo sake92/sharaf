@@ -57,7 +57,7 @@ object FormDataRW extends LowPriorityFormDataRWInstances {
       if str == expected then v.value
       else
         throw ParsingException(
-          ParseError(path, s"invalid literal '$expected'", Some(str))
+          ParseError(path, s"expected literal '$expected' but got '$str'", Some(str))
         )
   }
 
