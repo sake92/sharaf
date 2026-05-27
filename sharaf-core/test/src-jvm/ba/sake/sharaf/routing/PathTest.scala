@@ -32,6 +32,18 @@ class PathTest extends munit.FunSuite {
       case _ =>
         fail("Did not match route")
 
+    Path("users", "a") match
+      case Path("users", param["a" | "b"](kind)) =>
+        assertEquals(kind, "a")
+      case _ =>
+        fail("Did not match route")
+
+    Path("users", "2") match
+      case Path("users", param[1 | 2 | 3](status)) =>
+        assertEquals(status, 2)
+      case _ =>
+        fail("Did not match route")
+
     Path("users", "what", "the", "stuff") match
       case Path("users", parts*) =>
         assertEquals(parts, Seq("what", "the", "stuff"))

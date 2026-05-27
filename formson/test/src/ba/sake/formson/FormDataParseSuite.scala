@@ -284,5 +284,9 @@ class FormDataParseSuite extends munit.FunSuite {
       val res2 = SeqMap("lastname" -> Seq("Hrnjica").map(FormValue.Str.apply)).parseFormDataMap[(firstname: String) | (lastname: String)]
       assertEquals(res2, (lastname = "Hrnjica"))
     }
+    locally {
+      val res = SeqMap("status" -> Seq("2").map(FormValue.Str.apply)).parseFormDataMap[(status: 1 | 2 | 3)]
+      assertEquals(res, (status = 2))
+    }
   }
 }

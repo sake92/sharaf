@@ -46,6 +46,21 @@ object FormDataRW extends LowPriorityFormDataRWInstances {
 
   def apply[T](using instance: FormDataRW[T]): FormDataRW[T] = instance
 
+  given [T <: Singleton](using v: ValueOf[T]): FormDataRW[T] with {
+    private val expected = v.value.toString
+
+    override def write(path: String, value: T): FormData =
+      FormDataRW[String].write(path, value.toString)
+
+    override def parse(path: String, formData: FormData): T =
+      val str = FormDataRW[String].parse(path, formData)
+      if str == expected then v.value
+      else
+        throw ParsingException(
+          ParseError(path, s"expected literal '$expected' but got '$str'", Some(str))
+        )
+  }
+
   given FormDataRW[String] with {
     override def write(path: String, value: String): FormData =
       Simple(FormValue.Str(value))
