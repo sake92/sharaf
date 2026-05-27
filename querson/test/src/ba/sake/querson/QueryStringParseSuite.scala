@@ -267,6 +267,10 @@ class QueryStringParseSuite extends munit.FunSuite {
        val res2 = Map("lastname" -> Seq("Hrnjica")).parseQueryStringMap[(firstname: String) | (lastname: String)]
        assertEquals(res2, (lastname = "Hrnjica"))
     }
+    locally {
+      val res = Map("status" -> Seq("2")).parseQueryStringMap[(status: 1 | 2 | 3)]
+      assertEquals(res, (status = 2))
+    }
   }
 
 }

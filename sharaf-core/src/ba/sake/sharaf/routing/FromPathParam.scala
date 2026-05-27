@@ -10,6 +10,16 @@ trait FromPathParam[T]:
   def parse(str: String): Option[T]
 
 object FromPathParam {
+  given [T <: Singleton](using v: ValueOf[T]): FromPathParam[T] with {
+    override def parse(str: String): Option[T] =
+      Option.when(str == v.value.toString)(v.value)
+  }
+
+  given [L, R](using lfp: FromPathParam[L], rfp: FromPathParam[R]): FromPathParam[L | R] with {
+    override def parse(str: String): Option[L | R] =
+      lfp.parse(str).orElse(rfp.parse(str))
+  }
+
   given FromPathParam[Int] with {
     def parse(str: String): Option[Int] = str.toIntOption
   }

@@ -45,6 +45,21 @@ object QueryStringRW extends LowPriorityQueryStringRWInstances {
 
   def apply[T](using instance: QueryStringRW[T]): QueryStringRW[T] = instance
 
+  given [T <: Singleton](using v: ValueOf[T]): QueryStringRW[T] with {
+    private val expected = v.value.toString
+
+    override def write(path: String, value: T): QueryStringData =
+      QueryStringRW[String].write(path, value.toString)
+
+    override def parse(path: String, qsData: QueryStringData): T =
+      val str = QueryStringRW[String].parse(path, qsData)
+      if str == expected then v.value
+      else
+        throw ParsingException(
+          ParseError(path, s"invalid literal '$expected'", Some(str))
+        )
+  }
+
   given QueryStringRW[String] with {
     override def write(path: String, value: String): QueryStringData =
       Simple(value)
