@@ -45,12 +45,13 @@ abstract class AbstractSessionHandlerTest extends munit.FunSuite {
         }
       val response = request.send()
       response.header("Set-Cookie").foreach { setCookieHeader =>
-        setCookieHeader
+        val cookiePair = setCookieHeader
           .split(";", 2)
           .headOption
           .map(_.trim)
           .filter(_.contains("="))
-          .foreach(cookiePair => sessionCookie = Some(cookiePair))
+          .getOrElse(throw RuntimeException(s"Malformed Set-Cookie header: $setCookieHeader"))
+        sessionCookie = Some(cookiePair)
       }
       response.body
     }
