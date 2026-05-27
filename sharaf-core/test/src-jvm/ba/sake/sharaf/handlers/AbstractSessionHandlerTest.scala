@@ -1,6 +1,7 @@
 package ba.sake.sharaf.handlers
 
 import sttp.client4.quick.*
+import sttp.client4.WebSocketSyncBackend
 import sttp.client4.httpclient.HttpClientSyncBackend
 import ba.sake.sharaf.*
 import ba.sake.sharaf.utils.NetworkUtils
@@ -36,14 +37,14 @@ abstract class AbstractSessionHandlerTest extends munit.FunSuite {
       Response.withBody(Session.current.id)
   }
 
-  private def withStatefulBackend[T](f: HttpClientSyncBackend => T): T = {
+  private def withStatefulBackend[T](f: WebSocketSyncBackend => T): T = {
     val cookieHandler = new java.net.CookieManager()
     val javaClient = java.net.http.HttpClient.newBuilder().cookieHandler(cookieHandler).build()
     val statefulBackend = HttpClientSyncBackend.usingClient(javaClient)
     f(statefulBackend)
   }
 
-  private def send(path: String, backend: HttpClientSyncBackend): String =
+  private def send(path: String, backend: WebSocketSyncBackend): String =
     quickRequest.get(uri"${baseUrl}/$path").send(backend).body
 
   test("getOpt returns 'not found' when key is absent") {
