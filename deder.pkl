@@ -1,4 +1,4 @@
-amends "https://sake92.github.io/deder/config/v0.5.0/DederProject.pkl"
+amends "https://sake92.github.io/deder/config/v0.13.3/DederProject.pkl"
 
 //amends "https://sake92.github.io/deder/config/early-access/DederProject.pkl"
 
@@ -26,7 +26,8 @@ local const function pomSettings(
     }
   }
   scm {
-    url = "git@github.com:sake92/sharaf.git"
+    url = "https://github.com/sake92/sharaf"
+    connection = "scm:git@github.com:sake92/sharaf.git"
   }
 }
 
