@@ -1,6 +1,7 @@
 package ba.sake.sharaf.pac4j
 
-import java.util.{Optional as JOptional}
+import java.io.{ByteArrayOutputStream, ObjectOutputStream, ByteArrayInputStream, ObjectInputStream}
+import java.util.{Optional as JOptional, Base64}
 import scala.jdk.CollectionConverters.*
 import scala.jdk.OptionConverters.*
 import org.pac4j.core.context.{Cookie as Pac4jCookie, FrameworkParameters, WebContext, WebContextFactory}
@@ -12,6 +13,7 @@ import ba.sake.sharaf.*
 final class SharafPac4jContext(
     private val request: Request,
     private val fullUrl: String,
+    private val methodName: String,
 ) extends WebContext
     with SessionStore
     with HttpActionAdapter {
@@ -40,8 +42,7 @@ final class SharafPac4jContext(
   override def getRequestHeader(name: String): JOptional[String] =
     request.headers.get(HttpString(name)).flatMap(_.headOption).toJava
 
-  override def getRequestMethod(): String =
-    mutableRequestAttributes.get("_method").collect { case m: String => m }.getOrElse("GET")
+  override def getRequestMethod(): String = methodName
 
   override def getRemoteAddr(): String = "127.0.0.1"
 
@@ -67,10 +68,7 @@ final class SharafPac4jContext(
       pc
     }.asJavaCollection
 
-  override def getPath(): String = {
-    val idx = fullUrl.indexOf('?')
-    if idx == -1 then fullUrl else fullUrl.substring(0, idx)
-  }
+  override def getPath(): String = java.net.URI(fullUrl).getPath
 
   override def getRequestContent(): String = request.bodyString
 
@@ -122,12 +120,29 @@ final class SharafPac4jContext(
     catch case _: Exception => JOptional.empty()
 
   override def get(context: WebContext, key: String): JOptional[AnyRef] =
-    try Session.current.getOpt[String](key).map(_.asInstanceOf[AnyRef]).toJava
+    try Session.current.getOpt[String](key).flatMap { str =>
+      try {
+        val bytes = Base64.getDecoder.decode(str)
+        val ois = ObjectInputStream(ByteArrayInputStream(bytes))
+        try Option(ois.readObject())
+        finally ois.close()
+      } catch case _: Exception => None
+    }.toJava.asInstanceOf[JOptional[AnyRef]]
     catch case _: Exception => JOptional.empty()
 
   override def set(context: WebContext, key: String, value: Any): Unit =
-    try Session.current.set[String](key, value.toString)
-    catch case _: Exception => ()
+    try {
+      val baos = ByteArrayOutputStream()
+      val oos = ObjectOutputStream(baos)
+      try {
+        oos.writeObject(value)
+        oos.flush()
+        Session.current.set[String](key, Base64.getEncoder.encodeToString(baos.toByteArray))
+      } finally {
+        oos.close()
+        baos.close()
+      }
+    } catch case _: Exception => ()
 
   override def destroySession(context: WebContext): Boolean =
     try { Session.current.invalidate(); true }
@@ -168,14 +183,14 @@ object SharafPac4jContext {
   def webContextFactory: WebContextFactory =
     (params: FrameworkParameters) => params match {
       case sfp: SharafFrameworkParameters =>
-        SharafPac4jContext(sfp.request, sfp.fullUrl)
+        SharafPac4jContext(sfp.request, sfp.fullUrl, sfp.method.name)
       case _ => throw IllegalArgumentException("Expected SharafFrameworkParameters")
     }
 
   def sessionStoreFactory: SessionStoreFactory =
     (params: FrameworkParameters) => params match {
       case sfp: SharafFrameworkParameters =>
-        SharafPac4jContext(sfp.request, sfp.fullUrl)
+        SharafPac4jContext(sfp.request, sfp.fullUrl, sfp.method.name)
       case _ => throw IllegalArgumentException("Expected SharafFrameworkParameters")
     }
 
