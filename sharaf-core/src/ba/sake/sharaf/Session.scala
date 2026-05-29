@@ -1,6 +1,7 @@
 package ba.sake.sharaf
 
 import java.time.Instant
+import ba.sake.tupson.JsonRW
 import ba.sake.sharaf.exceptions.SharafException
 
 trait Session {
@@ -13,16 +14,29 @@ trait Session {
 
   def keys: Set[String]
 
-  def get[T <: Serializable](key: String): T =
-    getOpt(key).getOrElse(throw new SharafException(s"No value found for session key: ${key}"))
+  def get[T: JsonRW](key: String): T =
+    getOpt[T](key).getOrElse(throw new SharafException(s"No value found for session key: ${key}"))
 
-  def getOpt[T <: Serializable](key: String): Option[T]
+  def getOpt[T: JsonRW](key: String): Option[T]
 
-  def set[T <: Serializable](key: String, value: T): Unit
+  def set[T: JsonRW](key: String, value: T): Unit
 
-  def remove[T <: Serializable](key: String): Unit
+  def remove(key: String): Unit
+
+  /** Destroys this session. The session cookie will be cleared from the response. */
+  def invalidate(): Unit
+
+  /** Generates a new session ID while preserving data. Call this after a user logs in
+    * to prevent session fixation attacks.
+    */
+  def regenerate(): Unit
 
 }
 
 object Session:
-  def current(using s: Session): Session = s
+  def current: Session =
+    SessionHolder.get.getOrElse(
+      throw SharafException(
+        "No active session. Configure sessions with SharafHandler.sessions()."
+      )
+    )

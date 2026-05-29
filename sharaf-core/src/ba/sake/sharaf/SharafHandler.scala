@@ -39,6 +39,13 @@ object SharafHandler:
   def cors(next: SharafHandler, corsSettings: CorsSettings = CorsSettings.default): SharafHandler =
     CorsHandler(corsSettings, next)
 
+  def sessions(
+      next: SharafHandler,
+      store: SessionStore = InMemorySessionStore(),
+      config: SessionConfig = SessionConfig.default
+  ): SharafHandler =
+    SessionHandler(store, config, next)
+
 case class RequestContext(
     params: RequestParams,
     request: Request
