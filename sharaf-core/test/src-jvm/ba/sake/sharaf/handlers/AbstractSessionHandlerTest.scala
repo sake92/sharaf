@@ -39,9 +39,11 @@ abstract class AbstractSessionHandlerTest extends munit.FunSuite {
     private var sessionCookie: Option[String] = None
 
     def send(path: String): String = {
+      // Build URL with separate path segments to avoid encoding slashes
+      val fullUrl = path.split("/").foldLeft(uri"$baseUrl")(_.addPath(_))
       val request = sessionCookie
-        .fold(quickRequest.get(uri"${baseUrl}/$path")) { cookieHeader =>
-          quickRequest.get(uri"${baseUrl}/$path").header("Cookie", cookieHeader)
+        .fold(quickRequest.get(fullUrl)) { cookieHeader =>
+          quickRequest.get(fullUrl).header("Cookie", cookieHeader)
         }
       val response = request.send()
       response.header("Set-Cookie").foreach { setCookieHeader =>
