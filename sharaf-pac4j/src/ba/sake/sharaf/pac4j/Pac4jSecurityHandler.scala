@@ -41,9 +41,13 @@ final class Pac4jSecurityHandler(
       }
     }
 
+    val clientsParam = Option(securityConfig.clients).filter(_.nonEmpty).orNull
+    val authorizersParam = Option(securityConfig.authorizers).filter(_.nonEmpty).orNull
+    val matchersParam = Option(securityConfig.matchers).filter(_.nonEmpty).orNull
+
     pac4jConfig.getSecurityLogic.perform(
       pac4jConfig, successAdapter,
-      securityConfig.clients, securityConfig.authorizers, securityConfig.matchers,
+      clientsParam, authorizersParam, matchersParam,
       frameworkParams,
     )
 
