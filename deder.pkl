@@ -43,7 +43,7 @@ local const baseTemplate: ScalaModule = new {
 
 local const versions = new {
   scalaJsVersion = "1.19.0"
-  scalaNativeVersion = "0.5.9"
+  scalaNativeVersion = "0.5.11"
 }
 
 local const validsonModules =
