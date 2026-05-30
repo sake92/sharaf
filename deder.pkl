@@ -224,6 +224,31 @@ local const sharafUndertowModules =
     }
   }.get
 
+local const sharafPac4jModules =
+  new CreateScalaModules {
+    root = "sharaf-pac4j"
+    template = (baseTemplate) {
+      pomSettings =
+        pomSettings("sharaf-pac4j", "Sharaf Pac4j", "Sharaf integration with Pac4j security")
+      moduleDeps {
+        sharafCoreModules.jvm
+      }
+      deps {
+        "org.pac4j:pac4j-core:6.5.2"
+      }
+    }
+    testTemplate = (baseTemplate.asTest()) {
+      moduleDeps {
+        sharafCoreModules.jvm_test
+        sharafJdkHttpserverModules.main
+      }
+      deps {
+        "org.scalameta::munit::1.1.0"
+        "org.pac4j:pac4j-http:6.5.2"
+      }
+    }
+  }.get
+
 local const sharafHttp4sModules =
   new CreateCrossModules {
     root = "sharaf-http4s"
@@ -445,6 +470,7 @@ modules {
   sharafHttp4sModules.native_test
   ...sharafHelidonModules.all
   ...sharafJdkHttpserverModules.all
+  ...sharafPac4jModules.all
   sharafSnunit
   ...apiExampleModules.all
   ...fullstackExampleModules.all
