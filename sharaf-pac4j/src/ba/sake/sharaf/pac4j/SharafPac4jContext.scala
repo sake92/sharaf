@@ -20,6 +20,8 @@ final class SharafPac4jContext(
 
   var successResponse: Option[Response[?]] = None
 
+  private val cachedUri: java.net.URI = java.net.URI(fullUrl)
+
   private var mutableResponseHeaders: Map[String, String] = Map.empty
   private var mutableResponseCookies: Seq[Pac4jCookie] = Seq.empty
   private var mutableRequestAttributes: Map[String, Any] = Map.empty
@@ -46,13 +48,13 @@ final class SharafPac4jContext(
 
   override def getRemoteAddr(): String = "127.0.0.1"
 
-  override def getServerName(): String = "localhost"
+  override def getServerName(): String = Option(cachedUri.getHost).getOrElse("localhost")
 
-  override def getServerPort(): Int = 8080
+  override def getServerPort(): Int = cachedUri.getPort match { case -1 => 80; case p => p }
 
-  override def getScheme(): String = "http"
+  override def getScheme(): String = Option(cachedUri.getScheme).getOrElse("http")
 
-  override def isSecure(): Boolean = false
+  override def isSecure(): Boolean = getScheme == "https"
 
   override def getFullRequestURL(): String = fullUrl
 
@@ -68,7 +70,7 @@ final class SharafPac4jContext(
       pc
     }.asJavaCollection
 
-  override def getPath(): String = java.net.URI(fullUrl).getPath
+  override def getPath(): String = cachedUri.getPath
 
   override def getRequestContent(): String = request.bodyString
 
@@ -180,6 +182,8 @@ final class SharafPac4jContext(
 
 object SharafPac4jContext {
 
+  private val currentContext = new ThreadLocal[SharafPac4jContext]()
+
   def webContextFactory: WebContextFactory =
     (params: FrameworkParameters) => params match {
       case sfp: SharafFrameworkParameters =>
@@ -194,8 +198,20 @@ object SharafPac4jContext {
       case _ => throw IllegalArgumentException("Expected SharafFrameworkParameters")
     }
 
-  def httpActionAdapterFor(context: SharafPac4jContext): HttpActionAdapter =
-    (action: HttpAction, _: WebContext) => context.adapt(action, null)
+  /** Static singleton adapter — delegates to the current-request context via ThreadLocal.
+    * Safe to share across requests since each request sets the correct context before use.
+    */
+  val globalHttpActionAdapter: HttpActionAdapter = (action: HttpAction, _: WebContext) =>
+    Option(currentContext.get()) match {
+      case Some(sc) => sc.adapt(action, null)
+      case None => null
+    }
+
+  def withCurrentContext[T](ctx: SharafPac4jContext)(f: => T): T = {
+    currentContext.set(ctx)
+    try f
+    finally currentContext.remove()
+  }
 }
 
 final class SharafFrameworkParameters(

@@ -12,7 +12,7 @@ class SecurityService(pac4jConfig: Config) {
       val host = req.headers.get(HttpString("Host")).flatMap(_.headOption).getOrElse("localhost")
       s"http://$host/"
     }
-    val sharafCtx = SharafPac4jContext(req, fullUrl, "GET")
+    val sharafCtx = SharafPac4jContext(req, fullUrl, "GET") // GET is fine here; method doesn't matter for getProfile
     val profileManager = ProfileManager(sharafCtx, sharafCtx)
     profileManager.getProfile.toScala
   }

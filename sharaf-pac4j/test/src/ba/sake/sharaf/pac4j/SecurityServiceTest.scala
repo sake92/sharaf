@@ -6,7 +6,6 @@ import org.pac4j.core.client.Clients
 import org.pac4j.core.config.Config
 import org.pac4j.core.matching.matcher.{DefaultMatchers, PathMatcher}
 import org.pac4j.http.client.direct.HeaderClient
-import scala.compiletime.uninitialized
 import ba.sake.sharaf.*
 import ba.sake.sharaf.jdkhttp.JdkHttpServerSharafServer
 import ba.sake.sharaf.utils.NetworkUtils
@@ -46,18 +45,19 @@ class SecurityServiceTest extends munit.FunSuite {
       Response.withBody("secret data")
   }
 
-  private var server: JdkHttpServerSharafServer = uninitialized
+  private var server: Option[JdkHttpServerSharafServer] = None
 
   override def beforeAll(): Unit = {
     val handler = SharafHandler.sessions(
       SharafHandler.pac4j(SharafHandler.routes(appRoutes), securityConfig)
     )
-    server = JdkHttpServerSharafServer("localhost", port, handler)
-    server.start()
+    val s = JdkHttpServerSharafServer("localhost", port, handler)
+    s.start()
+    server = Some(s)
   }
 
   override def afterAll(): Unit = {
-    server.stop()
+    server.foreach(_.stop())
   }
 
   test("currentUser returns 'anonymous' on public route without previous auth") {

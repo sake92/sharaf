@@ -10,15 +10,15 @@ extension (handlerObj: SharafHandler.type)
   ): SharafHandler = {
     val securityHandler = Pac4jSecurityHandler(securityConfig, routes)
 
-    val hasCallback = securityConfig.callbackPath.isDefined
-    val hasLogout = securityConfig.logoutPath.isDefined
+    val hasCallback = securityConfig.callbackPath.exists(_.trim.nonEmpty)
+    val hasLogout = securityConfig.logoutPath.exists(_.trim.nonEmpty)
 
     if !hasCallback && !hasLogout then securityHandler
     else {
       val callbackSegments = securityConfig.callbackPath.toSeq
-        .flatMap(_.split("/")).filter(_.nonEmpty)
+        .flatMap(_.split("/")).map(_.trim).filter(_.nonEmpty)
       val logoutSegments = securityConfig.logoutPath.toSeq
-        .flatMap(_.split("/")).filter(_.nonEmpty)
+        .flatMap(_.split("/")).map(_.trim).filter(_.nonEmpty)
 
       new SharafHandler {
         private val callbackHandler: Option[SharafHandler] =

@@ -1,6 +1,5 @@
 package ba.sake.sharaf.pac4j
 
-import org.pac4j.core.adapter.FrameworkAdapter
 import org.pac4j.core.config.Config
 import ba.sake.sharaf.*
 import ba.sake.sharaf.routing.Path
@@ -15,22 +14,19 @@ final class Pac4jLogoutHandler(
 ) extends SharafHandler {
 
   override def handle(ctx: RequestContext): Response[?] = {
-    pac4jConfig.setWebContextFactory(SharafPac4jContext.webContextFactory)
-    pac4jConfig.setSessionStoreFactory(SharafPac4jContext.sessionStoreFactory)
-    FrameworkAdapter.INSTANCE.applyDefaultSettingsIfUndefined(pac4jConfig)
-
     val (method, path) = ctx.params
     val fullUrl = buildFullUrl(ctx.request, method, path)
     val frameworkParams = SharafFrameworkParameters(ctx.request, fullUrl, method)
     val sharafCtx = SharafPac4jContext(ctx.request, fullUrl, method.name)
-    pac4jConfig.setHttpActionAdapter(SharafPac4jContext.httpActionAdapterFor(sharafCtx))
 
-    pac4jConfig.getLogoutLogic.perform(
-      pac4jConfig, defaultUrl,
-      if logoutUrlPattern.nonEmpty then logoutUrlPattern else null,
-      Boolean.box(localLogout), Boolean.box(destroySession), Boolean.box(centralLogout),
-      frameworkParams,
-    )
+    SharafPac4jContext.withCurrentContext(sharafCtx) {
+      pac4jConfig.getLogoutLogic.perform(
+        pac4jConfig, defaultUrl,
+        if logoutUrlPattern.nonEmpty then logoutUrlPattern else null,
+        Boolean.box(localLogout), Boolean.box(destroySession), Boolean.box(centralLogout),
+        frameworkParams,
+      )
+    }
 
     val response = sharafCtx.toResponse()
     if response.status == sttp.model.StatusCode.InternalServerError then Response.redirect(defaultUrl)
@@ -43,7 +39,7 @@ final class Pac4jLogoutHandler(
     val query = {
       val raw = req.queryParamsRaw
       if raw.isEmpty then ""
-      else "?" + raw.flatMap { (k, vs) => vs.map(v => s"$k=$v") }.mkString("&")
+      else "?" + raw.flatMap { (k, vs) => vs.map(v => java.net.URLEncoder.encode(k, "UTF-8") + "=" + java.net.URLEncoder.encode(v, "UTF-8")) }.mkString("&")
     }
     s"http://$host$pathStr$query"
   }
