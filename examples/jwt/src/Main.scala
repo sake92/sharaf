@@ -26,7 +26,6 @@ class JwtModule(port: Int):
   private val signatureConfiguration = new SecretSignatureConfiguration("your_jwt_secret_key_that_is_at_least_32_chars")
   private val jwtAuthenticator = JwtAuthenticator(signatureConfiguration)
   private val headerClient = new HeaderClient("Authorization", jwtAuthenticator)
-  headerClient.setSaveProfileInSession(true)
 
   // generate a JWT claims set for testing purposes
   locally {
@@ -45,25 +44,21 @@ class JwtModule(port: Int):
   publicRoutesMatcher.excludePaths("/")
   pac4jConfig.addMatcher(publicRoutesMatcherName, publicRoutesMatcher)
 
+  // Use noop session store — JWTs are stateless, no server-side session needed
   private val securityConfig = Pac4jSecurityConfig(
     pac4jConfig,
     matchers = s"${DefaultMatchers.SECURITYHEADERS},${publicRoutesMatcherName}",
+    noopSessionStore = true,
   )
 
-  val securityService = SecurityService(pac4jConfig)
-
-  private val routes = SharafHandler.sessions(
-    SharafHandler.pac4j(
-      SharafHandler.routes(Routes {
-        case GET -> Path() =>
-          Response.withBody("Hello there! This is a public endpoint. Try accessing localhost:8181/protected.")
-        case GET -> Path("protected") =>
-          Response.withBody("This is a protected resource. You are authenticated.")
-        case GET -> Path("protected", "whoami") =>
-          Response.withBody(s"You are: ${securityService.currentUser.map(_.getId).getOrElse("anonymous")}")
-      }),
-      securityConfig,
-    )
+  private val routes = SharafHandler.pac4j(
+    SharafHandler.routes(Routes {
+      case GET -> Path() =>
+        Response.withBody("Hello there! This is a public endpoint. Try accessing localhost:8181/protected.")
+      case GET -> Path("protected") =>
+        Response.withBody("This is a protected resource. You are authenticated.")
+    }),
+    securityConfig,
   )
 
   val server = Undertow

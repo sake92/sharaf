@@ -39,15 +39,4 @@ class AppTests extends IntegrationTest {
     assertEquals(res.code, StatusCode.Ok)
     assert(res.body.contains("protected resource"))
   }
-
-  test("GET /protected/whoami should return user ID from JWT") {
-    val module = moduleFixture()
-    val jwt = generateTestJwt("12345")
-    val res = quickRequest
-      .get(uri"${module.baseUrl}/protected/whoami")
-      .header("Authorization", jwt)
-      .send()
-    assertEquals(res.code, StatusCode.Ok)
-    assert(res.body.contains("12345"))
-  }
 }
