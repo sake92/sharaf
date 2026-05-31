@@ -44,11 +44,11 @@ class JwtModule(port: Int):
   publicRoutesMatcher.excludePaths("/")
   pac4jConfig.addMatcher(publicRoutesMatcherName, publicRoutesMatcher)
 
-  // Use noop session store — JWTs are stateless, no server-side session needed
+  // JWTs are stateless — no server-side session needed
   private val securityConfig = Pac4jSecurityConfig(
     pac4jConfig,
     matchers = s"${DefaultMatchers.SECURITYHEADERS},${publicRoutesMatcherName}",
-    noopSessionStore = true,
+    sessionStoreFactory = NoopSessionStore.factory,
   )
 
   private val routes = SharafHandler.pac4j(
