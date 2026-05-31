@@ -385,11 +385,13 @@ local const jwtExampleModules =
   new CreateScalaModules {
     root = "examples/jwt"
     template = (baseExampleTemplate) {
-      moduleDeps { sharafUndertowModules.main }
+      moduleDeps {
+        sharafUndertowModules.main
+        sharafPac4jModules.main
+      }
       deps {
-        "org.pac4j:undertow-pac4j:6.0.0"
-        "org.pac4j:pac4j-http:6.1.2"
-        "org.pac4j:pac4j-jwt:6.1.2"
+        "org.pac4j:pac4j-http:6.5.2"
+        "org.pac4j:pac4j-jwt:6.5.2"
       }
     }
     testTemplate = (baseExampleTemplate.asTest()) {

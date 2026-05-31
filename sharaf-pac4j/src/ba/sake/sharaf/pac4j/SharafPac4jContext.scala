@@ -72,7 +72,9 @@ final class SharafPac4jContext(
 
   override def getPath(): String = cachedUri.getPath
 
-  override def getRequestContent(): String = request.bodyString
+  override def getRequestContent(): String =
+    try request.bodyString
+    catch case _: Exception => ""
 
   override def getCharacterEncoding(): JOptional[String] = JOptional.of("UTF-8")
 
