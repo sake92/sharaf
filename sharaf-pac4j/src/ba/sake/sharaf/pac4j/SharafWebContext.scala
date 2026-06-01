@@ -102,7 +102,7 @@ final class SharafWebContext(
   override def getScheme(): String =
     request.headers.get(HttpString("X-Forwarded-Proto"))
       .flatMap(_.headOption)
-      .getOrElse(if isSecure() then "https" else "http")
+      .getOrElse("http")
 
   override def isSecure(): Boolean =
     getScheme() == "https"

@@ -10,7 +10,6 @@ import sttp.model.StatusCode
 final class SharafHttpActionAdapter extends HttpActionAdapter:
 
   override def adapt(action: HttpAction, context: WebContext): AnyRef =
-    val sharafCtx = context.asInstanceOf[SharafWebContext]
     val baseResponse = action match
       case _: UnauthorizedAction =>
         Response.withStatus(StatusCode.Unauthorized)
@@ -43,4 +42,6 @@ final class SharafHttpActionAdapter extends HttpActionAdapter:
       case _ =>
         Response.withStatus(StatusCode.InternalServerError)
 
-    sharafCtx.supplementResponse(baseResponse)
+    context match
+      case sharafCtx: SharafWebContext => sharafCtx.supplementResponse(baseResponse)
+      case _ => baseResponse
