@@ -2,30 +2,31 @@ package userpassform
 
 import ba.sake.sharaf.{*, given}
 import ba.sake.querson.QueryStringRW
+import ba.sake.sharaf.pac4j.SecurityService
+import org.pac4j.core.profile.UserProfile
 
-class AppRoutes(callbackUrl: String, securityService: SecurityService) {
+class AppRoutes(callbackUrl: String):
   val routes = Routes {
     case GET -> Path("login-form") =>
       case class QP(username: String = "", error: Option[String]) derives QueryStringRW
       val qp = Request.current.queryParams[QP]
       Response.withBody(views.showForm(callbackUrl, qp.error.nonEmpty, qp.username))
     case GET -> Path("protected-resource") =>
-      securityService.withCurrentUser {
-        Response.withBody(views.protectedResource)
-      }
+      SecurityService.currentUser match
+        case None => Response.redirect("/login-form")
+        case Some(user) =>
+          Response.withBody(views.protectedResource(user.getUsername))
     case GET -> Path() =>
-      val view = views.index(securityService.currentUser)
-      Response.withBody(view)
+      Response.withBody(views.index(SecurityService.currentUser))
   }
 
-}
+object views:
 
-object views {
-  def index(currentUserOpt: Option[CustomUserProfile]) = {
-    val currentUserHtml = currentUserOpt.map { user =>
+  def index(currentUser: Option[UserProfile]) = {
+    val currentUserHtml = currentUser.map { user =>
       html"""
         <div>
-          Hello ${user.name} !
+          Hello ${user.getUsername} !
           <div>
             <a href="/logout">Logout</a>
           </div>
@@ -46,7 +47,7 @@ object views {
     """
   }
 
-  def protectedResource(using currentUser: CustomUserProfile) =
+  def protectedResource(username: String) =
     html"""
       <!DOCTYPE html>
       <html>
@@ -54,7 +55,7 @@ object views {
       <div>
           <a href="/">Home</a>
           <div>
-          Hello ${currentUser.name}! You are logged in!
+          Hello ${username}! You are logged in!
           </div>
       </div>
       </body>
@@ -72,17 +73,15 @@ object views {
               <input type="text" name="username" value="${username}" required minlength="3">
             </label>
             <label>Password
-              <input type="text" name="password" required minlength="8">
+              <input type="password" name="password" required minlength="8">
             </label>
             <input type="submit" value="Login">
           </form>
           ${if isError then html"<div style='background:orange'>Login failed, please try again.</div>" else ""}
           <div>
-          Use john_doe/john_doe as username/password to login.
+          Use johndoe/johndoe as username/password to login.
           </div>
       </div>
       </body>
       </html>
     """
-
-}

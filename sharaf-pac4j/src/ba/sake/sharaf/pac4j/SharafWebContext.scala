@@ -65,10 +65,22 @@ final class SharafWebContext(
     request.headers.map { (k, v) => k.value -> v.mkString(", ") }.asJava
 
   override def getRequestParameters(): java.util.Map[String, Array[String]] =
-    request.queryParamsRaw.map { (k, v) => k -> v.toArray }.asJava
+    mergedParams.map { (k, v) => k -> v.toArray }.asJava
 
   override def getRequestParameter(name: String): Optional[String] =
-    request.queryParamsRaw.get(name).flatMap(_.headOption).toJava
+    mergedParams.get(name).flatMap(_.headOption).toJava
+
+  /** Merges query params with POST body form params (body overrides query). */
+  private lazy val mergedParams: Map[String, Seq[String]] =
+    val bodyParams = try {
+      request.bodyFormRaw.map { (k, v) =>
+        k -> v.map {
+          case ba.sake.formson.FormValue.Str(value) => value
+          case _                                      => ""
+        }
+      }
+    } catch case _: Exception => Map.empty[String, Seq[String]]
+    request.queryParamsRaw ++ bodyParams
 
   override def getRequestHeader(name: String): Optional[String] =
     request.headers.collectFirst {

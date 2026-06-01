@@ -13,9 +13,8 @@ import ba.sake.sharaf.session.{SessionImpl, SessionHolder, NoOpSessionStore}
 object Pac4jSecurityHandler:
   private[pac4j] val currentProfiles = new ThreadLocal[List[UserProfile]]()
 
-/** A [[SharafHandler]] decorator that applies pac4j security AND manages session lifecycle.
-  *
-  * Subsumes both session management and pac4j security in one handler.
+/** A [[SharafHandler]] decorator that applies pac4j security, handles callbacks/logouts,
+  * AND manages session lifecycle — all in one handler.
   */
 final class Pac4jSecurityHandler(
     securityConfig: Pac4jSecurityConfig,
@@ -27,36 +26,77 @@ final class Pac4jSecurityHandler(
     val fullUrl = buildFullUrl(context.request, path)
     val webContext = new SharafWebContext(context.request, fullUrl, method)
     val pac4jConfig = securityConfig.pac4jConfig
+    val pathStr = "/" + path.segments.mkString("/")
 
     try
       val frameworkParams = new SharafFrameworkParameters(context.request, fullUrl, method)
 
-      val accessAdapter = new SecurityGrantedAccessAdapter:
-        override def adapt(
-            wc: WebContext,
-            sessionStore: Pac4jSessionStore,
-            profiles: JCollection[UserProfile]
-        ): AnyRef =
-          Pac4jSecurityHandler.currentProfiles.set(profiles.asScala.toList)
-          val res = next.handle(context)
-          finalizeResponse(webContext, res)
-
-      val result = pac4jConfig.getSecurityLogic.perform(
-        pac4jConfig,
-        accessAdapter,
-        securityConfig.clients,
-        securityConfig.authorizers,
-        securityConfig.matchers,
-        frameworkParams
-      )
+      val result =
+        if securityConfig.callbackPath.contains(pathStr) then
+          handleCallbackLogic(pac4jConfig, frameworkParams)
+        else if securityConfig.logoutPath.contains(pathStr) then
+          handleLogoutLogic(pac4jConfig, frameworkParams)
+        else
+          handleSecurityLogic(context, pac4jConfig, webContext, frameworkParams)
 
       result match
-        case res: Response[?] => res
+        case res: Response[?] =>
+          finalizeResponse(webContext, res)
         case _ =>
-          webContext.supplementResponse(Response.default)
+          finalizeResponse(webContext, webContext.supplementResponse(Response.default))
     finally
       Pac4jSecurityHandler.currentProfiles.remove()
       SessionHolder.clear()
+
+  private def handleCallbackLogic(
+      pac4jConfig: org.pac4j.core.config.Config,
+      params: SharafFrameworkParameters
+  ): AnyRef =
+    pac4jConfig.getCallbackLogic.perform(
+      pac4jConfig,
+      securityConfig.callbackPath.orNull,
+      true, // renewSession
+      null, // defaultClient
+      params
+    )
+
+  private def handleLogoutLogic(
+      pac4jConfig: org.pac4j.core.config.Config,
+      params: SharafFrameworkParameters
+  ): AnyRef =
+    pac4jConfig.getLogoutLogic.perform(
+      pac4jConfig,
+      securityConfig.defaultLogoutUrl,
+      null, // logoutUrlPattern
+      true, // localLogout
+      true, // destroySession
+      false, // centralLogout
+      params
+    )
+
+  private def handleSecurityLogic(
+      context: RequestContext,
+      pac4jConfig: org.pac4j.core.config.Config,
+      webContext: SharafWebContext,
+      params: SharafFrameworkParameters
+  ): AnyRef =
+    val accessAdapter = new SecurityGrantedAccessAdapter:
+      override def adapt(
+          wc: WebContext,
+          sessionStore: Pac4jSessionStore,
+          profiles: JCollection[UserProfile]
+      ): AnyRef =
+        Pac4jSecurityHandler.currentProfiles.set(profiles.asScala.toList)
+        next.handle(context)
+
+    pac4jConfig.getSecurityLogic.perform(
+      pac4jConfig,
+      accessAdapter,
+      securityConfig.clients,
+      securityConfig.authorizers,
+      securityConfig.matchers,
+      params
+    )
 
   private def buildFullUrl(req: ba.sake.sharaf.Request, path: Path): String =
     val host = req.headers.get(HttpString("Host")).flatMap(_.headOption).getOrElse("localhost")

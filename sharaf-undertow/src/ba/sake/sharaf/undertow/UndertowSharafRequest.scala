@@ -40,7 +40,7 @@ final class UndertowSharafRequest(val underlyingHttpServerExchange: HttpServerEx
   override lazy val bodyString: String =
     String(underlyingHttpServerExchange.getInputStream.readAllBytes(), StandardCharsets.UTF_8)
 
-  override def bodyFormRaw: FormDataMap =
+  override lazy val bodyFormRaw: FormDataMap =
     // createParser returns null if content-type is not suitable
     val parser = formBodyParserFactory.createParser(underlyingHttpServerExchange)
     Option(parser) match

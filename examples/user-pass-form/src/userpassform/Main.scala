@@ -1,22 +1,18 @@
 package userpassform
 
 import scala.jdk.CollectionConverters.*
-import io.undertow.server.session.{InMemorySessionManager, SessionAttachmentHandler, SessionCookieConfig}
-import io.undertow.{Handlers, Undertow}
-import io.undertow.server.handlers.BlockingHandler
 import org.pac4j.core.client.Clients
 import org.pac4j.core.config.Config
 import org.pac4j.core.credentials.password.JBCryptPasswordEncoder
-import org.pac4j.core.engine.{DefaultCallbackLogic, DefaultSecurityLogic}
-import org.pac4j.core.matching.matcher.*
+import org.pac4j.core.matching.matcher.{DefaultMatchers, PathMatcher}
 import org.pac4j.core.profile.CommonProfile
 import org.pac4j.core.profile.definition.CommonProfileDefinition
 import org.pac4j.core.profile.factory.ProfileFactory
 import org.pac4j.core.profile.service.InMemoryProfileService
 import org.pac4j.core.util.Pac4jConstants
 import org.pac4j.http.client.indirect.FormClient
-import org.pac4j.undertow.handler.{CallbackHandler, LogoutHandler, SecurityHandler}
 import ba.sake.sharaf.*
+import ba.sake.sharaf.pac4j.*
 import ba.sake.sharaf.undertow.*
 
 @main def main: Unit =
@@ -24,7 +20,7 @@ import ba.sake.sharaf.undertow.*
   module.server.start()
   println(s"Started HTTP server at ${module.baseUrl}")
 
-class UserPassFormModule(port: Int) {
+class UserPassFormModule(port: Int):
 
   val baseUrl = s"http://localhost:${port}"
 
@@ -46,39 +42,25 @@ class UserPassFormModule(port: Int) {
   private val formClient = new FormClient("/login-form", profileService)
   private val clients = Clients(callbackUrl, formClient)
   private val pac4jConfig = Config(clients)
-  private val publicRoutesMatcher = PathMatcher()
-  private val publicRoutesMatcherName = "publicRoutesMatcher"
-  publicRoutesMatcher.excludePaths("/", "/login-form")
-  pac4jConfig.addMatcher(publicRoutesMatcherName, publicRoutesMatcher)
   private val clientNames = clients.getClients.asScala.map(_.getName()).toSeq
-  val securityService = SecurityService(pac4jConfig)
-  private val securityHandler =
-    SecurityHandler.build(
-      SharafUndertowHandler(
-        SharafHandler.exceptions(
-          SharafHandler.routes(AppRoutes(callbackUrl, securityService).routes)
-        )
-      ),
-      pac4jConfig,
-      clientNames.mkString(","),
-      null,
-      s"${DefaultMatchers.SECURITYHEADERS},${publicRoutesMatcherName}",
-      DefaultSecurityLogic()
-    )
-  private val pathHandler = Handlers
-    .path()
-    .addExactPath(callbackUrl, CallbackHandler.build(pac4jConfig, null, DefaultCallbackLogic()))
-    .addExactPath("/logout", LogoutHandler(pac4jConfig, "/"))
-    .addPrefixPath("/", securityHandler)
 
-  private val finalHandler =
-    new BlockingHandler(
-      SessionAttachmentHandler(pathHandler, InMemorySessionManager("SessionManager"), SessionCookieConfig())
-    )
+  // exclude public paths from security (callback & logout are handled by Pac4jSecurityHandler)
+  private val publicRoutesMatcher = PathMatcher()
+  publicRoutesMatcher.excludePaths("/", "/login-form", callbackUrl, "/logout")
+  pac4jConfig.addMatcher("publicRoutes", publicRoutesMatcher)
 
-  val server = Undertow
-    .builder()
-    .addHttpListener(port, "localhost")
-    .setHandler(finalHandler)
-    .build()
-}
+  private val securityConfig = Pac4jSecurityConfig(
+    pac4jConfig,
+    clients = clientNames.mkString(","),
+    matchers = s"${DefaultMatchers.SECURITYHEADERS},publicRoutes",
+  )
+    .withCallbackPath(callbackUrl)
+    .withLogoutPath("/logout")
+
+  private val appRoutes = new AppRoutes(callbackUrl)
+
+  val server = UndertowSharafServer(
+    "localhost",
+    port,
+    Pac4jSecurityHandler(securityConfig, SharafHandler.routes(appRoutes.routes))
+  )

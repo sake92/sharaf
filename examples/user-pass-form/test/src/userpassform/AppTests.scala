@@ -15,11 +15,11 @@ class AppTests extends IntegrationTest {
     assertEquals(res.headers(HeaderNames.Location), Seq("/login-form"))
   }
 
-  test("/ and /form-login should return 200 when not logged in") {
+  test("/ and /login-form should return 200 when not logged in") {
     val module = moduleFixture()
     val baseUrl = module.baseUrl
     assertEquals(quickRequest.get(uri"$baseUrl").send().code, StatusCode.Ok)
-    assertEquals(quickRequest.get(uri"$baseUrl/form-login").send().code, StatusCode.Ok)
+    assertEquals(quickRequest.get(uri"$baseUrl/login-form").send().code, StatusCode.Ok)
   }
 
   test("/protected-resource should return 200 when logged in") {

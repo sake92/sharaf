@@ -60,7 +60,7 @@ final class JdkHttpServerSharafRequest(val underlyingHttpExchange: HttpExchange)
     val bytes = underlyingHttpExchange.getRequestBody.readAllBytes()
     String(bytes, StandardCharsets.UTF_8)
 
-  override def bodyFormRaw: FormDataMap =
+  override lazy val bodyFormRaw: FormDataMap =
     val contentType = headers.get(HttpString("Content-Type")).flatMap(_.headOption).getOrElse("")
 
     if contentType.startsWith("application/x-www-form-urlencoded") then
