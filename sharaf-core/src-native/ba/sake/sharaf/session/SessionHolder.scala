@@ -6,7 +6,7 @@ package ba.sake.sharaf.session
   * so a plain mutable variable is safe here. This must not be used in a multi-threaded
   * environment.
   */
-private[session] object SessionHolder {
+private[sharaf] object SessionHolder {
 
   private var _session: Option[Session] = None
 
