@@ -1,6 +1,7 @@
 package ba.sake.sharaf.pac4j
 
 import java.util.Collection as JCollection
+import scala.jdk.CollectionConverters.*
 import org.pac4j.core.context.WebContext
 import org.pac4j.core.context.session.SessionStore as Pac4jSessionStore
 import org.pac4j.core.engine.SecurityGrantedAccessAdapter
@@ -8,6 +9,9 @@ import org.pac4j.core.profile.UserProfile
 import ba.sake.sharaf.{SharafHandler, RequestContext, Response, Cookie, HttpString}
 import ba.sake.sharaf.routing.Path
 import ba.sake.sharaf.session.{SessionImpl, SessionHolder, NoOpSessionStore}
+
+object Pac4jSecurityHandler:
+  private[pac4j] val currentProfiles = new ThreadLocal[List[UserProfile]]()
 
 /** A [[SharafHandler]] decorator that applies pac4j security AND manages session lifecycle.
   *
@@ -33,6 +37,7 @@ final class Pac4jSecurityHandler(
             sessionStore: Pac4jSessionStore,
             profiles: JCollection[UserProfile]
         ): AnyRef =
+          Pac4jSecurityHandler.currentProfiles.set(profiles.asScala.toList)
           val res = next.handle(context)
           finalizeResponse(webContext, res)
 
@@ -50,6 +55,7 @@ final class Pac4jSecurityHandler(
         case _ =>
           webContext.supplementResponse(Response.default)
     finally
+      Pac4jSecurityHandler.currentProfiles.remove()
       SessionHolder.clear()
 
   private def buildFullUrl(req: ba.sake.sharaf.Request, path: Path): String =

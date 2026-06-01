@@ -50,14 +50,12 @@ class JwtModule(port: Int):
     pac4jConfig,
     clients = "HeaderClient",
     matchers = s"${DefaultMatchers.SECURITYHEADERS},publicRoutes",
-    sessionStore = NoOpSessionStore.instance, // stateless — JWT is self-contained
+    sessionStore = NoOpSessionStore.instance // stateless — JWT is self-contained
   )
 
   private val appRoutes = Routes {
     case GET -> Path() =>
-      Response.withBody(
-        "Hello there! This is a public endpoint. Try accessing localhost:8181/protected."
-      )
+      Response.withBody("Hello there! This is a public endpoint. Try accessing localhost:8181/protected.")
     case GET -> Path("whoami") =>
       val user = SecurityService.currentUser
       val username = user.map(_.getId).getOrElse("anonymous")
