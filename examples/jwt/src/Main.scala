@@ -58,6 +58,15 @@ class JwtModule(port: Int):
       Response.withBody(
         "Hello there! This is a public endpoint. Try accessing localhost:8181/protected."
       )
+    case GET -> Path("whoami") =>
+      val user = SecurityService.currentUser
+      val username = user.map(_.getId).getOrElse("anonymous")
+      val attrs = user.map(_.getAttributes).getOrElse(java.util.Map.of())
+      Response.withBody(
+        s"""|User ID: $username
+            |Attributes: $attrs
+            |""".stripMargin
+      )
     case GET -> Path("protected") =>
       Response.withBody("This is a protected resource. You are authenticated.")
   }
