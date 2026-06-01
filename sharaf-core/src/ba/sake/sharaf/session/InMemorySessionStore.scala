@@ -10,24 +10,24 @@ import java.util.concurrent.ConcurrentHashMap
   */
 final class InMemorySessionStore(config: SessionConfig) extends SessionStore {
 
-  private val store = new ConcurrentHashMap[String, SessionImpl]()
+  private val store = new ConcurrentHashMap[String, Session]()
 
-  override def create(): SessionImpl = {
+  override def create(): Session = {
     val id = SecureSessionId.generate()
     val now = Instant.now()
-    val session = new SessionImpl(id, now, now, Map.empty)
+    val session: Session = new SessionImpl(id, now)
     store.put(id, session)
     session
   }
 
-  override def load(sessionId: String): Option[SessionImpl] =
+  override def load(sessionId: String): Option[Session] =
     Option(store.get(sessionId)).flatMap { session =>
       val now = Instant.now()
       val idleExpired = config.maxAge.exists { maxAge =>
-        session._lastAccessedAt.plus(maxAge).isBefore(now)
+        session.lastAccessedAt.plus(maxAge).isBefore(now)
       }
       val absoluteExpired = config.absoluteTimeout.exists { timeout =>
-        session._createdAt.plus(timeout).isBefore(now)
+        session.createdAt.plus(timeout).isBefore(now)
       }
       if idleExpired || absoluteExpired then
         store.remove(sessionId)
@@ -35,7 +35,7 @@ final class InMemorySessionStore(config: SessionConfig) extends SessionStore {
       else Some(session)
     }
 
-  override def save(session: SessionImpl): Unit =
+  override def save(session: Session): Unit =
     store.put(session.id, session)
 
   override def delete(sessionId: String): Unit =

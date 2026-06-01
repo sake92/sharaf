@@ -51,7 +51,7 @@ final class SessionConfig private (
 
 object SessionConfig:
   val default: SessionConfig = new SessionConfig(
-    cookieName = "SHARAF_SESSION",
+    cookieName = "SESSION",
     cookiePath = "/",
     maxAge = Some(Duration.ofMinutes(30)),
     absoluteTimeout = Some(Duration.ofHours(8)),

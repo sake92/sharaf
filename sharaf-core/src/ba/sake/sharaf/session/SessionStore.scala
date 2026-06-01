@@ -11,13 +11,13 @@ package ba.sake.sharaf.session
 trait SessionStore {
 
   /** Creates a new empty session with a freshly generated ID. */
-  def create(): SessionImpl
+  def create(): Session
 
   /** Loads a session by its ID. Returns `None` if the session does not exist or has expired. */
-  def load(sessionId: String): Option[SessionImpl]
+  def load(sessionId: String): Option[Session]
 
   /** Persists a session after request processing. */
-  def save(session: SessionImpl): Unit
+  def save(session: Session): Unit
 
   /** Removes a session (e.g. when [[Session.invalidate]] is called). */
   def delete(sessionId: String): Unit

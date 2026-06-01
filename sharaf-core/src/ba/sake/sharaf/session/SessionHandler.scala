@@ -29,18 +29,18 @@ final class SessionHandler(
       .flatMap(id => store.load(id))
       .getOrElse(store.create())
 
-    session._lastAccessedAt = Instant.now()
+    session.touch()
 
     SessionHolder.set(session)
     val res =
       try next.handle(context)
       finally SessionHolder.clear()
 
-    if session._invalidated then
+    if session.isInvalid then
       store.delete(session.id)
       res.removingCookie(config.cookieName)
     else
-      if session._regenerated then session._previousId.foreach(store.delete)
+      if session.isRegenerated then session.previousId.foreach(store.delete)
       store.save(session)
       val maxAgeSeconds = config.maxAge.map(_.getSeconds.toInt)
       res.settingCookie(

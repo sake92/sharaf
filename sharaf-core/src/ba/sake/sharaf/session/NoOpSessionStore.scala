@@ -11,16 +11,17 @@ import java.time.Instant
   * `load` always returns [[None]], so a fresh session is created on every request.
   * `save` and `delete` are no-ops.
   */
-final class NoOpSessionStore extends SessionStore:
+final class NoOpSessionStore extends SessionStore {
 
-  override def create(): SessionImpl =
-    new SessionImpl(SecureSessionId.generate(), Instant.now(), Instant.now(), Map.empty)
+  override def create(): Session =
+    new SessionImpl(SecureSessionId.generate(), Instant.now())
 
-  override def load(sessionId: String): Option[SessionImpl] = None
+  override def load(sessionId: String): Option[Session] = None
 
-  override def save(session: SessionImpl): Unit = ()
+  override def save(session: Session): Unit = ()
 
   override def delete(sessionId: String): Unit = ()
+}
 
 object NoOpSessionStore:
   val instance: NoOpSessionStore = new NoOpSessionStore
