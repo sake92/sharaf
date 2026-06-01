@@ -1,4 +1,4 @@
-package ba.sake.sharaf.handlers
+package ba.sake.sharaf.session
 
 import java.time.Instant
 import ba.sake.sharaf.*
@@ -24,9 +24,9 @@ final class SessionHandler(
 ) extends SharafHandler {
 
   override def handle(context: RequestContext): Response[?] = {
-    val rawCookieValue = context.request.cookies.find(_.name == config.cookieName).map(_.value)
-    val session = rawCookieValue
-      .flatMap(v => store.load(v))
+    val sessionId = context.request.cookies.find(_.name == config.cookieName).map(_.value)
+    val session = sessionId
+      .flatMap(id => store.load(id))
       .getOrElse(store.create())
 
     session._lastAccessedAt = Instant.now()
@@ -36,17 +36,17 @@ final class SessionHandler(
       try next.handle(context)
       finally SessionHolder.clear()
 
-    if session._invalidated then {
+    if session._invalidated then
       store.delete(session.id)
       res.removingCookie(config.cookieName)
-    } else {
+    else
       if session._regenerated then session._previousId.foreach(store.delete)
       store.save(session)
       val maxAgeSeconds = config.maxAge.map(_.getSeconds.toInt)
       res.settingCookie(
         Cookie(
           name = config.cookieName,
-          value = store.cookieValue(session),
+          value = session.id, // always the session ID
           path = Some(config.cookiePath),
           maxAge = maxAgeSeconds,
           secure = config.secure,
@@ -55,6 +55,5 @@ final class SessionHandler(
           sameSiteMode = Some(config.sameSite)
         )
       )
-    }
   }
 }

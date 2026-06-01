@@ -1,4 +1,4 @@
-package ba.sake.sharaf
+package ba.sake.sharaf.session
 
 import java.time.Duration
 

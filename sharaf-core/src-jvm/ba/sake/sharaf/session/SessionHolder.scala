@@ -1,7 +1,7 @@
-package ba.sake.sharaf
+package ba.sake.sharaf.session
 
 /** Thread-local session holder for JVM request-scoped session access. */
-private[sharaf] object SessionHolder {
+private[session] object SessionHolder {
 
   private val threadLocal = new ThreadLocal[Option[Session]]()
 

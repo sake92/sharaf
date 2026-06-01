@@ -1,4 +1,4 @@
-package ba.sake.sharaf
+package ba.sake.sharaf.session
 
 /** Global session holder for Scala Native.
   *
@@ -6,7 +6,7 @@ package ba.sake.sharaf
   * so a plain mutable variable is safe here. This must not be used in a multi-threaded
   * environment.
   */
-private[sharaf] object SessionHolder {
+private[session] object SessionHolder {
 
   private var _session: Option[Session] = None
 

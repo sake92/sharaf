@@ -1,19 +1,19 @@
-package ba.sake.sharaf
+package ba.sake.sharaf.session
 
 import java.time.Instant
 import ba.sake.tupson.{*, given}
 
 /** Mutable session implementation backed by a JSON-serialized key-value map. */
-final class SharafSession(
-    private[sharaf] var _id: String,
-    private[sharaf] val _createdAt: Instant,
-    private[sharaf] var _lastAccessedAt: Instant,
-    private[sharaf] var _data: Map[String, String]
+final class SessionImpl(
+    private[session] var _id: String,
+    private[session] val _createdAt: Instant,
+    private[session] var _lastAccessedAt: Instant,
+    private[session] var _data: Map[String, String]
 ) extends Session {
 
-  private[sharaf] var _invalidated: Boolean = false
-  private[sharaf] var _regenerated: Boolean = false
-  private[sharaf] var _previousId: Option[String] = None
+  private[session] var _invalidated: Boolean = false
+  private[session] var _regenerated: Boolean = false
+  private[session] var _previousId: Option[String] = None
 
   override def id: String = _id
 

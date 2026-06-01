@@ -21,6 +21,12 @@ object param:
   def unapply[T](str: String)(using fp: FromPathParam[T]): Option[T] =
     fp.parse(str)
 
+// session re-exports
+export ba.sake.sharaf.session.{
+  Session, SessionConfig, SessionStore, SessionImpl,
+  InMemorySessionStore, NoOpSessionStore
+}
+
 // conversions to STTP
 extension [T](value: T)(using rw: formson.FormDataRW[T])
   def toSttpMultipart(config: formson.Config = formson.DefaultFormsonConfig): Seq[Part[BasicBodyPart]] =

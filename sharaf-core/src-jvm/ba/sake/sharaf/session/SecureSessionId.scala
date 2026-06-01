@@ -1,9 +1,9 @@
-package ba.sake.sharaf
+package ba.sake.sharaf.session
 
 import java.security.SecureRandom
 import java.util.Base64
 
-private[sharaf] object SecureSessionId {
+private[session] object SecureSessionId {
 
   private val rng = new SecureRandom()
 

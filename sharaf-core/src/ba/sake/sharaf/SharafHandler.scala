@@ -3,6 +3,7 @@ package ba.sake.sharaf
 import sttp.model.StatusCode
 import ba.sake.sharaf.routing.{RequestParams, Routes}
 import ba.sake.sharaf.handlers.*
+import ba.sake.sharaf.session.{SessionHandler, SessionStore, SessionConfig, InMemorySessionStore}
 
 trait SharafHandler:
   def handle(context: RequestContext): Response[?]

@@ -1,8 +1,8 @@
-package ba.sake.sharaf
+package ba.sake.sharaf.session
 
 import java.io.FileInputStream
 
-private[sharaf] object SecureSessionId {
+private[session] object SecureSessionId {
 
   def generate(): String = {
     val bytes = new Array[Byte](16) // 128-bit random ID

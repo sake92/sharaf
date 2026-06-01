@@ -1,28 +1,29 @@
-package ba.sake.sharaf
+package ba.sake.sharaf.session
 
 import java.time.Instant
-import java.util.concurrent.ConcurrentHashMap
-import scala.jdk.CollectionConverters.*
+import scala.collection.mutable
 
-/** In-memory session store backed by a [[ConcurrentHashMap]] for thread-safe JVM use.
+/** In-memory session store backed by a [[mutable.HashMap]].
   *
-  * Note: sessions are lost on server restart. For production use, consider a persistent
-  * store (e.g. Redis or database-backed).
+  * Suitable for SNUnit (single-threaded per worker). For multi-threaded environments
+  * use the JVM variant which uses a [[java.util.concurrent.ConcurrentHashMap]].
+  *
+  * Note: sessions are lost on server restart.
   */
 final class InMemorySessionStore(config: SessionConfig) extends SessionStore {
 
-  private val store = new ConcurrentHashMap[String, SharafSession]()
+  private val store = mutable.HashMap.empty[String, SessionImpl]
 
-  override def create(): SharafSession = {
+  override def create(): SessionImpl = {
     val id = SecureSessionId.generate()
     val now = Instant.now()
-    val session = new SharafSession(id, now, now, Map.empty)
+    val session = new SessionImpl(id, now, now, Map.empty)
     store.put(id, session)
     session
   }
 
-  override def load(cookieValue: String): Option[SharafSession] =
-    Option(store.get(cookieValue)).flatMap { session =>
+  override def load(sessionId: String): Option[SessionImpl] =
+    store.get(sessionId).flatMap { session =>
       val now = Instant.now()
       val idleExpired = config.maxAge.exists { maxAge =>
         session._lastAccessedAt.plus(maxAge).isBefore(now)
@@ -31,12 +32,12 @@ final class InMemorySessionStore(config: SessionConfig) extends SessionStore {
         session._createdAt.plus(timeout).isBefore(now)
       }
       if idleExpired || absoluteExpired then
-        store.remove(cookieValue)
+        store.remove(sessionId)
         None
       else Some(session)
     }
 
-  override def save(session: SharafSession): Unit =
+  override def save(session: SessionImpl): Unit =
     store.put(session.id, session)
 
   override def delete(sessionId: String): Unit =
