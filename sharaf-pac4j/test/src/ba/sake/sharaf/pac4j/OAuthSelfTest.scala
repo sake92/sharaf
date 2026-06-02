@@ -2,6 +2,7 @@ package ba.sake.sharaf.pac4j
 
 import scala.compiletime.uninitialized
 import no.nav.security.mock.oauth2.MockOAuth2Server
+import org.pac4j.oidc.client.OidcClient
 import org.pac4j.testkit.OAuthScenarios
 import org.pac4j.testkit.TestConfigs
 import ba.sake.sharaf.*
@@ -26,6 +27,8 @@ class OAuthSelfTest extends munit.FunSuite:
     serverUrl = s"http://localhost:$port"
 
     val pac4jConfig = TestConfigs.oauthConfig(mockServerUrl)
+    val oidcClient = pac4jConfig.getClients.findClient("OidcClient").get.asInstanceOf[OidcClient]
+    oidcClient.setCallbackUrl(s"http://localhost:$port/callback")
 
     val secConfig = Pac4jSecurityConfig(
       pac4jConfig,
@@ -33,11 +36,12 @@ class OAuthSelfTest extends munit.FunSuite:
       callbackPath = Some("/callback"),
     )
 
-    val routes = Routes {
-      case GET -> Path("protected") => Response.withBody("OK")
-    }
+    val handler = SharafHandler.sessions(
+      Pac4jSecurityHandler(secConfig, SharafHandler.routes(Routes {
+        case GET -> Path("protected") => Response.withBody("OK")
+      }))
+    )
 
-    val handler = Pac4jSecurityHandler(secConfig, SharafHandler.routes(routes))
     val s = JdkHttpServerSharafServer("localhost", port, handler)
     s.start()
     sharafServer = Some(s)
@@ -50,10 +54,10 @@ class OAuthSelfTest extends munit.FunSuite:
     OAuthScenarios.runUnauthenticatedRedirect(serverUrl, mockOAuthServer.get.baseUrl().toString)
   }
 
-  // Known issue: authorizationCodeFlow fails due to pac4j-oidc version mismatch
-  // (testkit uses 6.1.0, sharaf uses pac4j-core 6.5.2; oidc 6.5.2 not on classpath).
-  // The relative redirect_uri causes the mock IdP to redirect to the wrong port.
-  // TODO: fix when pac4j-oidc 6.5.2 is added as a dependency.
+  // Known issue: mock-oauth2-server 4.0.0 produces tokens with typ=test-client-id header.
+  // pac4j-oidc 6.5.2 (via nimbus DefaultJOSEObjectTypeVerifier) rejects non-standard typ values.
+  // This worked in pac4j 6.1.0 but the testkit was compiled against 6.1.0 and we run against 6.5.2.
+  // Fix: requires either a mock-oauth2-server update or custom OidcProfileCreator with lenient type checking.
   test("authorization code flow".ignore) {
     OAuthScenarios.runAuthorizationCodeFlow(serverUrl, mockOAuthServer.get)
   }
