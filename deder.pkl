@@ -1,4 +1,4 @@
-amends "https://sake92.github.io/deder/config/v0.13.3/DederProject.pkl"
+amends "https://sake92.github.io/deder/config/v0.14.1/DederProject.pkl"
 
 //amends "https://sake92.github.io/deder/config/early-access/DederProject.pkl"
 
