@@ -5,6 +5,7 @@ import org.pac4j.core.context.CallContext
 import org.pac4j.core.credentials.{Credentials, TokenCredentials, UsernamePasswordCredentials}
 import org.pac4j.core.credentials.authenticator.Authenticator
 import org.pac4j.core.profile.CommonProfile
+import org.pac4j.testkit.TestConstants
 
 /** Authenticator helpers compatible with pac4j 6.5.2.
   *
@@ -26,6 +27,9 @@ object SharafTestAuthenticators:
           if validCreds then
             val profile = new CommonProfile()
             profile.setId(username)
+            // Assign roles based on username for authorizer checks
+            if username == "testuser" then profile.addRole(TestConstants.ROLE_USER)
+            else if username == "admin" then profile.addRole(TestConstants.ROLE_ADMIN)
             upc.setUserProfile(profile)
             Optional.of(upc)
           else Optional.empty()

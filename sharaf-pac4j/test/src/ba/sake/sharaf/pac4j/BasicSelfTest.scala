@@ -3,8 +3,7 @@ package ba.sake.sharaf.pac4j
 import scala.compiletime.uninitialized
 import org.pac4j.core.client.Clients
 import org.pac4j.http.client.direct.DirectBasicAuthClient
-import org.pac4j.testkit.BasicScenarios
-import org.pac4j.testkit.TestConfigs
+import org.pac4j.testkit.BasicAuthScenarios
 import ba.sake.sharaf.*
 import ba.sake.sharaf.jdkhttp.JdkHttpServerSharafServer
 import ba.sake.sharaf.utils.NetworkUtils
@@ -45,6 +44,6 @@ class BasicSelfTest extends munit.FunSuite:
   override def afterAll(): Unit =
     server.foreach(_.stop())
 
-  test("happy path") { BasicScenarios.runHappyPath(serverUrl) }
-  test("bad credentials") { BasicScenarios.runBadCredentials(serverUrl) }
-  test("missing auth") { BasicScenarios.runMissingAuth(serverUrl) }
+  test("happy path") { BasicAuthScenarios.runHappyPath(serverUrl) }
+  test("bad credentials") { BasicAuthScenarios.runBadCredentials(serverUrl) }
+  test("missing auth") { BasicAuthScenarios.runMissingAuth(serverUrl) }
