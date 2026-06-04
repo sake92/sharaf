@@ -47,8 +47,9 @@ class MethodMatcherSelfTest extends munit.FunSuite:
 
   test("method matcher get allowed") { AuthorizerScenarios.runMethodMatcherGetAllowed(serverUrl) }
 
-  // Known issue: in pac4j 6.5.2, when a specified matcher (like HttpMethodMatcher(GET))
-  // doesn't match a request (e.g. POST), the DefaultSecurityLogic grants access without
-  // authentication rather than returning 403. This is expected behavior for pac4j matchers
-  // which act as security scope filters, not denial rules. The testkit scenario expects 403.
+  // TODO: Breaking change in pac4j 6.5 vs 6.0. In 6.0, when a specified matcher (e.g. HttpMethodMatcher(GET))
+  // doesn't match the request method (POST), DefaultSecurityLogic returns 403 (forbidden).
+  // In 6.5, it grants access without authentication (matchers act as scope filters, not denial rules).
+  // The testkit scenario was designed for pac4j 6.0 behavior. Fix requires either reverting to
+  // pac4j 6.0 matcher semantics or updating the testkit to use an HTTP method authorizer instead.
   test("method matcher post denied".ignore) { AuthorizerScenarios.runMethodMatcherPostDenied(serverUrl) }

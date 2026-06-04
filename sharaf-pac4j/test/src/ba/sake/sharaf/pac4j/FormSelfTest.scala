@@ -92,10 +92,9 @@ class FormSelfTest extends munit.FunSuite:
   test("happy path") { FormScenarios.runHappyPath(serverUrl) }
   test("bad credentials") { FormScenarios.runBadCredentials(serverUrl) }
   test("redirect when unauthenticated") { FormScenarios.runRedirectWhenUnauthenticated(serverUrl) }
-  // Known limitation: pac4j's DefaultSavedRequestHandler saves the originally requested URL
-  // to the session store, but Sharaf's session lifecycle (SessionHolder/try-finally clear)
-  // prevents the login handler from reading it. The login handler redirects to /protected
-  // instead of the originally requested URL. This matches the Undertow example's behavior.
+  // TODO: pac4j's DefaultSavedRequestHandler saves the originally requested URL to the session,
+  // but the login handler's SharafSessionStore can't retrieve it (SessionHolder lifecycle mismatch).
+  // The Undertow example works because pac4j 6.0 handles this differently.
   test("redirect after login to requested url".ignore) { FormScenarios.runRedirectAfterLoginToRequestedUrl(serverUrl) }
   test("logout") { FormScenarios.runLogout(serverUrl) }
   test("logout with custom redirect") { FormScenarios.runLogoutWithCustomRedirect(serverUrl) }

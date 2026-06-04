@@ -60,16 +60,15 @@ class OidcSelfTest extends munit.FunSuite:
     OidcScenarios.runCallbackError(serverUrl)
   }
 
-  // Known issue: mock-oauth2-server 4.0.0 auth code flow fails with pac4j-oidc 6.5.2
-  // (nimbus DefaultJOSEObjectTypeVerifier rejects non-standard typ values).
-  // The logout test depends on the auth flow succeeding, so it's also ignored.
+  // TODO: mock-oauth2-server 4.0.0 produces JWT tokens with typ=test-client-id.
+  // nimbus DefaultJOSEObjectTypeVerifier (used by pac4j-oidc 6.5.x) rejects non-standard typ values.
+  // Fix requires either: updating testkit's TestConfigs.oidcConfig() to configure lenient type checking,
+  // or upgrading mock-oauth2-server to a version that produces standard typ=JWT tokens.
   test("logout".ignore) {
     OidcScenarios.runLogout(serverUrl, mockOAuthServer.get)
   }
 
-  // Known issue: mock-oauth2-server 4.0.0 produces tokens with typ=test-client-id header.
-  // pac4j-oidc 6.5.2 (via nimbus DefaultJOSEObjectTypeVerifier) rejects non-standard typ values.
-  // Fix: requires either a mock-oauth2-server update or custom OidcProfileCreator with lenient type checking.
+  // TODO: same mock-oauth2-server JWT typ issue as above.
   test("authorization code flow".ignore) {
     OidcScenarios.runAuthorizationCodeFlow(serverUrl, mockOAuthServer.get)
   }

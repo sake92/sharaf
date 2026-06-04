@@ -234,7 +234,7 @@ local const sharafPac4jModules =
         sharafCoreModules.jvm
       }
       deps {
-        "org.pac4j:pac4j-core:6.5.2"
+        "org.pac4j:pac4j-core:6.5.3"
       }
     }
     testTemplate = (baseTemplate.asTest()) {
@@ -244,10 +244,10 @@ local const sharafPac4jModules =
       }
       deps {
         "org.scalameta::munit::1.1.0"
-        "org.pac4j:pac4j-http:6.5.2"
-        "org.pac4j:pac4j-oidc:6.5.2"
+        "org.pac4j:pac4j-http:6.5.3"
+        "org.pac4j:pac4j-oidc:6.5.3"
         "no.nav.security:mock-oauth2-server:4.0.0"
-        "ba.sake:pac4j-testkit:0.1.1-SNAPSHOT"
+        "ba.sake:pac4j-testkit:0.2.0"
       }
     }
   }.get
