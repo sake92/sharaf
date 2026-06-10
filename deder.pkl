@@ -1,14 +1,11 @@
-amends "https://sake92.github.io/deder/config/v0.16.0/DederProject.pkl"
+amends "https://sake92.github.io/deder/config/v0.17.0/DederProject.pkl"
 
-
-//amends "https://sake92.github.io/deder/config/early-access/DederProject.pkl"
-
-import "https://sake92.github.io/deder-plugins/config/deder-web-dashboard/v0.1.1/WebDashboardPlugin.pkl" as WD
+import "https://sake92.github.io/deder-plugins/config/deder-web-dashboard/v0.2.0/WebDashboardPlugin.pkl" as WD
 
 plugins {
   new WD.WebDashboardPlugin {
     config = new {
-//      enabled = false
+      enabled = false
       statsRefreshIntervalMs = 1000
     }
   }
