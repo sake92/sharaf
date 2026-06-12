@@ -87,7 +87,10 @@ final class Pac4jSecurityHandler(
           profiles: JCollection[UserProfile]
       ): AnyRef =
         Pac4jSecurityHandler.currentProfiles.set(profiles.asScala.toList)
-        next.handle(context)
+        val res = next.handle(context)
+        wc match
+          case sharafCtx: SharafWebContext => sharafCtx.supplementResponse(res)
+          case _ => res
 
     pac4jConfig.getSecurityLogic.perform(
       pac4jConfig,

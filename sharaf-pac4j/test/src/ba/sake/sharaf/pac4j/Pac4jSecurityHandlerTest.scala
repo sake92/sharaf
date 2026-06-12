@@ -71,6 +71,37 @@ class Pac4jSecurityHandlerTest extends munit.FunSuite:
     assertEquals(res.code, StatusCode.Ok)
     assertEquals(res.body, "secret data")
 
+  // --- Security headers tests ---
+
+  test("security headers present on success response (authenticated)"):
+    val res = quickRequest.get(uri"${baseUrl}/protected")
+      .header(authHeader, "user123")
+      .send()
+    assertEquals(res.code, StatusCode.Ok)
+
+    // These headers are always set by DefaultMatchers.SECURITYHEADERS
+    assertEquals(res.header("X-Content-Type-Options"), Some("nosniff"))
+    assertEquals(res.header("X-Frame-Options"), Some("DENY"))
+    assertEquals(res.header("X-XSS-Protection"), Some("1; mode=block"))
+
+    // Cache control headers (not suppressed for this URL)
+    assert(res.header("Cache-Control").isDefined)
+    assert(res.header("Cache-Control").get.contains("no-cache"))
+    assertEquals(res.header("Pragma"), Some("no-cache"))
+    assertEquals(res.header("Expires"), Some("0"))
+
+  test("security headers present on failure response (401)"):
+    val res = quickRequest.get(uri"${baseUrl}/protected").send()
+    assertEquals(res.code.code, Pac4jHttpConstants.UNAUTHORIZED)
+
+    assertEquals(res.header("X-Content-Type-Options"), Some("nosniff"))
+    assertEquals(res.header("X-Frame-Options"), Some("DENY"))
+    assertEquals(res.header("X-XSS-Protection"), Some("1; mode=block"))
+
+    assert(res.header("Cache-Control").isDefined)
+    assertEquals(res.header("Pragma"), Some("no-cache"))
+    assertEquals(res.header("Expires"), Some("0"))
+
 class TestHeaderAuthenticator extends Authenticator:
 
   override def validate(ctx: CallContext, credentials: Credentials): Optional[Credentials] =
