@@ -58,7 +58,7 @@ object ResponseWritable extends LowPriResponseWritableInstances {
 
   given [T: JsonRW]: ResponseWritable[T] with {
     override def write(value: T, outputStream: OutputStream): Unit =
-      ResponseWritable[String].write(value.toJson, outputStream)
+      ResponseWritable[String].write(value.toJson(sort = false, spaces = 0), outputStream)
     override def headers(value: T): Seq[(HttpString, Seq[String])] = Seq(
       ContentTypeHttpString -> Seq("application/json; charset=utf-8")
     )
