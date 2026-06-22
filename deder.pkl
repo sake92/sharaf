@@ -1,42 +1,14 @@
 amends "https://sake92.github.io/deder/config/v0.19.5/DederProject.pkl"
 
-
-import "https://sake92.github.io/deder-plugins/config/deder-web-dashboard/early-access/WebDashboardPlugin.pkl" as WD
+import
+  "https://sake92.github.io/deder-plugins/config/deder-web-dashboard/early-access/WebDashboardPlugin.pkl"
+  as WD
 
 plugins {
   new WD.WebDashboardPlugin {
     config = new {
-//      enabled = false
+      enabled = false
     }
-  }
-}
-
-local const function pomSettings(
-  _artifactId: String,
-  _name: String,
-  _description: String,
-): PomSettings = new {
-  groupId = "ba.sake"
-  artifactId = _artifactId
-  name = _name
-  description = _description
-  url = "https://github.com/sake92/sharaf"
-  licenses {
-    new PomLicense {
-      name = "Apache License 2.0"
-      url = "https://opensource.org/license/apache-2-0"
-    }
-  }
-  developers {
-    new PomDeveloper {
-      id = "sake92"
-      name = "Sakib Hadžiavdić"
-      email = "sakib@sake.ba"
-    }
-  }
-  scm {
-    url = "https://github.com/sake92/sharaf"
-    connection = "scm:git@github.com:sake92/sharaf.git"
   }
 }
 
@@ -48,6 +20,29 @@ local const baseTemplate: ScalaModule = new {
     "-Wunused:all"
     "-explain"
   }
+  pomSettings = new {
+    artifactId = "dummy"
+    name = "dummy"
+    groupId = "ba.sake"
+    url = "https://github.com/sake92/sharaf"
+    licenses {
+      new PomLicense {
+        name = "Apache License 2.0"
+        url = "https://opensource.org/license/apache-2-0"
+      }
+    }
+    developers {
+      new PomDeveloper {
+        id = "sake92"
+        name = "Sakib Hadžiavdić"
+        email = "sakib@sake.ba"
+      }
+    }
+    scm {
+      url = "https://github.com/sake92/sharaf"
+      connection = "scm:git@github.com:sake92/sharaf.git"
+    }
+  }
 }
 
 local const versions = new {
@@ -58,32 +53,36 @@ local const versions = new {
 local const validsonModules =
   new CreateCrossModules {
     root = "validson"
-    local const _pomSettings = pomSettings("validson", "Validson", "Sharaf validation library")
     template = (baseTemplate) {
-      pomSettings = _pomSettings
+      pomSettings {
+        artifactId = "validson"
+        name = "Validson"
+        description = "Sharaf validation library"
+      }
       deps { "com.lihaoyi::sourcecode::0.4.2" }
+      publish = true
     }
     testTemplate = (baseTemplate.asTest()) {
       deps { "org.scalameta::munit::1.1.0" }
     }
-    jsTemplate = (baseTemplate.asJs()) {
+    jsTemplate = (template.asJs()) {
       scalaJsVersion = versions.scalaJsVersion
-      pomSettings = _pomSettings
       deps {
         "com.lihaoyi::sourcecode::0.4.2"
         "io.github.cquiroz::scala-java-time::2.6.0"
       }
+      publish = true
     }
     jsTestTemplate = (jsTemplate.asTest()) {
       deps { "org.scalameta::munit::1.1.0" }
     }
-    nativeTemplate = (baseTemplate.asNative()) {
+    nativeTemplate = (template.asNative()) {
       scalaNativeVersion = versions.scalaNativeVersion
-      pomSettings = _pomSettings
       deps {
         "com.lihaoyi::sourcecode::0.4.2"
         "io.github.cquiroz::scala-java-time::2.6.0"
       }
+      publish = true
     }
     nativeTestTemplate = (nativeTemplate.asTest()) {
       deps { "org.scalameta::munit::1.1.0" }
@@ -93,32 +92,36 @@ local const validsonModules =
 local const quersonModules =
   new CreateCrossModules {
     root = "querson"
-    local const _pomSettings = pomSettings("querson", "Querson", "Sharaf query params library")
     template = (baseTemplate) {
-      pomSettings = _pomSettings
+      pomSettings {
+        artifactId = "querson"
+        name = "Querson"
+        description = "Sharaf query params library"
+      }
       deps { "com.lihaoyi::fastparse::3.1.1" }
+      publish = true
     }
     testTemplate = (baseTemplate.asTest()) {
       deps { "org.scalameta::munit::1.1.0" }
     }
-    jsTemplate = (baseTemplate.asJs()) {
+    jsTemplate = (template.asJs()) {
       scalaJsVersion = versions.scalaJsVersion
-      pomSettings = _pomSettings
       deps {
         "com.lihaoyi::fastparse::3.1.1"
         "io.github.cquiroz::scala-java-time::2.6.0"
       }
+      publish = true
     }
     jsTestTemplate = (jsTemplate.asTest()) {
       deps { "org.scalameta::munit::1.1.0" }
     }
-    nativeTemplate = (baseTemplate.asNative()) {
+    nativeTemplate = (template.asNative()) {
       scalaNativeVersion = versions.scalaNativeVersion
-      pomSettings = _pomSettings
       deps {
         "com.lihaoyi::fastparse::3.1.1"
         "io.github.cquiroz::scala-java-time::2.6.0"
       }
+      publish = true
     }
     nativeTestTemplate = (nativeTemplate.asTest()) {
       deps { "org.scalameta::munit::1.1.0" }
@@ -128,32 +131,36 @@ local const quersonModules =
 local const formsonModules =
   new CreateCrossModules {
     root = "formson"
-    local const _pomSettings = pomSettings("formson", "Formson", "Sharaf form binding library")
     template = (baseTemplate) {
-      pomSettings = _pomSettings
+      pomSettings {
+        artifactId = "formson"
+        name = "Formson"
+        description = "Sharaf form binding library"
+      }
       deps { "com.lihaoyi::fastparse::3.1.1" }
+      publish = true
     }
     testTemplate = (baseTemplate.asTest()) {
       deps { "org.scalameta::munit::1.1.0" }
     }
-    jsTemplate = (baseTemplate.asJs()) {
+    jsTemplate = (template.asJs()) {
       scalaJsVersion = versions.scalaJsVersion
-      pomSettings = _pomSettings
       deps {
         "com.lihaoyi::fastparse::3.1.1"
         "io.github.cquiroz::scala-java-time::2.6.0"
       }
+      publish = true
     }
     jsTestTemplate = (jsTemplate.asTest()) {
       deps { "org.scalameta::munit::1.1.0" }
     }
-    nativeTemplate = (baseTemplate.asNative()) {
+    nativeTemplate = (template.asNative()) {
       scalaNativeVersion = versions.scalaNativeVersion
-      pomSettings = _pomSettings
       deps {
         "com.lihaoyi::fastparse::3.1.1"
         "io.github.cquiroz::scala-java-time::2.6.0"
       }
+      publish = true
     }
     nativeTestTemplate = (nativeTemplate.asTest()) {
       deps { "org.scalameta::munit::1.1.0" }
@@ -161,7 +168,11 @@ local const formsonModules =
   }.get
 
 local const sharafCoreTemplate = (baseTemplate) {
-  pomSettings = pomSettings("sharaf-core", "Sharaf Core", "Core library for Sharaf")
+  pomSettings {
+    artifactId = "sharaf-core"
+    name = "Sharaf Core"
+    description = "Core library for Sharaf"
+  }
   deps {
     "ba.sake::tupson::0.20.0"
     "com.lihaoyi::geny::1.1.1"
@@ -180,6 +191,7 @@ local const sharafCoreModules =
       deps {
         "org.playframework.twirl::twirl-api:2.1.0-M4"
       }
+      publish = true
     }
     testTemplate = (sharafCoreTemplate.asTest()) {
       deps { "org.scalameta::munit::1.1.0" }
@@ -191,6 +203,7 @@ local const sharafCoreModules =
         quersonModules.native
         formsonModules.native
       }
+      publish = true
     }
     nativeTestTemplate = (nativeTemplate.asTest()) {
       deps { "org.scalameta::munit::1.1.0" }
@@ -200,20 +213,27 @@ local const sharafCoreModules =
 local const sharafHepekComponents = (baseTemplate) {
   id = "sharaf-hepek-components"
   root = "sharaf-hepek-components"
-  pomSettings =
-    pomSettings(root, "Sharaf Hepek Components", "Sharaf integration with hepek-components")
+  pomSettings {
+    artifactId = "sharaf-hepek-components"
+    name = "Sharaf Hepek Components"
+    description = "Sharaf integration with hepek-components"
+  }
   moduleDeps {
     sharafCoreModules.jvm
   }
   deps { "ba.sake::hepek-components:0.34.0" }
+  publish = true
 }
 
 local const sharafUndertowModules =
   new CreateScalaModules {
     root = "sharaf-undertow"
     template = (baseTemplate) {
-      pomSettings =
-        pomSettings("sharaf-undertow", "Sharaf Undertow", "Sharaf integration with Undertow")
+      pomSettings {
+        artifactId = "sharaf-undertow"
+        name = "Sharaf Undertow"
+        description = "Sharaf integration with Undertow"
+      }
       moduleDeps {
         sharafCoreModules.jvm
       }
@@ -221,6 +241,7 @@ local const sharafUndertowModules =
         "io.undertow:undertow-core:2.3.18.Final"
         "ba.sake::tupson-config:0.20.0"
       }
+      publish = true
     }
     testTemplate = (baseTemplate.asTest()) {
       moduleDeps {
@@ -237,14 +258,18 @@ local const sharafPac4jModules =
   new CreateScalaModules {
     root = "sharaf-pac4j"
     template = (baseTemplate) {
-      pomSettings =
-        pomSettings("sharaf-pac4j", "Sharaf Pac4j", "Sharaf integration with Pac4j security")
+      pomSettings {
+        artifactId = "sharaf-pac4j"
+        name = "Sharaf Pac4j"
+        description = "Sharaf integration with Pac4j security"
+      }
       moduleDeps {
         sharafCoreModules.jvm
       }
       deps {
         "org.pac4j:pac4j-core:6.5.3"
       }
+      publish = true
     }
     testTemplate = (baseTemplate.asTest()) {
       moduleDeps {
@@ -264,12 +289,15 @@ local const sharafPac4jModules =
 local const sharafHttp4sModules =
   new CreateCrossModules {
     root = "sharaf-http4s"
-    local const _pomSettings =
-      pomSettings("sharaf-http4s", "Sharaf Http4s", "Sharaf integration with Http4s")
     template = (baseTemplate) {
-      pomSettings = _pomSettings
+      pomSettings {
+        artifactId = "sharaf-http4s"
+        name = "Sharaf Http4s"
+        description = "Sharaf integration with Http4s"
+      }
       moduleDeps { sharafCoreModules.jvm }
       deps { "org.http4s::http4s-server::0.23.34" }
+      publish = true
     }
     testTemplate = (baseTemplate.asTest()) {
       deps {
@@ -277,15 +305,15 @@ local const sharafHttp4sModules =
         "org.http4s::http4s-client::0.23.34"
       }
     }
-    nativeTemplate = (baseTemplate.asNative()) {
+    nativeTemplate = (template.asNative()) {
       scalaNativeVersion = versions.scalaNativeVersion
-      pomSettings = _pomSettings
       moduleDeps { sharafCoreModules.native }
       deps {
         "org.http4s::http4s-server::0.23.34"
         "com.lihaoyi::sourcecode::0.4.2"
         "io.github.cquiroz::scala-java-time::2.6.0"
       }
+      publish = true
     }
     nativeTestTemplate = (nativeTemplate.asTest()) {
       multithreading = true
@@ -300,8 +328,11 @@ local const sharafHelidonModules =
   new CreateScalaModules {
     root = "sharaf-helidon"
     template = (baseTemplate) {
-      pomSettings =
-        pomSettings("sharaf-helidon", "Sharaf Helidon", "Sharaf integration with Helidon")
+      pomSettings {
+        artifactId = "sharaf-helidon"
+        name = "Sharaf Helidon"
+        description = "Sharaf integration with Helidon"
+      }
       moduleDeps {
         sharafCoreModules.jvm
       }
@@ -309,6 +340,7 @@ local const sharafHelidonModules =
         "io.helidon.webserver:helidon-webserver:4.2.2"
         "io.helidon.config:helidon-config-yaml:4.2.2"
       }
+      publish = true
     }
     testTemplate = (baseTemplate.asTest()) {
       moduleDeps {
@@ -321,15 +353,15 @@ local const sharafJdkHttpserverModules =
   new CreateScalaModules {
     root = "sharaf-jdk-httpserver"
     template = (baseTemplate) {
-      pomSettings =
-        pomSettings(
-          "sharaf-jdk-httpserver",
-          "Sharaf JDK HttpServer",
-          "Sharaf integration with JDK HttpServer",
-        )
+      pomSettings {
+        artifactId = "sharaf-jdk-httpserver"
+        name = "Sharaf JDK HttpServer"
+        description = "Sharaf integration with JDK HttpServer"
+      }
       moduleDeps {
         sharafCoreModules.jvm
       }
+      publish = true
     }
     testTemplate = (baseTemplate.asTest()) {
       moduleDeps {
@@ -342,16 +374,20 @@ local const sharafSnunit = (baseTemplate.asNative()) {
   id = "sharaf-snunit"
   root = "sharaf-snunit"
   scalaNativeVersion = versions.scalaNativeVersion
-  pomSettings = pomSettings("sharaf-snunit", "Sharaf Snunit", "Sharaf integration with Snunit")
+  pomSettings {
+    artifactId = "sharaf-snunit"
+    name = "Sharaf Snunit"
+    description = "Sharaf integration with Snunit"
+  }
   moduleDeps {
     sharafCoreModules.native
   }
   deps { "com.github.lolgab::snunit::0.10.3" }
+  publish = true
 }
 
 // examples
 local const baseExampleTemplate = (baseTemplate) {
-  publish = false
   deps { "ch.qos.logback:logback-classic:1.4.6" }
 }
 
