@@ -1,4 +1,4 @@
-amends "https://sake92.github.io/deder/config/v0.18.1/DederProject.pkl"
+amends "https://sake92.github.io/deder/config/v0.19.5/DederProject.pkl"
 
 
 import "https://sake92.github.io/deder-plugins/config/deder-web-dashboard/early-access/WebDashboardPlugin.pkl" as WD
@@ -163,7 +163,7 @@ local const formsonModules =
 local const sharafCoreTemplate = (baseTemplate) {
   pomSettings = pomSettings("sharaf-core", "Sharaf Core", "Core library for Sharaf")
   deps {
-    "ba.sake::tupson::0.18.0"
+    "ba.sake::tupson::0.20.0"
     "com.lihaoyi::geny::1.1.1"
     "com.softwaremill.sttp.client4::core::4.0.5"
   }
@@ -219,7 +219,7 @@ local const sharafUndertowModules =
       }
       deps {
         "io.undertow:undertow-core:2.3.18.Final"
-        "ba.sake::tupson-config:0.18.0"
+        "ba.sake::tupson-config:0.20.0"
       }
     }
     testTemplate = (baseTemplate.asTest()) {
