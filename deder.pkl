@@ -1,4 +1,4 @@
-amends "https://sake92.github.io/deder/config/v0.19.5/DederProject.pkl"
+amends "https://sake92.github.io/deder/config/v0.20.0/DederProject.pkl"
 
 import
   "https://sake92.github.io/deder-plugins/config/deder-web-dashboard/early-access/WebDashboardPlugin.pkl"
@@ -6,8 +6,9 @@ import
 
 plugins {
   new WD.WebDashboardPlugin {
+    version = "0.6.0"
     config = new {
-      enabled = false
+//      enabled = false
     }
   }
 }
@@ -307,7 +308,7 @@ local const sharafHttp4sModules =
     }
     nativeTemplate = (template.asNative()) {
       scalaNativeVersion = versions.scalaNativeVersion
-      moduleDeps { sharafCoreModules.native }
+      moduleDeps = new { sharafCoreModules.native }
       deps {
         "org.http4s::http4s-server::0.23.34"
         "com.lihaoyi::sourcecode::0.4.2"
