@@ -23,7 +23,7 @@ jobs:
         env: 
           FLATMARK_BASE_URL: https://sake92.github.io/sharaf
         run: |
-            FLATMARK_VERSION=0.0.28
+            FLATMARK_VERSION=0.3.0
             curl -L https://github.com/sake92/flatmark/releases/download/v${FLATMARK_VERSION}/flatmark_${FLATMARK_VERSION}_amd64.deb -o flatmark.deb
             sudo dpkg -i flatmark.deb
             flatmark build -i docs
