@@ -9,6 +9,7 @@ target/
 .metals/
 .bsp/
 .vscode/
+.basamake/
 
 out/
 

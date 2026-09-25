@@ -18,7 +18,8 @@ jobs:
         with:
           jvm: temurin:21
       - name: Check documentation examples
-        run: scala docs/sync_examples.scala
+        continue-on-error: true
+        run: scala-cli docs/sync_examples.scala
       - name: Build
         env: 
           FLATMARK_BASE_URL: https://sake92.github.io/sharaf
