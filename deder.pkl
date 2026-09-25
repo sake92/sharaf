@@ -423,7 +423,7 @@ local const userPassFormExampleModules =
         sharafPac4jModules.main
       }
       deps {
-        "org.pac4j:pac4j-http:6.1.2"
+        "org.pac4j:pac4j-http:6.5.3"
         "org.mindrot:jbcrypt:0.4"
       }
     }
@@ -441,8 +441,8 @@ local const jwtExampleModules =
         sharafPac4jModules.main
       }
       deps {
-        "org.pac4j:pac4j-http:6.1.2"
-        "org.pac4j:pac4j-jwt:6.1.2"
+        "org.pac4j:pac4j-http:6.5.3"
+        "org.pac4j:pac4j-jwt:6.5.3"
       }
     }
     testTemplate = (baseExampleTemplate.asTest()) {
@@ -454,10 +454,12 @@ local const oauth2ExampleModules =
   new CreateScalaModules {
     root = "examples/oauth2"
     template = (baseExampleTemplate) {
-      moduleDeps { sharafUndertowModules.main }
+      moduleDeps {
+        sharafUndertowModules.main
+        sharafPac4jModules.main
+      }
       deps {
-        "org.pac4j:undertow-pac4j:6.0.0"
-        "org.pac4j:pac4j-oauth:6.1.2"
+        "org.pac4j:pac4j-oauth:6.5.3"
         "com.google.guava:guava:33.4.6-jre"
       }
     }

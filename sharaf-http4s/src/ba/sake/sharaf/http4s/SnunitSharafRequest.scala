@@ -33,20 +33,10 @@ class Http4sSharafRequest(underlyingRequest: Http4sRequest) extends Request {
     underlyingRequest.body.through(fs2.text.utf8.decode).compile.string.unsafeRunSync()
 
   def bodyFormRaw: FormDataMap =
-    val io = for
-      urlForm <- underlyingRequest.as[UrlForm]
-      builder <- IO(SeqMap.newBuilder[String, Seq[FormValue]])
-      _ <- IO {
-        urlForm.values.foreach { case (key, values) =>
-          key -> values.map { value =>
-            FormValue.Str(value)
-          }.toList
-        }
-      }
-      result <- IO(builder.result())
-    yield result
-
-    io.unsafeRunSync()
+    val urlForm = underlyingRequest.as[UrlForm].unsafeRunSync()
+    SeqMap.from(urlForm.values.iterator.map { case (key, values) =>
+      key -> values.map(FormValue.Str.apply).toList
+    })
 
   override def toString(): String =
     s"Http4sSharafRequest(headers=${headers}, cookies=${cookies}, queryParamsRaw=${queryParamsRaw}, bodyString=...)"

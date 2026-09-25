@@ -22,10 +22,10 @@ class CustomCallbackLogic() extends DefaultCallbackLogic {
     userProfile match
       case profile: GitHubProfile =>
         // save to database etc. whatever is needed
-        println(s"Saving profile to database: $profile")
+        println(s"OAuth profile received for user ${profile.getId}")
       case profile: OAuth20Profile =>
         // this should probably be a different CallbackLogic for tests..
-        println(s"Saving TEST profile to database: $profile")
+        println(s"Test OAuth profile received for user ${profile.getId}")
       case other =>
         throw RuntimeException(s"Cant handle Pac4jUserProfile: $other")
   }

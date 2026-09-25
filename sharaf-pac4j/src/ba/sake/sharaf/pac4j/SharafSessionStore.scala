@@ -36,6 +36,7 @@ final class SharafSessionStore(store: SharafSessionStoreTrait) extends Pac4jSess
       case None => Optional.empty()
 
   override def set(context: WebContext, key: String, value: AnyRef): Unit =
+    getSessionId(context, true)
     SessionHolder.get.foreach { session =>
       val encoded = serialize(value)
       session.set(s"$prefix$key", encoded)

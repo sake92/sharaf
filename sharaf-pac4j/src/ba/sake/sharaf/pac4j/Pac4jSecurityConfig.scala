@@ -13,6 +13,7 @@ import ba.sake.sharaf.session.SessionStore
   * @param callbackPath  Optional OAuth callback path
   * @param logoutPath    Optional logout path
   * @param sessionStore  Sharaf session store for non-stateless auth
+  * @param secureSessionCookie  Whether the session cookie requires HTTPS (default: true)
   */
 final class Pac4jSecurityConfig(
     val pac4jConfig: Config,
@@ -23,6 +24,7 @@ final class Pac4jSecurityConfig(
     val logoutPath: Option[String] = None,
     val defaultLogoutUrl: String = "/",
     val sessionStore: SessionStore = ba.sake.sharaf.session.InMemorySessionStore(),
+    val secureSessionCookie: Boolean = true,
 ):
 
   // Apply Sharaf adapters
@@ -34,16 +36,20 @@ final class Pac4jSecurityConfig(
   def withSessionStore(store: SessionStore): Pac4jSecurityConfig =
     pac4jConfig.setSessionStoreFactory(SharafSessionStore.factory(store))
     new Pac4jSecurityConfig(pac4jConfig, clients, authorizers, matchers,
-      callbackPath, logoutPath, defaultLogoutUrl, store)
+      callbackPath, logoutPath, defaultLogoutUrl, store, secureSessionCookie)
 
   def withCallbackPath(path: String): Pac4jSecurityConfig =
     new Pac4jSecurityConfig(pac4jConfig, clients, authorizers, matchers,
-      Some(path), logoutPath, defaultLogoutUrl, sessionStore)
+      Some(path), logoutPath, defaultLogoutUrl, sessionStore, secureSessionCookie)
 
   def withLogoutPath(path: String): Pac4jSecurityConfig =
     new Pac4jSecurityConfig(pac4jConfig, clients, authorizers, matchers,
-      callbackPath, Some(path), defaultLogoutUrl, sessionStore)
+      callbackPath, Some(path), defaultLogoutUrl, sessionStore, secureSessionCookie)
 
   def withDefaultLogoutUrl(url: String): Pac4jSecurityConfig =
     new Pac4jSecurityConfig(pac4jConfig, clients, authorizers, matchers,
-      callbackPath, logoutPath, url, sessionStore)
+      callbackPath, logoutPath, url, sessionStore, secureSessionCookie)
+
+  def withSecureSessionCookie(secure: Boolean): Pac4jSecurityConfig =
+    new Pac4jSecurityConfig(pac4jConfig, clients, authorizers, matchers,
+      callbackPath, logoutPath, defaultLogoutUrl, sessionStore, secure)

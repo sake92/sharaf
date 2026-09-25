@@ -4,6 +4,7 @@ import scala.jdk.CollectionConverters.*
 import org.pac4j.core.client.Clients
 import org.pac4j.core.config.Config
 import org.pac4j.core.matching.matcher.*
+import ba.sake.sharaf.pac4j.Pac4jSecurityConfig
 
 class SecurityConfig(clients: Clients) {
 
@@ -14,7 +15,7 @@ class SecurityConfig(clients: Clients) {
     publicRoutesMatcherName
   ).mkString(",")
 
-  val pac4jConfig = {
+  private val pac4jConfig = {
     val publicRoutesMatcher = PathMatcher()
     // exclude fixed paths
     publicRoutesMatcher.excludePaths("/")
@@ -28,4 +29,11 @@ class SecurityConfig(clients: Clients) {
   }
 
   val clientNames = clients.getClients.asScala.map(_.getName()).toSeq
+
+  val securityConfig = Pac4jSecurityConfig(
+    pac4jConfig,
+    clients = clientNames.mkString(","),
+    matchers = matchers
+  ).withCallbackPath("/callback").withLogoutPath("/logout")
+    .withSecureSessionCookie(false) // local HTTP demo only; production sessions require HTTPS
 }
