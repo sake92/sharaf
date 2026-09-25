@@ -25,6 +25,9 @@ It supports many authentication mechanisms, including:
 - form based authentication (username + password)
 - OAuth2, with many providers (Google, Facebook, GitHub, etc)
 
+For production configuration, deployment, session persistence, CSRF, and verification, see
+the [security guide](/howtos/security.html) and [secure production defaults](/reference/secure-production-defaults.html).
+
 Pac4j has a concept of `Client`, which is a type of authentication mechanism.
 The main split is between `IndirectClient` and `DirectClient`.
     
@@ -65,4 +68,3 @@ SecurityHandler.build(
 There are also:
 - `excludeBranch("/somepath")` to exclude all paths starting with "/somepath"
 - `excludeRegex("^/somepath/.*\$")` to exclude all paths matching the regex (be careful with this one!)
-
