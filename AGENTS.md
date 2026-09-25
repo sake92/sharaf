@@ -70,4 +70,4 @@ deder exec -t publishLocal                 # publish jars to local ~/.ivy2
 ## Docs
 
 - Static site built with FlatMark, stored in `docs/`, served via GitHub Pages
-- Example code snippets synced into `docs/_includes/` via `docs/copy-examples.ps1`
+- Sync example snippets into `docs/_includes/` with `scala docs/sync_examples.scala -- --write`; CI checks them with `scala docs/sync_examples.scala`

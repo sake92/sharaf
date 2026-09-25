@@ -6,24 +6,23 @@ description: Sharaf How To Response Body
 
 # {{ page.title }}
 
-How to use a custom response body?
-
-You need to define a custom `ResponseWritable[T]` for your type `T`.
-
-Let's say you have a `MyXML` class, and you want to use it as a response body.  
-You would write something like this:
+Define a `ResponseWritable[T]` for your type. For example, to return XML:
 ```scala
-given ResponseWritable[MyXML] with {
-    override def write(value: MyXML, exchange: HttpServerExchange): Unit =
-      exchange.getResponseSender.send(value.asString)
-    override def headers(value: String): Seq[(HttpString, Seq[String])] = Seq(
-      HttpString(HeaderNames.ContentType) -> Seq("text/xml")
-    )
-}
+import java.io.OutputStream
+import java.nio.charset.StandardCharsets
+import ba.sake.sharaf.{HttpString, ResponseWritable}
+
+case class MyXml(value: String)
+
+given ResponseWritable[MyXml] with
+  def write(value: MyXml, outputStream: OutputStream): Unit =
+    outputStream.write(value.value.getBytes(StandardCharsets.UTF_8))
+
+  def headers(value: MyXml): Seq[(HttpString, Seq[String])] =
+    Seq(HttpString("Content-Type") -> Seq("application/xml; charset=utf-8"))
 ```
 
-Now you can use `MyXML` as a response body:
+Then return it from a route:
 ```scala
-val myXml = MyXML(...)
-Response.withBody(myXml)
+Response.withBody(MyXml("<message>Hello</message>"))
 ```

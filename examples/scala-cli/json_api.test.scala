@@ -1,4 +1,4 @@
-//> using scala "3.7.0"
+//> using scala "3.7.3"
 //> using dep ba.sake::tupson:0.18.0
 //> using dep com.softwaremill.sttp.client4::core::4.0.13
 //> using test.dep org.scalameta::munit::1.2.1

@@ -6,40 +6,31 @@ description: Sharaf Tutorial Quickstart
 
 # {{ page.title }}
 
-Get started quickly with Sharaf framework.
+This lesson starts a Sharaf server and makes one request. You need JDK 21 and [Scala CLI](https://scala-cli.virtuslab.org/) installed.
 
-## Mill
-
-```scala
-def ivyDeps = super.ivyDeps() ++ Agg(
-    ivy"{{site.data.project.artifact.org}}::{{site.data.project.artifact.name}}:{{site.data.project.artifact.version}}"
-)
-def scalacOptions = super.scalacOptions() ++ Seq("-Yretain-trees")
-```
-
-## Sbt
+Create a file named `hello.sc` with this content:
 
 ```scala
-libraryDependencies ++= Seq(
-    "{{site.data.project.artifact.org}}" %% "{{site.data.project.artifact.name}}" % "{{site.data.project.artifact.version}}"
-),
-scalacOptions ++= Seq("-Yretain-trees")
+{% include "hello.sc" %}
 ```
 
+Run it from the directory containing the file:
 
-## Scala CLI
-
-Create a file `my_script.sc` with the following content:
-```scala
-//> using dep {{site.data.project.artifact.org}}::{{site.data.project.artifact.name}}:{{site.data.project.artifact.version}}
-```
-and then run it with:
-```bash
-scala my_script.sc --scala-option -Yretain-trees
+```sh
+scala hello.sc
 ```
 
+In another terminal, make a request:
 
-## Examples
+```sh
+curl http://localhost:8181/hello/Bob
+```
+
+The response is `Hello Bob`. Stop the server with Ctrl-C.
+
+The route matches a GET request whose path begins with `hello` and captures the next segment as `name`. Continue with [path parameters](/tutorials/path-params.html), or see [dependency setup](/reference/dependencies.html) for Mill and sbt.
+
+## More examples
 
 - [Scala CLI examples]({{site.data.project.gh.sourcesUrl}}/examples/scala-cli), standalone examples using Scala CLI
 - [Scala CLI HTMX examples]({{site.data.project.gh.sourcesUrl}}/examples/htmx), standalone examples featuring HTMX
@@ -53,5 +44,3 @@ scala my_script.sc --scala-option -Yretain-trees
 - [Http4s]({{site.data.project.gh.sourcesUrl}}/examples/http4s) demo app
 - [PetClinic](https://github.com/sake92/sharaf-petclinic) implementation, featuring full-stack app with Postgres db, config, integration tests etc.
 - [Giter8 template for fullstack app](https://github.com/sake92/sharaf-fullstack.g8)
-
-

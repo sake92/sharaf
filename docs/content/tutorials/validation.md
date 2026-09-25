@@ -44,7 +44,7 @@ Also, for JSON body parsing+validation we use `bodyJsonValidated` and not plain 
 
 ---
 When you do a GET [http://localhost:8181/cars?brand=  ](http://localhost:8181/cars?brand=  )  
-you will get a nice JSON error message with HTTP Status of `400 Bad Request`:
+you will get a JSON error message with HTTP status `422 Unprocessable Entity`:
 ```json
 {
     "instance": null,
@@ -58,7 +58,7 @@ you will get a nice JSON error message with HTTP Status of `400 Bad Request`:
     "detail": "",
     "type": null,
     "title": "Validation errors",
-    "status": 400
+    "status": 422
 }
 ```
 
@@ -94,7 +94,6 @@ you will get these errors:
     "detail": "",
     "type": null,
     "title": "Validation errors",
-    "status": 400
+    "status": 422
 }
 ```
-

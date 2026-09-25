@@ -6,7 +6,7 @@ description: Sharaf Server Sent Events
 
 # {{ page.title }}
 
-[HTMX]("https://htmx.org/") is an incredibly simple, HTML-first library.  
+[HTMX](https://htmx.org/) is an incredibly simple, HTML-first library.
 Instead of going through HTML->JS->JSON-API loop/mess, you can go directly HTML->HTML-API.  
 Basically you just return HTML snippets that get included where you want in your page.
 
@@ -19,7 +19,7 @@ Create a file `sse.sc` and paste this code into it:
 
 ```scala
 //> using scala 3.7.3
-//> using dep ba.sake::sharaf-undertow:0.14.0
+//> using dep ba.sake::sharaf-undertow:{{site.data.project.artifact.version}}
 
 import ba.sake.sharaf.{*, given}
 import ba.sake.sharaf.undertow.UndertowSharafServer
@@ -77,4 +77,3 @@ Otherwise the browser would constantly try to reconnect.
 
 Of course, the sending of events is usually much more complicated.  
 The coordination of threads and which events to send to which browser is on you to implement.
-
