@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light dark">
-  <meta name="description" content="Sharaf Query Params Handling">
-  <title>Query Params Handling | Sharaf Documentation</title>
+  <meta name="description" content="Sharaf server modules and platform support">
+  <title>Servers and platforms | Sharaf Documentation</title>
   <link rel="shortcut icon" href="https://sake92.github.io/sharaf/images/favicon.png" type="image/png">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-dark.min.css" media="(prefers-color-scheme: dark)" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-light.min.css" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" rel="stylesheet">
@@ -38,64 +38,52 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
   <main class="pico container">
    <div>
     <div class="content">
-     <h1 id="query-params-handling">Query Params Handling<a href="#query-params-handling" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
-     <h2 id="query-params-handling-design">Query params handling design<a href="#query-params-handling-design" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
-     <p>Web frameworks do handle query params with various mechanisms:</p>
-     <ul>
-      <li>annotation + method param: <a href="https://spring.io/guides/tutorials/rest/">Spring</a> and most other popular Java frameworks, <a href="https://com-lihaoyi.github.io/cask/">Cask</a> etc</li>
-      <li>special route file DSL: <a href="https://www.playframework.com/documentation/2.9.x/ScalaRouting#The-routes-file-syntax">PlayFramework</a>, Ruby on Rails</li>
-      <li>in-language DSL: zio-http</li>
-      <li>pattern matching: http4s</li>
-      <li>parsing from request: Sharaf</li>
-     </ul>
-     <h2 id="why-not-annotations">Why not annotations?<a href="#why-not-annotations" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
-     <p>This approach is mostly fine, as long as you know from where a parameter comes.</p>
-     <p>In Spring you use the <code>@RequestParam</code> annotation when you have simple parameters.
-      <br>
-      But when you want to group them in a class <a href="https://stackoverflow.com/questions/16942193/spring-mvc-complex-object-as-get-requestparam">you don't use it</a>.. #wtf
-      <br>
-      Also, that same class can be bound from the form body too... convenient? eh.</p>
-     <p>In <a href="https://com-lihaoyi.github.io/cask/#variable-routes">Cask</a> there is no annotation, so it is ambiguous in my opinion.</p>
-     <h2 id="why-not-special-route-file">Why not special route file?<a href="#why-not-special-route-file" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
-     <p>You need a special compiler for this, essentially a new language.
-      <br>
-      People have to learn how it works, there's probably no syntax highlighting, no autocomplete etc.</p>
-     <h2 id="why-not-in-language-dsl">Why not in-language DSL?<a href="#why-not-in-language-dsl" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
-     <p>Similar to special route file approach, people need to learn it.
-      <br>
-      Not a huge deal I guess.</p>
-     <h2 id="why-not-pattern-matching">Why not pattern matching?<a href="#why-not-pattern-matching" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
-     <p>If you look at <a href="https://http4s.org/v0.23/docs/dsl.html#handling-query-parameters">http4s' approach</a>, you can see that if the query param is not found, it falls through.
-      <br>
-      It is customizable, but more work for you. eh.
-      <br>
-      Essentially you'll get a 404.. which is not a good choice IMO.</p>
-     <p>Rarely any framework does this, and you rarely want to handle <em>the same path</em> in 2 places.</p>
-     <h2 id="sharafs-approach">Sharaf's approach<a href="#sharafs-approach" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
-     <p>Sharaf parses query params from the <code>Request</code>.
-      <br>
-      Admittedly, you do have to make a new class if you want to parse them in a typesafe way.
-      <br>
-      But you usually do grouping of these parameters when passing them further, so why not do it immediatelly.</p>
-     <p><a href="https://sake92.github.io/sharaf/howtos/query-params.html#how-to-bind-composite-query-parameter">Composition</a> adds even more benefits, which I rarely saw implemented in any framework.</p>
-     <div role="group">
-      <a role="button" href="https://sake92.github.io/sharaf/philosophy/dependency-injection.html">⬅️ Dependency Injection</a> <span></span> <a role="button" href="https://sake92.github.io/sharaf/philosophy/routes-matching.html">Routes Matching ➡️</a>
-     </div>
+     <h1 id="servers-and-platforms">Servers and platforms<a href="#servers-and-platforms" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
+     <table>
+      <thead>
+       <tr>
+        <th>Module</th>
+        <th>Server integration</th>
+        <th>Platform</th>
+       </tr>
+      </thead>
+      <tbody>
+       <tr>
+        <td><code>sharaf-undertow</code></td>
+        <td>Undertow</td>
+        <td>JVM</td>
+       </tr>
+       <tr>
+        <td><code>sharaf-http4s</code></td>
+        <td>http4s</td>
+        <td>JVM, Scala Native</td>
+       </tr>
+       <tr>
+        <td><code>sharaf-helidon</code></td>
+        <td>Helidon</td>
+        <td>JVM</td>
+       </tr>
+       <tr>
+        <td><code>sharaf-jdk-httpserver</code></td>
+        <td>JDK HTTP server</td>
+        <td>JVM</td>
+       </tr>
+       <tr>
+        <td><code>sharaf-snunit</code></td>
+        <td>snunit</td>
+        <td>Scala Native</td>
+       </tr>
+      </tbody>
+     </table>
+     <p><code>sharaf-core</code> supports JVM and Scala Native. The companion libraries <code>formson</code>, <code>querson</code>, and <code>validson</code> also support Scala.js.</p>
+     <p>The <a href="https://sake92.github.io/sharaf/tutorials/quickstart.html">quickstart</a> uses Undertow. Working adapter examples are in the <a href="https://github.com/sake92/sharaf/tree/main/examples">repository</a>.</p>
     </div>
     <aside aria-label="On this page">
      <details open>
       <summary>On this page</summary>
       <nav aria-label="Table of contents">
        <ul>
-        <li><a href="#query-params-handling">Query Params Handling</a>
-         <ul>
-          <li><a href="#query-params-handling-design">Query params handling design</a></li>
-          <li><a href="#why-not-annotations">Why not annotations?</a></li>
-          <li><a href="#why-not-special-route-file">Why not special route file?</a></li>
-          <li><a href="#why-not-in-language-dsl">Why not in-language DSL?</a></li>
-          <li><a href="#why-not-pattern-matching">Why not pattern matching?</a></li>
-          <li><a href="#sharafs-approach">Sharaf's approach</a></li>
-         </ul></li>
+        <li><a href="#servers-and-platforms">Servers and platforms</a></li>
        </ul>
       </nav>
      </details>
