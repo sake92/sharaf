@@ -57,6 +57,8 @@ howtos:
     url: "/howtos/cors.html"
   - label: "Exception Handler"
     url: "/howtos/exception-handler.html"
+  - label: "Secure a production application"
+    url: "/howtos/security.html"
 philosophies:
   - label: "Why Sharaf?"
     url: "/philosophy/why-sharaf.html"
@@ -83,5 +85,7 @@ references:
     url: "/reference/errors.html"
   - label: "Servers and platforms"
     url: "/reference/servers.html"
+  - label: "Secure production defaults"
+    url: "/reference/secure-production-defaults.html"
   - label: "Scaladoc"
     url: "https://javadoc.io/doc/ba.sake/sharaf-core_3/latest/index.html"
