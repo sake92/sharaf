@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light dark">
-  <meta name="description" content="Sharaf Authentication">
-  <title>Authentication | Sharaf Documentation</title>
+  <meta name="description" content="Production security baseline for Sharaf applications">
+  <title>Secure production defaults | Sharaf Documentation</title>
   <link rel="shortcut icon" href="https://sake92.github.io/sharaf/images/favicon.png" type="image/png">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-dark.min.css" media="(prefers-color-scheme: dark)" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-light.min.css" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" rel="stylesheet">
@@ -38,73 +38,83 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
   <main class="pico container">
    <div>
     <div class="content">
-     <h1 id="authentication">Authentication<a href="#authentication" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
-     <p>Some important security principles from OWASP guidelines:</p>
-     <ul>
-      <li>use HTTPS</li>
-      <li>use random user ids to prevent enumeration and other attacks</li>
-      <li>use strong passwords, store them hashed, implement password recovery</li>
-      <li>use MFA, CAPTCHA, rate limiting etc to prevent automated attacks</li>
-      <li>etc.</li>
-     </ul>
-     <p>Read all of them in the <a href="https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html">OWASP auth cheat sheet</a>.</p>
-     <h2 id="pac4j">Pac4j<a href="#pac4j" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
-     <p>Authentication in Sharaf is done usually by delegating it to <a href="https://www.pac4j.org/index.html">pac4j</a>. Pac4j is a battle-tested and widely used library for authentication and authorization. It supports many authentication mechanisms, including:</p>
-     <ul>
-      <li>form based authentication (username + password)</li>
-      <li>OAuth2, with many providers (Google, Facebook, GitHub, etc)</li>
-     </ul>
-     <p>For production configuration, deployment, session persistence, CSRF, and verification, see the <a href="https://sake92.github.io/sharaf/howtos/security.html">security guide</a> and <a href="https://sake92.github.io/sharaf/reference/secure-production-defaults.html">secure production defaults</a>.</p>
-     <p>Pac4j has a concept of <code>Client</code>, which is a type of authentication mechanism. The main split is between <code>IndirectClient</code> and <code>DirectClient</code>.</p>
-     <h3 id="indirect-clients">Indirect clients<a href="#indirect-clients" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h3>
-     <p>Indirect clients are used for form based authentication, OAuth2, etc. An important thing to mention here is the callback URL:</p>
-     <ul>
-      <li>for username + password authentication, the callback URL where the form is submitted to. Then a server-side session is created and user is signed in.</li>
-      <li>for OAuth2 (and similar mechanisms), the callback URL where the user is redirected to <em>after authentication</em>. The server will then exchange the code for an <em>access token</em> and create a server-side session.</li>
-     </ul>
-     <h3 id="direct-clients">Direct clients<a href="#direct-clients" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h3>
-     <p>Direct clients are used for API authentication <em>on every request</em> (e.g. Basic Auth, JWT, etc). On every request, the client will extract the credentials from the request and authenticate the user.</p>
-     <h2 id="deny-by-default-principle">Deny by Default Principle<a href="#deny-by-default-principle" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
-     <p>One important principle in security is the "deny by default" principle. You should use whitelisting, allow access only to what is needed.
-      <br>
-      This is because it is easy to forget to deny something, and it is hard to remember everything that should be denied.</p>
-     <p>Concretely in pac4j, you can use <code>PathMatcher()</code>, to exclude certain paths from authentication:</p>
-     <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">val</span> publicRoutesMatcher = <span class="hljs-type">PathMatcher</span>()
-publicRoutesMatcher.excludePaths(<span class="hljs-string">"/"</span>, <span class="hljs-string">"/login-form"</span>)
-pac4jConfig.addMatcher(<span class="hljs-string">"publicRoutesMatcher"</span>, publicRoutesMatcher)
-..
-<span class="hljs-type">SecurityHandler</span>.build(
-    <span class="hljs-type">SharafHandler</span>(..),
-    pac4jConfig,
-    <span class="hljs-string">"client1,client2..."</span>,
-    <span class="hljs-literal">null</span>,
-    <span class="hljs-string">"securityheaders,publicRoutesMatcher"</span>, <span class="hljs-comment">// use publicRoutesMatcher here!</span>
-    <span class="hljs-type">DefaultSecurityLogic</span>()
-)
-</code></pre>
-     <p>There are also:</p>
-     <ul>
-      <li><code>excludeBranch("/somepath")</code> to exclude all paths starting with "/somepath"</li>
-      <li><code>excludeRegex("^/somepath/.*\$")</code> to exclude all paths matching the regex (be careful with this one!)</li>
-     </ul>
-     <div role="group">
-      <a role="button" href="https://sake92.github.io/sharaf/philosophy/alternatives.html">⬅️ Alternatives</a> <span></span> <a role="button" href="https://sake92.github.io/sharaf/philosophy/dependency-injection.html">Dependency Injection ➡️</a>
-     </div>
+     <h1 id="secure-production-defaults">Secure production defaults<a href="#secure-production-defaults" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
+     <p>This reference applies to Sharaf 0.19.0 applications using <code>sharaf-pac4j</code>.</p>
+     <table>
+      <thead>
+       <tr>
+        <th>Concern</th>
+        <th>Production baseline</th>
+       </tr>
+      </thead>
+      <tbody>
+       <tr>
+        <td>Transport</td>
+        <td>HTTPS only; redirect HTTP at the trusted proxy; enable HSTS after confirming every public subdomain supports HTTPS.</td>
+       </tr>
+       <tr>
+        <td>Public surface</td>
+        <td>Protect all routes by default. Exclude only named public endpoints and static assets.</td>
+       </tr>
+       <tr>
+        <td>Browser session</td>
+        <td><code>Secure</code>, <code>HttpOnly</code>, <code>SameSite=Strict</code>, narrow path/domain, short idle expiry, absolute expiry, regenerated after login, destroyed at logout.</td>
+       </tr>
+       <tr>
+        <td>Session storage</td>
+        <td>Use Redis or JDBC-backed <code>SessionStore</code> for replicas or restart-safe sessions. Do not use <code>InMemorySessionStore</code> in production.</td>
+       </tr>
+       <tr>
+        <td>API tokens</td>
+        <td>Use a <code>HeaderClient</code> plus <code>NoOpSessionStore</code>; validate signature, expiry, issuer and audience where applicable; rotate signing keys.</td>
+       </tr>
+       <tr>
+        <td>Credentials</td>
+        <td>Store bcrypt/Argon2 password hashes, rate-limit login, use generic login errors, never log passwords, tokens, cookies, or authorization headers.</td>
+       </tr>
+       <tr>
+        <td>OAuth/OIDC</td>
+        <td>Exact registered HTTPS callback URL; validate provider metadata and tokens; store client secrets outside source control; allow-list post-login redirects.</td>
+       </tr>
+       <tr>
+        <td>Authorization</td>
+        <td>Enforce roles with pac4j authorizers and enforce resource ownership in application code. Test denial paths.</td>
+       </tr>
+       <tr>
+        <td>CSRF</td>
+        <td>Verify a session-bound token on every unsafe browser request; use <code>Origin</code>/<code>Referer</code> as defense in depth.</td>
+       </tr>
+       <tr>
+        <td>Response headers</td>
+        <td>Enable <code>DefaultMatchers.SECURITYHEADERS</code>; add application-specific CSP, <code>Strict-Transport-Security</code>, <code>Referrer-Policy</code>, and <code>Permissions-Policy</code> at the proxy.</td>
+       </tr>
+       <tr>
+        <td>Proxy trust</td>
+        <td>Only trust forwarded headers added by an owned proxy. Strip all client-supplied forwarded headers before proxying.</td>
+       </tr>
+       <tr>
+        <td>Request limits</td>
+        <td>Bound request/upload size, timeout, and rate at the proxy and server adapter. Return <code>413</code> for oversized bodies.</td>
+       </tr>
+       <tr>
+        <td>Secrets</td>
+        <td>Validate required secrets at startup; use a secret manager or deployment environment; redact values and rotate them on a schedule.</td>
+       </tr>
+       <tr>
+        <td>Verification</td>
+        <td>Test authentication, authorization, CSRF, session regeneration/logout, headers, size limits, and external callback URLs through the deployed proxy.</td>
+       </tr>
+      </tbody>
+     </table>
+     <p>Sharaf's pac4j handler currently writes <code>SHARAF_SESSION</code> cookies as <code>Secure</code>, <code>HttpOnly</code>, <code>SameSite=Strict</code>, path <code>/</code>, with a 30-minute maximum age. These are sensible browser defaults, but they do not make an HTTP deployment safe and do not replace CSRF validation or a persistent store.</p>
+     <p>For setup and deployment details, use the <a href="https://sake92.github.io/sharaf/howtos/security.html">security guide</a>.</p>
     </div>
     <aside aria-label="On this page">
      <details open>
       <summary>On this page</summary>
       <nav aria-label="Table of contents">
        <ul>
-        <li><a href="#authentication">Authentication</a>
-         <ul>
-          <li><a href="#pac4j">Pac4j</a>
-           <ul>
-            <li><a href="#indirect-clients">Indirect clients</a></li>
-            <li><a href="#direct-clients">Direct clients</a></li>
-           </ul></li>
-          <li><a href="#deny-by-default-principle">Deny by Default Principle</a></li>
-         </ul></li>
+        <li><a href="#secure-production-defaults">Secure production defaults</a></li>
        </ul>
       </nav>
      </details>

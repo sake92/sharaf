@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Configure Sharaf and pac4j authentication for a production deployment">
+  <title>Secure a production application | Sharaf Documentation</title>
+  <link rel="shortcut icon" href="https://sake92.github.io/sharaf/images/favicon.png" type="image/png">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-dark.min.css" media="(prefers-color-scheme: dark)" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-light.min.css" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.conditional.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://sake92.github.io/sharaf/styles/default.css">
+ </head>
+ <body>
+  <header class="pico container">
+   <nav aria-label="Main navigation">
+    <a href="https://sake92.github.io/sharaf/">Sharaf Documentation</a>
+    <div>
+     <a href="https://sake92.github.io/sharaf/tutorials">Tutorials</a> <a href="https://sake92.github.io/sharaf/howtos">How-Tos</a> <a href="https://sake92.github.io/sharaf/reference">Reference</a> <a href="https://sake92.github.io/sharaf/philosophy">Philosophy</a>
+    </div>
+    <form action="https://sake92.github.io/sharaf/search/results.html" method="get" role="search">
+     <input name="q" type="search" placeholder="Search" aria-label="Search this site">
+    </form>
+   </nav>
+  </header>
+  <script>
+for (const link of document.querySelectorAll('body > header > nav > div > a')) {
+    const path = new URL(link.href).pathname.replace(/\/$/, '');
+    const current = window.location.pathname;
+    if (current === path || current.startsWith(path + '/')) link.setAttribute('aria-current', 'page');
+}
+</script>
+  <main class="pico container">
+   <div>
+    <div class="content">
+     <h1 id="secure-a-production-application">Secure a production application<a href="#secure-a-production-application" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
+     <p>This guide applies to Sharaf 0.19.0 and its <code>sharaf-pac4j</code> integration. It assumes a TLS-terminating reverse proxy and an application that is already reachable through its final public URL. Use the <a href="https://sake92.github.io/sharaf/reference/secure-production-defaults.html">secure production defaults</a> as the release checklist.</p>
+     <h2 id="start-deny-by-default">Start deny-by-default<a href="#start-deny-by-default" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p>Put the application behind one <code>Pac4jSecurityHandler</code>. Register a <code>PathMatcher</code> that excludes only the endpoints that must be public: typically the landing page, login page, callback, static assets, health endpoint, and logout endpoint. Keep the callback and logout paths in both the matcher and <code>Pac4jSecurityConfig</code>; the handler processes those paths before it delegates to application routes.</p>
+     <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">import</span> scala.jdk.<span class="hljs-type">CollectionConverters</span>.*
+<span class="hljs-keyword">import</span> org.pac4j.core.client.<span class="hljs-type">Clients</span>
+<span class="hljs-keyword">import</span> org.pac4j.core.config.<span class="hljs-type">Config</span>
+<span class="hljs-keyword">import</span> org.pac4j.core.matching.matcher.{<span class="hljs-type">DefaultMatchers</span>, <span class="hljs-type">PathMatcher</span>}
+<span class="hljs-keyword">import</span> ba.sake.sharaf.*
+<span class="hljs-keyword">import</span> ba.sake.sharaf.pac4j.*
+
+<span class="hljs-keyword">val</span> callbackPath = <span class="hljs-string">"/callback"</span>
+<span class="hljs-keyword">val</span> clients = <span class="hljs-type">Clients</span>(callbackPath, formClient) <span class="hljs-comment">// use the client for your login mechanism</span>
+<span class="hljs-keyword">val</span> pac4jConfig = <span class="hljs-type">Config</span>(clients)
+
+<span class="hljs-keyword">val</span> publicRoutes = <span class="hljs-type">PathMatcher</span>()
+publicRoutes.excludePaths(<span class="hljs-string">"/"</span>, <span class="hljs-string">"/login"</span>, callbackPath, <span class="hljs-string">"/logout"</span>, <span class="hljs-string">"/health"</span>)
+publicRoutes.excludeBranch(<span class="hljs-string">"/assets"</span>)
+pac4jConfig.addMatcher(<span class="hljs-string">"publicRoutes"</span>, publicRoutes)
+
+<span class="hljs-keyword">val</span> security = <span class="hljs-type">Pac4jSecurityConfig</span>(
+  pac4jConfig,
+  clients = clients.getClients.asScala.map(_.getName()).mkString(<span class="hljs-string">","</span>),
+  matchers = <span class="hljs-string">s"<span class="hljs-subst">${DefaultMatchers.SECURITYHEADERS}</span>,publicRoutes"</span>
+).withCallbackPath(callbackPath)
+ .withLogoutPath(<span class="hljs-string">"/logout"</span>)
+ .withDefaultLogoutUrl(<span class="hljs-string">"/"</span>)
+
+<span class="hljs-keyword">val</span> handler = <span class="hljs-type">Pac4jSecurityHandler</span>(security, <span class="hljs-type">SharafHandler</span>.routes(routes))
+</code></pre>
+     <p>Do not exclude a broad application branch merely to make a route work. Add an explicit public endpoint instead. <code>DefaultMatchers.SECURITYHEADERS</code> enables pac4j's security-header matcher; add a Content Security Policy and the HTTPS-specific headers at the proxy as described in the defaults page.</p>
+     <h2 id="choose-one-authentication-flow">Choose one authentication flow<a href="#choose-one-authentication-flow" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <h3 id="form-login">Form login<a href="#form-login" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h3>
+     <p>Use an indirect <code>FormClient</code> with a real user repository and a deliberately slow password hash such as bcrypt. The <a href="https://github.com/sake92/sharaf/tree/main/examples/user-pass-form"><code>user-pass-form</code> example</a> shows Sharaf's wiring. Serve the login form and callback over HTTPS, rate-limit login attempts at the edge, and return the same failure message for unknown users and bad passwords. Do not put credentials in query parameters or logs.</p>
+     <p>The callback executed by <code>Pac4jSecurityHandler</code> renews the session after successful authentication. Keep that behavior: it changes the session identifier and protects against session fixation. Configure logout with <code>.withLogoutPath</code>; the handler performs local logout and destroys the pac4j session.</p>
+     <h3 id="oauth2-and-openid-connect">OAuth2 and OpenID Connect<a href="#oauth2-and-openid-connect" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h3>
+     <p>Use pac4j's indirect OAuth/OIDC client, a callback URL that exactly matches the provider registration, and a fixed public base URL. Load the client ID and secret from deployment secrets, not source code or a checked-in config file. Validate issuer, audience, signature, expiry, and redirect URI through the provider-specific pac4j client settings. Do not accept arbitrary <code>returnUrl</code> values after login; permit only local, allow-listed paths.</p>
+     <p>The <a href="https://github.com/sake92/sharaf/tree/main/examples/oauth2"><code>oauth2</code> example</a> demonstrates the redirect flow. Treat it as a development example: use the <code>sharaf-pac4j</code> handler for new applications rather than the older Undertow-specific pac4j handler used there.</p>
+     <h3 id="jwt-for-an-api">JWT for an API<a href="#jwt-for-an-api" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h3>
+     <p>Use a direct <code>HeaderClient</code> and <code>NoOpSessionStore</code> for a stateless API. Supply a high-entropy signing key through a secret manager, require a <code>Bearer</code> authorization scheme, set short expirations, and validate issuer/audience when your token design has them. Rotate keys deliberately; never print generated tokens or signing keys at startup.</p>
+     <p>The <a href="https://github.com/sake92/sharaf/tree/main/examples/jwt"><code>jwt</code> example</a> shows the handler shape. Its inline secret and printed test token are intentionally not production configuration.</p>
+     <h2 id="authorize-separately-from-authentication">Authorize separately from authentication<a href="#authorize-separately-from-authentication" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p>Authentication proves who made a request. Authorization decides whether that identity may perform the action. Register pac4j authorizers by name and pass their comma-separated names through <code>Pac4jSecurityConfig.authorizers</code> for the routes they protect.</p>
+     <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">import</span> org.pac4j.core.authorization.authorizer.<span class="hljs-type">RequireAnyRoleAuthorizer</span>
+
+pac4jConfig.addAuthorizer(<span class="hljs-string">"admin"</span>, <span class="hljs-type">RequireAnyRoleAuthorizer</span>(<span class="hljs-string">"admin"</span>))
+
+<span class="hljs-keyword">val</span> adminSecurity = <span class="hljs-type">Pac4jSecurityConfig</span>(
+  pac4jConfig,
+  clients = <span class="hljs-string">"HeaderClient"</span>,
+  authorizers = <span class="hljs-string">"admin"</span>
+)
+</code></pre>
+     <p>Ensure the client maps trusted identity-provider claims to pac4j roles before relying on a role authorizer. For resource ownership rules such as “may edit this invoice”, enforce the check next to the route/domain operation after obtaining <code>SecurityService.currentUser</code>; a role alone is not sufficient.</p>
+     <h2 id="use-a-production-session-store">Use a production session store<a href="#use-a-production-session-store" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p><code>InMemorySessionStore</code> is appropriate for local development and a single disposable process only. Sessions disappear on restart and are not shared by replicas. For browser login, provide a <code>SessionStore</code> backed by Redis or a database and pass it to <code>Pac4jSecurityConfig.withSessionStore</code>.</p>
+     <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">val</span> sessions: ba.sake.sharaf.session.<span class="hljs-type">SessionStore</span> = productionSessionStore
+
+<span class="hljs-keyword">val</span> security = <span class="hljs-type">Pac4jSecurityConfig</span>(pac4jConfig, clients = <span class="hljs-string">"FormClient"</span>)
+  .withSessionStore(sessions)
+  .withCallbackPath(<span class="hljs-string">"/callback"</span>)
+  .withLogoutPath(<span class="hljs-string">"/logout"</span>)
+</code></pre>
+     <p>The store must generate unguessable IDs, atomically persist updates, enforce idle and absolute expiry, delete on logout, and make a regenerated ID invalidate the old one across every replica. Encrypt access to the backing service, restrict it to the application network, and monitor failed reads/writes. Test it with two application instances: log in through one, use the cookie through the other, regenerate on login, then verify that logout and expiry invalidate both IDs.</p>
+     <p>The handler emits a <code>SHARAF_SESSION</code> cookie with <code>Secure</code>, <code>HttpOnly</code>, <code>SameSite=Strict</code>, path <code>/</code>, and a 30-minute maximum age. <code>Secure</code> means browser login requires HTTPS. If cross-site login is a requirement, design the cookie and CSRF protections together rather than weakening <code>SameSite</code> by default.</p>
+     <h2 id="protect-browser-forms">Protect browser forms<a href="#protect-browser-forms" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p>For every state-changing browser endpoint, require a CSRF token tied to the authenticated session and verify it on the server before changing state. Render it as a hidden form input (or send it in a custom header for HTMX/AJAX) and use a constant-time comparison. Check <code>Origin</code> or <code>Referer</code> as defense in depth. Do not rely on <code>SameSite</code> alone, and do not apply browser CSRF rules to a bearer-token API whose credentials are not sent automatically by the browser.</p>
+     <p>Set a restrictive Content Security Policy for HTML responses and avoid inline scripts where practical. Pac4j's <code>SECURITYHEADERS</code> matcher supplies baseline headers, but it does not replace a CSP, HSTS, <code>Referrer-Policy</code>, or <code>Permissions-Policy</code> configured for your application.</p>
+     <h2 id="deploy-behind-a-trusted-proxy">Deploy behind a trusted proxy<a href="#deploy-behind-a-trusted-proxy" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p>Terminate TLS at a proxy you operate and permit traffic to the Sharaf process only from that proxy. Strip client-supplied <code>Forwarded</code>, <code>X-Forwarded-For</code>, <code>X-Forwarded-Host</code>, and <code>X-Forwarded-Proto</code> headers, then set trusted replacements at the proxy. Do not use forwarded headers received directly from the internet for redirect URLs, callback URLs, audit identity, or access-control decisions.</p>
+     <p>Configure the external HTTPS URL explicitly in your OAuth/OIDC provider and pac4j client. Test login, callback, and logout through that URL—not only against <code>localhost</code>—before release.</p>
+     <h2 id="keep-secrets-and-requests-bounded">Keep secrets and requests bounded<a href="#keep-secrets-and-requests-bounded" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p>Read signing keys, OAuth client secrets, database credentials, and encryption keys from the deployment environment or a secret manager. Validate that required values are present and sufficiently strong during startup, redact them from configuration dumps and errors, and rotate them with a documented procedure.</p>
+     <p>Set request and upload body-size limits at the reverse proxy and, where supported by the selected server adapter, at the server. Apply timeouts and rate limits at the proxy. Return a controlled <code>413 Payload Too Large</code> for requests exceeding the agreed limit; do not allow an oversized body to reach parsing or application code.</p>
+     <h2 id="test-the-real-security-boundary">Test the real security boundary<a href="#test-the-real-security-boundary" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p>Use a stateful HTTP client in integration tests and run the server through the same handler composition as production. At minimum, cover:</p>
+     <ul>
+      <li>unauthenticated access is rejected or redirected;</li>
+      <li>valid and invalid form/OIDC/JWT credentials have the expected outcome;</li>
+      <li>a user without the required role receives <code>403</code>;</li>
+      <li>login regenerates the session and logout invalidates it;</li>
+      <li>state-changing browser requests without a CSRF token fail;</li>
+      <li>the session cookie and security headers are present on both success and denial responses;</li>
+      <li>an oversized request is rejected; and</li>
+      <li>the public HTTPS URL, proxy redirects, and OAuth callback work end-to-end.</li>
+     </ul>
+     <p>The <code>sharaf-pac4j</code> test suite exercises form, JWT, roles, logout, session invalidation, and baseline security headers. Keep application-specific authorization and CSRF tests alongside the application: they are part of its public security contract.</p>
+     <div role="group">
+      <a role="button" href="https://sake92.github.io/sharaf/howtos/exception-handler.html">⬅️ Exception Handler</a> <span></span> <span></span>
+     </div>
+    </div>
+    <aside aria-label="On this page">
+     <details open>
+      <summary>On this page</summary>
+      <nav aria-label="Table of contents">
+       <ul>
+        <li><a href="#secure-a-production-application">Secure a production application</a>
+         <ul>
+          <li><a href="#start-deny-by-default">Start deny-by-default</a></li>
+          <li><a href="#choose-one-authentication-flow">Choose one authentication flow</a>
+           <ul>
+            <li><a href="#form-login">Form login</a></li>
+            <li><a href="#oauth2-and-openid-connect">OAuth2 and OpenID Connect</a></li>
+            <li><a href="#jwt-for-an-api">JWT for an API</a></li>
+           </ul></li>
+          <li><a href="#authorize-separately-from-authentication">Authorize separately from authentication</a></li>
+          <li><a href="#use-a-production-session-store">Use a production session store</a></li>
+          <li><a href="#protect-browser-forms">Protect browser forms</a></li>
+          <li><a href="#deploy-behind-a-trusted-proxy">Deploy behind a trusted proxy</a></li>
+          <li><a href="#keep-secrets-and-requests-bounded">Keep secrets and requests bounded</a></li>
+          <li><a href="#test-the-real-security-boundary">Test the real security boundary</a></li>
+         </ul></li>
+       </ul>
+      </nav>
+     </details>
+    </aside>
+   </div>
+  </main>
+  <style>
+  body > footer.site-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding-block: 1.5rem 2rem;
+  }
+
+  .site-footer__identity {
+    display: grid;
+    gap: .1rem;
+  }
+
+  .site-footer__identity strong {
+    color: var(--pico-color);
+    font-size: 1rem;
+  }
+
+  .site-footer__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .65rem;
+  }
+
+  .site-footer__links a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .55rem;
+    min-height: 2.75rem;
+    padding: .55rem .85rem;
+    border: 1px solid var(--pico-muted-border-color);
+    border-radius: .7rem;
+    background: var(--pico-card-background-color);
+    color: var(--pico-color);
+    font-weight: 600;
+    line-height: 1;
+    text-decoration: none;
+    transition: border-color .15s ease, background-color .15s ease, transform .15s ease;
+  }
+
+  .site-footer__links a:hover {
+    border-color: var(--pico-primary);
+    background: var(--pico-secondary-background);
+    color: var(--pico-color);
+    transform: translateY(-2px);
+  }
+
+  .site-footer__links a:focus-visible {
+    outline: 2px solid var(--pico-primary);
+    outline-offset: 3px;
+  }
+
+  .site-footer__links svg {
+    width: 1.2rem;
+    height: 1.2rem;
+    flex: none;
+  }
+
+  .site-footer__links a[href*="discord"] svg {
+    color: #5865f2;
+  }
+
+  @media (max-width: 600px) {
+    body > footer.site-footer {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 1rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .site-footer__links a { transition: none; }
+    .site-footer__links a:hover { transform: none; }
+  }
+</style>
+  <footer class="pico container site-footer">
+   <div class="site-footer__identity">
+    <strong>Sharaf</strong> <span>Scala 3 web framework</span>
+   </div>
+   <nav class="site-footer__links" aria-label="Community links">
+    <a href="https://github.com/sake92/sharaf" target="_blank" rel="noopener noreferrer"> 
+     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23A10.94 10.94 0 0 1 12.03 5.79c1.02 0 2.04.135 3 .405 2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57C20.595 21.795 24 17.31 24 12 24 5.37 18.63 0 12 0Z" />
+     </svg> 
+     <span>GitHub</span> 
+    </a> <a href="https://discord.gg/g9KVY3WkMG" target="_blank" rel="noopener noreferrer"> 
+     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+      <path d="M19.73 5.29a17.4 17.4 0 0 0-4.27-1.32 12.1 12.1 0 0 0-.55 1.12 16.1 16.1 0 0 0-4.82 0 12.1 12.1 0 0 0-.55-1.12 17.4 17.4 0 0 0-4.27 1.32C2.57 9.29 1.84 13.2 2.2 17.05a17.7 17.7 0 0 0 5.23 2.67c.42-.57.8-1.17 1.12-1.8a11 11 0 0 1-1.7-.82c.14-.1.27-.21.4-.32 3.28 1.54 6.83 1.54 10.07 0 .13.11.26.22.4.32-.54.32-1.11.59-1.7.82.32.63.7 1.23 1.12 1.8a17.7 17.7 0 0 0 5.24-2.67c.42-4.46-.72-8.34-3.1-11.76ZM8.94 14.68c-.98 0-1.78-.89-1.78-1.98 0-1.1.78-1.99 1.78-1.99s1.8.9 1.78 1.99c0 1.09-.79 1.98-1.78 1.98Zm6.12 0c-.98 0-1.78-.89-1.78-1.98 0-1.1.78-1.99 1.78-1.99s1.8.9 1.78 1.99c0 1.09-.79 1.98-1.78 1.98Z" />
+     </svg> 
+     <span>Discord</span> 
+    </a>
+   </nav>
+  </footer>
+  <script>
+if (window.matchMedia('(max-width: 850px)').matches) {
+    document.querySelectorAll('body > main > div > aside > details').forEach(details => { details.open = false; });
+}
+</script>
+  <script src="https://sake92.github.io/sharaf/scripts/code-copy.js"></script>
+ </body>
+</html>

@@ -45,6 +45,8 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
         <th>Module</th>
         <th>Server integration</th>
         <th>Platform</th>
+        <th>Support tier</th>
+        <th>Form bodies</th>
        </tr>
       </thead>
       <tbody>
@@ -52,31 +54,42 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
         <td><code>sharaf-undertow</code></td>
         <td>Undertow</td>
         <td>JVM</td>
+        <td>Stable</td>
+        <td>URL encoded and multipart</td>
        </tr>
        <tr>
         <td><code>sharaf-http4s</code></td>
         <td>http4s</td>
         <td>JVM, Scala Native</td>
-       </tr>
-       <tr>
-        <td><code>sharaf-helidon</code></td>
-        <td>Helidon</td>
-        <td>JVM</td>
+        <td>Beta</td>
+        <td>URL encoded</td>
        </tr>
        <tr>
         <td><code>sharaf-jdk-httpserver</code></td>
         <td>JDK HTTP server</td>
         <td>JVM</td>
+        <td>Beta</td>
+        <td>URL encoded</td>
+       </tr>
+       <tr>
+        <td><code>sharaf-helidon</code></td>
+        <td>Helidon</td>
+        <td>JVM</td>
+        <td>Experimental</td>
+        <td>URL encoded; multipart unsupported</td>
        </tr>
        <tr>
         <td><code>sharaf-snunit</code></td>
         <td>snunit</td>
         <td>Scala Native</td>
+        <td>Experimental</td>
+        <td>URL encoded; multipart unsupported</td>
        </tr>
       </tbody>
      </table>
      <p><code>sharaf-core</code> supports JVM and Scala Native. The companion libraries <code>formson</code>, <code>querson</code>, and <code>validson</code> also support Scala.js.</p>
-     <p>The <a href="https://sake92.github.io/sharaf/tutorials/quickstart.html">quickstart</a> uses Undertow. Working adapter examples are in the <a href="https://github.com/sake92/sharaf/tree/main/examples">repository</a>.</p>
+     <p>Stable is the recommended server integration. Beta integrations support the listed platforms but have narrower form handling. Experimental integrations have incomplete request features and may change between releases.</p>
+     <p>The <a href="https://sake92.github.io/sharaf/tutorials/quickstart.html">quickstart</a> uses Undertow. Adapter examples are in the <a href="https://github.com/sake92/sharaf/tree/main/examples">repository</a>.</p>
     </div>
     <aside aria-label="On this page">
      <details open>
