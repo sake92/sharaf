@@ -25,9 +25,12 @@ object ResponseUtils {
     response.cookieUpdates.updates.foreach { cookie =>
       exchange.setResponseCookie(undertow.CookieUtils.toUndertow(cookie))
     }
-     */
+    */
 
     helidonRes.status(response.status.code)
-    response.body.foreach(b => response.rw.write(b, helidonRes.outputStream()))
+    response.body match {
+      case Some(body) => response.rw.write(body, helidonRes.outputStream())
+      case None       => helidonRes.send()
+    }
   }
 }
