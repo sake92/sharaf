@@ -62,7 +62,6 @@ local const versions = new {
   logback = "1.6.4"
   mockOauth2Server = "6.0.3"
   jquery = "4.0.0"
-  guava = "33.7.1-jre"
 }
 
 local const validsonModules =
@@ -474,7 +473,6 @@ local const oauth2ExampleModules =
       }
       deps {
         "org.pac4j:pac4j-oauth:\(versions.pac4j)"
-        "com.google.guava:guava:\(versions.guava)"
       }
     }
     testTemplate = (baseExampleTemplate.asTest()) {
