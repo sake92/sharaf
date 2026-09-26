@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Generate Sharaf APIs and STTP clients from an OpenAPI contract with OpenApi4s">
+  <title>OpenAPI-first API | Sharaf Documentation</title>
+  <link rel="shortcut icon" href="https://sake92.github.io/sharaf/images/favicon.png" type="image/png">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-dark.min.css" media="(prefers-color-scheme: dark)" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-light.min.css" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.conditional.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://sake92.github.io/sharaf/styles/default.css">
+ </head>
+ <body>
+  <header class="pico container">
+   <nav aria-label="Main navigation">
+    <a href="https://sake92.github.io/sharaf/">Sharaf Documentation</a>
+    <div>
+     <a href="https://sake92.github.io/sharaf/tutorials">Tutorials</a> <a href="https://sake92.github.io/sharaf/howtos">How-Tos</a> <a href="https://sake92.github.io/sharaf/reference">Reference</a> <a href="https://sake92.github.io/sharaf/philosophy">Philosophy</a>
+    </div>
+    <form action="https://sake92.github.io/sharaf/search/results.html" method="get" role="search">
+     <input name="q" type="search" placeholder="Search" aria-label="Search this site">
+    </form>
+   </nav>
+  </header>
+  <script>
+for (const link of document.querySelectorAll('body > header > nav > div > a')) {
+    const path = new URL(link.href).pathname.replace(/\/$/, '');
+    const current = window.location.pathname;
+    if (current === path || current.startsWith(path + '/')) link.setAttribute('aria-current', 'page');
+}
+</script>
+  <main class="pico container">
+   <div>
+    <div class="content">
+     <h1 id="openapi-first-api">OpenAPI-first API<a href="#openapi-first-api" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
+     <p><a href="https://github.com/sake92/openapi4s">OpenApi4s</a> turns an OpenAPI document into Scala 3 code. With the Sharaf backend it generates Tupson request/response models and controller route stubs. The contract is the source of truth, not a second description of the routes.</p>
+     <p>This tutorial uses the <a href="https://github.com/sake92/sbt-openapi4s">sbt-openapi4s</a> plugin. It keeps OpenApi4s outside the application's runtime classpath: it is a build-time generator, while the generated sources depend only on Sharaf, Tupson, Validson, and optionally STTP.</p>
+     <h2 id="1-write-the-contract">1. Write the contract<a href="#1-write-the-contract" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p>Create <code>openapi/greeting.yaml</code>:</p>
+     <pre><code class="language-yaml hljs" data-highlighted="yes"><span class="hljs-attr">openapi:</span> <span class="hljs-number">3.0</span><span class="hljs-number">.3</span>
+<span class="hljs-attr">info:</span>
+  <span class="hljs-attr">title:</span> <span class="hljs-string">Greeting</span> <span class="hljs-string">API</span>
+  <span class="hljs-attr">version:</span> <span class="hljs-number">1.0</span><span class="hljs-number">.0</span>
+<span class="hljs-attr">paths:</span>
+  <span class="hljs-string">/greetings/{name}:</span>
+    <span class="hljs-attr">get:</span>
+      <span class="hljs-attr">operationId:</span> <span class="hljs-string">getGreeting</span>
+      <span class="hljs-attr">tags:</span> [<span class="hljs-string">greetings</span>]
+      <span class="hljs-attr">parameters:</span>
+        <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">name</span>
+          <span class="hljs-attr">in:</span> <span class="hljs-string">path</span>
+          <span class="hljs-attr">required:</span> <span class="hljs-literal">true</span>
+          <span class="hljs-attr">schema:</span>
+            <span class="hljs-attr">type:</span> <span class="hljs-string">string</span>
+            <span class="hljs-attr">minLength:</span> <span class="hljs-number">1</span>
+      <span class="hljs-attr">responses:</span>
+        <span class="hljs-attr">'200':</span>
+          <span class="hljs-attr">description:</span> <span class="hljs-string">A</span> <span class="hljs-string">greeting</span>
+          <span class="hljs-attr">content:</span>
+            <span class="hljs-attr">application/json:</span>
+              <span class="hljs-attr">schema:</span>
+                <span class="hljs-string">$ref:</span> <span class="hljs-string">'#/components/schemas/Greeting'</span>
+<span class="hljs-attr">components:</span>
+  <span class="hljs-attr">schemas:</span>
+    <span class="hljs-attr">Greeting:</span>
+      <span class="hljs-attr">type:</span> <span class="hljs-string">object</span>
+      <span class="hljs-attr">required:</span> [<span class="hljs-string">message</span>]
+      <span class="hljs-attr">properties:</span>
+        <span class="hljs-attr">message:</span>
+          <span class="hljs-attr">type:</span> <span class="hljs-string">string</span>
+</code></pre>
+     <h2 id="2-add-the-generator-to-sbt">2. Add the generator to sbt<a href="#2-add-the-generator-to-sbt" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p>Add the plugin in <code>project/plugins.sbt</code>:</p>
+     <pre><code class="language-scala hljs" data-highlighted="yes">addSbtPlugin(<span class="hljs-string">"ba.sake"</span> % <span class="hljs-string">"sbt-openapi4s"</span> % <span class="hljs-string">"0.1.0"</span>)
+</code></pre>
+     <p>Enable and configure the plugin in <code>build.sbt</code>:</p>
+     <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">import</span> ba.sake.openapi4s.<span class="hljs-type">OpenApi4sPlugin</span>
+<span class="hljs-keyword">import</span> ba.sake.openapi4s.<span class="hljs-type">OpenApi4sPlugin</span>.autoImport.*
+
+<span class="hljs-keyword">lazy</span> <span class="hljs-keyword">val</span> canonicalOpenApiFile = file(<span class="hljs-string">"openapi/greeting.yaml"</span>)
+
+<span class="hljs-keyword">lazy</span> <span class="hljs-keyword">val</span> api = project
+  .in(file(<span class="hljs-string">"modules/api"</span>))
+  .enablePlugins(<span class="hljs-type">OpenApi4sPlugin</span>)
+  .settings(
+    scalaVersion := <span class="hljs-string">"3.7.3"</span>,
+    libraryDependencies += <span class="hljs-string">"ba.sake"</span> %% <span class="hljs-string">"sharaf-undertow"</span> % <span class="hljs-string">"0.19.0"</span>,
+    openApi4sPackage := <span class="hljs-string">"com.example.greetings"</span>,
+    openApi4sFile := canonicalOpenApiFile,
+    openApi4sModels := <span class="hljs-string">"tupson"</span>,
+    openApi4sFramework := <span class="hljs-type">Some</span>(<span class="hljs-string">"sharaf"</span>),
+    openApi4sValidation := <span class="hljs-string">"validson"</span>,
+    openApi4sVersion := <span class="hljs-string">"0.9.0"</span>
+  )
+</code></pre>
+     <p>Generate the contracts whenever the specification changes. The generated sources go below <code>modules/api/src/main/scala/com/example/greetings</code>:</p>
+     <pre><code class="language-sh hljs language-bash" data-highlighted="yes">sbt api/openApi4sGenerate
+</code></pre>
+     <p>OpenApi4s generation is additive: review and commit the resulting source changes. Do not hand-maintain another model or route definition alongside the canonical document.</p>
+     <p>OpenApi4s can also generate a typed STTP client from the same contract. Keep that client in its own module, with its own model backend, as shown by the <a href="https://github.com/sake92/sharaf-api-starter">API starter</a> and the <a href="https://github.com/sake92/sbt-openapi4s">sbt-openapi4s documentation</a>.</p>
+     <h3 id="deder-and-mill">Deder and Mill<a href="#deder-and-mill" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h3>
+     <p>If your application already uses another build tool, use its integration instead of adding sbt just for code generation:</p>
+     <ul>
+      <li><a href="https://github.com/sake92/deder-plugins">deder-plugins</a> provides the Deder OpenApi4s plugin.</li>
+      <li><a href="https://github.com/sake92/mill-openapi4s">mill-openapi4s</a> provides the Mill OpenApi4s plugin.</li>
+     </ul>
+     <p>All three integrations invoke OpenApi4s with the same model, framework, validation, and client backend choices.</p>
+     <h2 id="3-implement-generated-controller-routes">3. Implement generated controller routes<a href="#3-implement-generated-controller-routes" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p>The command creates <code>models/</code>, <code>controllers/</code>, and <code>clients/</code> under <code>src/com/example/greetings</code>. The generated controller initially returns <code>501 Not Implemented</code>; replace that stub with your application behavior while retaining its generated route pattern and request parsing. For example, the generated <code>GreetingsController</code> route can return its generated <code>Greeting</code> model:</p>
+     <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">package</span> com.example.greetings.controllers
+
+<span class="hljs-keyword">import</span> ba.sake.sharaf.*
+<span class="hljs-keyword">import</span> com.example.greetings.models.<span class="hljs-type">Greeting</span>
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">GreetingsController</span> </span>{
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">routes</span> </span>= <span class="hljs-type">Routes</span> {
+    <span class="hljs-keyword">case</span> <span class="hljs-type">GET</span> -&gt; <span class="hljs-type">Path</span>(<span class="hljs-string">"greetings"</span>, name) =&gt;
+      <span class="hljs-type">Response</span>.withBody(<span class="hljs-type">Greeting</span>(<span class="hljs-string">s"Hello, <span class="hljs-subst">$name</span>"</span>))
+  }
+}
+</code></pre>
+     <p>Wire it as you would any other Sharaf routes:</p>
+     <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">import</span> ba.sake.sharaf.<span class="hljs-type">Routes</span>
+<span class="hljs-keyword">import</span> ba.sake.sharaf.undertow.<span class="hljs-type">UndertowSharafServer</span>
+<span class="hljs-keyword">import</span> com.example.greetings.controllers.<span class="hljs-type">GreetingsController</span>
+
+<span class="hljs-keyword">val</span> routes = <span class="hljs-type">Routes</span>.merge(<span class="hljs-type">Seq</span>(<span class="hljs-type">GreetingsController</span>().routes))
+<span class="hljs-type">UndertowSharafServer</span>(<span class="hljs-string">"0.0.0.0"</span>, <span class="hljs-number">8080</span>, routes).start()
+</code></pre>
+     <h2 id="4-serve-the-contract-and-swagger-ui">4. Serve the contract and Swagger UI<a href="#4-serve-the-contract-and-swagger-ui" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p>Copy the canonical contract to <code>modules/api/src/main/resources/public/openapi.yaml</code>. <code>UndertowSharafServer</code> serves classpath resources from <code>public</code>, so the document is then available as <code>/openapi.yaml</code>. Add the Swagger UI WebJar to the <code>api</code> project:</p>
+     <pre><code class="language-scala hljs" data-highlighted="yes">libraryDependencies += <span class="hljs-string">"org.webjars"</span> % <span class="hljs-string">"swagger-ui"</span> % <span class="hljs-string">"5.20.1"</span>
+</code></pre>
+     <p>Expose a <code>/swagger</code> route whose HTML loads the WebJar assets and points Swagger UI at <code>/openapi.yaml</code>. The <a href="https://github.com/sake92/sharaf-api-starter/blob/main/modules/api/src/main/scala/com/example/petclinic/ui/SwaggerUIController.scala">API starter's Swagger controller</a> is the maintained copy-and-adapt implementation.</p>
+     <h2 id="5-test-the-contract-through-http">5. Test the contract through HTTP<a href="#5-test-the-contract-through-http" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p>Use the generated STTP client in an integration test against a running server. This proves that the generated types, routes, and implementation still agree:</p>
+     <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">import</span> munit.<span class="hljs-type">FunSuite</span>
+<span class="hljs-keyword">import</span> sttp.client4.*
+<span class="hljs-keyword">import</span> sttp.model.<span class="hljs-type">StatusCode</span>
+<span class="hljs-keyword">import</span> com.example.greetings.client.clients.<span class="hljs-type">GreetingsClient</span>
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">GreetingIntegrationTest</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">FunSuite</span> </span>{
+  <span class="hljs-keyword">private</span> <span class="hljs-keyword">val</span> backend = <span class="hljs-type">DefaultSyncBackend</span>()
+
+  test(<span class="hljs-string">"the generated client matches the running API"</span>) {
+    <span class="hljs-keyword">val</span> response = <span class="hljs-type">GreetingsClient</span>(<span class="hljs-string">"http://127.0.0.1:8080"</span>).getGreeting(<span class="hljs-string">"Ada"</span>).send(backend)
+    assertEquals(response.code, <span class="hljs-type">StatusCode</span>.<span class="hljs-type">Ok</span>)
+    assertEquals(response.body.map(_.message), <span class="hljs-type">Right</span>(<span class="hljs-string">"Hello, Ada"</span>))
+  }
+}
+</code></pre>
+     <p>Put this test in a separate integration-test project that depends on the generated client module and starts the API.</p>
+     <p>Also make a direct request to <code>/openapi.yaml</code> in that suite and assert its <code>openapi</code> version and an expected <code>operationId</code>. Together, those checks catch a missing deployed contract as well as a route or payload that drifted from the generated client.</p>
+     <p>For a complete runnable reference—including database migrations, Docker, Swagger UI, generated Sharaf server contracts, a generated STTP client, and integration tests—see <a href="https://github.com/sake92/sharaf-api-starter">sharaf-api-starter</a>.</p>
+     <div role="group">
+      <a role="button" href="https://sake92.github.io/sharaf/tutorials/validation.html">⬅️ Validation</a> <span></span> <a role="button" href="https://sake92.github.io/sharaf/tutorials/sql.html">SQL ➡️</a>
+     </div>
+    </div>
+    <aside aria-label="On this page">
+     <details open>
+      <summary>On this page</summary>
+      <nav aria-label="Table of contents">
+       <ul>
+        <li><a href="#openapi-first-api">OpenAPI-first API</a>
+         <ul>
+          <li><a href="#1-write-the-contract">1. Write the contract</a></li>
+          <li><a href="#2-add-the-generator-to-sbt">2. Add the generator to sbt</a>
+           <ul>
+            <li><a href="#deder-and-mill">Deder and Mill</a></li>
+           </ul></li>
+          <li><a href="#3-implement-generated-controller-routes">3. Implement generated controller routes</a></li>
+          <li><a href="#4-serve-the-contract-and-swagger-ui">4. Serve the contract and Swagger UI</a></li>
+          <li><a href="#5-test-the-contract-through-http">5. Test the contract through HTTP</a></li>
+         </ul></li>
+       </ul>
+      </nav>
+     </details>
+    </aside>
+   </div>
+  </main>
+  <style>
+  body > footer.site-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding-block: 1.5rem 2rem;
+  }
+
+  .site-footer__identity {
+    display: grid;
+    gap: .1rem;
+  }
+
+  .site-footer__identity strong {
+    color: var(--pico-color);
+    font-size: 1rem;
+  }
+
+  .site-footer__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .65rem;
+  }
+
+  .site-footer__links a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .55rem;
+    min-height: 2.75rem;
+    padding: .55rem .85rem;
+    border: 1px solid var(--pico-muted-border-color);
+    border-radius: .7rem;
+    background: var(--pico-card-background-color);
+    color: var(--pico-color);
+    font-weight: 600;
+    line-height: 1;
+    text-decoration: none;
+    transition: border-color .15s ease, background-color .15s ease, transform .15s ease;
+  }
+
+  .site-footer__links a:hover {
+    border-color: var(--pico-primary);
+    background: var(--pico-secondary-background);
+    color: var(--pico-color);
+    transform: translateY(-2px);
+  }
+
+  .site-footer__links a:focus-visible {
+    outline: 2px solid var(--pico-primary);
+    outline-offset: 3px;
+  }
+
+  .site-footer__links svg {
+    width: 1.2rem;
+    height: 1.2rem;
+    flex: none;
+  }
+
+  .site-footer__links a[href*="discord"] svg {
+    color: #5865f2;
+  }
+
+  @media (max-width: 600px) {
+    body > footer.site-footer {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 1rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .site-footer__links a { transition: none; }
+    .site-footer__links a:hover { transform: none; }
+  }
+</style>
+  <footer class="pico container site-footer">
+   <div class="site-footer__identity">
+    <strong>Sharaf</strong> <span>Scala 3 web framework</span>
+   </div>
+   <nav class="site-footer__links" aria-label="Community links">
+    <a href="https://github.com/sake92/sharaf" target="_blank" rel="noopener noreferrer"> 
+     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23A10.94 10.94 0 0 1 12.03 5.79c1.02 0 2.04.135 3 .405 2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57C20.595 21.795 24 17.31 24 12 24 5.37 18.63 0 12 0Z" />
+     </svg> 
+     <span>GitHub</span> 
+    </a> <a href="https://discord.gg/g9KVY3WkMG" target="_blank" rel="noopener noreferrer"> 
+     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+      <path d="M19.73 5.29a17.4 17.4 0 0 0-4.27-1.32 12.1 12.1 0 0 0-.55 1.12 16.1 16.1 0 0 0-4.82 0 12.1 12.1 0 0 0-.55-1.12 17.4 17.4 0 0 0-4.27 1.32C2.57 9.29 1.84 13.2 2.2 17.05a17.7 17.7 0 0 0 5.23 2.67c.42-.57.8-1.17 1.12-1.8a11 11 0 0 1-1.7-.82c.14-.1.27-.21.4-.32 3.28 1.54 6.83 1.54 10.07 0 .13.11.26.22.4.32-.54.32-1.11.59-1.7.82.32.63.7 1.23 1.12 1.8a17.7 17.7 0 0 0 5.24-2.67c.42-4.46-.72-8.34-3.1-11.76ZM8.94 14.68c-.98 0-1.78-.89-1.78-1.98 0-1.1.78-1.99 1.78-1.99s1.8.9 1.78 1.99c0 1.09-.79 1.98-1.78 1.98Zm6.12 0c-.98 0-1.78-.89-1.78-1.98 0-1.1.78-1.99 1.78-1.99s1.8.9 1.78 1.99c0 1.09-.79 1.98-1.78 1.98Z" />
+     </svg> 
+     <span>Discord</span> 
+    </a>
+   </nav>
+  </footer>
+  <script>
+if (window.matchMedia('(max-width: 850px)').matches) {
+    document.querySelectorAll('body > main > div > aside > details').forEach(details => { details.open = false; });
+}
+</script>
+  <script src="https://sake92.github.io/sharaf/scripts/code-copy.js"></script>
+ </body>
+</html>
