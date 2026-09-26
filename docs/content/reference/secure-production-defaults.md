@@ -1,5 +1,4 @@
 ---
-layout: reference.html
 title: Secure production defaults
 description: Production security baseline for Sharaf applications
 ---
