@@ -1,8 +1,9 @@
 package demo
 
 import ba.sake.sharaf.{*, given}
+import ba.sake.sharaf.pac4j.SecurityService
 
-class AppRoutes(securityService: SecurityService) {
+class AppRoutes() {
 
   val routes = Routes:
     case GET -> Path("protected") =>
@@ -10,13 +11,13 @@ class AppRoutes(securityService: SecurityService) {
     case GET -> Path("login") =>
       Response.redirect("/")
     case GET -> Path() =>
-      Response.withBody(IndexPage(securityService.currentUser))
+      Response.withBody(IndexPage(SecurityService.currentUser.map(_.getUsername)))
     case _ =>
       Response.withBody("Not found. ¯\\_(ツ)_/¯")
 
 }
 
-def IndexPage(userOpt: Option[CustomUserProfile]) =
+def IndexPage(userOpt: Option[String]) =
   userOpt match {
     case None =>
       html"""
@@ -35,7 +36,7 @@ def IndexPage(userOpt: Option[CustomUserProfile]) =
         <!DOCTYPE html>
         <html>
         <body>
-        <div>Hello ${user.name} !</div>
+        <div>Hello ${user} !</div>
         <div>
             <a href="/protected">Protected page</a>
         </div>

@@ -1,6 +1,6 @@
 //> using scala "3.7.0"
-//> using dep ba.sake::sharaf-undertow:0.18.0
-//> using dep ba.sake::sharaf-hepek-components:0.17.0
+//> using dep ba.sake::sharaf-undertow:0.19.0
+//> using dep ba.sake::sharaf-hepek-components:0.19.0
 
 import scalatags.Text.all.*
 import ba.sake.hepek.html.HtmlPage

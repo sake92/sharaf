@@ -23,6 +23,12 @@ final class Pac4jSecurityHandler(
 
   override def handle(context: RequestContext): Response[?] =
     val (method, path) = context.params
+    context.request.cookies.find(_.name == "SHARAF_SESSION")
+      .flatMap(cookie => securityConfig.sessionStore.load(cookie.value))
+      .foreach { session =>
+        session.touch()
+        SessionHolder.set(session)
+      }
     val fullUrl = buildFullUrl(context.request, path)
     val webContext = new SharafWebContext(context.request, fullUrl, method)
     val pac4jConfig = securityConfig.pac4jConfig
@@ -54,7 +60,7 @@ final class Pac4jSecurityHandler(
   ): AnyRef =
     pac4jConfig.getCallbackLogic.perform(
       pac4jConfig,
-      securityConfig.callbackPath.orNull,
+      "/",
       true, // renewSession
       null, // defaultClient
       params
@@ -132,10 +138,10 @@ final class Pac4jSecurityHandler(
                 value = s.id,
                 path = Some("/"),
                 maxAge = Some(1800),
-                secure = true,
+                secure = securityConfig.secureSessionCookie,
                 httpOnly = true,
                 sameSite = true,
-                sameSiteMode = Some("Strict")
+                sameSiteMode = Some("Lax")
               )
             )
       case None => supplemented

@@ -39,7 +39,6 @@ jobs:
             .deder/logs/server.log
   compile-scala-cli-examples:
     runs-on: ubuntu-latest
-    continue-on-error: true # not critical
     steps:
       - uses: actions/checkout@v5
       - uses: VirtusLab/scala-cli-setup@main
@@ -49,3 +48,4 @@ jobs:
         run: |
           ./scripts/compile-scala-cli-examples.sh examples/scala-cli
           ./scripts/compile-scala-cli-examples.sh examples/htmx
+          scala-cli compile examples/scala-cli/hello-http4s-native.scala --server=false

@@ -1,5 +1,5 @@
 //> using scala 3.7.0
-//> using dep ba.sake::sharaf-undertow:0.18.0
+//> using dep ba.sake::sharaf-undertow:0.19.0
 
 import ba.sake.tupson.JsonRW
 import ba.sake.validson.Validator
@@ -30,4 +30,3 @@ object CarsDb {
 }
 
 case class Car(model: String, quantity: Int) derives JsonRW
-
