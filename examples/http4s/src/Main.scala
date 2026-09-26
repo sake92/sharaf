@@ -4,6 +4,8 @@ import ba.sake.sharaf.http4s.*
 import cats.effect.*
 import com.comcast.ip4s.*
 import org.http4s.ember.server.*
+import _root_.org.typelevel.log4cats.LoggerFactory
+import _root_.org.typelevel.log4cats.noop.NoOpFactory
 
 val routes = Routes {
   case GET -> Path("hello", name) =>
@@ -11,6 +13,8 @@ val routes = Routes {
   case _ =>
     Response.withBody("Hello Http4s!")
 }
+
+given LoggerFactory[IO] = NoOpFactory[IO]
 
 object Main extends IOApp.Simple:
   def run =

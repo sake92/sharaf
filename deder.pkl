@@ -14,7 +14,7 @@ plugins {
 }
 
 local const baseTemplate: ScalaModule = new {
-  scalaVersion = "3.7.3"
+  scalaVersion = "3.9.0"
   scalacOptions = new Listing<String> {
     "-Yretain-trees" // needed for default parameters
     "-deprecation"
@@ -47,8 +47,22 @@ local const baseTemplate: ScalaModule = new {
 }
 
 local const versions = new {
-  scalaJsVersion = "1.19.0"
-  scalaNativeVersion = "0.5.11"
+  scalaJsVersion = "1.22.0"
+  scalaNativeVersion = "0.5.12"
+  sourcecode = "0.4.4"
+  scalaJavaTime = "2.7.0"
+  munit = "1.3.6"
+  tupson = "0.30.0"
+  sttp = "4.0.27"
+  twirl = "2.1.0-M9"
+  undertow = "2.4.3.Final"
+  pac4j = "6.5.8"
+  http4s = "1.0.0-M48"
+  helidon = "4.5.5"
+  logback = "1.6.4"
+  mockOauth2Server = "6.0.3"
+  jquery = "4.0.0"
+  guava = "33.7.1-jre"
 }
 
 local const validsonModules =
@@ -60,33 +74,33 @@ local const validsonModules =
         name = "Validson"
         description = "Sharaf validation library"
       }
-      deps { "com.lihaoyi::sourcecode::0.4.2" }
+      deps { "com.lihaoyi::sourcecode::\(versions.sourcecode)" }
       publish = true
     }
     testTemplate = (baseTemplate.asTest()) {
-      deps { "org.scalameta::munit::1.1.0" }
+      deps { "org.scalameta::munit::\(versions.munit)" }
     }
     jsTemplate = (template.asJs()) {
       scalaJsVersion = versions.scalaJsVersion
       deps {
-        "com.lihaoyi::sourcecode::0.4.2"
-        "io.github.cquiroz::scala-java-time::2.6.0"
+        "com.lihaoyi::sourcecode::\(versions.sourcecode)"
+        "io.github.cquiroz::scala-java-time::\(versions.scalaJavaTime)"
       }
       publish = true
     }
     jsTestTemplate = (jsTemplate.asTest()) {
-      deps { "org.scalameta::munit::1.1.0" }
+      deps { "org.scalameta::munit::\(versions.munit)" }
     }
     nativeTemplate = (template.asNative()) {
       scalaNativeVersion = versions.scalaNativeVersion
       deps {
-        "com.lihaoyi::sourcecode::0.4.2"
-        "io.github.cquiroz::scala-java-time::2.6.0"
+        "com.lihaoyi::sourcecode::\(versions.sourcecode)"
+        "io.github.cquiroz::scala-java-time::\(versions.scalaJavaTime)"
       }
       publish = true
     }
     nativeTestTemplate = (nativeTemplate.asTest()) {
-      deps { "org.scalameta::munit::1.1.0" }
+      deps { "org.scalameta::munit::\(versions.munit)" }
     }
   }.get
 
@@ -103,29 +117,29 @@ local const quersonModules =
       publish = true
     }
     testTemplate = (baseTemplate.asTest()) {
-      deps { "org.scalameta::munit::1.1.0" }
+      deps { "org.scalameta::munit::\(versions.munit)" }
     }
     jsTemplate = (template.asJs()) {
       scalaJsVersion = versions.scalaJsVersion
       deps {
         "com.lihaoyi::fastparse::3.1.1"
-        "io.github.cquiroz::scala-java-time::2.6.0"
+        "io.github.cquiroz::scala-java-time::\(versions.scalaJavaTime)"
       }
       publish = true
     }
     jsTestTemplate = (jsTemplate.asTest()) {
-      deps { "org.scalameta::munit::1.1.0" }
+      deps { "org.scalameta::munit::\(versions.munit)" }
     }
     nativeTemplate = (template.asNative()) {
       scalaNativeVersion = versions.scalaNativeVersion
       deps {
         "com.lihaoyi::fastparse::3.1.1"
-        "io.github.cquiroz::scala-java-time::2.6.0"
+        "io.github.cquiroz::scala-java-time::\(versions.scalaJavaTime)"
       }
       publish = true
     }
     nativeTestTemplate = (nativeTemplate.asTest()) {
-      deps { "org.scalameta::munit::1.1.0" }
+      deps { "org.scalameta::munit::\(versions.munit)" }
     }
   }.get
 
@@ -142,29 +156,29 @@ local const formsonModules =
       publish = true
     }
     testTemplate = (baseTemplate.asTest()) {
-      deps { "org.scalameta::munit::1.1.0" }
+      deps { "org.scalameta::munit::\(versions.munit)" }
     }
     jsTemplate = (template.asJs()) {
       scalaJsVersion = versions.scalaJsVersion
       deps {
         "com.lihaoyi::fastparse::3.1.1"
-        "io.github.cquiroz::scala-java-time::2.6.0"
+        "io.github.cquiroz::scala-java-time::\(versions.scalaJavaTime)"
       }
       publish = true
     }
     jsTestTemplate = (jsTemplate.asTest()) {
-      deps { "org.scalameta::munit::1.1.0" }
+      deps { "org.scalameta::munit::\(versions.munit)" }
     }
     nativeTemplate = (template.asNative()) {
       scalaNativeVersion = versions.scalaNativeVersion
       deps {
         "com.lihaoyi::fastparse::3.1.1"
-        "io.github.cquiroz::scala-java-time::2.6.0"
+        "io.github.cquiroz::scala-java-time::\(versions.scalaJavaTime)"
       }
       publish = true
     }
     nativeTestTemplate = (nativeTemplate.asTest()) {
-      deps { "org.scalameta::munit::1.1.0" }
+      deps { "org.scalameta::munit::\(versions.munit)" }
     }
   }.get
 
@@ -175,9 +189,9 @@ local const sharafCoreTemplate = (baseTemplate) {
     description = "Core library for Sharaf"
   }
   deps {
-    "ba.sake::tupson::0.20.0"
+    "ba.sake::tupson::\(versions.tupson)"
     "com.lihaoyi::geny::1.1.1"
-    "com.softwaremill.sttp.client4::core::4.0.5"
+    "com.softwaremill.sttp.client4::core::\(versions.sttp)"
   }
 }
 local const sharafCoreModules =
@@ -190,12 +204,12 @@ local const sharafCoreModules =
         formsonModules.jvm
       }
       deps {
-        "org.playframework.twirl::twirl-api:2.1.0-M4"
+        "org.playframework.twirl::twirl-api:\(versions.twirl)"
       }
       publish = true
     }
     testTemplate = (sharafCoreTemplate.asTest()) {
-      deps { "org.scalameta::munit::1.1.0" }
+      deps { "org.scalameta::munit::\(versions.munit)" }
     }
     nativeTemplate = (sharafCoreTemplate.asNative()) {
       scalaNativeVersion = versions.scalaNativeVersion
@@ -207,7 +221,7 @@ local const sharafCoreModules =
       publish = true
     }
     nativeTestTemplate = (nativeTemplate.asTest()) {
-      deps { "org.scalameta::munit::1.1.0" }
+      deps { "org.scalameta::munit::\(versions.munit)" }
     }
   }.get
 
@@ -239,8 +253,8 @@ local const sharafUndertowModules =
         sharafCoreModules.jvm
       }
       deps {
-        "io.undertow:undertow-core:2.3.18.Final"
-        "ba.sake::tupson-config:0.20.0"
+        "io.undertow:undertow-core:\(versions.undertow)"
+        "ba.sake::tupson-config:\(versions.tupson)"
       }
       publish = true
     }
@@ -249,8 +263,8 @@ local const sharafUndertowModules =
         sharafCoreModules.jvm_test
       }
       deps {
-        "org.scalameta::munit::1.1.0"
-        "org.webjars:jquery:3.7.1"
+        "org.scalameta::munit::\(versions.munit)"
+        "org.webjars:jquery:\(versions.jquery)"
       }
     }
   }.get
@@ -268,7 +282,7 @@ local const sharafPac4jModules =
         sharafCoreModules.jvm
       }
       deps {
-        "org.pac4j:pac4j-core:6.5.3"
+        "org.pac4j:pac4j-core:\(versions.pac4j)"
       }
       publish = true
     }
@@ -278,10 +292,10 @@ local const sharafPac4jModules =
         sharafJdkHttpserverModules.main
       }
       deps {
-        "org.scalameta::munit::1.1.0"
-        "org.pac4j:pac4j-http:6.5.3"
-        "org.pac4j:pac4j-oidc:6.5.3"
-        "no.nav.security:mock-oauth2-server:4.0.0"
+        "org.scalameta::munit::\(versions.munit)"
+        "org.pac4j:pac4j-http:\(versions.pac4j)"
+        "org.pac4j:pac4j-oidc:\(versions.pac4j)"
+        "no.nav.security:mock-oauth2-server:\(versions.mockOauth2Server)"
         "ba.sake:pac4j-testkit:0.2.0"
       }
     }
@@ -297,30 +311,30 @@ local const sharafHttp4sModules =
         description = "Sharaf integration with Http4s"
       }
       moduleDeps { sharafCoreModules.jvm }
-      deps { "org.http4s::http4s-server::0.23.34" }
+      deps { "org.http4s::http4s-server::\(versions.http4s)" }
       publish = true
     }
     testTemplate = (baseTemplate.asTest()) {
       deps {
-        "org.scalameta::munit::1.1.0"
-        "org.http4s::http4s-client::0.23.34"
+        "org.scalameta::munit::\(versions.munit)"
+        "org.http4s::http4s-client::\(versions.http4s)"
       }
     }
     nativeTemplate = (template.asNative()) {
       scalaNativeVersion = versions.scalaNativeVersion
       moduleDeps = new { sharafCoreModules.native }
       deps {
-        "org.http4s::http4s-server::0.23.34"
-        "com.lihaoyi::sourcecode::0.4.2"
-        "io.github.cquiroz::scala-java-time::2.6.0"
+        "org.http4s::http4s-server::\(versions.http4s)"
+        "com.lihaoyi::sourcecode::\(versions.sourcecode)"
+        "io.github.cquiroz::scala-java-time::\(versions.scalaJavaTime)"
       }
       publish = true
     }
     nativeTestTemplate = (nativeTemplate.asTest()) {
       multithreading = true
       deps {
-        "org.scalameta::munit::1.1.0"
-        "org.http4s::http4s-client::0.23.34"
+        "org.scalameta::munit::\(versions.munit)"
+        "org.http4s::http4s-client::\(versions.http4s)"
       }
     }
   }.get
@@ -338,8 +352,8 @@ local const sharafHelidonModules =
         sharafCoreModules.jvm
       }
       deps {
-        "io.helidon.webserver:helidon-webserver:4.2.2"
-        "io.helidon.config:helidon-config-yaml:4.2.2"
+        "io.helidon.webserver:helidon-webserver:\(versions.helidon)"
+        "io.helidon.config:helidon-config-yaml:\(versions.helidon)"
       }
       publish = true
     }
@@ -389,7 +403,7 @@ local const sharafSnunit = (baseTemplate.asNative()) {
 
 // examples
 local const baseExampleTemplate = (baseTemplate) {
-  deps { "ch.qos.logback:logback-classic:1.4.6" }
+  deps { "ch.qos.logback:logback-classic:\(versions.logback)" }
 }
 
 local const apiExampleModules =
@@ -399,7 +413,7 @@ local const apiExampleModules =
       moduleDeps { sharafUndertowModules.main }
     }
     testTemplate = (baseExampleTemplate.asTest()) {
-      deps { "org.scalameta::munit::1.1.0" }
+      deps { "org.scalameta::munit::\(versions.munit)" }
     }
   }.get
 
@@ -410,7 +424,7 @@ local const fullstackExampleModules =
       moduleDeps { sharafUndertowModules.main }
     }
     testTemplate = (baseExampleTemplate.asTest()) {
-      deps { "org.scalameta::munit::1.1.0" }
+      deps { "org.scalameta::munit::\(versions.munit)" }
     }
   }.get
 
@@ -423,12 +437,12 @@ local const userPassFormExampleModules =
         sharafPac4jModules.main
       }
       deps {
-        "org.pac4j:pac4j-http:6.5.3"
+        "org.pac4j:pac4j-http:\(versions.pac4j)"
         "org.mindrot:jbcrypt:0.4"
       }
     }
     testTemplate = (baseExampleTemplate.asTest()) {
-      deps { "org.scalameta::munit::1.1.0" }
+      deps { "org.scalameta::munit::\(versions.munit)" }
     }
   }.get
 
@@ -441,12 +455,12 @@ local const jwtExampleModules =
         sharafPac4jModules.main
       }
       deps {
-        "org.pac4j:pac4j-http:6.5.3"
-        "org.pac4j:pac4j-jwt:6.5.3"
+        "org.pac4j:pac4j-http:\(versions.pac4j)"
+        "org.pac4j:pac4j-jwt:\(versions.pac4j)"
       }
     }
     testTemplate = (baseExampleTemplate.asTest()) {
-      deps { "org.scalameta::munit::1.1.0" }
+      deps { "org.scalameta::munit::\(versions.munit)" }
     }
   }.get
 
@@ -459,14 +473,14 @@ local const oauth2ExampleModules =
         sharafPac4jModules.main
       }
       deps {
-        "org.pac4j:pac4j-oauth:6.5.3"
-        "com.google.guava:guava:33.4.6-jre"
+        "org.pac4j:pac4j-oauth:\(versions.pac4j)"
+        "com.google.guava:guava:\(versions.guava)"
       }
     }
     testTemplate = (baseExampleTemplate.asTest()) {
       deps {
-        "org.scalameta::munit::1.1.0"
-        "no.nav.security:mock-oauth2-server:0.5.10"
+        "org.scalameta::munit::\(versions.munit)"
+        "no.nav.security:mock-oauth2-server:\(versions.mockOauth2Server)"
       }
     }
   }.get
@@ -478,7 +492,7 @@ local const jdkHttpserverExampleModules =
       moduleDeps { sharafJdkHttpserverModules.main }
     }
     testTemplate = (baseExampleTemplate.asTest()) {
-      deps { "org.scalameta::munit::1.1.0" }
+      deps { "org.scalameta::munit::\(versions.munit)" }
     }
   }.get
 
@@ -490,7 +504,7 @@ local const snunitExampleModules =
       moduleDeps { sharafSnunit }
     }
     testTemplate = (template.asTest()) {
-      deps { "org.scalameta::munit::1.1.0" }
+      deps { "org.scalameta::munit::\(versions.munit)" }
     }
   }.get
 
@@ -499,10 +513,10 @@ local const http4sExampleModules =
     root = "examples/http4s"
     template = (baseExampleTemplate) {
       moduleDeps { sharafHttp4sModules.jvm }
-      deps { "org.http4s::http4s-ember-server::0.23.32" }
+      deps { "org.http4s::http4s-ember-server::\(versions.http4s)" }
     }
     testTemplate = (baseExampleTemplate.asTest()) {
-      deps { "org.scalameta::munit::1.1.0" }
+      deps { "org.scalameta::munit::\(versions.munit)" }
     }
   }.get
 
