@@ -30,6 +30,8 @@ tutorials:
     url: "/tutorials/json.html"
   - label: "Validation"
     url: "/tutorials/validation.html"
+  - label: "OpenAPI"
+    url: "/tutorials/openapi.html"
   - label: "SQL"
     url: "/tutorials/sql.html"
   - label: "Tests"

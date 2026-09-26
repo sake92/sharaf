@@ -22,6 +22,17 @@ val routes = Routes {
 UndertowSharafServer("localhost", 8181, routes).start()
 ```
 
+## OpenAPI-first APIs
+
+Sharaf integrates with [OpenApi4s](https://github.com/sake92/openapi4s) to generate Scala 3 request/response models
+and Sharaf controller routes from an OpenAPI 3.0/3.1 document. The generated code uses Tupson and Validson, so request
+parsing and schema constraints are enforced at the HTTP boundary. OpenApi4s can also generate a typed STTP client from
+the same contract.
+
+Start with the [OpenAPI tutorial](https://sake92.github.io/sharaf/tutorials/openapi.html), or clone the
+[API starter](https://github.com/sake92/sharaf-api-starter) for a complete Postgres-backed application with Swagger UI
+and integration tests.
+
 ## Cheatsheet
 
 ### Route Matching
@@ -178,4 +189,3 @@ case GET -> Path("sse-events") =>
   }).start()
   Response.withBody(sseSender)
 ```
-

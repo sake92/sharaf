@@ -35,6 +35,8 @@ The route matches a GET request whose path begins with `hello` and captures the 
 - [Scala CLI examples]({{site.data.project.gh.sourcesUrl}}/examples/scala-cli), standalone examples using Scala CLI
 - [Scala CLI HTMX examples]({{site.data.project.gh.sourcesUrl}}/examples/htmx), standalone examples featuring HTMX
 - [API example]({{site.data.project.gh.sourcesUrl}}/examples/api) featuring JSON and validation
+- [OpenAPI API starter](https://github.com/sake92/sharaf-api-starter), a spec-first Postgres application with generated
+  Sharaf routes and STTP client, Swagger UI, Docker, and integration tests
 - [full-stack example]({{site.data.project.gh.sourcesUrl}}/examples/fullstack) featuring HTML, static files and forms
 - [sharaf-todo-backend](https://github.com/sake92/sharaf-todo-backend), implementation of the [todobackend.com](http://todobackend.com/) spec, featuring CORS handling
 - [Username+Password form login]({{site.data.project.gh.sourcesUrl}}/examples/user-pass-form) with [Pac4J](https://www.pac4j.org/)
