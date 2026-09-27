@@ -7,7 +7,6 @@ import java.time.format.DateTimeFormatter
 import ba.sake.sharaf.*
 import ba.sake.sharaf.exceptions.*
 import sttp.model.*
-import scala.util.boundary
 
 final class ClasspathResourcesHandler(
     rootPath: String,
@@ -79,7 +78,7 @@ final class ClasspathResourcesHandler(
 
   private def serveResource(resourceUrl: URL, resourcePath: String, withBody: Boolean)(using
       request: Request
-  ): Response[?] = boundary {
+  ): Response[?] = {
     val connection = resourceUrl.openConnection()
     connection.setUseCaches(false)
     val contentLength = connection.getContentLengthLong
@@ -91,21 +90,15 @@ final class ClasspathResourcesHandler(
     val etag = Option.when(enableCaching) {
       generateETag(resourcePath, contentLength, lastModified)
     }
-    etag.filter(_ => enableCaching).foreach { tag =>
-      request.headers.get(HttpString(HeaderNames.IfNoneMatch)) match {
-        case Some(Seq(clientETag, _*)) if clientETag == tag =>
-          boundary.break(
-            Response
-              .withStatus(StatusCode.NotModified)
-              .settingHeader("ETag", tag)
-          )
-        case _ =>
-      }
+    request.headers.get(HttpString(HeaderNames.IfNoneMatch)) match {
+      case Some(Seq(clientETag, _*)) if etag.contains(clientETag) =>
+        Response
+          .withStatus(StatusCode.NotModified)
+          .settingHeader("ETag", clientETag)
+      case _ =>
+        val mimeType = detectMimeType(connection)
+        serveFullResource(resourceUrl, contentLength, mimeType, etag, lastModified, withBody)
     }
-
-    val mimeType = detectMimeType(connection)
-
-    serveFullResource(resourceUrl, contentLength, mimeType, etag, lastModified, withBody)
   }
 
   private def serveFullResource(
