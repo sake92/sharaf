@@ -108,10 +108,17 @@ ownership rules such as “may edit this invoice”, enforce the check next to t
 
 `InMemorySessionStore` is appropriate for local development and a single disposable process only. Sessions disappear on
 restart and are not shared by replicas. For browser login, provide a `SessionStore` backed by Redis or a database and
-pass it to `Pac4jSecurityConfig.withSessionStore`.
+pass it to `Pac4jSecurityConfig.withSessionStore`. `sharaf-jdbc-session` provides the JDBC option; it uses squery and
+accepts any standard JDBC `DataSource` (add your database driver and connection pool separately).
 
 ```scala
-val sessions: ba.sake.sharaf.session.SessionStore = productionSessionStore
+import ba.sake.sharaf.session.SessionConfig
+import ba.sake.sharaf.session.jdbc.JdbcSessionStore
+
+// Run this idempotent initial migration as part of deployment/startup.
+JdbcSessionStore.createSchema(dataSource)
+
+val sessions = JdbcSessionStore(dataSource, SessionConfig.default)
 
 val security = Pac4jSecurityConfig(pac4jConfig, clients = "FormClient")
   .withSessionStore(sessions)
@@ -119,10 +126,11 @@ val security = Pac4jSecurityConfig(pac4jConfig, clients = "FormClient")
   .withLogoutPath("/logout")
 ```
 
-The store must generate unguessable IDs, atomically persist updates, enforce idle and absolute expiry, delete on logout,
-and make a regenerated ID invalidate the old one across every replica. Encrypt access to the backing service, restrict
-it to the application network, and monitor failed reads/writes. Test it with two application instances: log in through
-one, use the cookie through the other, regenerate on login, then verify that logout and expiry invalidate both IDs.
+The store serializes each session value as JSON and atomically replaces the old ID when a session is regenerated. It
+enforces idle and absolute expiry on load; call `sessions.deleteExpired()` periodically to remove abandoned expired rows.
+Database and serialization failures are propagated, so monitor failed reads/writes. Encrypt access to the backing
+service, restrict it to the application network, and test it with two application instances: log in through one, use the
+cookie through the other, regenerate on login, then verify that logout and expiry invalidate both IDs.
 
 The handler emits a `SHARAF_SESSION` cookie with `Secure`, `HttpOnly`, `SameSite=Strict`, path `/`, and a 30-minute
 maximum age. `Secure` means browser login requires HTTPS. If cross-site login is a requirement, design the cookie and

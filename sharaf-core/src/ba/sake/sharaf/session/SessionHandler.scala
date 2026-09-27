@@ -40,8 +40,8 @@ final class SessionHandler(
       store.delete(session.id)
       res.removingCookie(config.cookieName)
     else
-      if session.isRegenerated then session.previousId.foreach(store.delete)
       store.save(session)
+      if session.isRegenerated then session.previousId.foreach(store.delete)
       val maxAgeSeconds = config.maxAge.map(_.getSeconds.toInt)
       res.settingCookie(
         Cookie(

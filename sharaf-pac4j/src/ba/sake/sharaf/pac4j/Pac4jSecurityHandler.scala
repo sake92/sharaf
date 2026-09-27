@@ -8,7 +8,7 @@ import org.pac4j.core.engine.SecurityGrantedAccessAdapter
 import org.pac4j.core.profile.UserProfile
 import ba.sake.sharaf.{SharafHandler, RequestContext, Response, Cookie, HttpString}
 import ba.sake.sharaf.routing.Path
-import ba.sake.sharaf.session.{SessionImpl, SessionHolder, NoOpSessionStore}
+import ba.sake.sharaf.session.{SessionHolder, NoOpSessionStore}
 
 object Pac4jSecurityHandler:
   private[pac4j] val currentProfiles = new ThreadLocal[List[UserProfile]]()
@@ -131,7 +131,7 @@ final class Pac4jSecurityHandler(
         securityConfig.sessionStore match
           case _: NoOpSessionStore => supplemented
           case store =>
-            store.save(s.asInstanceOf[SessionImpl])
+            store.save(s)
             supplemented.settingCookie(
               Cookie(
                 name = "SHARAF_SESSION",
