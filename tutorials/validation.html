@@ -54,6 +54,11 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
     .minItems(_.seq, <span class="hljs-number">1</span>)
 </code></pre>
      <p>The <code>ValidatedData</code> can be any <code>case class</code>: json data, form data, query params..</p>
+     <p><code>Validator</code> also provides <code>.notEmpty</code>, <code>.email</code>, and <code>.exactLength</code> for strings. For collections, use <code>.allItems(_.values, predicate, message)</code> when every element must meet a condition. For example:</p>
+     <pre><code class="language-scala hljs" data-highlighted="yes">.email(_.contactEmail)
+.allItems(_.tags, _.nonEmpty, <span class="hljs-string">"must not be empty"</span>)
+</code></pre>
+     <p>Derived validators recurse through nested <code>Seq</code> and <code>Option</code> fields when their element type has a <code>Validator</code>. <code>None</code> is valid; use a non-optional field when the value is required.</p>
      <hr>
      <p>Create a file <code>validation.sc</code> and paste this code into it:</p>
      <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">scala</span> <span class="hljs-string">"3.7.3"</span>
