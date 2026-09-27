@@ -53,11 +53,3 @@ private[jdbc] final class JdbcSession(
 
   private[jdbc] def serializedData: String =
     data.toJson(spaces = 0)
-
-private[jdbc] object SecureJdbcSessionId:
-  private val random = new java.security.SecureRandom()
-
-  def generate(): String =
-    val bytes = new Array[Byte](16)
-    random.nextBytes(bytes)
-    java.util.Base64.getUrlEncoder.withoutPadding.encodeToString(bytes)

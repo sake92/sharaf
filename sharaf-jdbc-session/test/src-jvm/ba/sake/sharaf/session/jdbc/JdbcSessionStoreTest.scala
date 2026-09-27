@@ -4,16 +4,16 @@ import java.time.Duration
 import java.util.UUID
 import org.h2.jdbcx.JdbcDataSource
 import ba.sake.sharaf.session.SessionConfig
+import ba.sake.squery.*
 import ba.sake.tupson.JsonRW
 
 class JdbcSessionStoreTest extends munit.FunSuite:
 
   private final case class Profile(name: String, roles: Seq[String]) derives JsonRW
 
-  test("creates the schema idempotently and persists typed values across store instances") {
+  test("persists typed values across store instances after the application migrates the schema") {
     val dataSource = newDataSource()
-    JdbcSessionStore.createSchema(dataSource)
-    JdbcSessionStore.createSchema(dataSource)
+    createSchema(dataSource)
     val store = JdbcSessionStore(dataSource)
 
     val session = store.create()
@@ -75,8 +75,20 @@ class JdbcSessionStoreTest extends munit.FunSuite:
 
   private def newStore(config: SessionConfig = SessionConfig.default): JdbcSessionStore =
     val dataSource = newDataSource()
-    JdbcSessionStore.createSchema(dataSource)
+    createSchema(dataSource)
     JdbcSessionStore(dataSource, config)
+
+  private def createSchema(dataSource: JdbcDataSource): Unit =
+    SqueryContext(dataSource).run {
+      sql"""
+        CREATE TABLE sharaf_session (
+          session_id VARCHAR(128) PRIMARY KEY,
+          created_at BIGINT NOT NULL,
+          last_accessed_at BIGINT NOT NULL,
+          session_data TEXT NOT NULL
+        )
+      """.update()
+    }
 
   private def newDataSource(): JdbcDataSource =
     val dataSource = new JdbcDataSource()

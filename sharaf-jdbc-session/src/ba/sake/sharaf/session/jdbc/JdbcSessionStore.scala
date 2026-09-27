@@ -6,11 +6,12 @@ import ba.sake.sharaf.session.{Session, SessionConfig, SessionStore}
 import ba.sake.squery.{*, given}
 import ba.sake.tupson.*
 
-/** A JVM-only [[SessionStore]] backed by a JDBC database through squery.
+/** A [[SessionStore]] backed by a JDBC database through squery.
   *
-  * Call [[JdbcSessionStore.createSchema]] once during deployment before creating the store. Session values are stored
-  * as Tupson JSON, so they retain the same [[ba.sake.tupson.JsonRW]] semantics as Sharaf's in-memory store. Database
-  * failures and corrupt serialized values are propagated to the caller; they are never treated as missing sessions.
+  * Before creating the store, apply the template for your database from this artifact's `resources` directory through
+  * your application's migration tool. Session values are stored as Tupson JSON, so they retain the same
+  * [[ba.sake.tupson.JsonRW]] semantics as Sharaf's in-memory store. Database failures and corrupt serialized values
+  * are propagated to the caller; they are never treated as missing sessions.
   */
 final class JdbcSessionStore(dataSource: DataSource, config: SessionConfig = SessionConfig.default) extends SessionStore:
 
@@ -36,7 +37,7 @@ final class JdbcSessionStore(dataSource: DataSource, config: SessionConfig = Ses
           Some(
             new JdbcSession(
               stored.session_id,
-              stored.created_at,
+              Instant.ofEpochMilli(stored.created_at),
               stored.session_data.parseJson[Map[String, String]]
             )
           )
@@ -70,16 +71,17 @@ final class JdbcSessionStore(dataSource: DataSource, config: SessionConfig = Ses
         context.run {
           sql"""
             DELETE FROM sharaf_session
-            WHERE last_accessed_at < ${now.minus(maxAge)} OR created_at < ${now.minus(absoluteTimeout)}
+            WHERE last_accessed_at < ${now.minus(maxAge).toEpochMilli} OR
+                  created_at < ${now.minus(absoluteTimeout).toEpochMilli}
           """.update()
         }
       case (Some(maxAge), None) =>
         context.run {
-          sql"DELETE FROM sharaf_session WHERE last_accessed_at < ${now.minus(maxAge)}".update()
+          sql"DELETE FROM sharaf_session WHERE last_accessed_at < ${now.minus(maxAge).toEpochMilli}".update()
         }
       case (None, Some(absoluteTimeout)) =>
         context.run {
-          sql"DELETE FROM sharaf_session WHERE created_at < ${now.minus(absoluteTimeout)}".update()
+          sql"DELETE FROM sharaf_session WHERE created_at < ${now.minus(absoluteTimeout).toEpochMilli}".update()
         }
       case (None, None) => 0
 
@@ -88,7 +90,7 @@ final class JdbcSessionStore(dataSource: DataSource, config: SessionConfig = Ses
       if session.isRegenerated then session.previousId.foreach(deleteSession)
       val updated = sql"""
         UPDATE sharaf_session
-        SET created_at = ${session.createdAt}, last_accessed_at = ${session.lastAccessedAt},
+        SET created_at = ${session.createdAt.toEpochMilli}, last_accessed_at = ${session.lastAccessedAt.toEpochMilli},
             session_data = ${session.serializedData}
         WHERE session_id = ${session.id}
       """.update()
@@ -98,7 +100,8 @@ final class JdbcSessionStore(dataSource: DataSource, config: SessionConfig = Ses
   private def insertSession(session: JdbcSession)(using SqueryConnection): Unit =
     sql"""
       INSERT INTO sharaf_session(session_id, created_at, last_accessed_at, session_data)
-      VALUES (${session.id}, ${session.createdAt}, ${session.lastAccessedAt}, ${session.serializedData})
+      VALUES (${session.id}, ${session.createdAt.toEpochMilli}, ${session.lastAccessedAt.toEpochMilli},
+              ${session.serializedData})
     """.insert()
     ()
 
@@ -107,30 +110,16 @@ final class JdbcSessionStore(dataSource: DataSource, config: SessionConfig = Ses
     ()
 
   private def isExpired(session: StoredSession, now: Instant): Boolean =
-    config.maxAge.exists(session.last_accessed_at.plus(_).isBefore(now)) ||
-      config.absoluteTimeout.exists(session.created_at.plus(_).isBefore(now))
+    config.maxAge.exists(Instant.ofEpochMilli(session.last_accessed_at).plus(_).isBefore(now)) ||
+      config.absoluteTimeout.exists(Instant.ofEpochMilli(session.created_at).plus(_).isBefore(now))
 
 private[jdbc] final case class StoredSession(
     session_id: String,
-    created_at: Instant,
-    last_accessed_at: Instant,
+    created_at: Long,
+    last_accessed_at: Long,
     session_data: String
 ) derives SqlReadRow
 
 object JdbcSessionStore:
-
-  /** Runs the idempotent initial schema migration for this store. */
-  def createSchema(dataSource: DataSource): Unit =
-    SqueryContext(dataSource).run {
-      sql"""
-        CREATE TABLE IF NOT EXISTS sharaf_session (
-          session_id VARCHAR(128) PRIMARY KEY,
-          created_at TIMESTAMP NOT NULL,
-          last_accessed_at TIMESTAMP NOT NULL,
-          session_data TEXT NOT NULL
-        )
-      """.execute()
-    }
-
   def apply(dataSource: DataSource, config: SessionConfig = SessionConfig.default): JdbcSessionStore =
     new JdbcSessionStore(dataSource, config)
