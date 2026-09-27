@@ -35,6 +35,9 @@ trait Validator[T] {
     validatorImpl(getter, _ >= summon[Numeric[F]].zero, s"must be nonnegative")
 
   // strings
+  def notEmpty(getter: T => sourcecode.Text[String]): Validator[T] =
+    validatorImpl(getter, _.nonEmpty, "must not be empty")
+
   def notBlank(getter: T => sourcecode.Text[String]): Validator[T] =
     validatorImpl(getter, !_.isBlank, "must not be blank")
 
@@ -44,11 +47,17 @@ trait Validator[T] {
   def maxLength(getter: T => sourcecode.Text[String], value: Long): Validator[T] =
     validatorImpl(getter, _.length <= value, s"must be <= $value")
 
+  def exactLength(getter: T => sourcecode.Text[String], value: Long): Validator[T] =
+    validatorImpl(getter, _.length == value, s"must have length $value")
+
   def contains(getter: T => sourcecode.Text[String], value: String): Validator[T] =
     validatorImpl(getter, _.contains(value), s"must contain $value")
 
   def matches(getter: T => sourcecode.Text[String], value: String): Validator[T] =
-    validatorImpl(getter, _.matches(value), s"must contain $value")
+    validatorImpl(getter, _.matches(value), s"must match $value")
+
+  def email(getter: T => sourcecode.Text[String]): Validator[T] =
+    validatorImpl(getter, _.matches("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$"), "must be a valid email")
 
   // seqs
   def minItems(getter: T => sourcecode.Text[Iterable[?]], value: Int): Validator[T] =
@@ -56,6 +65,9 @@ trait Validator[T] {
 
   def maxItems(getter: T => sourcecode.Text[Iterable[?]], value: Int): Validator[T] =
     validatorImpl(getter, _.size <= value, s"must be <= $value")
+
+  def allItems[F](getter: T => sourcecode.Text[Iterable[F]], predicate: F => Boolean, msg: String): Validator[T] =
+    validatorImpl(getter, _.forall(predicate), msg)
 
   private def validatorImpl[F](getter: T => sourcecode.Text[F], predicate: F => Boolean, msg: String): Validator[T] =
     (value: T) => {

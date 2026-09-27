@@ -26,6 +26,17 @@ object ValidatedData:
 
 The `ValidatedData` can be any `case class`: json data, form data, query params..  
 
+`Validator` also provides `.notEmpty`, `.email`, and `.exactLength` for strings. For collections, use
+`.allItems(_.values, predicate, message)` when every element must meet a condition. For example:
+
+```scala
+.email(_.contactEmail)
+.allItems(_.tags, _.nonEmpty, "must not be empty")
+```
+
+Derived validators recurse through nested `Seq` and `Option` fields when their element type has a `Validator`.
+`None` is valid; use a non-optional field when the value is required.
+
 ---
 
 Create a file `validation.sc` and paste this code into it:
