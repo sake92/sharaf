@@ -21,7 +21,7 @@ class WebJarsTest extends munit.FunSuite {
   override def afterAll(): Unit = server.stop()
 
   test("WebJars should work") {
-    val res = quickRequest.get(uri"${baseUrl}/jquery/3.7.1/jquery.js").send()
+    val res = quickRequest.get(uri"${baseUrl}/jquery/4.0.0/jquery.js").send()
     assert(res.body.length > 100)
     assertEquals(res.headers(HeaderNames.ContentType), Seq("text/javascript"))
   }

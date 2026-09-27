@@ -48,7 +48,7 @@ def SharafHttpApp(sharafHandler: SharafHandler) =
             .getOrElse(throw exceptions.SharafException(s"${response.status} can't be converted to org.http4s.Status")),
           httpVersion = HttpVersion.`HTTP/1.1`,
           headers = headers,
-          body = body
+          entity = Entity.stream(body)
         )
       )
     yield response
