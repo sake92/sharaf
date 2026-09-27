@@ -61,6 +61,42 @@ class ValidsonSuite extends munit.FunSuite {
       )
     )
   }
+
+  test("validate should validate additional string and collection constraints") {
+    assertEquals(
+      AdditionalData("abc", "person@example.com", "ABC", Seq("one", "two")).validate,
+      Seq.empty
+    )
+
+    assertEquals(
+      AdditionalData("", "person@example", "AB", Seq("one", "")).validate,
+      Seq(
+        ValidationError("$.required", "must not be empty", ""),
+        ValidationError("$.email", "must be a valid email", "person@example"),
+        ValidationError("$.code", "must have length 3", "AB"),
+        ValidationError("$.tags", "must not be empty", Seq("one", ""))
+      )
+    )
+  }
+
+  test("matches should describe a regular-expression mismatch") {
+    assertEquals(
+      RegexData("abc").validate,
+      Seq(ValidationError("$.value", "must match [A-Z]+", "abc"))
+    )
+  }
+
+  test("validate should recurse through optional nested sequences") {
+    assertEquals(OptionalData(None).validate, Seq.empty)
+    assertEquals(
+      OptionalData(Some(Seq(SimpleData(0, " ", Seq.empty)))).validate,
+      Seq(
+        ValidationError("$.data[0].num", "must be positive", 0),
+        ValidationError("$.data[0].str", "must not be blank", " "),
+        ValidationError("$.data[0].seq", "must be >= 1", Seq.empty)
+      )
+    )
+  }
 }
 
 // types
@@ -84,3 +120,20 @@ object ComplexData:
     .contains(_.password, "A")
     .contains(_.password, "5")
     .minItems(_.matrix, 1)
+
+case class AdditionalData(required: String, email: String, code: String, tags: Seq[String])
+object AdditionalData:
+  given Validator[AdditionalData] = Validator
+    .derived[AdditionalData]
+    .notEmpty(_.required)
+    .email(_.email)
+    .exactLength(_.code, 3)
+    .allItems(_.tags, _.nonEmpty, "must not be empty")
+
+case class RegexData(value: String)
+object RegexData:
+  given Validator[RegexData] = Validator.derived[RegexData].matches(_.value, "[A-Z]+")
+
+case class OptionalData(data: Option[Seq[SimpleData]])
+object OptionalData:
+  given Validator[OptionalData] = Validator.derived[OptionalData]
