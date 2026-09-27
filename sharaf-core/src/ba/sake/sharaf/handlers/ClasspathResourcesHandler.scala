@@ -84,7 +84,7 @@ final class ClasspathResourcesHandler(
     connection.setUseCaches(false)
     val contentLength = connection.getContentLengthLong
     val lastModified = connection.getLastModified match {
-      case 0    => Instant.now() // Unknown modification time
+      case 0    => Instant.EPOCH // Unknown modification time must produce a stable ETag
       case time => Instant.ofEpochMilli(time)
     }
 

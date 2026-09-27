@@ -20,7 +20,8 @@ def parseQSMap(queryStringMap: QueryStringMap): QueryStringData =
 
 private def fromInternal(qsi: QueryStringInternal): QueryStringData = qsi match
   case QueryStringInternal.Simple(value)       => QueryStringData.Simple(value)
-  case QueryStringInternal.Obj(values)         => QueryStringData.Obj(values.view.mapValues(fromInternal).toMap)
+  case QueryStringInternal.Obj(values)         =>
+    QueryStringData.Obj(values.iterator.map { case (key, value) => key -> fromInternal(value) }.toMap)
   case QueryStringInternal.Sequence(valuesMap) =>
     // TODO doesnt work for List[List[T]]
     QueryStringData.Sequence(valuesMap.values.toSeq.flatten.map(fromInternal))
@@ -38,7 +39,7 @@ private[querson] class QuersonParser(qsMap: QueryStringMap) {
   def parse(): Obj = {
 
     // for every key we get an AST (object) with possibly recursive values
-    val objects = qsMap.map { case (key, values) =>
+    val objects = qsMap.iterator.map { case (key, values) =>
       val keyParts = KeyParser(key).parse()
       parseInternal(keyParts, values).asInstanceOf[Obj]
     }.toSeq

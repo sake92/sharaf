@@ -21,7 +21,8 @@ private[formson] def parseFDMap(formDataMap: FormDataMap): FormData =
 
 private def fromInternal(fdi: FormDataInternal): FormData = fdi match
   case FormDataInternal.Simple(value)       => FormData.Simple(value)
-  case FormDataInternal.Obj(values)         => FormData.Obj(values.map((k, v) => k -> fromInternal(v)))
+  case FormDataInternal.Obj(values)         =>
+    FormData.Obj(values.map { case (key, value) => key -> fromInternal(value) })
   case FormDataInternal.Sequence(valuesMap) => FormData.Sequence(valuesMap.values.toSeq.flatten.map(fromInternal))
 
 // internal, temporary representation
@@ -36,7 +37,7 @@ private[formson] class FormsonParser(formDataMap: FormDataMap) {
 
   def parse(): Obj =
     // for every key we get an AST (object) with possibly recursive values
-    val objects = formDataMap.map { case (key, values) =>
+    val objects = formDataMap.iterator.map { case (key, values) =>
       val keyParts = KeyParser(key).parse()
       parseInternal(keyParts, values).asInstanceOf[Obj]
     }.toSeq
