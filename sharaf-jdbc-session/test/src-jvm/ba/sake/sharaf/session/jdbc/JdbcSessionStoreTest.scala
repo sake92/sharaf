@@ -1,10 +1,10 @@
 package ba.sake.sharaf.session.jdbc
 
 import java.time.Duration
+import java.nio.charset.StandardCharsets
 import java.util.UUID
 import org.h2.jdbcx.JdbcDataSource
 import ba.sake.sharaf.session.SessionConfig
-import ba.sake.squery.*
 import ba.sake.tupson.JsonRW
 
 class JdbcSessionStoreTest extends munit.FunSuite:
@@ -73,22 +73,61 @@ class JdbcSessionStoreTest extends munit.FunSuite:
     assertEquals(store.load(session.id), None)
   }
 
+  test("a stale ordinary save does not recreate a deleted session") {
+    val dataSource = newDataSource()
+    createSchema(dataSource)
+    val store = JdbcSessionStore(dataSource)
+    val session = store.create()
+    val staleSession = store.load(session.id).getOrElse(fail("session was not loaded"))
+
+    store.delete(session.id)
+    staleSession.set("user", "ada")
+    store.save(staleSession)
+
+    assertEquals(store.load(session.id), None)
+  }
+
+  test("a regenerated session cannot recreate itself after its first save") {
+    val store = newStore()
+    val session = store.create()
+    session.regenerate()
+    store.save(session)
+
+    store.delete(session.id)
+    store.save(session)
+
+    assertEquals(store.load(session.id), None)
+  }
+
+  test("invalidating a regenerated unsaved session deletes its previous ID") {
+    val store = newStore()
+    val session = store.create()
+    val previousId = session.id
+    session.regenerate()
+    session.invalidate()
+
+    store.save(session)
+
+    assertEquals(store.load(previousId), None)
+  }
+
   private def newStore(config: SessionConfig = SessionConfig.default): JdbcSessionStore =
     val dataSource = newDataSource()
     createSchema(dataSource)
     JdbcSessionStore(dataSource, config)
 
   private def createSchema(dataSource: JdbcDataSource): Unit =
-    SqueryContext(dataSource).run {
-      sql"""
-        CREATE TABLE sharaf_session (
-          session_id VARCHAR(128) PRIMARY KEY,
-          created_at BIGINT NOT NULL,
-          last_accessed_at BIGINT NOT NULL,
-          session_data TEXT NOT NULL
-        )
-      """.update()
-    }
+    val script =
+      val input = Option(getClass.getResourceAsStream("/ba/sake/sharaf/session/jdbc/schema-h2.sql"))
+        .getOrElse(fail("bundled H2 schema template was not found"))
+      try new String(input.readAllBytes(), StandardCharsets.UTF_8)
+      finally input.close()
+    val connection = dataSource.getConnection
+    try
+      val statement = connection.createStatement()
+      try script.split(';').map(_.trim).filter(_.nonEmpty).foreach(statement.execute)
+      finally statement.close()
+    finally connection.close()
 
   private def newDataSource(): JdbcDataSource =
     val dataSource = new JdbcDataSource()

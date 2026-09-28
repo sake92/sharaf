@@ -130,13 +130,15 @@ val security = Pac4jSecurityConfig(pac4jConfig, clients = "FormClient")
 
 Copy one of `schema-h2.sql`, `schema-mysql.sql`, `schema-postgresql.sql`, or `schema-sqlite.sql` from
 `sharaf-jdbc-session/resources/ba/sake/sharaf/session/jdbc/` into your application's migration directory and assign its
-own version. These are templates, not automatically-discovered Flyway migrations, so this library cannot interfere with
-an existing migration history. The store serializes each session value as JSON and atomically replaces the old ID when a
-session is regenerated. It enforces idle and absolute expiry on load; call `sessions.deleteExpired()` periodically to
-remove abandoned expired rows. Database and serialization failures are propagated, so monitor failed reads/writes.
-Encrypt access to the backing service, restrict it to the application network, and test it with two application
-instances: log in through one, use the cookie through the other, regenerate on login, then verify that logout and expiry
-invalidate both IDs.
+own version. Published artifacts expose the same files on the classpath under
+`/ba/sake/sharaf/session/jdbc/schema-<database>.sql`; this is useful for tests or build tooling, but do not execute them
+at application startup. They are templates, not automatically-discovered Flyway migrations, so this library cannot
+interfere with an existing migration history. The store serializes each session value as JSON and atomically replaces the
+old ID when a session is regenerated. It enforces idle and absolute expiry on load; call `sessions.deleteExpired()`
+periodically to remove abandoned expired rows. Database and serialization failures are propagated, so monitor failed
+reads/writes. Encrypt access to the backing service, restrict it to the application network, and test it with two
+application instances: log in through one, use the cookie through the other, regenerate on login, then verify that logout
+and expiry invalidate both IDs.
 
 The handler emits a `SHARAF_SESSION` cookie with `Secure`, `HttpOnly`, `SameSite=Strict`, path `/`, and a 30-minute
 maximum age. `Secure` means browser login requires HTTPS. If cross-site login is a requirement, design the cookie and

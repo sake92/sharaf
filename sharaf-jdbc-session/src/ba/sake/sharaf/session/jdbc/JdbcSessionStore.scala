@@ -20,7 +20,9 @@ final class JdbcSessionStore(dataSource: DataSource, config: SessionConfig = Ses
   override def create(): Session =
     val now = Instant.now()
     val session = new JdbcSession(SecureJdbcSessionId.generate(), now, Map.empty)
-    save(session)
+    context.runTransaction {
+      insertSession(session)
+    }
     session
 
   override def load(sessionId: String): Option[Session] =
@@ -45,7 +47,11 @@ final class JdbcSessionStore(dataSource: DataSource, config: SessionConfig = Ses
     }
 
   override def save(session: Session): Unit =
-    if session.isInvalid then delete(session.id)
+    if session.isInvalid then
+      context.runTransaction {
+        deleteSession(session.id)
+        session.previousId.foreach(deleteSession)
+      }
     else
       session match
         case jdbcSession: JdbcSession => saveJdbcSession(jdbcSession)
@@ -87,15 +93,17 @@ final class JdbcSessionStore(dataSource: DataSource, config: SessionConfig = Ses
 
   private def saveJdbcSession(session: JdbcSession): Unit =
     context.runTransaction {
-      if session.isRegenerated then session.previousId.foreach(deleteSession)
+      val mayInsert = session.isRegenerated
+      if mayInsert then session.previousId.foreach(deleteSession)
       val updated = sql"""
         UPDATE sharaf_session
         SET created_at = ${session.createdAt.toEpochMilli}, last_accessed_at = ${session.lastAccessedAt.toEpochMilli},
             session_data = ${session.serializedData}
         WHERE session_id = ${session.id}
       """.update()
-      if updated == 0 then insertSession(session)
+      if updated == 0 && mayInsert then insertSession(session)
     }
+    if session.isRegenerated then session.markRegenerationPersisted()
 
   private def insertSession(session: JdbcSession)(using SqueryConnection): Unit =
     sql"""

@@ -51,5 +51,8 @@ private[jdbc] final class JdbcSession(
 
   override def isRegenerated: Boolean = _regenerated
 
+  private[jdbc] def markRegenerationPersisted(): Unit =
+    _regenerated = false
+
   private[jdbc] def serializedData: String =
     data.toJson(spaces = 0)
