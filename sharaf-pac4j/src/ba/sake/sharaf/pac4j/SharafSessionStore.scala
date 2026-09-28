@@ -5,7 +5,7 @@ import java.util.{Base64, Optional}
 import scala.util.Using
 import org.pac4j.core.context.{FrameworkParameters, WebContext}
 import org.pac4j.core.context.session.{SessionStore as Pac4jSessionStore, SessionStoreFactory}
-import ba.sake.sharaf.session.{SessionStore as SharafSessionStoreTrait, SessionImpl, SessionHolder}
+import ba.sake.sharaf.session.{SessionStore as SharafSessionStoreTrait, SessionHolder}
 
 /** Adapts a Sharaf [[SharafSessionStoreTrait]] to pac4j's [[Pac4jSessionStore]].
   *
@@ -53,10 +53,9 @@ final class SharafSessionStore(store: SharafSessionStoreTrait) extends Pac4jSess
   override def renewSession(context: WebContext): Boolean =
     SessionHolder.get match
       case Some(session) =>
-        val oldId = session.id
         session.regenerate()
-        store.delete(oldId)
-        store.save(session.asInstanceOf[SessionImpl])
+        store.save(session)
+        session.previousId.foreach(store.delete)
         true
       case None => false
 

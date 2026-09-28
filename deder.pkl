@@ -224,6 +224,45 @@ local const sharafCoreModules =
     }
   }.get
 
+local const sharafJdbcSessionModules =
+  new CreateCrossModules {
+    root = "sharaf-jdbc-session"
+    template = (baseTemplate) {
+      pomSettings {
+        artifactId = "sharaf-jdbc-session"
+        name = "Sharaf JDBC Session"
+        description = "JDBC-backed session storage for Sharaf"
+      }
+      moduleDeps {
+        sharafCoreModules.jvm
+      }
+      deps {
+        "ba.sake::squery::0.12.0"
+      }
+      publish = true
+    }
+    testTemplate = (baseTemplate.asTest()) {
+      moduleDeps {
+        sharafCoreModules.jvm_test
+      }
+      deps {
+        "org.scalameta::munit::\(versions.munit)"
+        "com.h2database:h2:2.3.232"
+      }
+    }
+    nativeTemplate = (template.asNative()) {
+      scalaNativeVersion = versions.scalaNativeVersion
+      moduleDeps = new { sharafCoreModules.native }
+      publish = true
+    }
+    nativeTestTemplate = (nativeTemplate.asTest()) {
+      deps {
+        "org.scalameta::munit::\(versions.munit)"
+        "com.github.lolgab::scala-native-jdbc-sqlite::0.0.6"
+      }
+    }
+  }.get
+
 local const sharafHepekComponents = (baseTemplate) {
   id = "sharaf-hepek-components"
   root = "sharaf-hepek-components"
@@ -531,6 +570,10 @@ modules {
   sharafCoreModules.jvm_test
   sharafCoreModules.native
   sharafCoreModules.native_test
+  sharafJdbcSessionModules.jvm
+  sharafJdbcSessionModules.jvm_test
+  sharafJdbcSessionModules.native
+  sharafJdbcSessionModules.native_test
   ...sharafUndertowModules.all
   sharafHttp4sModules.jvm
   sharafHttp4sModules.jvm_test

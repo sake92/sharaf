@@ -1,6 +1,5 @@
 package ba.sake.sharaf.session
 
-import java.time.Instant
 import ba.sake.sharaf.*
 
 /** A [[SharafHandler]] decorator that provides session management.
@@ -38,10 +37,11 @@ final class SessionHandler(
 
     if session.isInvalid then
       store.delete(session.id)
+      session.previousId.foreach(store.delete)
       res.removingCookie(config.cookieName)
     else
-      if session.isRegenerated then session.previousId.foreach(store.delete)
       store.save(session)
+      if session.isRegenerated then session.previousId.foreach(store.delete)
       val maxAgeSeconds = config.maxAge.map(_.getSeconds.toInt)
       res.settingCookie(
         Cookie(
