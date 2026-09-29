@@ -1,4 +1,4 @@
-//> using scala 3.7.3
+//> using scala 3.9.0
 
 import java.nio.file.{Files, Path, StandardCopyOption}
 import java.util.Arrays

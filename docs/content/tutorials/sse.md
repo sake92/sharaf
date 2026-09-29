@@ -18,7 +18,7 @@ Let's make a simple page that sends 5 SSE events and then a "stop" message.
 Create a file `sse.sc` and paste this code into it:
 
 ```scala
-//> using scala 3.7.3
+//> using scala 3.9.0
 //> using dep ba.sake::sharaf-undertow:{{site.data.project.artifact.version}}
 
 import ba.sake.sharaf.{*, given}

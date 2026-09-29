@@ -12,7 +12,7 @@ description: Sharaf Tutorial JSON
 Let's make a simple JSON API in scala-cli.  
 Create a file `json_api.sc` and paste this code into it:
 ```scala
-//> using scala "3.7.3"
+//> using scala 3.9.0
 //> using dep {{site.data.project.artifact.org}}::{{site.data.project.artifact.name}}:{{site.data.project.artifact.version}}
 
 import ba.sake.tupson.JsonRW

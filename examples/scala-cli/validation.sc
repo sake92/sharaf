@@ -1,5 +1,5 @@
-//> using scala "3.7.3"
-//> using dep ba.sake::sharaf-undertow:0.19.0
+//> using scala 3.9.0
+//> using dep ba.sake::sharaf-undertow:0.20.0
 
 import ba.sake.querson.QueryStringRW
 import ba.sake.tupson.JsonRW

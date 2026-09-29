@@ -1,10 +1,10 @@
 // you can build it as native executable with Scala CLI, and run it without JVM
 // scala --power package hello-http4s-native.scala -o http4s
 // ./http4s
-//> using scala 3.7.3
+//> using scala 3.9.0
 //> using platform native
 //> using nativeVersion 0.5.11
-//> using dep ba.sake::sharaf-http4s::0.19.0
+//> using dep ba.sake::sharaf-http4s::0.20.0
 //> using dep org.http4s::http4s-ember-server::0.23.34
 
 import cats.effect.*
