@@ -41,9 +41,9 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
      <h1 id="sql">SQL<a href="#sql" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
      <p>In this lesson, you will add a customer and read it back. The example uses an in-memory H2 database, so no database setup is needed.</p>
      <p>Create a file named <code>sql_db.sc</code>:</p>
-     <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">scala</span> <span class="hljs-string">3.7.3</span>
+     <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">scala</span> <span class="hljs-string">3.9.0</span>
 <span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">com.h2database:h2:2.4.240</span>
-<span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">ba.sake::sharaf-undertow:0.19.0</span>
+<span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">ba.sake::sharaf-undertow:0.20.0</span>
 <span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">ba.sake::squery:0.8.2</span>
 
 <span class="hljs-keyword">import</span> ba.sake.tupson.<span class="hljs-type">JsonRW</span>

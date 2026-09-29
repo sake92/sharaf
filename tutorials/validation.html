@@ -61,8 +61,8 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
      <p>Derived validators recurse through nested <code>Seq</code> and <code>Option</code> fields when their element type has a <code>Validator</code>. <code>None</code> is valid; use a non-optional field when the value is required.</p>
      <hr>
      <p>Create a file <code>validation.sc</code> and paste this code into it:</p>
-     <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">scala</span> <span class="hljs-string">"3.7.3"</span>
-<span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">ba.sake::sharaf-undertow:0.19.0</span>
+     <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">scala</span> <span class="hljs-string">3.9.0</span>
+<span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">ba.sake::sharaf-undertow:0.20.0</span>
 
 <span class="hljs-keyword">import</span> ba.sake.querson.<span class="hljs-type">QueryStringRW</span>
 <span class="hljs-keyword">import</span> ba.sake.tupson.<span class="hljs-type">JsonRW</span>
