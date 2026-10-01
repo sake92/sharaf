@@ -39,8 +39,8 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
    <div>
     <div class="content">
      <h1 id="patch-requests">PATCH Requests<a href="#patch-requests" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
-     <p>A <code>PUT</code> request normally replaces a whole resource, but a client often needs to update just one field. With ordinary optional fields, JSON cannot distinguish an omitted key (leave the existing value unchanged) from <code>null</code> (clear its value). Model those three states explicitly so a PATCH endpoint can preserve that intent.</p>
-     <p>Define a <code>Patch[T]</code> codec whose default for a missing key is <code>Keep</code>; <code>null</code> becomes <code>Clear</code>, and any value becomes <code>Set</code>. The runnable Scala CLI example below applies the patch to a user resource:</p>
+     <p>A <code>PUT</code> request normally replaces a whole resource, but a client often needs to update just one field. With ordinary optional fields, JSON cannot distinguish an omitted key (leave the existing value unchanged) from <code>null</code> (replace a nullable value with no value). Model whether the field was sent separately from its nullability so a PATCH endpoint can preserve that intent.</p>
+     <p>Define a <code>Patch[T]</code> codec whose default for a missing key is <code>Keep</code>; every present key becomes <code>Set(value)</code>. Use <code>Patch[String]</code> for a required field and <code>Patch[Option[String]]</code> for a nullable field, so JSON <code>null</code> becomes <code>Set(None)</code>. The runnable Scala CLI example below applies the patch to a user resource:</p>
      <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">scala</span> <span class="hljs-string">3.9.0</span>
 <span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">ba.sake::sharaf-undertow:0.20.0</span>
 <span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">ba.sake::tupson:0.31.0</span>
@@ -52,41 +52,36 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
 
 <span class="hljs-keyword">enum</span> <span class="hljs-type">Patch</span>[+<span class="hljs-type">T</span>]:
   <span class="hljs-keyword">case</span> <span class="hljs-type">Set</span>(value: <span class="hljs-type">T</span>)
-  <span class="hljs-keyword">case</span> <span class="hljs-type">Clear</span>
   <span class="hljs-keyword">case</span> <span class="hljs-type">Keep</span>
 
 <span class="hljs-class"><span class="hljs-keyword">object</span> <span class="hljs-title">Patch</span></span>:
   <span class="hljs-keyword">given</span> [<span class="hljs-type">T</span>](<span class="hljs-keyword">using</span> valueRW: <span class="hljs-type">JsonRW</span>[<span class="hljs-type">T</span>]): <span class="hljs-type">JsonRW</span>[<span class="hljs-type">Patch</span>[<span class="hljs-type">T</span>]] <span class="hljs-keyword">with</span>
     <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">write</span></span>(value: <span class="hljs-type">Patch</span>[<span class="hljs-type">T</span>]): <span class="hljs-type">JValue</span> = value <span class="hljs-keyword">match</span>
       <span class="hljs-keyword">case</span> <span class="hljs-type">Set</span>(value) =&gt; valueRW.write(value)
-      <span class="hljs-keyword">case</span> <span class="hljs-type">Clear</span>      =&gt; <span class="hljs-type">JNull</span>
       <span class="hljs-keyword">case</span> <span class="hljs-type">Keep</span>       =&gt; <span class="hljs-keyword">throw</span> <span class="hljs-type">TupsonException</span>(<span class="hljs-string">"Patch.Keep can only be written as an object field"</span>)
 
     <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">shouldWriteField</span></span>(value: <span class="hljs-type">Patch</span>[<span class="hljs-type">T</span>]): <span class="hljs-type">Boolean</span> = value != <span class="hljs-type">Keep</span>
 
-    <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">parse</span></span>(path: <span class="hljs-type">String</span>, jValue: <span class="hljs-type">JValue</span>): <span class="hljs-type">Patch</span>[<span class="hljs-type">T</span>] = jValue <span class="hljs-keyword">match</span>
-      <span class="hljs-keyword">case</span> <span class="hljs-type">JNull</span> =&gt; <span class="hljs-type">Clear</span>
-      <span class="hljs-keyword">case</span> other =&gt; <span class="hljs-type">Set</span>(valueRW.parse(path, other))
+    <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">parse</span></span>(path: <span class="hljs-type">String</span>, jValue: <span class="hljs-type">JValue</span>): <span class="hljs-type">Patch</span>[<span class="hljs-type">T</span>] =
+      <span class="hljs-type">Set</span>(valueRW.parse(path, jValue))
 
     <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">default</span></span>: <span class="hljs-type">Option</span>[<span class="hljs-type">Patch</span>[<span class="hljs-type">T</span>]] = <span class="hljs-type">Some</span>(<span class="hljs-type">Keep</span>)
 
-<span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">User</span>(<span class="hljs-params">name: <span class="hljs-type">Option</span>[<span class="hljs-type">String</span>], address: <span class="hljs-type">Option</span>[<span class="hljs-type">String</span>]</span>) <span class="hljs-title">derives</span> <span class="hljs-title">JsonRW</span></span>
-<span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">UserPatch</span>(<span class="hljs-params">name: <span class="hljs-type">Patch</span>[<span class="hljs-type">String</span>], address: <span class="hljs-type">Patch</span>[<span class="hljs-type">String</span>]</span>) <span class="hljs-title">derives</span> <span class="hljs-title">JsonRW</span></span>
+<span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">User</span>(<span class="hljs-params">name: <span class="hljs-type">String</span>, address: <span class="hljs-type">Option</span>[<span class="hljs-type">String</span>]</span>) <span class="hljs-title">derives</span> <span class="hljs-title">JsonRW</span></span>
+<span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">UserPatch</span>(<span class="hljs-params">name: <span class="hljs-type">Patch</span>[<span class="hljs-type">String</span>], address: <span class="hljs-type">Patch</span>[<span class="hljs-type">Option</span>[<span class="hljs-type">String</span>]]</span>) <span class="hljs-title">derives</span> <span class="hljs-title">JsonRW</span></span>
 
 <span class="hljs-class"><span class="hljs-keyword">object</span> <span class="hljs-title">Users</span></span>:
-  <span class="hljs-keyword">private</span> <span class="hljs-keyword">var</span> user = <span class="hljs-type">User</span>(<span class="hljs-type">Some</span>(<span class="hljs-string">"Grace"</span>), <span class="hljs-type">Some</span>(<span class="hljs-string">"Arlington"</span>))
+  <span class="hljs-keyword">private</span> <span class="hljs-keyword">var</span> user = <span class="hljs-type">User</span>(<span class="hljs-string">"Grace"</span>, <span class="hljs-type">Some</span>(<span class="hljs-string">"Arlington"</span>))
 
   <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">current</span></span>: <span class="hljs-type">User</span> = user
 
   <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">patch</span></span>(update: <span class="hljs-type">UserPatch</span>): <span class="hljs-type">User</span> =
     user = <span class="hljs-type">User</span>(
       name = update.name <span class="hljs-keyword">match</span>
-        <span class="hljs-keyword">case</span> <span class="hljs-type">Patch</span>.<span class="hljs-type">Set</span>(value) =&gt; <span class="hljs-type">Some</span>(value)
-        <span class="hljs-keyword">case</span> <span class="hljs-type">Patch</span>.<span class="hljs-type">Clear</span>      =&gt; <span class="hljs-type">None</span>
+        <span class="hljs-keyword">case</span> <span class="hljs-type">Patch</span>.<span class="hljs-type">Set</span>(value) =&gt; value
         <span class="hljs-keyword">case</span> <span class="hljs-type">Patch</span>.<span class="hljs-type">Keep</span>       =&gt; user.name,
       address = update.address <span class="hljs-keyword">match</span>
-        <span class="hljs-keyword">case</span> <span class="hljs-type">Patch</span>.<span class="hljs-type">Set</span>(value) =&gt; <span class="hljs-type">Some</span>(value)
-        <span class="hljs-keyword">case</span> <span class="hljs-type">Patch</span>.<span class="hljs-type">Clear</span>      =&gt; <span class="hljs-type">None</span>
+        <span class="hljs-keyword">case</span> <span class="hljs-type">Patch</span>.<span class="hljs-type">Set</span>(value) =&gt; value
         <span class="hljs-keyword">case</span> <span class="hljs-type">Patch</span>.<span class="hljs-type">Keep</span>       =&gt; user.address,
     )
     user
