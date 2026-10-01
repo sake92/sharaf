@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Apply partial JSON updates in a Sharaf API">
+  <title>PATCH Requests | Sharaf Documentation</title>
+  <link rel="shortcut icon" href="https://sake92.github.io/sharaf/images/favicon.png" type="image/png">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-dark.min.css" media="(prefers-color-scheme: dark)" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-light.min.css" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.conditional.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://sake92.github.io/sharaf/styles/default.css">
+ </head>
+ <body>
+  <header class="pico container">
+   <nav aria-label="Main navigation">
+    <a href="https://sake92.github.io/sharaf/">Sharaf Documentation</a>
+    <div>
+     <a href="https://sake92.github.io/sharaf/tutorials">Tutorials</a> <a href="https://sake92.github.io/sharaf/howtos">How-Tos</a> <a href="https://sake92.github.io/sharaf/reference">Reference</a> <a href="https://sake92.github.io/sharaf/philosophy">Philosophy</a>
+    </div>
+    <form action="https://sake92.github.io/sharaf/search/results.html" method="get" role="search">
+     <input name="q" type="search" placeholder="Search" aria-label="Search this site">
+    </form>
+   </nav>
+  </header>
+  <script>
+for (const link of document.querySelectorAll('body > header > nav > div > a')) {
+    const path = new URL(link.href).pathname.replace(/\/$/, '');
+    const current = window.location.pathname;
+    if (current === path || current.startsWith(path + '/')) link.setAttribute('aria-current', 'page');
+}
+</script>
+  <main class="pico container">
+   <div>
+    <div class="content">
+     <h1 id="patch-requests">PATCH Requests<a href="#patch-requests" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
+     <p>A <code>PUT</code> request normally replaces a whole resource, but a client often needs to update just one field. With ordinary optional fields, JSON cannot distinguish an omitted key (leave the existing value unchanged) from <code>null</code> (clear its value). Model those three states explicitly so a PATCH endpoint can preserve that intent.</p>
+     <p>Define a <code>Patch[T]</code> codec whose default for a missing key is <code>Keep</code>; <code>null</code> becomes <code>Clear</code>, and any value becomes <code>Set</code>. The runnable Scala CLI example below applies the patch to a user resource:</p>
+     <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">scala</span> <span class="hljs-string">3.9.0</span>
+<span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">ba.sake::sharaf-undertow:0.20.0</span>
+<span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">ba.sake::tupson:0.31.0</span>
+
+<span class="hljs-keyword">import</span> ba.sake.sharaf.*
+<span class="hljs-keyword">import</span> ba.sake.sharaf.undertow.<span class="hljs-type">UndertowSharafServer</span>
+<span class="hljs-keyword">import</span> ba.sake.tupson.{<span class="hljs-keyword">given</span>, *}
+<span class="hljs-keyword">import</span> org.typelevel.jawn.ast.*
+
+<span class="hljs-keyword">enum</span> <span class="hljs-type">Patch</span>[+<span class="hljs-type">T</span>]:
+  <span class="hljs-keyword">case</span> <span class="hljs-type">Set</span>(value: <span class="hljs-type">T</span>)
+  <span class="hljs-keyword">case</span> <span class="hljs-type">Clear</span>
+  <span class="hljs-keyword">case</span> <span class="hljs-type">Keep</span>
+
+<span class="hljs-class"><span class="hljs-keyword">object</span> <span class="hljs-title">Patch</span></span>:
+  <span class="hljs-keyword">given</span> [<span class="hljs-type">T</span>](<span class="hljs-keyword">using</span> valueRW: <span class="hljs-type">JsonRW</span>[<span class="hljs-type">T</span>]): <span class="hljs-type">JsonRW</span>[<span class="hljs-type">Patch</span>[<span class="hljs-type">T</span>]] <span class="hljs-keyword">with</span>
+    <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">write</span></span>(value: <span class="hljs-type">Patch</span>[<span class="hljs-type">T</span>]): <span class="hljs-type">JValue</span> = value <span class="hljs-keyword">match</span>
+      <span class="hljs-keyword">case</span> <span class="hljs-type">Set</span>(value) =&gt; valueRW.write(value)
+      <span class="hljs-keyword">case</span> <span class="hljs-type">Clear</span>      =&gt; <span class="hljs-type">JNull</span>
+      <span class="hljs-keyword">case</span> <span class="hljs-type">Keep</span>       =&gt; <span class="hljs-keyword">throw</span> <span class="hljs-type">TupsonException</span>(<span class="hljs-string">"Patch.Keep can only be written as an object field"</span>)
+
+    <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">shouldWriteField</span></span>(value: <span class="hljs-type">Patch</span>[<span class="hljs-type">T</span>]): <span class="hljs-type">Boolean</span> = value != <span class="hljs-type">Keep</span>
+
+    <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">parse</span></span>(path: <span class="hljs-type">String</span>, jValue: <span class="hljs-type">JValue</span>): <span class="hljs-type">Patch</span>[<span class="hljs-type">T</span>] = jValue <span class="hljs-keyword">match</span>
+      <span class="hljs-keyword">case</span> <span class="hljs-type">JNull</span> =&gt; <span class="hljs-type">Clear</span>
+      <span class="hljs-keyword">case</span> other =&gt; <span class="hljs-type">Set</span>(valueRW.parse(path, other))
+
+    <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">default</span></span>: <span class="hljs-type">Option</span>[<span class="hljs-type">Patch</span>[<span class="hljs-type">T</span>]] = <span class="hljs-type">Some</span>(<span class="hljs-type">Keep</span>)
+
+<span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">User</span>(<span class="hljs-params">name: <span class="hljs-type">Option</span>[<span class="hljs-type">String</span>], address: <span class="hljs-type">Option</span>[<span class="hljs-type">String</span>]</span>) <span class="hljs-title">derives</span> <span class="hljs-title">JsonRW</span></span>
+<span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">UserPatch</span>(<span class="hljs-params">name: <span class="hljs-type">Patch</span>[<span class="hljs-type">String</span>], address: <span class="hljs-type">Patch</span>[<span class="hljs-type">String</span>]</span>) <span class="hljs-title">derives</span> <span class="hljs-title">JsonRW</span></span>
+
+<span class="hljs-class"><span class="hljs-keyword">object</span> <span class="hljs-title">Users</span></span>:
+  <span class="hljs-keyword">private</span> <span class="hljs-keyword">var</span> user = <span class="hljs-type">User</span>(<span class="hljs-type">Some</span>(<span class="hljs-string">"Grace"</span>), <span class="hljs-type">Some</span>(<span class="hljs-string">"Arlington"</span>))
+
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">current</span></span>: <span class="hljs-type">User</span> = user
+
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">patch</span></span>(update: <span class="hljs-type">UserPatch</span>): <span class="hljs-type">User</span> =
+    user = <span class="hljs-type">User</span>(
+      name = update.name <span class="hljs-keyword">match</span>
+        <span class="hljs-keyword">case</span> <span class="hljs-type">Patch</span>.<span class="hljs-type">Set</span>(value) =&gt; <span class="hljs-type">Some</span>(value)
+        <span class="hljs-keyword">case</span> <span class="hljs-type">Patch</span>.<span class="hljs-type">Clear</span>      =&gt; <span class="hljs-type">None</span>
+        <span class="hljs-keyword">case</span> <span class="hljs-type">Patch</span>.<span class="hljs-type">Keep</span>       =&gt; user.name,
+      address = update.address <span class="hljs-keyword">match</span>
+        <span class="hljs-keyword">case</span> <span class="hljs-type">Patch</span>.<span class="hljs-type">Set</span>(value) =&gt; <span class="hljs-type">Some</span>(value)
+        <span class="hljs-keyword">case</span> <span class="hljs-type">Patch</span>.<span class="hljs-type">Clear</span>      =&gt; <span class="hljs-type">None</span>
+        <span class="hljs-keyword">case</span> <span class="hljs-type">Patch</span>.<span class="hljs-type">Keep</span>       =&gt; user.address,
+    )
+    user
+
+<span class="hljs-keyword">val</span> routes = <span class="hljs-type">Routes</span>:
+  <span class="hljs-keyword">case</span> <span class="hljs-type">GET</span> -&gt; <span class="hljs-type">Path</span>(<span class="hljs-string">"user"</span>) =&gt; <span class="hljs-type">Response</span>.withBody(<span class="hljs-type">Users</span>.current)
+
+  <span class="hljs-keyword">case</span> <span class="hljs-type">PATCH</span> -&gt; <span class="hljs-type">Path</span>(<span class="hljs-string">"user"</span>) =&gt;
+    <span class="hljs-type">Response</span>.withBody(<span class="hljs-type">Users</span>.patch(<span class="hljs-type">Request</span>.current.bodyJson[<span class="hljs-type">UserPatch</span>]))
+
+<span class="hljs-type">UndertowSharafServer</span>(<span class="hljs-string">"localhost"</span>, <span class="hljs-number">8181</span>, routes, exceptionMapper = <span class="hljs-type">ExceptionMapper</span>.json).start()
+println(<span class="hljs-string">"Server started at http://localhost:8181"</span>)
+
+</code></pre>
+     <p>Start it from <code>examples/scala-cli</code>:</p>
+     <pre><code class="language-sh hljs language-bash" data-highlighted="yes">scala patch_requests.sc
+</code></pre>
+     <p>To update only the name, omit <code>address</code>:</p>
+     <pre><code class="language-sh hljs language-bash" data-highlighted="yes">curl -X PATCH http://localhost:8181/user \
+  -H <span class="hljs-string">'Content-Type: application/json'</span> \
+  -d <span class="hljs-string">'{"name":"Ada"}'</span>
+</code></pre>
+     <p>To clear the address, send it as <code>null</code>:</p>
+     <pre><code class="language-sh hljs language-bash" data-highlighted="yes">curl -X PATCH http://localhost:8181/user \
+  -H <span class="hljs-string">'Content-Type: application/json'</span> \
+  -d <span class="hljs-string">'{"address":null}'</span>
+</code></pre>
+     <p>For the JSON-specific behavior and a reusable standalone codec, see Tupson’s <a href="https://sake92.github.io/tupson/howtos/patch-requests.html">PATCH requests guide</a>.</p>
+     <div role="group">
+      <a role="button" href="https://sake92.github.io/sharaf/howtos/response-body.html">⬅️ Response Body</a> <span></span> <a role="button" href="https://sake92.github.io/sharaf/howtos/routes.html">Routes ➡️</a>
+     </div>
+    </div>
+    <aside aria-label="On this page">
+     <details open>
+      <summary>On this page</summary>
+      <nav aria-label="Table of contents">
+       <ul>
+        <li><a href="#patch-requests">PATCH Requests</a></li>
+       </ul>
+      </nav>
+     </details>
+    </aside>
+   </div>
+  </main>
+  <style>
+  body > footer.site-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding-block: 1.5rem 2rem;
+  }
+
+  .site-footer__identity {
+    display: grid;
+    gap: .1rem;
+  }
+
+  .site-footer__identity strong {
+    color: var(--pico-color);
+    font-size: 1rem;
+  }
+
+  .site-footer__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .65rem;
+  }
+
+  .site-footer__links a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .55rem;
+    min-height: 2.75rem;
+    padding: .55rem .85rem;
+    border: 1px solid var(--pico-muted-border-color);
+    border-radius: .7rem;
+    background: var(--pico-card-background-color);
+    color: var(--pico-color);
+    font-weight: 600;
+    line-height: 1;
+    text-decoration: none;
+    transition: border-color .15s ease, background-color .15s ease, transform .15s ease;
+  }
+
+  .site-footer__links a:hover {
+    border-color: var(--pico-primary);
+    background: var(--pico-secondary-background);
+    color: var(--pico-color);
+    transform: translateY(-2px);
+  }
+
+  .site-footer__links a:focus-visible {
+    outline: 2px solid var(--pico-primary);
+    outline-offset: 3px;
+  }
+
+  .site-footer__links svg {
+    width: 1.2rem;
+    height: 1.2rem;
+    flex: none;
+  }
+
+  .site-footer__links a[href*="discord"] svg {
+    color: #5865f2;
+  }
+
+  @media (max-width: 600px) {
+    body > footer.site-footer {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 1rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .site-footer__links a { transition: none; }
+    .site-footer__links a:hover { transform: none; }
+  }
+</style>
+  <footer class="pico container site-footer">
+   <div class="site-footer__identity">
+    <strong>Sharaf</strong> <span>Scala 3 web framework</span>
+   </div>
+   <nav class="site-footer__links" aria-label="Community links">
+    <a href="https://github.com/sake92/sharaf" target="_blank" rel="noopener noreferrer"> 
+     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23A10.94 10.94 0 0 1 12.03 5.79c1.02 0 2.04.135 3 .405 2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57C20.595 21.795 24 17.31 24 12 24 5.37 18.63 0 12 0Z" />
+     </svg> 
+     <span>GitHub</span> 
+    </a> <a href="https://discord.gg/g9KVY3WkMG" target="_blank" rel="noopener noreferrer"> 
+     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+      <path d="M19.73 5.29a17.4 17.4 0 0 0-4.27-1.32 12.1 12.1 0 0 0-.55 1.12 16.1 16.1 0 0 0-4.82 0 12.1 12.1 0 0 0-.55-1.12 17.4 17.4 0 0 0-4.27 1.32C2.57 9.29 1.84 13.2 2.2 17.05a17.7 17.7 0 0 0 5.23 2.67c.42-.57.8-1.17 1.12-1.8a11 11 0 0 1-1.7-.82c.14-.1.27-.21.4-.32 3.28 1.54 6.83 1.54 10.07 0 .13.11.26.22.4.32-.54.32-1.11.59-1.7.82.32.63.7 1.23 1.12 1.8a17.7 17.7 0 0 0 5.24-2.67c.42-4.46-.72-8.34-3.1-11.76ZM8.94 14.68c-.98 0-1.78-.89-1.78-1.98 0-1.1.78-1.99 1.78-1.99s1.8.9 1.78 1.99c0 1.09-.79 1.98-1.78 1.98Zm6.12 0c-.98 0-1.78-.89-1.78-1.98 0-1.1.78-1.99 1.78-1.99s1.8.9 1.78 1.99c0 1.09-.79 1.98-1.78 1.98Z" />
+     </svg> 
+     <span>Discord</span> 
+    </a>
+   </nav>
+  </footer>
+  <script>
+if (window.matchMedia('(max-width: 850px)').matches) {
+    document.querySelectorAll('body > main > div > aside > details').forEach(details => { details.open = false; });
+}
+</script>
+  <script src="https://sake92.github.io/sharaf/scripts/code-copy.js"></script>
+ </body>
+</html>
