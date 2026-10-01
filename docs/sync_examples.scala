@@ -17,6 +17,7 @@ import java.util.Arrays
     "html.sc" -> "examples/scala-cli/html.sc",
     "htmx_load_snippet.sc" -> "examples/htmx/htmx_load_snippet.sc",
     "json_api.test.scala" -> "examples/scala-cli/json_api.test.scala",
+    "patch_requests.sc" -> "examples/scala-cli/patch_requests.sc",
     "path_params.sc" -> "examples/scala-cli/path_params.sc",
     "query_params.sc" -> "examples/scala-cli/query_params.sc",
     "sql_db.sc" -> "examples/scala-cli/sql_db.sc",

@@ -49,6 +49,8 @@ howtos:
     url: "/howtos/redirect.html"
   - label: "Response Body"
     url: "/howtos/response-body.html"
+  - label: "PATCH Requests"
+    url: "/howtos/patch-requests.html"
   - label: "Routes"
     url: "/howtos/routes.html"
   - label: "Upload File"
