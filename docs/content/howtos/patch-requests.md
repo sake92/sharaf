@@ -7,11 +7,13 @@ description: Apply partial JSON updates in a Sharaf API
 # {{ page.title }}
 
 A `PUT` request normally replaces a whole resource, but a client often needs to update just one field. With ordinary
-optional fields, JSON cannot distinguish an omitted key (leave the existing value unchanged) from `null` (clear its
-value). Model those three states explicitly so a PATCH endpoint can preserve that intent.
+optional fields, JSON cannot distinguish an omitted key (leave the existing value unchanged) from `null` (replace a
+nullable value with no value). Model whether the field was sent separately from its nullability so a PATCH endpoint can
+preserve that intent.
 
-Define a `Patch[T]` codec whose default for a missing key is `Keep`; `null` becomes `Clear`, and any value becomes
-`Set`. The runnable Scala CLI example below applies the patch to a user resource:
+Define a `Patch[T]` codec whose default for a missing key is `Keep`; every present key becomes `Set(value)`. Use
+`Patch[String]` for a required field and `Patch[Option[String]]` for a nullable field, so JSON `null` becomes
+`Set(None)`. The runnable Scala CLI example below applies the patch to a user resource:
 
 ```scala
 {% include "patch_requests.sc" %}

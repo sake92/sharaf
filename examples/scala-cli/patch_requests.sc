@@ -9,41 +9,36 @@ import org.typelevel.jawn.ast.*
 
 enum Patch[+T]:
   case Set(value: T)
-  case Clear
   case Keep
 
 object Patch:
   given [T](using valueRW: JsonRW[T]): JsonRW[Patch[T]] with
     override def write(value: Patch[T]): JValue = value match
       case Set(value) => valueRW.write(value)
-      case Clear      => JNull
       case Keep       => throw TupsonException("Patch.Keep can only be written as an object field")
 
     override def shouldWriteField(value: Patch[T]): Boolean = value != Keep
 
-    override def parse(path: String, jValue: JValue): Patch[T] = jValue match
-      case JNull => Clear
-      case other => Set(valueRW.parse(path, other))
+    override def parse(path: String, jValue: JValue): Patch[T] =
+      Set(valueRW.parse(path, jValue))
 
     override def default: Option[Patch[T]] = Some(Keep)
 
-case class User(name: Option[String], address: Option[String]) derives JsonRW
-case class UserPatch(name: Patch[String], address: Patch[String]) derives JsonRW
+case class User(name: String, address: Option[String]) derives JsonRW
+case class UserPatch(name: Patch[String], address: Patch[Option[String]]) derives JsonRW
 
 object Users:
-  private var user = User(Some("Grace"), Some("Arlington"))
+  private var user = User("Grace", Some("Arlington"))
 
   def current: User = user
 
   def patch(update: UserPatch): User =
     user = User(
       name = update.name match
-        case Patch.Set(value) => Some(value)
-        case Patch.Clear      => None
+        case Patch.Set(value) => value
         case Patch.Keep       => user.name,
       address = update.address match
-        case Patch.Set(value) => Some(value)
-        case Patch.Clear      => None
+        case Patch.Set(value) => value
         case Patch.Keep       => user.address,
     )
     user
