@@ -48,4 +48,3 @@ jobs:
         run: |
           ./scripts/compile-scala-cli-examples.sh examples/scala-cli
           ./scripts/compile-scala-cli-examples.sh examples/htmx
-          scala-cli compile examples/scala-cli/hello-http4s-native.scala --server=false

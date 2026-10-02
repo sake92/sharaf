@@ -3,7 +3,7 @@
 // ./http4s
 //> using scala 3.9.0
 //> using platform native
-//> using nativeVersion 0.5.11
+//> using nativeVersion 0.5.12
 //> using dep ba.sake::sharaf-http4s::0.20.0
 //> using dep org.http4s::http4s-ember-server::0.23.34
 
