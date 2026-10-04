@@ -15,6 +15,7 @@ plugins {
 
 local const baseTemplate: ScalaModule = new {
   scalaVersion = "3.9.0"
+  publishTo = publishRepo
   scalacOptions = new Listing<String> {
     "-Yretain-trees" // needed for default parameters
     "-deprecation"
@@ -63,6 +64,11 @@ local const versions = new {
   mockOauth2Server = "6.0.3"
   jquery = "4.0.0"
 }
+
+local const publishRepo = if (read?("env:DEDER_PUBLISH_SNAPSHOT") == "true")
+  new SonatypeSnapshotRepo { id = "sonatype" }
+else
+  new SonatypeCentralRepo { id = "sonatype" }
 
 local const validsonModules =
   new CreateCrossModules {
