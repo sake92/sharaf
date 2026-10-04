@@ -60,6 +60,8 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.test.outputs.snapshot == 'true'
     needs: test
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     env:
       DEDER_PUBLISH_SNAPSHOT: ${{ needs.test.outputs.snapshot }}
       DEDER_SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
