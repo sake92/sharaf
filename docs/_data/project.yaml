@@ -45,6 +45,8 @@ howtos:
     url: "/howtos/not-found.html"
   - label: "Query Parameters"
     url: "/howtos/query-params.html"
+  - label: "Iron Query Parameters"
+    url: "/howtos/iron-query-params.html"
   - label: "Redirect"
     url: "/howtos/redirect.html"
   - label: "Response Body"
