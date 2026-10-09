@@ -1,0 +1,21 @@
+{
+  "$schema": "https://context7.com/schema/context7.json",
+  "projectTitle": "Sharaf",
+  "description": "A Scala 3 web framework with routing, JSON and form handling, validation, and integrations for multiple HTTP servers.",
+  "rules": [
+    "Use Scala 3 and choose the Sharaf server adapter module that matches the application's HTTP server.",
+    "Derive FormDataRW for typed form models; use bodyFormValidated[T] with a Validson Validator when form input needs validation.",
+    "Form support varies by adapter: Undertow supports URL-encoded and multipart; http4s and JDK support URL-encoded; Helidon and snunit do not support multipart.",
+    "Derive QueryStringRW for typed query parameters; queryParams[T] parses but does not validate, so use queryParamsValidated[T] when validation is required.",
+    "Use queryParamsRaw for dynamic query parameters or when the raw Map[String, Seq[String]] representation is more appropriate.",
+    "Derive JsonRW from ba.sake.tupson for JSON models; read request bodies with Request.current.bodyJson[Model].",
+    "Return JSON values with Response.withBody(value), and configure ExceptionMapper.json for JSON error responses.",
+    "Use bodyJsonValidated[Model] with a derived Validson Validator when request fields need validation.",
+    "For derivation involving default values, enable -Yretain-trees in sbt, Mill, or Scala CLI compiler options.",
+    "Undertow is the stable JVM adapter; http4s and JDK are beta, while Helidon and snunit are experimental. Check platform support before choosing.",
+    "Use sharaf-pac4j for new authentication integrations; do not copy the older Undertow-specific pac4j handler from the OAuth2 example.",
+    "For production authentication, use HTTPS, protect browser forms against CSRF, keep secrets out of source, and use a shared persistent session store for replicas.",
+    "Treat the JWT example's inline signing secret and printed test token as demonstration-only, never as production configuration.",
+    "Treat mutable in-memory state in tutorials as demonstration-only; use a persistent store in real applications."
+  ]
+}
