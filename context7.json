@@ -1,0 +1,13 @@
+{
+  "$schema": "https://context7.com/schema/context7.json",
+  "projectTitle": "Sharaf",
+  "description": "A Scala 3 web framework with routing, JSON and form handling, validation, and integrations for multiple HTTP servers.",
+  "rules": [
+    "Use Scala 3 and choose the Sharaf server adapter module that matches the application's HTTP server.",
+    "Derive JsonRW from ba.sake.tupson for JSON models; read request bodies with Request.current.bodyJson[Model].",
+    "Return JSON values with Response.withBody(value), and configure ExceptionMapper.json for JSON error responses.",
+    "Use bodyJsonValidated[Model] with a derived Validson Validator when request fields need validation.",
+    "For derivation involving default values, enable -Yretain-trees in sbt, Mill, or Scala CLI compiler options.",
+    "Treat mutable in-memory state in tutorials as demonstration-only; use a persistent store in real applications."
+  ]
+}

@@ -38,6 +38,7 @@ deder exec -t publishLocal                 # publish jars to local ~/.ivy2
 - **Immutable builder pattern** for `Response`, `CorsSettings`, `Cookie` — use `.withStatus()`, `.settingHeader()`, `.settingCookie()` etc.
 - **Context functions** for `Request` access: route handlers get `given Request`, use `Request.current` anywhere
 - **Typeclass-based serialization**: use `derives JsonRW`, `derives QueryStringRW`, `derives FormDataRW` on case classes. Validation uses `derives Validator` from validson
+- **JSON endpoints**: import `JsonRW` from `ba.sake.tupson`; use `Request.current.bodyJson[T]` and `Response.withBody(value)`. Configure `ExceptionMapper.json` for JSON errors. When derivation uses default values, enable `-Yretain-trees` in compiler options.
 - **Route definitions** use pattern matching on `(HttpMethod, Path)` tuples: `case GET -> Path("hello", name) =>`
 
 ## Module → Package Map
