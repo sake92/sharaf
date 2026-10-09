@@ -39,6 +39,9 @@ deder exec -t publishLocal                 # publish jars to local ~/.ivy2
 - **Context functions** for `Request` access: route handlers get `given Request`, use `Request.current` anywhere
 - **Typeclass-based serialization**: use `derives JsonRW`, `derives QueryStringRW`, `derives FormDataRW` on case classes. Validation uses `derives Validator` from validson
 - **JSON endpoints**: import `JsonRW` from `ba.sake.tupson`; use `Request.current.bodyJson[T]` and `Response.withBody(value)`. Configure `ExceptionMapper.json` for JSON errors. When derivation uses default values, enable `-Yretain-trees` in compiler options.
+- **Forms and query parameters**: derive `FormDataRW` or `QueryStringRW` for typed parsing. Parsing alone does not validate input; use `bodyFormValidated[T]` or `queryParamsValidated[T]` with a `Validator` when needed. Multipart form support varies by server adapter.
+- **Server adapters**: Undertow is stable; http4s and JDK HTTP server are beta; Helidon and snunit are experimental. Check platform and multipart support in `docs/content/reference/servers.md`.
+- **Authentication**: use `sharaf-pac4j` for new integrations, not the older Undertow-specific OAuth2 example. Production browser auth needs HTTPS, CSRF protection, and a shared persistent session store when running multiple instances; keep secrets out of source.
 - **Route definitions** use pattern matching on `(HttpMethod, Path)` tuples: `case GET -> Path("hello", name) =>`
 
 ## Module → Package Map
