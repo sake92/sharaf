@@ -17,12 +17,14 @@ description: Sharaf server modules and platform support
 
 Native executable examples cover three deployment paths:
 
-- [GraalVM Native Image with JDK HTTP server]({{site.data.project.gh.sourcesUrl}}/examples/scala-cli/hello-jdk-graalvm.scala)
+- [GraalVM Native Image with Undertow]({{site.data.project.gh.sourcesUrl}}/examples/scala-cli/hello-undertow-graalvm.scala)
 - [Scala Native with http4s/Ember]({{site.data.project.gh.sourcesUrl}}/examples/scala-cli/hello-http4s-native.scala)
 - [Scala Native with snunit and external Unit]({{site.data.project.gh.sourcesUrl}}/examples/snunit)
 
-The GraalVM example covers the JDK adapter and its example dependencies; it does not establish Native Image compatibility
+The GraalVM example covers Undertow and its example dependencies; it does not establish Native Image compatibility
 for every JVM adapter. The snunit example requires `libunit` at build time and a separately configured Unit daemon.
+
+Local size, startup, and memory figures are listed in the [native footprint reference](/reference/native-footprint.html).
 
 Stable is the recommended server integration. Beta integrations support the listed platforms but have narrower form handling. Experimental integrations have incomplete request features and may change between releases.
 

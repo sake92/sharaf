@@ -35,12 +35,12 @@ and integration tests.
 
 ## Native executables
 
-- [GraalVM Native Image](examples/scala-cli/hello-jdk-graalvm.scala): build the JDK HTTP server example as a native
+- [GraalVM Native Image](examples/scala-cli/hello-undertow-graalvm.scala): build the Undertow example as a native
   executable, including JSON requests and responses.
 - [Scala Native with http4s/Ember](examples/scala-cli/hello-http4s-native.scala): compile directly with Scala Native.
 - [Scala Native with snunit/Unit](examples/snunit): experimental integration requiring Unit and `libunit`.
 
-See the [reproducible measurements](benchmarks/native/README.md) for packaged size, startup, and memory comparisons.
+See the [measured footprint](docs/content/reference/native-footprint.md) for packaged size, startup, and memory figures.
 
 ## AWS Lambda
 

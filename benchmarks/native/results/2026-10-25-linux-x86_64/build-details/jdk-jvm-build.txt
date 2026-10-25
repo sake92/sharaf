@@ -1,1 +1,0 @@
-Wrote /home/sake/projects/sake92/sharaf/.worktrees/native-examples/out/native-final/jdk-jvm/app.jar

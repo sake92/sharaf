@@ -21,9 +21,11 @@ Authorization examples progress from authentication to ABAC and scoped membershi
 
 Native executable examples (build and run commands are at the top of each file):
 
+- [GraalVM Native Image with Undertow](hello-undertow-graalvm.scala)
 - [Scala Native with http4s/Ember](hello-http4s-native.scala)
-- [GraalVM Native Image with JDK HTTP server](hello-jdk-graalvm.scala), including JSON requests and responses
 
-Both examples share plain-text and JSON routes, including JSON input and error handling. A JVM Undertow baseline is
-in [hello-undertow.scala](hello-undertow.scala). Follow the [measurement instructions](../../benchmarks/native/README.md)
-to build and compare the packaged JVM and native applications.
+Both examples demonstrate plain-text and JSON routes, including JSON input and error handling.
+See the [measured footprint](../../docs/content/reference/native-footprint.md) for local size, startup, and memory figures.
+
+Keep `graalvm-resources/` alongside the Undertow example: its metadata registers the generated Undertow/XNIO loggers,
+HTTP header fields, direct-buffer cleanup, and version resources required by Native Image.
