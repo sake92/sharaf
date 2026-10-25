@@ -88,8 +88,17 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
       </tbody>
      </table>
      <p><code>sharaf-core</code> supports JVM and Scala Native. The companion libraries <code>formson</code>, <code>querson</code>, and <code>validson</code> also support Scala.js.</p>
+     <p>Native executable examples cover three deployment paths:</p>
+     <ul>
+      <li><a href="https://github.com/sake92/sharaf/tree/main/examples/scala-cli/hello-undertow-graalvm.scala">GraalVM Native Image with Undertow</a></li>
+      <li><a href="https://github.com/sake92/sharaf/tree/main/examples/scala-cli/hello-http4s-native.scala">Scala Native with http4s/Ember</a></li>
+      <li><a href="https://github.com/sake92/sharaf/tree/main/examples/snunit">Scala Native with snunit and external Unit</a></li>
+     </ul>
+     <p>The GraalVM example covers Undertow and its example dependencies; it does not establish Native Image compatibility for every JVM adapter. The snunit example requires <code>libunit</code> at build time and a separately configured Unit daemon.</p>
+     <p>Local size, startup, and memory figures are listed in the <a href="https://sake92.github.io/sharaf/reference/native-footprint.html">native footprint reference</a>.</p>
      <p>Stable is the recommended server integration. Beta integrations support the listed platforms but have narrower form handling. Experimental integrations have incomplete request features and may change between releases.</p>
      <p>The <a href="https://sake92.github.io/sharaf/tutorials/quickstart.html">quickstart</a> uses Undertow. Adapter examples are in the <a href="https://github.com/sake92/sharaf/tree/main/examples">repository</a>.</p>
+     <p>The <a href="https://github.com/sake92/sharaf-aws-lambda-starter">AWS Lambda starter</a> packages an Undertow/JVM application with AWS Lambda Web Adapter and includes Terraform configuration and local integration tests.</p>
     </div>
     <aside aria-label="On this page">
      <details open>
