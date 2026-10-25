@@ -7,8 +7,12 @@ if [[ -z "$FOLDER" ]]; then
     exit 1
 fi
 
-cd $FOLDER
-for example in *.sc; do
+cd "$FOLDER"
+shopt -s nullglob
+for example in *.sc *.scala; do
+  case "$example" in
+    project.scala|*.test.scala) continue ;;
+  esac
   echo "Compiling $example"
-  scala-cli compile "$example"
+  scala-cli compile "$example" --server=false
 done

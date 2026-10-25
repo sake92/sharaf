@@ -95,6 +95,8 @@ references:
     url: "/reference/errors.html"
   - label: "Servers and platforms"
     url: "/reference/servers.html"
+  - label: "Native footprint"
+    url: "/reference/native-footprint.html"
   - label: "Secure production defaults"
     url: "/reference/secure-production-defaults.html"
   - label: "Scaladoc"

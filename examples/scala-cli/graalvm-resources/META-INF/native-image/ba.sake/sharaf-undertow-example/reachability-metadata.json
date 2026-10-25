@@ -1,0 +1,28 @@
+{
+  "reflection": [
+    {
+      "type": "io.undertow.UndertowLogger_$logger",
+      "methods": [{"name": "<init>", "parameterTypes": ["org.jboss.logging.Logger"]}]
+    },
+    {
+      "type": "org.xnio._private.Messages_$logger",
+      "methods": [{"name": "<init>", "parameterTypes": ["org.jboss.logging.Logger"]}]
+    },
+    {
+      "type": "org.xnio.nio.Log_$logger",
+      "methods": [{"name": "<init>", "parameterTypes": ["org.jboss.logging.Logger"]}]
+    },
+    {"type": "io.undertow.util.Headers", "allPublicFields": true},
+    {
+      "type": "sun.misc.Unsafe",
+      "fields": [{"name": "theUnsafe"}],
+      "methods": [{"name": "invokeCleaner", "parameterTypes": ["java.nio.ByteBuffer"]}]
+    }
+  ],
+  "resources": [
+    {"glob": "io/undertow/version.properties"},
+    {"glob": "org/jboss/threads/Version.properties"},
+    {"glob": "org/xnio/Version.properties"},
+    {"glob": "org/xnio/nio/Version.properties"}
+  ]
+}
