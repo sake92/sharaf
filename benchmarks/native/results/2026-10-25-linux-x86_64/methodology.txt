@@ -1,0 +1,7 @@
+Process-cold startup on warm host/filesystem; HTTP polling interval 5ms, per-request timeout 500ms.
+Idle RSS: 1s after readiness; post-workload RSS: 1s after 300 sequential mixed requests.
+Build time includes Scala CLI startup/compilation/packaging and any downloads; caches are retained.
+Build max RSS is GNU time's maximum resident set size, not aggregate concurrent process-tree RSS.
+Artifact bytes exclude OS shared libraries; JVM artifacts additionally require the recorded JDK.
+JDK directory bytes are the installed full JDK, not a minimal jlink runtime.
+No throughput, machine-cold, container-size, TLS, or Lambda cold-start claims.

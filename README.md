@@ -33,6 +33,21 @@ Start with the [OpenAPI tutorial](https://sake92.github.io/sharaf/tutorials/open
 [API starter](https://github.com/sake92/sharaf-api-starter) for a complete Postgres-backed application with Swagger UI
 and integration tests.
 
+## Native executables
+
+- [GraalVM Native Image](examples/scala-cli/hello-jdk-graalvm.scala): build the JDK HTTP server example as a native
+  executable, including JSON requests and responses.
+- [Scala Native with http4s/Ember](examples/scala-cli/hello-http4s-native.scala): compile directly with Scala Native.
+- [Scala Native with snunit/Unit](examples/snunit): experimental integration requiring Unit and `libunit`.
+
+See the [reproducible measurements](benchmarks/native/README.md) for packaged size, startup, and memory comparisons.
+
+## AWS Lambda
+
+The [AWS Lambda starter](https://github.com/sake92/sharaf-aws-lambda-starter) runs an ordinary Undertow-based Sharaf
+application on the JVM through AWS Lambda Web Adapter. It includes container packaging, Terraform configuration,
+and local integration tests.
+
 ## Cheatsheet
 
 ### Route Matching

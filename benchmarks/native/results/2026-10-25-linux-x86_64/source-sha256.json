@@ -1,0 +1,7 @@
+{
+  "examples/scala-cli/hello-http4s-native.scala": "7ddf6b01e61e3b37ca6c63aa61496bac633fe2d195d755c1e9ac34ed35cd3d38",
+  "examples/scala-cli/hello-jdk-graalvm.scala": "f3ed7aacb5ae14cd8a9517d20a89cee88b6f899716e006b2aa841c3807d67c9e",
+  "examples/scala-cli/hello-undertow.scala": "cb31d3cf42c4f56e7ca898efa9bea8c7ad9653887f7ff32f467ec80ec2a5c722",
+  "examples/scala-cli/native/ExampleRoutes.scala": "a3c0c712e195fb7bbb78476751fc214313894da49846555321a4ed395a44c189",
+  "scripts/measure-native.scala": "1481b301611b25e1a49851f8f449034100338c91827cfc86035dbf3e52790366"
+}

@@ -1,0 +1,14 @@
+{
+  "clang": "Ubuntu clang version 14.0.0-1ubuntu1.1\nTarget: x86_64-pc-linux-gnu\nThread model: posix\nInstalledDir: /usr/bin",
+  "cpu": "model name\t: 11th Gen Intel(R) Core(TM) i7-1165G7 @ 2.80GHz",
+  "installedJdkBytes": "362127166",
+  "java": "openjdk version \"21.0.10\" 2026-01-20 LTS\nOpenJDK Runtime Environment Temurin-21.0.10+7 (build 21.0.10+7-LTS)\nOpenJDK 64-Bit Server VM Temurin-21.0.10+7 (build 21.0.10+7-LTS, mixed mode, sharing)",
+  "javaHome": "/home/sake/.cache/coursier/arc/https/github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.10%252B7/OpenJDK21U-jdk_x64_linux_hotspot_21.0.10_7.tar.gz/jdk-21.0.10+7",
+  "os": "Linux pop-os 6.17.9-76061709-generic #202511241048~1777506088~22.04~b3c7b11 SMP PREEMPT_DYNAMIC Thu A x86_64 x86_64 x86_64 GNU/Linux",
+  "requests": "300",
+  "revision": "570725de2dc0b404f1fddf76088e2b578d6ac438",
+  "runs": "5",
+  "scalaCli": "Scala CLI version: 1.17.1\nScala version (default): 3.9.0\nYour Scala CLI version is outdated. The newest version is 1.18.0\nIt is recommended that you update Scala CLI through the same tool or method you used for its initial installation for avoiding the creation of outdated duplicates.",
+  "timestamp": "2026-10-25T14:58:33.100000001Z",
+  "workingTree": "M README.md\n M docs/content/reference/servers.md\n M examples/scala-cli/README.md\n M examples/scala-cli/hello-http4s-native.scala\n M examples/snunit/README.md\n M scripts/compile-scala-cli-examples.sh\n M sharaf-http4s/src/ba/sake/sharaf/http4s/SharafHttpApp.scala\n M sharaf-http4s/test/src/ba/sake/sharaf/http4s/SharafHttpAppTest.scala\n?? .github/workflows/native-examples.yml\n?? benchmarks/\n?? examples/scala-cli/hello-jdk-graalvm.scala\n?? examples/scala-cli/hello-undertow.scala\n?? examples/scala-cli/native/\n?? scripts/measure-native.scala"
+}
