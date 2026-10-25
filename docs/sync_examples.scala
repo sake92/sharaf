@@ -12,6 +12,11 @@ import java.util.Arrays
       sys.exit(2)
 
   val examples = Seq(
+    "authorization-authenticated.scala" -> "examples/scala-cli/authorization/01_authenticated.scala",
+    "authorization-roles.scala" -> "examples/scala-cli/authorization/02_roles.scala",
+    "authorization-ownership.scala" -> "examples/scala-cli/authorization/03_ownership.scala",
+    "authorization-abac.scala" -> "examples/scala-cli/authorization/04_abac.scala",
+    "authorization-relationships.scala" -> "examples/scala-cli/authorization/05_relationships.scala",
     "form_handling.sc" -> "examples/scala-cli/form_handling.sc",
     "hello.sc" -> "examples/scala-cli/hello.sc",
     "html.sc" -> "examples/scala-cli/html.sc",
