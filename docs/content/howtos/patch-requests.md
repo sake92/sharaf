@@ -11,9 +11,20 @@ optional fields, JSON cannot distinguish an omitted key (leave the existing valu
 nullable value with no value). Model whether the field was sent separately from its nullability so a PATCH endpoint can
 preserve that intent.
 
-Define a `Patch[T]` codec whose default for a missing key is `Keep`; every present key becomes `Set(value)`. Use
+Starting with the next Sharaf release, import `ba.sake.sharaf.Patch` from core. Its JSON codec defaults a missing key to
+`Keep`; every present key becomes `Set(value)`. Use
 `Patch[String]` for a required field and `Patch[Option[String]]` for a nullable field, so JSON `null` becomes
-`Set(None)`. The runnable Scala CLI example below applies the patch to a user resource:
+`Set(None)`. Your request model can derive `JsonRW` as usual:
+
+```scala
+import ba.sake.sharaf.Patch
+import ba.sake.tupson.JsonRW
+
+case class UserPatch(name: Patch[String], address: Patch[Option[String]]) derives JsonRW
+```
+
+The runnable Scala CLI example below pins Sharaf 0.20.0 and defines the equivalent standalone codec. After upgrading
+to a release containing core's `Patch`, remove that local enum and companion. The example applies the patch to a user resource:
 
 ```scala
 {% include "patch_requests.sc" %}
