@@ -80,18 +80,7 @@ pac4jConfig.addMatcher(<span class="hljs-string">"publicRoutes"</span>, publicRo
      <p>Use a direct <code>HeaderClient</code> and <code>NoOpSessionStore</code> for a stateless API. Supply a high-entropy signing key through a secret manager, require a <code>Bearer</code> authorization scheme, set short expirations, and validate issuer/audience when your token design has them. Rotate keys deliberately; never print generated tokens or signing keys at startup.</p>
      <p>The <a href="https://github.com/sake92/sharaf/tree/main/examples/jwt"><code>jwt</code> example</a> shows the handler shape. Its inline secret and printed test token are intentionally not production configuration.</p>
      <h2 id="authorize-separately-from-authentication">Authorize separately from authentication<a href="#authorize-separately-from-authentication" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
-     <p>Authentication proves who made a request. Authorization decides whether that identity may perform the action. Register pac4j authorizers by name and pass their comma-separated names through <code>Pac4jSecurityConfig.authorizers</code> for the routes they protect.</p>
-     <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">import</span> org.pac4j.core.authorization.authorizer.<span class="hljs-type">RequireAnyRoleAuthorizer</span>
-
-pac4jConfig.addAuthorizer(<span class="hljs-string">"admin"</span>, <span class="hljs-type">RequireAnyRoleAuthorizer</span>(<span class="hljs-string">"admin"</span>))
-
-<span class="hljs-keyword">val</span> adminSecurity = <span class="hljs-type">Pac4jSecurityConfig</span>(
-  pac4jConfig,
-  clients = <span class="hljs-string">"HeaderClient"</span>,
-  authorizers = <span class="hljs-string">"admin"</span>
-)
-</code></pre>
-     <p>Ensure the client maps trusted identity-provider claims to pac4j roles before relying on a role authorizer. For resource ownership rules such as “may edit this invoice”, enforce the check next to the route/domain operation after obtaining <code>SecurityService.currentUser</code>; a role alone is not sufficient.</p>
+     <p>Use the <a href="https://sake92.github.io/sharaf/howtos/authorization.html">authorization How-to guides</a> for runnable examples of authentication-only routes, route-local role guards, application identity/context functions, ownership, ABAC, and scoped relationships. Keep resource permission checks in service operations, and map application exceptions inside the pac4j boundary. Authentication alone does not require looking up a domain user.</p>
      <h2 id="use-a-production-session-store">Use a production session store<a href="#use-a-production-session-store" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
      <p><code>InMemorySessionStore</code> is appropriate for local development and a single disposable process only. Sessions disappear on restart and are not shared by replicas. For browser login, provide a <code>SessionStore</code> backed by Redis or a database and pass it to <code>Pac4jSecurityConfig.withSessionStore</code>. <code>sharaf-jdbc-session</code> provides the JDBC option; it uses squery and accepts any standard JDBC <code>DataSource</code> on the JVM or a Native-compatible JDBC driver such as SQLite on Scala Native. Add the database driver and, on the JVM, a connection pool separately.</p>
      <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">import</span> ba.sake.sharaf.session.<span class="hljs-type">SessionConfig</span>
@@ -133,7 +122,7 @@ pac4jConfig.addAuthorizer(<span class="hljs-string">"admin"</span>, <span class=
      </ul>
      <p>The <code>sharaf-pac4j</code> test suite exercises form, JWT, roles, logout, session invalidation, and baseline security headers. Keep application-specific authorization and CSRF tests alongside the application: they are part of its public security contract.</p>
      <div role="group">
-      <a role="button" href="https://sake92.github.io/sharaf/howtos/exception-handler.html">⬅️ Exception Handler</a> <span></span> <span></span>
+      <a role="button" href="https://sake92.github.io/sharaf/howtos/authorization.html">⬅️ Authorization</a> <span></span> <span></span>
      </div>
     </div>
     <aside aria-label="On this page">

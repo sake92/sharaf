@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Authorization models and context functions in Sharaf">
+  <title>Authorization | Sharaf Documentation</title>
+  <link rel="shortcut icon" href="https://sake92.github.io/sharaf/images/favicon.png" type="image/png">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-dark.min.css" media="(prefers-color-scheme: dark)" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-light.min.css" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.conditional.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://sake92.github.io/sharaf/styles/default.css">
+ </head>
+ <body>
+  <header class="pico container">
+   <nav aria-label="Main navigation">
+    <a href="https://sake92.github.io/sharaf/">Sharaf Documentation</a>
+    <div>
+     <a href="https://sake92.github.io/sharaf/tutorials">Tutorials</a> <a href="https://sake92.github.io/sharaf/howtos">How-Tos</a> <a href="https://sake92.github.io/sharaf/reference">Reference</a> <a href="https://sake92.github.io/sharaf/philosophy">Philosophy</a>
+    </div>
+    <form action="https://sake92.github.io/sharaf/search/results.html" method="get" role="search">
+     <input name="q" type="search" placeholder="Search" aria-label="Search this site">
+    </form>
+   </nav>
+  </header>
+  <script>
+for (const link of document.querySelectorAll('body > header > nav > div > a')) {
+    const path = new URL(link.href).pathname.replace(/\/$/, '');
+    const current = window.location.pathname;
+    if (current === path || current.startsWith(path + '/')) link.setAttribute('aria-current', 'page');
+}
+</script>
+  <main class="pico container">
+   <div>
+    <div class="content">
+     <h1 id="authorization">Authorization<a href="#authorization" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
+     <p>Authentication establishes identity. Authorization decides whether an actor may perform an operation on a resource. An authenticated route can return shared content without looking up an application user. Identity becomes relevant when a query or policy needs to distinguish callers.</p>
+     <h2 id="broad-roles-and-resource-specific-decisions">Broad roles and resource-specific decisions<a href="#broad-roles-and-resource-specific-decisions" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p>Role-based access control (RBAC) is useful for broad requirements such as administrator or support access. A role set supports multiple roles simultaneously, but a global role does not describe which course, tenant, or document an actor may access.</p>
+     <p>Attribute-based access control (ABAC) evaluates facts about the actor, resource, and possibly environment. An editing policy might combine active account status, subscription state, ownership, and whether a document is archived. Relationship-based access control (ReBAC) focuses on connections such as owning a document or teaching a specific course. A policy can combine both approaches.</p>
+     <p><a href="https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html#prefer-attribute-and-relationship-based-access-control-over-rbac">OWASP recommends preferring ABAC and ReBAC over relying solely on RBAC</a>. A role can still be one policy input. These patterns can be implemented with focused application functions; they do not require a separate policy engine.</p>
+     <h2 id="identity-and-relationships-are-different-facts">Identity and relationships are different facts<a href="#identity-and-relationships-are-different-facts" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p>Teacher, student, and customer are overlapping relationships or attributes. Modeling them as mutually exclusive user categories loses valid combinations. A person may teach and study in the same course, study in a second course, and independently hold a subscription.</p>
+     <p>Membership scoped to a resource expresses those facts without a hierarchy of increasingly specific user categories. The resource identifier is part of the relationship: teacher of course A says nothing about editing course B.</p>
+     <h2 id="context-functions-carry-facts">Context functions carry facts<a href="#context-functions-carry-facts" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p>A method with <code>(using CurrentUser)</code> declares that it requires an actor. A <code>CurrentUser ?=&gt; A</code> helper can resolve that actor once and make it available through a call chain. Explicit parameters provide the same access-control behavior. The choice is one of clarity at the call sites.</p>
+     <p>Neither form establishes permission by itself. A context can be constructed by application code, and an authenticated actor can still lack access to the target resource. The service's policy checks remain the runtime enforcement point. There is no need to construct fake users to discover routes; authentication can decorate handlers before route execution.</p>
+     <h2 id="enforcement-belongs-with-the-operation">Enforcement belongs with the operation<a href="#enforcement-belongs-with-the-operation" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p>Pac4j establishes authenticated profiles and supports broad role requirements at the HTTP boundary. Application code can check profile roles inside selected routes, map profiles to domain identities when needed, and apply resource rules in service operations. This keeps the same rules in force for HTML controllers, API routes, and other callers.</p>
+     <p>A policy predicate can also inform the UI, but client-side visibility cannot enforce access. Checks must remain tied to the actual actor, resource, and write. For changing state, a transaction or a conditional database mutation preserves that relationship between the checked facts and the update.</p>
+     <p>Runnable implementations and request commands are in the <a href="https://sake92.github.io/sharaf/howtos/authorization.html">authorization How-to guides</a>. Deployment concerns are covered by the <a href="https://sake92.github.io/sharaf/howtos/security.html">production security guide</a>.</p>
+     <div role="group">
+      <a role="button" href="https://sake92.github.io/sharaf/philosophy/authentication.html">⬅️ Authentication</a> <span></span> <a role="button" href="https://sake92.github.io/sharaf/philosophy/dependency-injection.html">Dependency Injection ➡️</a>
+     </div>
+    </div>
+    <aside aria-label="On this page">
+     <details open>
+      <summary>On this page</summary>
+      <nav aria-label="Table of contents">
+       <ul>
+        <li><a href="#authorization">Authorization</a>
+         <ul>
+          <li><a href="#broad-roles-and-resource-specific-decisions">Broad roles and resource-specific decisions</a></li>
+          <li><a href="#identity-and-relationships-are-different-facts">Identity and relationships are different facts</a></li>
+          <li><a href="#context-functions-carry-facts">Context functions carry facts</a></li>
+          <li><a href="#enforcement-belongs-with-the-operation">Enforcement belongs with the operation</a></li>
+         </ul></li>
+       </ul>
+      </nav>
+     </details>
+    </aside>
+   </div>
+  </main>
+  <style>
+  body > footer.site-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding-block: 1.5rem 2rem;
+  }
+
+  .site-footer__identity {
+    display: grid;
+    gap: .1rem;
+  }
+
+  .site-footer__identity strong {
+    color: var(--pico-color);
+    font-size: 1rem;
+  }
+
+  .site-footer__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .65rem;
+  }
+
+  .site-footer__links a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .55rem;
+    min-height: 2.75rem;
+    padding: .55rem .85rem;
+    border: 1px solid var(--pico-muted-border-color);
+    border-radius: .7rem;
+    background: var(--pico-card-background-color);
+    color: var(--pico-color);
+    font-weight: 600;
+    line-height: 1;
+    text-decoration: none;
+    transition: border-color .15s ease, background-color .15s ease, transform .15s ease;
+  }
+
+  .site-footer__links a:hover {
+    border-color: var(--pico-primary);
+    background: var(--pico-secondary-background);
+    color: var(--pico-color);
+    transform: translateY(-2px);
+  }
+
+  .site-footer__links a:focus-visible {
+    outline: 2px solid var(--pico-primary);
+    outline-offset: 3px;
+  }
+
+  .site-footer__links svg {
+    width: 1.2rem;
+    height: 1.2rem;
+    flex: none;
+  }
+
+  .site-footer__links a[href*="discord"] svg {
+    color: #5865f2;
+  }
+
+  @media (max-width: 600px) {
+    body > footer.site-footer {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 1rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .site-footer__links a { transition: none; }
+    .site-footer__links a:hover { transform: none; }
+  }
+</style>
+  <footer class="pico container site-footer">
+   <div class="site-footer__identity">
+    <strong>Sharaf</strong> <span>Scala 3 web framework</span>
+   </div>
+   <nav class="site-footer__links" aria-label="Community links">
+    <a href="https://github.com/sake92/sharaf" target="_blank" rel="noopener noreferrer"> 
+     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23A10.94 10.94 0 0 1 12.03 5.79c1.02 0 2.04.135 3 .405 2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57C20.595 21.795 24 17.31 24 12 24 5.37 18.63 0 12 0Z" />
+     </svg> 
+     <span>GitHub</span> 
+    </a> <a href="https://discord.gg/g9KVY3WkMG" target="_blank" rel="noopener noreferrer"> 
+     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+      <path d="M19.73 5.29a17.4 17.4 0 0 0-4.27-1.32 12.1 12.1 0 0 0-.55 1.12 16.1 16.1 0 0 0-4.82 0 12.1 12.1 0 0 0-.55-1.12 17.4 17.4 0 0 0-4.27 1.32C2.57 9.29 1.84 13.2 2.2 17.05a17.7 17.7 0 0 0 5.23 2.67c.42-.57.8-1.17 1.12-1.8a11 11 0 0 1-1.7-.82c.14-.1.27-.21.4-.32 3.28 1.54 6.83 1.54 10.07 0 .13.11.26.22.4.32-.54.32-1.11.59-1.7.82.32.63.7 1.23 1.12 1.8a17.7 17.7 0 0 0 5.24-2.67c.42-4.46-.72-8.34-3.1-11.76ZM8.94 14.68c-.98 0-1.78-.89-1.78-1.98 0-1.1.78-1.99 1.78-1.99s1.8.9 1.78 1.99c0 1.09-.79 1.98-1.78 1.98Zm6.12 0c-.98 0-1.78-.89-1.78-1.98 0-1.1.78-1.99 1.78-1.99s1.8.9 1.78 1.99c0 1.09-.79 1.98-1.78 1.98Z" />
+     </svg> 
+     <span>Discord</span> 
+    </a>
+   </nav>
+  </footer>
+  <script src="https://context7.com/widget.js" data-library="/sake92/sharaf" data-color="#059669" data-position="bottom-right" async></script>
+  <script>
+if (window.matchMedia('(max-width: 850px)').matches) {
+    document.querySelectorAll('body > main > div > aside > details').forEach(details => { details.open = false; });
+}
+</script>
+  <script src="https://sake92.github.io/sharaf/scripts/code-copy.js"></script>
+ </body>
+</html>

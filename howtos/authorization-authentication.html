@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Require authentication in Sharaf">
+  <title>Require authentication | Sharaf Documentation</title>
+  <link rel="shortcut icon" href="https://sake92.github.io/sharaf/images/favicon.png" type="image/png">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-dark.min.css" media="(prefers-color-scheme: dark)" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-light.min.css" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.conditional.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://sake92.github.io/sharaf/styles/default.css">
+ </head>
+ <body>
+  <header class="pico container">
+   <nav aria-label="Main navigation">
+    <a href="https://sake92.github.io/sharaf/">Sharaf Documentation</a>
+    <div>
+     <a href="https://sake92.github.io/sharaf/tutorials">Tutorials</a> <a href="https://sake92.github.io/sharaf/howtos">How-Tos</a> <a href="https://sake92.github.io/sharaf/reference">Reference</a> <a href="https://sake92.github.io/sharaf/philosophy">Philosophy</a>
+    </div>
+    <form action="https://sake92.github.io/sharaf/search/results.html" method="get" role="search">
+     <input name="q" type="search" placeholder="Search" aria-label="Search this site">
+    </form>
+   </nav>
+  </header>
+  <script>
+for (const link of document.querySelectorAll('body > header > nav > div > a')) {
+    const path = new URL(link.href).pathname.replace(/\/$/, '');
+    const current = window.location.pathname;
+    if (current === path || current.startsWith(path + '/')) link.setAttribute('aria-current', 'page');
+}
+</script>
+  <main class="pico container">
+   <div>
+    <div class="content">
+     <h1 id="require-authentication">Require authentication<a href="#require-authentication" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
+     <p>Use this pattern when every authenticated caller may access an endpoint and its body does not need application-user data. Follow the <a href="https://sake92.github.io/sharaf/howtos/authorization.html#run-and-adapt-the-examples">example prerequisites</a>.</p>
+     <h2 id="protect-the-handler">Protect the handler<a href="#protect-the-handler" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p>Define an application <code>authenticated(next: SharafHandler)</code> helper that constructs a single <code>Pac4jSecurityHandler</code> around all routes. Register a pac4j <code>PathMatcher</code> to exempt the exact landing path <code>/</code> and the public branch <code>/public</code>. Keep pac4j's security-header matchers in the matcher list. Routes remain in one normal <code>Routes</code> definition; there is no manual handler dispatch or duplicated path matching.</p>
+     <p>The example uses <code>excludePath("/")</code> for an exact path and <code>excludeBranch("/public")</code> for <code>/public</code> and its descendants. <code>/public/help</code> is public, while <code>/publicity</code> still requires authentication. Path exemptions apply to every HTTP method; only the explicitly defined route/method combinations return content.</p>
+     <p>If your application intentionally protects only a prefix, <code>includePath("/api/")</code> applies security to paths starting with <code>/api/</code>; it does not cover <code>/api</code> itself, and other paths bypass security. Use explicit public exemptions when the application should require authentication by default.</p>
+     <p>The <code>/members</code> route returns fixed content. It never calls <code>SecurityService.currentUser</code>, resolves a domain user, or introduces a user context parameter. Authentication establishes access without requiring identity in the route body.</p>
+     <h2 id="run-and-check-access">Run and check access<a href="#run-and-check-access" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <pre><code class="language-sh hljs language-bash" data-highlighted="yes">scala run examples/scala-cli/authorization/01_authenticated.scala --server=<span class="hljs-literal">false</span>
+</code></pre>
+     <p>In another terminal:</p>
+     <pre><code class="language-sh hljs language-bash" data-highlighted="yes">curl -i http://localhost:8181/                       <span class="hljs-comment"># 200 Public</span>
+curl -i http://localhost:8181/public/help            <span class="hljs-comment"># 200 Public help</span>
+curl -i http://localhost:8181/publicity              <span class="hljs-comment"># 401: neighboring prefix</span>
+curl -i http://localhost:8181/members                <span class="hljs-comment"># 401; WWW-Authenticate: Basic ...</span>
+curl -i -u alice:demo http://localhost:8181/members  <span class="hljs-comment"># 200 Members only</span>
+curl -i -u alice:wrong http://localhost:8181/members <span class="hljs-comment"># 401</span>
+</code></pre>
+     <p><code>bob:demo</code> is also valid. No session cookie is created. An authenticated request to an unknown path receives 404; an anonymous request to it still requires authentication.</p>
+     <p>If a route needs to query user-owned data, continue with <a href="https://sake92.github.io/sharaf/howtos/authorization-ownership.html">application identity and ownership</a>. For a broad role requirement, use <a href="https://sake92.github.io/sharaf/howtos/authorization-roles.html">authorizedAnyRole</a>.</p>
+     <h2 id="run-this-examples-integration-tests">Run this example's integration tests<a href="#run-this-examples-integration-tests" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p>From the example folder, run the application source, its adjacent tests, and the shared HTTP fixture together:</p>
+     <pre><code class="language-sh hljs language-bash" data-highlighted="yes"><span class="hljs-built_in">cd</span> examples/scala-cli/authorization
+scala <span class="hljs-built_in">test</span> 01_authenticated.scala 01_authenticated.test.scala HttpExampleSuite.test.scala --server=<span class="hljs-literal">false</span>
+</code></pre>
+     <p>This starts and stops the real server on a free port. No other examples or manually started servers are needed.</p>
+     <h2 id="complete-runnable-example">Complete runnable example<a href="#complete-runnable-example" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p><a href="https://github.com/sake92/sharaf/tree/main/examples/scala-cli/authorization/01_authenticated.scala">Source</a>. The listing is synchronized from the tested source.</p>
+     <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">scala</span> <span class="hljs-string">3.9.0</span>
+<span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">ba.sake::sharaf-undertow:0.20.0</span>
+<span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">ba.sake::sharaf-pac4j:0.20.0</span>
+<span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">org.pac4j:pac4j-http:6.5.8</span>
+<span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">options</span> <span class="hljs-string">-Yretain-trees</span>
+
+<span class="hljs-keyword">package</span> authorization.authentication
+
+<span class="hljs-keyword">import</span> java.util.<span class="hljs-type">Optional</span>
+<span class="hljs-keyword">import</span> org.pac4j.core.client.<span class="hljs-type">Clients</span>
+<span class="hljs-keyword">import</span> org.pac4j.core.config.<span class="hljs-type">Config</span>
+<span class="hljs-keyword">import</span> org.pac4j.core.context.<span class="hljs-type">CallContext</span>
+<span class="hljs-keyword">import</span> org.pac4j.core.credentials.{<span class="hljs-type">Credentials</span>, <span class="hljs-type">UsernamePasswordCredentials</span>}
+<span class="hljs-keyword">import</span> org.pac4j.core.credentials.authenticator.<span class="hljs-type">Authenticator</span>
+<span class="hljs-keyword">import</span> org.pac4j.core.profile.<span class="hljs-type">CommonProfile</span>
+<span class="hljs-keyword">import</span> org.pac4j.core.matching.matcher.{<span class="hljs-type">DefaultMatchers</span>, <span class="hljs-type">PathMatcher</span>}
+<span class="hljs-keyword">import</span> org.pac4j.http.client.direct.<span class="hljs-type">DirectBasicAuthClient</span>
+<span class="hljs-keyword">import</span> ba.sake.sharaf.*
+<span class="hljs-keyword">import</span> ba.sake.sharaf.pac4j.*
+<span class="hljs-keyword">import</span> ba.sake.sharaf.session.<span class="hljs-type">NoOpSessionStore</span>
+<span class="hljs-keyword">import</span> ba.sake.sharaf.undertow.<span class="hljs-type">UndertowSharafServer</span>
+
+<span class="hljs-class"><span class="hljs-keyword">object</span> <span class="hljs-title">AuthenticationExample</span></span>:
+  <span class="hljs-comment">// Development credentials only: each listed username uses the password "demo".</span>
+  <span class="hljs-keyword">private</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">config</span></span>(): <span class="hljs-type">Config</span> =
+    <span class="hljs-keyword">val</span> authenticator = <span class="hljs-keyword">new</span> <span class="hljs-type">Authenticator</span>:
+      <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">validate</span></span>(ctx: <span class="hljs-type">CallContext</span>, credentials: <span class="hljs-type">Credentials</span>): <span class="hljs-type">Optional</span>[<span class="hljs-type">Credentials</span>] =
+        credentials <span class="hljs-keyword">match</span>
+          <span class="hljs-keyword">case</span> c: <span class="hljs-type">UsernamePasswordCredentials</span>
+              <span class="hljs-keyword">if</span> <span class="hljs-type">Set</span>(<span class="hljs-string">"alice"</span>, <span class="hljs-string">"bob"</span>).contains(c.getUsername) &amp;&amp; c.getPassword == <span class="hljs-string">"demo"</span> =&gt;
+            <span class="hljs-keyword">val</span> profile = <span class="hljs-keyword">new</span> <span class="hljs-type">CommonProfile</span>()
+            profile.setId(c.getUsername)
+            c.setUserProfile(profile)
+            <span class="hljs-type">Optional</span>.of(c)
+          <span class="hljs-keyword">case</span> _ =&gt; <span class="hljs-type">Optional</span>.empty()
+    <span class="hljs-keyword">val</span> client = <span class="hljs-keyword">new</span> <span class="hljs-type">DirectBasicAuthClient</span>(authenticator)
+    client.setName(<span class="hljs-string">"basic"</span>)
+    <span class="hljs-keyword">new</span> <span class="hljs-type">Config</span>(<span class="hljs-keyword">new</span> <span class="hljs-type">Clients</span>(client))
+
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">authenticated</span></span>(next: <span class="hljs-type">SharafHandler</span>): <span class="hljs-type">SharafHandler</span> =
+    <span class="hljs-keyword">val</span> pac4j = config()
+    <span class="hljs-keyword">val</span> publicPaths = <span class="hljs-keyword">new</span> <span class="hljs-type">PathMatcher</span>()
+    publicPaths.excludePath(<span class="hljs-string">"/"</span>)
+    publicPaths.excludeBranch(<span class="hljs-string">"/public"</span>)
+    pac4j.addMatcher(<span class="hljs-string">"publicPaths"</span>, publicPaths)
+    <span class="hljs-keyword">val</span> security = <span class="hljs-type">Pac4jSecurityConfig</span>(
+      pac4j, clients = <span class="hljs-string">"basic"</span>, matchers = <span class="hljs-string">s"<span class="hljs-subst">${DefaultMatchers.SECURITYHEADERS}</span>,publicPaths"</span>,
+      sessionStore = <span class="hljs-type">NoOpSessionStore</span>()
+    )
+    <span class="hljs-type">Pac4jSecurityHandler</span>(security, next)
+
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">handler</span></span>(): <span class="hljs-type">SharafHandler</span> =
+    <span class="hljs-keyword">val</span> routes = <span class="hljs-type">Routes</span> {
+      <span class="hljs-keyword">case</span> <span class="hljs-type">GET</span> -&gt; <span class="hljs-type">Path</span>()                 =&gt; <span class="hljs-type">Response</span>.withBody(<span class="hljs-string">"Public"</span>)
+      <span class="hljs-keyword">case</span> <span class="hljs-type">GET</span> -&gt; <span class="hljs-type">Path</span>(<span class="hljs-string">"public"</span>, <span class="hljs-string">"help"</span>) =&gt; <span class="hljs-type">Response</span>.withBody(<span class="hljs-string">"Public help"</span>)
+      <span class="hljs-keyword">case</span> <span class="hljs-type">GET</span> -&gt; <span class="hljs-type">Path</span>(<span class="hljs-string">"members"</span>)        =&gt; <span class="hljs-type">Response</span>.withBody(<span class="hljs-string">"Members only"</span>)
+    }
+    authenticated(<span class="hljs-type">SharafHandler</span>.routes(routes))
+
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">server</span></span>(port: <span class="hljs-type">Int</span> = <span class="hljs-number">8181</span>): <span class="hljs-type">UndertowSharafServer</span> =
+    <span class="hljs-type">UndertowSharafServer</span>(<span class="hljs-string">"localhost"</span>, port, handler())
+
+  <span class="hljs-meta">@main</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">runAuthentication</span></span>(): <span class="hljs-type">Unit</span> =
+    <span class="hljs-keyword">val</span> app = server()
+    sys.addShutdownHook(app.stop())
+    app.start()
+    println(<span class="hljs-string">"Server started at http://localhost:8181"</span>)
+
+</code></pre>
+    </div>
+    <aside aria-label="On this page">
+     <details open>
+      <summary>On this page</summary>
+      <nav aria-label="Table of contents">
+       <ul>
+        <li><a href="#require-authentication">Require authentication</a>
+         <ul>
+          <li><a href="#protect-the-handler">Protect the handler</a></li>
+          <li><a href="#run-and-check-access">Run and check access</a></li>
+          <li><a href="#run-this-examples-integration-tests">Run this example's integration tests</a></li>
+          <li><a href="#complete-runnable-example">Complete runnable example</a></li>
+         </ul></li>
+       </ul>
+      </nav>
+     </details>
+    </aside>
+   </div>
+  </main>
+  <style>
+  body > footer.site-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding-block: 1.5rem 2rem;
+  }
+
+  .site-footer__identity {
+    display: grid;
+    gap: .1rem;
+  }
+
+  .site-footer__identity strong {
+    color: var(--pico-color);
+    font-size: 1rem;
+  }
+
+  .site-footer__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .65rem;
+  }
+
+  .site-footer__links a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .55rem;
+    min-height: 2.75rem;
+    padding: .55rem .85rem;
+    border: 1px solid var(--pico-muted-border-color);
+    border-radius: .7rem;
+    background: var(--pico-card-background-color);
+    color: var(--pico-color);
+    font-weight: 600;
+    line-height: 1;
+    text-decoration: none;
+    transition: border-color .15s ease, background-color .15s ease, transform .15s ease;
+  }
+
+  .site-footer__links a:hover {
+    border-color: var(--pico-primary);
+    background: var(--pico-secondary-background);
+    color: var(--pico-color);
+    transform: translateY(-2px);
+  }
+
+  .site-footer__links a:focus-visible {
+    outline: 2px solid var(--pico-primary);
+    outline-offset: 3px;
+  }
+
+  .site-footer__links svg {
+    width: 1.2rem;
+    height: 1.2rem;
+    flex: none;
+  }
+
+  .site-footer__links a[href*="discord"] svg {
+    color: #5865f2;
+  }
+
+  @media (max-width: 600px) {
+    body > footer.site-footer {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 1rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .site-footer__links a { transition: none; }
+    .site-footer__links a:hover { transform: none; }
+  }
+</style>
+  <footer class="pico container site-footer">
+   <div class="site-footer__identity">
+    <strong>Sharaf</strong> <span>Scala 3 web framework</span>
+   </div>
+   <nav class="site-footer__links" aria-label="Community links">
+    <a href="https://github.com/sake92/sharaf" target="_blank" rel="noopener noreferrer"> 
+     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23A10.94 10.94 0 0 1 12.03 5.79c1.02 0 2.04.135 3 .405 2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57C20.595 21.795 24 17.31 24 12 24 5.37 18.63 0 12 0Z" />
+     </svg> 
+     <span>GitHub</span> 
+    </a> <a href="https://discord.gg/g9KVY3WkMG" target="_blank" rel="noopener noreferrer"> 
+     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+      <path d="M19.73 5.29a17.4 17.4 0 0 0-4.27-1.32 12.1 12.1 0 0 0-.55 1.12 16.1 16.1 0 0 0-4.82 0 12.1 12.1 0 0 0-.55-1.12 17.4 17.4 0 0 0-4.27 1.32C2.57 9.29 1.84 13.2 2.2 17.05a17.7 17.7 0 0 0 5.23 2.67c.42-.57.8-1.17 1.12-1.8a11 11 0 0 1-1.7-.82c.14-.1.27-.21.4-.32 3.28 1.54 6.83 1.54 10.07 0 .13.11.26.22.4.32-.54.32-1.11.59-1.7.82.32.63.7 1.23 1.12 1.8a17.7 17.7 0 0 0 5.24-2.67c.42-4.46-.72-8.34-3.1-11.76ZM8.94 14.68c-.98 0-1.78-.89-1.78-1.98 0-1.1.78-1.99 1.78-1.99s1.8.9 1.78 1.99c0 1.09-.79 1.98-1.78 1.98Zm6.12 0c-.98 0-1.78-.89-1.78-1.98 0-1.1.78-1.99 1.78-1.99s1.8.9 1.78 1.99c0 1.09-.79 1.98-1.78 1.98Z" />
+     </svg> 
+     <span>Discord</span> 
+    </a>
+   </nav>
+  </footer>
+  <script src="https://context7.com/widget.js" data-library="/sake92/sharaf" data-color="#059669" data-position="bottom-right" async></script>
+  <script>
+if (window.matchMedia('(max-width: 850px)').matches) {
+    document.querySelectorAll('body > main > div > aside > details').forEach(details => { details.open = false; });
+}
+</script>
+  <script src="https://sake92.github.io/sharaf/scripts/code-copy.js"></script>
+ </body>
+</html>

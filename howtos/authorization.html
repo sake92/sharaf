@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Implement authorization in Sharaf">
+  <title>Implement authorization | Sharaf Documentation</title>
+  <link rel="shortcut icon" href="https://sake92.github.io/sharaf/images/favicon.png" type="image/png">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-dark.min.css" media="(prefers-color-scheme: dark)" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-light.min.css" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.conditional.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://sake92.github.io/sharaf/styles/default.css">
+ </head>
+ <body>
+  <header class="pico container">
+   <nav aria-label="Main navigation">
+    <a href="https://sake92.github.io/sharaf/">Sharaf Documentation</a>
+    <div>
+     <a href="https://sake92.github.io/sharaf/tutorials">Tutorials</a> <a href="https://sake92.github.io/sharaf/howtos">How-Tos</a> <a href="https://sake92.github.io/sharaf/reference">Reference</a> <a href="https://sake92.github.io/sharaf/philosophy">Philosophy</a>
+    </div>
+    <form action="https://sake92.github.io/sharaf/search/results.html" method="get" role="search">
+     <input name="q" type="search" placeholder="Search" aria-label="Search this site">
+    </form>
+   </nav>
+  </header>
+  <script>
+for (const link of document.querySelectorAll('body > header > nav > div > a')) {
+    const path = new URL(link.href).pathname.replace(/\/$/, '');
+    const current = window.location.pathname;
+    if (current === path || current.startsWith(path + '/')) link.setAttribute('aria-current', 'page');
+}
+</script>
+  <main class="pico container">
+   <div>
+    <div class="content">
+     <h1 id="implement-authorization">Implement authorization<a href="#implement-authorization" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
+     <p>Choose the smallest pattern that enforces your application's access rules. The following guides progress from requiring a signed-in identity to checking attributes and relationships for a specific resource.</p>
+     <table>
+      <thead>
+       <tr>
+        <th>Task</th>
+        <th>Guide</th>
+       </tr>
+      </thead>
+      <tbody>
+       <tr>
+        <td>Restrict an endpoint to authenticated callers</td>
+        <td><a href="https://sake92.github.io/sharaf/howtos/authorization-authentication.html">Require authentication</a></td>
+       </tr>
+       <tr>
+        <td>Allow any of several broad roles</td>
+        <td><a href="https://sake92.github.io/sharaf/howtos/authorization-roles.html">Require any role</a></td>
+       </tr>
+       <tr>
+        <td>Query or mutate data belonging to the caller</td>
+        <td><a href="https://sake92.github.io/sharaf/howtos/authorization-ownership.html">Enforce resource ownership</a></td>
+       </tr>
+       <tr>
+        <td>Combine account and resource attributes</td>
+        <td><a href="https://sake92.github.io/sharaf/howtos/authorization-abac.html">Implement an ABAC policy</a></td>
+       </tr>
+       <tr>
+        <td>Enforce course or tenant membership, including combined roles</td>
+        <td><a href="https://sake92.github.io/sharaf/howtos/authorization-relationships.html">Authorize scoped relationships</a></td>
+       </tr>
+      </tbody>
+     </table>
+     <h2 id="run-and-adapt-the-examples">Run and adapt the examples<a href="#run-and-adapt-the-examples" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p>Install Scala CLI and a supported JDK, clone the Sharaf repository, and run the commands in each guide from the repository root. Each example runs independently on <code>localhost:8181</code>; stop it with Ctrl-C before starting another. All dependencies are pinned in the example file. No database or external identity provider is required.</p>
+     <p>Use the complete example linked in each guide as the starting point. The helpers <code>authenticated</code>, <code>authorizedAnyRole</code>, and <code>withCurrentUser</code> are application code included in the examples; they are not Sharaf APIs. <code>authenticated</code> decorates one <code>SharafHandler</code> at application construction time, with pac4j matchers for public exemptions. <code>authorizedAnyRole</code> guards a matched route body when needed; <code>withCurrentUser</code> supplies an application identity through a context function when queries or service policies need it. Both run inside the authenticated routes.</p>
+     <p>The examples use HTTP Basic authentication with explicit <strong>development-only</strong> accounts and password <code>demo</code>. They use <code>NoOpSessionStore</code> and private in-memory data that resets on restart. For deployment, replace the demonstration authenticator with your real identity mechanism, use HTTPS, and follow the <a href="https://sake92.github.io/sharaf/howtos/security.html">production security guide</a>. Keep the service policies when changing login mechanisms. For a persistent store, check permissions and change data within a suitable transaction or use a write constrained by both actor and resource identifiers.</p>
+     <h2 id="preserve-denial-responses">Preserve denial responses<a href="#preserve-denial-responses" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p>Use 401 for missing or invalid API credentials and preserve the authentication challenge. Use 403 when an authenticated caller lacks permission. Return 404 deliberately when private resource existence must be concealed. Keep these responses consistent for reads and writes. Browser form/OIDC clients may redirect to login instead of returning the direct client's API 401.</p>
+     <p>Map application exceptions <strong>inside</strong> the pac4j boundary so pac4j does not wrap the original exception before Sharaf can map it. The ownership, ABAC, and relationship examples do this in <code>authenticated</code>:</p>
+     <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-type">Pac4jSecurityHandler</span>(security, <span class="hljs-type">SharafHandler</span>.exceptions(next, <span class="hljs-type">ExceptionMapper</span>.json))
+</code></pre>
+     <p>An outer exception handler can handle unexpected security or adapter errors. Do not unwrap arbitrary exception causes to expose them to clients.</p>
+     <h2 id="verify-your-policies-through-the-api">Verify your policies through the API<a href="#verify-your-policies-through-the-api" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p>Run all five HTTP integration suites without starting servers manually:</p>
+     <pre><code class="language-sh hljs language-bash" data-highlighted="yes">scala <span class="hljs-built_in">test</span> examples/scala-cli/authorization --server=<span class="hljs-literal">false</span>
+</code></pre>
+     <p>Each example has its own adjacent <code>.test.scala</code> file and independently runnable suite. Only the HTTP/server fixture is shared. To test one example in isolation:</p>
+     <pre><code class="language-sh hljs language-bash" data-highlighted="yes"><span class="hljs-built_in">cd</span> examples/scala-cli/authorization
+scala <span class="hljs-built_in">test</span> 04_abac.scala 04_abac.test.scala HttpExampleSuite.test.scala --server=<span class="hljs-literal">false</span>
+</code></pre>
+     <p>The tests start the actual example applications on free ports and stop them afterward. They verify successful access, missing and invalid credentials, any-role semantics, empty role sets, ownership, forged request attributes, independent ABAC conditions, combined roles, cross-course access, and unchanged state after denied mutations. Add equivalent denial cases whenever you add a policy or a new entry point.</p>
+     <p>For the reasoning behind these patterns, see <a href="https://sake92.github.io/sharaf/philosophy/authorization.html">authorization models and context functions</a>.</p>
+     <div role="group">
+      <a role="button" href="https://sake92.github.io/sharaf/howtos/exception-handler.html">⬅️ Exception Handler</a> <span></span> <a role="button" href="https://sake92.github.io/sharaf/howtos/security.html">Secure a production application ➡️</a>
+     </div>
+    </div>
+    <aside aria-label="On this page">
+     <details open>
+      <summary>On this page</summary>
+      <nav aria-label="Table of contents">
+       <ul>
+        <li><a href="#implement-authorization">Implement authorization</a>
+         <ul>
+          <li><a href="#run-and-adapt-the-examples">Run and adapt the examples</a></li>
+          <li><a href="#preserve-denial-responses">Preserve denial responses</a></li>
+          <li><a href="#verify-your-policies-through-the-api">Verify your policies through the API</a></li>
+         </ul></li>
+       </ul>
+      </nav>
+     </details>
+    </aside>
+   </div>
+  </main>
+  <style>
+  body > footer.site-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding-block: 1.5rem 2rem;
+  }
+
+  .site-footer__identity {
+    display: grid;
+    gap: .1rem;
+  }
+
+  .site-footer__identity strong {
+    color: var(--pico-color);
+    font-size: 1rem;
+  }
+
+  .site-footer__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .65rem;
+  }
+
+  .site-footer__links a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .55rem;
+    min-height: 2.75rem;
+    padding: .55rem .85rem;
+    border: 1px solid var(--pico-muted-border-color);
+    border-radius: .7rem;
+    background: var(--pico-card-background-color);
+    color: var(--pico-color);
+    font-weight: 600;
+    line-height: 1;
+    text-decoration: none;
+    transition: border-color .15s ease, background-color .15s ease, transform .15s ease;
+  }
+
+  .site-footer__links a:hover {
+    border-color: var(--pico-primary);
+    background: var(--pico-secondary-background);
+    color: var(--pico-color);
+    transform: translateY(-2px);
+  }
+
+  .site-footer__links a:focus-visible {
+    outline: 2px solid var(--pico-primary);
+    outline-offset: 3px;
+  }
+
+  .site-footer__links svg {
+    width: 1.2rem;
+    height: 1.2rem;
+    flex: none;
+  }
+
+  .site-footer__links a[href*="discord"] svg {
+    color: #5865f2;
+  }
+
+  @media (max-width: 600px) {
+    body > footer.site-footer {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 1rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .site-footer__links a { transition: none; }
+    .site-footer__links a:hover { transform: none; }
+  }
+</style>
+  <footer class="pico container site-footer">
+   <div class="site-footer__identity">
+    <strong>Sharaf</strong> <span>Scala 3 web framework</span>
+   </div>
+   <nav class="site-footer__links" aria-label="Community links">
+    <a href="https://github.com/sake92/sharaf" target="_blank" rel="noopener noreferrer"> 
+     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23A10.94 10.94 0 0 1 12.03 5.79c1.02 0 2.04.135 3 .405 2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57C20.595 21.795 24 17.31 24 12 24 5.37 18.63 0 12 0Z" />
+     </svg> 
+     <span>GitHub</span> 
+    </a> <a href="https://discord.gg/g9KVY3WkMG" target="_blank" rel="noopener noreferrer"> 
+     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+      <path d="M19.73 5.29a17.4 17.4 0 0 0-4.27-1.32 12.1 12.1 0 0 0-.55 1.12 16.1 16.1 0 0 0-4.82 0 12.1 12.1 0 0 0-.55-1.12 17.4 17.4 0 0 0-4.27 1.32C2.57 9.29 1.84 13.2 2.2 17.05a17.7 17.7 0 0 0 5.23 2.67c.42-.57.8-1.17 1.12-1.8a11 11 0 0 1-1.7-.82c.14-.1.27-.21.4-.32 3.28 1.54 6.83 1.54 10.07 0 .13.11.26.22.4.32-.54.32-1.11.59-1.7.82.32.63.7 1.23 1.12 1.8a17.7 17.7 0 0 0 5.24-2.67c.42-4.46-.72-8.34-3.1-11.76ZM8.94 14.68c-.98 0-1.78-.89-1.78-1.98 0-1.1.78-1.99 1.78-1.99s1.8.9 1.78 1.99c0 1.09-.79 1.98-1.78 1.98Zm6.12 0c-.98 0-1.78-.89-1.78-1.98 0-1.1.78-1.99 1.78-1.99s1.8.9 1.78 1.99c0 1.09-.79 1.98-1.78 1.98Z" />
+     </svg> 
+     <span>Discord</span> 
+    </a>
+   </nav>
+  </footer>
+  <script src="https://context7.com/widget.js" data-library="/sake92/sharaf" data-color="#059669" data-position="bottom-right" async></script>
+  <script>
+if (window.matchMedia('(max-width: 850px)').matches) {
+    document.querySelectorAll('body > main > div > aside > details').forEach(details => { details.open = false; });
+}
+</script>
+  <script src="https://sake92.github.io/sharaf/scripts/code-copy.js"></script>
+ </body>
+</html>
