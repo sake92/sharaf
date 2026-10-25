@@ -63,6 +63,8 @@ howtos:
     url: "/howtos/cors.html"
   - label: "Exception Handler"
     url: "/howtos/exception-handler.html"
+  - label: "Authorization"
+    url: "/howtos/authorization.html"
   - label: "Secure a production application"
     url: "/howtos/security.html"
 philosophies:
@@ -72,6 +74,8 @@ philosophies:
     url: "/philosophy/alternatives.html"
   - label: "Authentication"
     url: "/philosophy/authentication.html"
+  - label: "Authorization"
+    url: "/philosophy/authorization.html"
   - label: "Dependency Injection"
     url: "/philosophy/dependency-injection.html"
   - label: "Query Params Handling"

@@ -91,3 +91,5 @@ jobs:
         run: |
           ./scripts/compile-scala-cli-examples.sh examples/scala-cli
           ./scripts/compile-scala-cli-examples.sh examples/htmx
+      - name: Test authorization examples over HTTP
+        run: scala-cli test examples/scala-cli/authorization --server=false

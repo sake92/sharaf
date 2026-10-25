@@ -84,25 +84,10 @@ printed test token are intentionally not production configuration.
 
 ## Authorize separately from authentication
 
-Authentication proves who made a request. Authorization decides whether that identity may perform the action. Register
-pac4j authorizers by name and pass their comma-separated names through `Pac4jSecurityConfig.authorizers` for the routes
-they protect.
-
-```scala
-import org.pac4j.core.authorization.authorizer.RequireAnyRoleAuthorizer
-
-pac4jConfig.addAuthorizer("admin", RequireAnyRoleAuthorizer("admin"))
-
-val adminSecurity = Pac4jSecurityConfig(
-  pac4jConfig,
-  clients = "HeaderClient",
-  authorizers = "admin"
-)
-```
-
-Ensure the client maps trusted identity-provider claims to pac4j roles before relying on a role authorizer. For resource
-ownership rules such as “may edit this invoice”, enforce the check next to the route/domain operation after obtaining
-`SecurityService.currentUser`; a role alone is not sufficient.
+Use the [authorization How-to guides](/howtos/authorization.html) for runnable examples of authentication-only
+routes, route-local role guards, application identity/context functions, ownership, ABAC, and scoped relationships.
+Keep resource permission checks in service operations, and map application exceptions inside the pac4j boundary.
+Authentication alone does not require looking up a domain user.
 
 ## Use a production session store
 
