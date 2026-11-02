@@ -72,4 +72,11 @@ class QueryStringWriteSuite extends munit.FunSuite {
     assertEquals(res1, "q=searchme&page=42")
   }
 
+  test("toQueryString should write optional named tuple fields") {
+    val present: (opt: Option[String]) = (opt = Some("value"))
+    val absent: (opt: Option[String]) = (opt = None)
+    assertEquals(present.toQueryStringMap(), Map("opt[0]" -> Seq("value")))
+    assertEquals(absent.toQueryStringMap(), Map.empty)
+  }
+
 }

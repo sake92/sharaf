@@ -97,6 +97,23 @@ class ValidsonSuite extends munit.FunSuite {
       )
     )
   }
+
+  test("validate named tuples through implicit and explicit derivation") {
+    type Named = (value: Option[SimpleData])
+    val absent: Named = (value = None)
+    val valid: Named = (value = Some(SimpleData(1, "abc", Seq("ab"))))
+    val invalid: Named = (value = Some(SimpleData(0, " ", Seq.empty)))
+    val expected = Seq(
+      ValidationError("$.value.num", "must be positive", 0),
+      ValidationError("$.value.str", "must not be blank", " "),
+      ValidationError("$.value.seq", "must be >= 1", Seq.empty)
+    )
+
+    assertEquals(absent.validate, Seq.empty)
+    assertEquals(valid.validate, Seq.empty)
+    assertEquals(invalid.validate, expected)
+    assertEquals(Validator.derived[Named].validate(invalid).map(_.withPathPrefix("$")), expected)
+  }
 }
 
 // types

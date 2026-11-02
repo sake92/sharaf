@@ -177,11 +177,25 @@ object QueryStringRW extends LowPriorityQueryStringRWInstances {
     override def write(path: String, value: Option[T]): QueryStringData =
       QueryStringRW[Seq[T]].write(path, value.toSeq)
 
-    override def parse(path: String, qsData: QueryStringData): Option[T] =
-      val firstNonEmptyIndex = QueryStringRW[Seq[String]].parse(path, qsData).indexWhere(_.nonEmpty)
-      Option.when(firstNonEmptyIndex >= 0) {
-        QueryStringRW[Seq[T]].parse(path, qsData)(firstNonEmptyIndex)
-      }
+    override def parse(path: String, qsData: QueryStringData): Option[T] = qsData match
+      case Sequence(values) if values.forall(_.isInstanceOf[Simple]) =>
+        val firstNonEmptyIndex = QueryStringRW[Seq[String]].parse(path, qsData).indexWhere(_.nonEmpty)
+        Option.when(firstNonEmptyIndex >= 0) {
+          QueryStringRW[Seq[T]].parse(path, qsData)(firstNonEmptyIndex)
+        }
+      case Sequence(values) =>
+        val firstNonEmptyIndex = values.indexWhere {
+          case Simple(value) => value.nonEmpty
+          case _             => true
+        }
+        Option.when(firstNonEmptyIndex >= 0) {
+          fqsp.parse(s"$path[$firstNonEmptyIndex]", values(firstNonEmptyIndex))
+        }
+      case other =>
+        val firstNonEmptyIndex = QueryStringRW[Seq[String]].parse(path, other).indexWhere(_.nonEmpty)
+        Option.when(firstNonEmptyIndex >= 0) {
+          QueryStringRW[Seq[T]].parse(path, other)(firstNonEmptyIndex)
+        }
 
     override def default: Option[Option[T]] = Some(None)
   }
@@ -485,7 +499,8 @@ private[querson] trait LowPriorityQueryStringRWInstances {
           val parsedValues = fieldNames.zip(tcInstances).map { case (name, rw) =>
             fieldMap.get(name) match {
               case Some(jv) => rw.parse(s"$path.$name", jv)
-              case None     => throw QuersonException(s"Missing field '$name' at path '$path'")
+              case None =>
+                rw.default.getOrElse(throw QuersonException(s"Missing field '$name' at path '$path'"))
             }
           }
           val tupleValue = Tuple.fromArray(parsedValues.toArray)

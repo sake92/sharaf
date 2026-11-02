@@ -241,9 +241,46 @@ class QueryStringParseSuite extends munit.FunSuite {
     val res = Map("q" -> Seq("searchme"), "page" -> Seq("42")).parseQueryStringMap[(q: String, page: Int)]
     assertEquals(res, (q = "searchme", page = 42))
 
-    // TODO fix this
-    //val res2 = Map().parseQueryStringMap[(opt: Option[String])]
-   // assertEquals(res2, (opt = None))
+    val present = Map("opt" -> Seq("value")).parseQueryStringMap[(opt: Option[String])]
+    assertEquals(present, (opt = Some("value")))
+
+    val empty = Map("opt" -> Seq("")).parseQueryStringMap[(opt: Option[String])]
+    assertEquals(empty, (opt = None))
+
+    val absent = Map.empty[String, Seq[String]].parseQueryStringMap[(opt: Option[String])]
+    assertEquals(absent, (opt = None))
+
+    val invalid = intercept[ParsingException] {
+      Map("opt" -> Seq("not_an_int")).parseQueryStringMap[(opt: Option[Int])]
+    }
+    assertEquals(invalid.errors, Seq(ParseError(".opt[0]", "invalid Int", Some("not_an_int"))))
+  }
+
+  test("parse and write Option wrapping a named tuple") {
+    type Named = (name: String, age: Int)
+    val value: (person: Option[Named]) = (person = Some((name = "Ada", age = 37)))
+    val serialized = value.toQueryStringMap()
+    assertEquals(serialized, Map("person[0].name" -> Seq("Ada"), "person[0].age" -> Seq("37")))
+
+    assertEquals(serialized.parseQueryStringMap[(person: Option[Named])], value)
+
+    val absent = Map.empty[String, Seq[String]].parseQueryStringMap[(person: Option[Named])]
+    assertEquals(absent, (person = None))
+
+    val empty = Map("person" -> Seq("")).parseQueryStringMap[(person: Option[Named])]
+    assertEquals(empty, (person = None))
+
+    val invalid = intercept[ParsingException] {
+      Map("person[0].name" -> Seq("Ada"), "person[0].age" -> Seq("not_an_int"))
+        .parseQueryStringMap[(person: Option[Named])]
+    }
+    assertEquals(invalid.errors, Seq(ParseError(".person[0].age", "invalid Int", Some("not_an_int"))))
+
+    val nested: (person: Option[Option[Named]]) = (person = Some(Some((name = "Ada", age = 37))))
+    assertEquals(
+      nested.toQueryStringMap().parseQueryStringMap[(person: Option[Option[Named]])],
+      nested
+    )
   }
 
   test("parse union type") {

@@ -3,8 +3,10 @@ package ba.sake.validson
 import scala.deriving.*
 import scala.quoted.*
 import scala.math.Ordered.*
+import scala.NamedTuple.AnyNamedTuple
+import scala.NamedTuple.DropNames
+import scala.NamedTuple.Names
 
-// TODO Option-al fields cannot validate easily
 trait Validator[T] {
 
   def validate(value: T): Seq[ValidationError]
@@ -120,7 +122,7 @@ object Validator extends LowPriValidators {
         '{
           new Validator[T] {
             override def validate(value: T): Seq[ValidationError] = {
-              val valueAsProd = ${ 'value.asExprOf[Product] }
+              val valueAsProd = value.asInstanceOf[Product]
               val res = $labels.zip(valueAsProd.productIterator).zip($validatorInstancesExpr).flatMap {
                 case ((label, v), validator) =>
                   validator.asInstanceOf[Validator[Any]].validate(v).map(_.withPathPrefix(s".${label}"))
@@ -142,6 +144,27 @@ object Validator extends LowPriValidators {
 }
 
 trait LowPriValidators {
+  inline given autoderiveNamedTuple[T <: AnyNamedTuple]: Validator[T] = {
+    val fieldNames = compiletime.constValueTuple[Names[T]].productIterator.asInstanceOf[Iterator[String]].toSeq
+    val tcInstances =
+      compiletime
+        .summonAll[Tuple.Map[DropNames[T], Validator]]
+        .productIterator
+        .asInstanceOf[Iterator[Validator[Any]]]
+        .toSeq
+    deriveNamedTupleTC[T](fieldNames, tcInstances)
+  }
+
+  private def deriveNamedTupleTC[T](fieldNames: Seq[String], tcInstances: Seq[Validator[Any]]) =
+    new Validator[T] {
+      override def validate(value: T): Seq[ValidationError] = {
+        val fieldValues = value.asInstanceOf[Tuple].productIterator.asInstanceOf[Iterator[Any]]
+        fieldNames.zip(fieldValues).zip(tcInstances).flatMap { case ((name, fieldValue), validator) =>
+          validator.validate(fieldValue).map(_.withPathPrefix(s".$name"))
+        }
+      }
+    }
+
   // noop if there is no validator for T
   given dummyValidator[T]: Validator[T] with {
     override def validate(values: T): Seq[ValidationError] =

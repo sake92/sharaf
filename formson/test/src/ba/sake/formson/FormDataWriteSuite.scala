@@ -131,4 +131,14 @@ class FormDataWriteSuite extends munit.FunSuite {
     assertEquals(res1, SeqMap("q" -> Seq(FormValue.Str("searchme")), "page" -> Seq(FormValue.Str("42"))))
   }
 
+  test("toFormDataMap should write optional named tuple fields") {
+    val present: (opt: Option[String]) = (opt = Some("value"))
+    val absent: (opt: Option[String]) = (opt = None)
+    assertEquals(
+      present.toFormDataMap(),
+      SeqMap("opt[0]" -> Seq(FormValue.Str("value")))
+    )
+    assertEquals(absent.toFormDataMap(), SeqMap.empty)
+  }
+
 }
