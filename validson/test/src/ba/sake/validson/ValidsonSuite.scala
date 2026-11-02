@@ -114,6 +114,20 @@ class ValidsonSuite extends munit.FunSuite {
     assertEquals(invalid.validate, expected)
     assertEquals(Validator.derived[Named].validate(invalid).map(_.withPathPrefix("$")), expected)
   }
+
+  test("explicit named tuple validator takes precedence") {
+    type Named = (value: Int)
+    given Validator[Named] with {
+      override def validate(value: Named): Seq[ValidationError] =
+        Seq(ValidationError(".explicit", "explicit validator", value.value))
+    }
+
+    val value: Named = (value = 42)
+    assertEquals(
+      value.validate,
+      Seq(ValidationError("$.explicit", "explicit validator", 42))
+    )
+  }
 }
 
 // types

@@ -141,29 +141,40 @@ object Validator extends LowPriValidators {
       case '[elem *: elems] => Expr.summon[Validator[elem]].get :: summonInstances[elems]
       case '[EmptyTuple]    => Nil
 
+  private[validson] inline def deriveNamedTuple[T <: AnyNamedTuple]: Validator[T] = ${ deriveNamedTupleMacro[T] }
+
+  private def deriveNamedTupleMacro[T <: AnyNamedTuple: Type](using Quotes): Expr[Validator[T]] = {
+    import quotes.reflect.*
+    TypeRepr.of[T].dealias match {
+      case _: OrType => '{ Validator.dummyValidator[T] }
+      case _ =>
+        '{
+          val labels = compiletime.constValueTuple[Names[T]].productIterator.asInstanceOf[Iterator[String]].toSeq
+          val validators =
+            compiletime
+              .summonAll[Tuple.Map[DropNames[T], Validator]]
+              .productIterator
+              .asInstanceOf[Iterator[Validator[Any]]]
+              .toSeq
+          new Validator[T] {
+            override def validate(value: T): Seq[ValidationError] = {
+              val valueAsProd = value.asInstanceOf[Product]
+              labels.zip(valueAsProd.productIterator).zip(validators).flatMap {
+                case ((label, fieldValue), validator) =>
+                  validator.asInstanceOf[Validator[Any]].validate(fieldValue).map(_.withPathPrefix(s".$label"))
+              }
+            }
+          }
+        }
+    }
+  }
+
 }
 
 trait LowPriValidators {
   inline given autoderiveNamedTuple[T <: AnyNamedTuple]: Validator[T] = {
-    val fieldNames = compiletime.constValueTuple[Names[T]].productIterator.asInstanceOf[Iterator[String]].toSeq
-    val tcInstances =
-      compiletime
-        .summonAll[Tuple.Map[DropNames[T], Validator]]
-        .productIterator
-        .asInstanceOf[Iterator[Validator[Any]]]
-        .toSeq
-    deriveNamedTupleTC[T](fieldNames, tcInstances)
+    Validator.deriveNamedTuple[T]
   }
-
-  private def deriveNamedTupleTC[T](fieldNames: Seq[String], tcInstances: Seq[Validator[Any]]) =
-    new Validator[T] {
-      override def validate(value: T): Seq[ValidationError] = {
-        val fieldValues = value.asInstanceOf[Tuple].productIterator.asInstanceOf[Iterator[Any]]
-        fieldNames.zip(fieldValues).zip(tcInstances).flatMap { case ((name, fieldValue), validator) =>
-          validator.validate(fieldValue).map(_.withPathPrefix(s".$name"))
-        }
-      }
-    }
 
   // noop if there is no validator for T
   given dummyValidator[T]: Validator[T] with {
