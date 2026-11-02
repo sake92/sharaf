@@ -17,6 +17,14 @@ jobs:
       - uses: actions/checkout@v5
         with:
           fetch-depth: 0
+      - name: Restore Deder output cache
+        id: deder-output-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: .deder/out
+          key: deder-${{ github.sha }}
+          restore-keys: |
+            deder-
       - uses: coursier/cache-action@v7
         with:
           extraFiles: deder.pkl
@@ -48,6 +56,12 @@ jobs:
         run: deder exec -t compile
       - name: Test
         run: deder exec -t test
+      - name: Save Deder output cache
+        if: ${{ success() && github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.deder-output-cache.outputs.cache-hit != 'true' }}
+        uses: actions/cache/save@v4
+        with:
+          path: .deder/out
+          key: deder-${{ github.sha }}
       - name: Deder output
         if: failure()
         uses: actions/upload-artifact@v4
@@ -70,6 +84,13 @@ jobs:
       - uses: actions/checkout@v5
         with:
           fetch-depth: 0
+      - name: Restore Deder output cache
+        uses: actions/cache/restore@v4
+        with:
+          path: .deder/out
+          key: deder-${{ github.sha }}
+          restore-keys: |
+            deder-
       - uses: actions/setup-java@v3
         with:
           distribution: temurin
