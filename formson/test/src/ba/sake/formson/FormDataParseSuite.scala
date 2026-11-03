@@ -261,6 +261,73 @@ class FormDataParseSuite extends munit.FunSuite {
     val res = SeqMap("q" -> Seq("searchme").map(FormValue.Str.apply), "page" -> Seq("42").map(FormValue.Str.apply))
       .parseFormDataMap[(q: String, page: Int)]
     assertEquals(res, (q = "searchme", page = 42))
+
+    val present = SeqMap("opt" -> Seq("value").map(FormValue.Str.apply)).parseFormDataMap[(opt: Option[String])]
+    assertEquals(present, (opt = Some("value")))
+
+    val empty = SeqMap("opt" -> Seq("").map(FormValue.Str.apply)).parseFormDataMap[(opt: Option[String])]
+    assertEquals(empty, (opt = None))
+
+    val absent = SeqMap.empty[String, Seq[FormValue]].parseFormDataMap[(opt: Option[String])]
+    assertEquals(absent, (opt = None))
+
+    val invalid = intercept[ParsingException] {
+      SeqMap("opt" -> Seq("not_an_int").map(FormValue.Str.apply)).parseFormDataMap[(opt: Option[Int])]
+    }
+    assertEquals(invalid.errors, Seq(ParseError(".opt[0]", "invalid Int", Some("not_an_int"))))
+  }
+
+  test("parse and write Option wrapping a named tuple") {
+    type Named = (name: String, age: Int)
+    val value: (person: Option[Named]) = (person = Some((name = "Ada", age = 37)))
+    val serialized = value.toFormDataMap()
+    assertEquals(
+      serialized,
+      SeqMap(
+        "person[0][name]" -> Seq(FormValue.Str("Ada")),
+        "person[0][age]" -> Seq(FormValue.Str("37"))
+      )
+    )
+
+    assertEquals(serialized.parseFormDataMap[(person: Option[Named])], value)
+
+    val noBrackets = value.toFormDataMap(DefaultFormsonConfig.withSeqNoBrackets.withObjDots)
+    assertEquals(
+      noBrackets,
+      SeqMap(
+        "person.name" -> Seq(FormValue.Str("Ada")),
+        "person.age" -> Seq(FormValue.Str("37"))
+      )
+    )
+    assertEquals(noBrackets.parseFormDataMap[(person: Option[Named])], value)
+
+    val noBracketsInvalid = intercept[ParsingException] {
+      SeqMap(
+        "person.name" -> Seq(FormValue.Str("Ada")),
+        "person.age" -> Seq(FormValue.Str("not_an_int"))
+      ).parseFormDataMap[(person: Option[Named])]
+    }
+    assertEquals(noBracketsInvalid.errors, Seq(ParseError(".person.age", "invalid Int", Some("not_an_int"))))
+
+    val absent = SeqMap.empty[String, Seq[FormValue]].parseFormDataMap[(person: Option[Named])]
+    assertEquals(absent, (person = None))
+
+    val empty = SeqMap("person" -> Seq(FormValue.Str(""))).parseFormDataMap[(person: Option[Named])]
+    assertEquals(empty, (person = None))
+
+    val invalid = intercept[ParsingException] {
+      SeqMap(
+        "person[0][name]" -> Seq(FormValue.Str("Ada")),
+        "person[0][age]" -> Seq(FormValue.Str("not_an_int"))
+      ).parseFormDataMap[(person: Option[Named])]
+    }
+    assertEquals(invalid.errors, Seq(ParseError(".person[0].age", "invalid Int", Some("not_an_int"))))
+
+    val nested: (person: Option[Option[Named]]) = (person = Some(Some((name = "Ada", age = 37))))
+    assertEquals(
+      nested.toFormDataMap().parseFormDataMap[(person: Option[Option[Named]])],
+      nested
+    )
   }
 
   test("parse union type") {
@@ -283,6 +350,34 @@ class FormDataParseSuite extends munit.FunSuite {
       assertEquals(res1, (firstname = "Mujo"))
       val res2 = SeqMap("lastname" -> Seq("Hrnjica").map(FormValue.Str.apply)).parseFormDataMap[(firstname: String) | (lastname: String)]
       assertEquals(res2, (lastname = "Hrnjica"))
+    }
+    locally {
+      val res = SeqMap("right" -> Seq("value").map(FormValue.Str.apply))
+        .parseFormDataMap[(left: Option[String]) | (right: String)]
+      assertEquals(res, (right = "value"))
+      val absent = SeqMap.empty[String, Seq[FormValue]]
+        .parseFormDataMap[(left: Option[String]) | (right: String)]
+      assertEquals(absent, (left = None))
+      val ambiguous = SeqMap(
+        "left" -> Seq(FormValue.Str("left")),
+        "right" -> Seq(FormValue.Str("right"))
+      ).parseFormDataMap[(left: Option[String]) | (right: String)]
+      assertEquals(ambiguous, (left = Some("left")))
+    }
+    locally {
+      type First = (first: Option[String], marker: Option[Int])
+      type Second = (second: Option[String])
+      type Third = (third: String)
+
+      val suppliedFirst = SeqMap(
+        "first" -> Seq(FormValue.Str("one")),
+        "marker" -> Seq(FormValue.Str("2"))
+      ).parseFormDataMap[First | Second | Third]
+      assertEquals(suppliedFirst, (first = Some("one"), marker = Some(2)))
+
+      val suppliedThird = SeqMap("third" -> Seq(FormValue.Str("three")))
+        .parseFormDataMap[First | Second | Third]
+      assertEquals(suppliedThird, (third = "three"))
     }
     locally {
       val res = SeqMap("status" -> Seq("2").map(FormValue.Str.apply)).parseFormDataMap[(status: 1 | 2 | 3)]

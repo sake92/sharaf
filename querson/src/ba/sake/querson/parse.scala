@@ -73,7 +73,10 @@ private[querson] class QuersonParser(qsMap: QueryStringMap) {
         seqAcc.get(idx) match
           case None => seqAcc(idx) = values
           case Some(existingValues) =>
-            seqAcc(idx) = existingValues ++ values
+            val allValues = existingValues ++ values
+            val (objects, remaining) = allValues.partition(_.isInstanceOf[Obj])
+            val (sequences, nonObjects) = remaining.partition(_.isInstanceOf[Sequence])
+            seqAcc(idx) = nonObjects ++ objects.reduceOption(merge) ++ sequences.reduceOption(merge)
       }
       Sequence(seqAcc.to(SortedMap))
 

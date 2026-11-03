@@ -3,8 +3,10 @@ package ba.sake.validson
 import scala.deriving.*
 import scala.quoted.*
 import scala.math.Ordered.*
+import scala.NamedTuple.AnyNamedTuple
+import scala.NamedTuple.DropNames
+import scala.NamedTuple.Names
 
-// TODO Option-al fields cannot validate easily
 trait Validator[T] {
 
   def validate(value: T): Seq[ValidationError]
@@ -120,7 +122,7 @@ object Validator extends LowPriValidators {
         '{
           new Validator[T] {
             override def validate(value: T): Seq[ValidationError] = {
-              val valueAsProd = ${ 'value.asExprOf[Product] }
+              val valueAsProd = value.asInstanceOf[Product]
               val res = $labels.zip(valueAsProd.productIterator).zip($validatorInstancesExpr).flatMap {
                 case ((label, v), validator) =>
                   validator.asInstanceOf[Validator[Any]].validate(v).map(_.withPathPrefix(s".${label}"))
@@ -139,9 +141,44 @@ object Validator extends LowPriValidators {
       case '[elem *: elems] => Expr.summon[Validator[elem]].get :: summonInstances[elems]
       case '[EmptyTuple]    => Nil
 
+  private[validson] inline def deriveNamedTuple[T <: AnyNamedTuple]: Validator[T] = ${ deriveNamedTupleMacro[T] }
+
+  private def deriveNamedTupleMacro[T <: AnyNamedTuple: Type](using Quotes): Expr[Validator[T]] = {
+    import quotes.reflect.*
+    val tpe = TypeRepr.of[T].dealias
+    tpe match {
+      case _: OrType => '{ Validator.dummyValidator[T] }
+      // Abstract named tuples cannot expand Names[T]; preserve the generic no-op fallback.
+      case _ if tpe.typeSymbol != TypeRepr.of[(field: Int)].typeSymbol => '{ Validator.dummyValidator[T] }
+      case _ =>
+        '{
+          val labels = compiletime.constValueTuple[Names[T]].productIterator.asInstanceOf[Iterator[String]].toSeq
+          val validators =
+            compiletime
+              .summonAll[Tuple.Map[DropNames[T], Validator]]
+              .productIterator
+              .asInstanceOf[Iterator[Validator[Any]]]
+              .toSeq
+          new Validator[T] {
+            override def validate(value: T): Seq[ValidationError] = {
+              val valueAsProd = value.asInstanceOf[Product]
+              labels.zip(valueAsProd.productIterator).zip(validators).flatMap {
+                case ((label, fieldValue), validator) =>
+                  validator.asInstanceOf[Validator[Any]].validate(fieldValue).map(_.withPathPrefix(s".$label"))
+              }
+            }
+          }
+        }
+    }
+  }
+
 }
 
 trait LowPriValidators {
+  inline given autoderiveNamedTuple[T <: AnyNamedTuple]: Validator[T] = {
+    Validator.deriveNamedTuple[T]
+  }
+
   // noop if there is no validator for T
   given dummyValidator[T]: Validator[T] with {
     override def validate(values: T): Seq[ValidationError] =

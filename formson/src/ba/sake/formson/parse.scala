@@ -70,8 +70,9 @@ private[formson] class FormsonParser(formDataMap: FormDataMap) {
           case None => seqAcc(idx) = values
           case Some(existingValues) =>
             val allValues = existingValues ++ values
-            val (objects, nonObjects) = allValues.partition(_.isInstanceOf[Obj])
-            seqAcc(idx) = nonObjects ++ objects.reduceOption(merge)
+            val (objects, remaining) = allValues.partition(_.isInstanceOf[Obj])
+            val (sequences, nonObjects) = remaining.partition(_.isInstanceOf[Sequence])
+            seqAcc(idx) = nonObjects ++ objects.reduceOption(merge) ++ sequences.reduceOption(merge)
       }
       Sequence(seqAcc.to(SortedMap))
 

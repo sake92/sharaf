@@ -2,6 +2,11 @@ package ba.sake.validson
 
 class ValidsonSuite extends munit.FunSuite {
 
+  test("generic named tuple validation retains fallback") {
+    def check[T <: scala.NamedTuple.AnyNamedTuple](value: T): Seq[ValidationError] = value.validate
+    assertEquals(check((value = 1)), Seq.empty)
+  }
+
   // this is just so people can use this anywhere..
   // see LowPriValidators.dummyValidator
   test("validate should not care about data with no validation") {
@@ -95,6 +100,37 @@ class ValidsonSuite extends munit.FunSuite {
         ValidationError("$.data[0].str", "must not be blank", " "),
         ValidationError("$.data[0].seq", "must be >= 1", Seq.empty)
       )
+    )
+  }
+
+  test("validate named tuples through implicit and explicit derivation") {
+    type Named = (value: Option[SimpleData])
+    val absent: Named = (value = None)
+    val valid: Named = (value = Some(SimpleData(1, "abc", Seq("ab"))))
+    val invalid: Named = (value = Some(SimpleData(0, " ", Seq.empty)))
+    val expected = Seq(
+      ValidationError("$.value.num", "must be positive", 0),
+      ValidationError("$.value.str", "must not be blank", " "),
+      ValidationError("$.value.seq", "must be >= 1", Seq.empty)
+    )
+
+    assertEquals(absent.validate, Seq.empty)
+    assertEquals(valid.validate, Seq.empty)
+    assertEquals(invalid.validate, expected)
+    assertEquals(Validator.derived[Named].validate(invalid).map(_.withPathPrefix("$")), expected)
+  }
+
+  test("explicit named tuple validator takes precedence") {
+    type Named = (value: Int)
+    given Validator[Named] with {
+      override def validate(value: Named): Seq[ValidationError] =
+        Seq(ValidationError(".explicit", "explicit validator", value.value))
+    }
+
+    val value: Named = (value = 42)
+    assertEquals(
+      value.validate,
+      Seq(ValidationError("$.explicit", "explicit validator", 42))
     )
   }
 }
