@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light dark">
-  <meta name="description" content="Sharaf - a minimalistic Scala 3 web framework.">
+  <meta name="description" content="A simple Scala 3 web framework. Build web apps and APIs, and deploy on a single VPS or AWS Lambda.">
   <title>Sharaf | Sharaf Documentation</title>
   <link rel="shortcut icon" href="https://sake92.github.io/sharaf/images/favicon.png" type="image/png">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-dark.min.css" media="(prefers-color-scheme: dark)" rel="stylesheet">
@@ -38,91 +38,127 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
   <main class="pico container">
    <div>
     <div class="content">
-     <h1 id="sharaf">Sharaf<a href="#sharaf" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
-     <p>Sharaf is a minimalistic Scala 3 web framework.</p>
-     <p>Jump right into:</p>
-     <ul>
-      <li><a href="https://sake92.github.io/sharaf/tutorials">Tutorials</a> to get you started</li>
-      <li><a href="https://sake92.github.io/sharaf/howtos">How-Tos</a> to get answers for some common questions</li>
-      <li><a href="https://sake92.github.io/sharaf/reference">Reference</a> to see detailed information</li>
-      <li><a href="https://sake92.github.io/sharaf/philosophy">Philosophy</a> to get insights into design decisions</li>
-     </ul>
-     <hr>
-     <h2 id="site-map">Site Map<a href="#site-map" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
-     <ul>
-      <li>
-       <p><a href="https://sake92.github.io/sharaf/tutorials">Tutorials</a></p>
-       <ul>
-        <li><a href="https://sake92.github.io/sharaf/tutorials/quickstart.html">Quickstart</a></li>
-        <li><a href="https://sake92.github.io/sharaf/tutorials/hello-world.html">Hello World</a></li>
-        <li><a href="https://sake92.github.io/sharaf/tutorials/path-params.html">Path Params</a></li>
-        <li><a href="https://sake92.github.io/sharaf/tutorials/query-params.html">Query Params</a></li>
-        <li><a href="https://sake92.github.io/sharaf/tutorials/static-files.html">Static Files</a></li>
-        <li><a href="https://sake92.github.io/sharaf/tutorials/html.html">HTML</a></li>
-        <li><a href="https://sake92.github.io/sharaf/tutorials/forms.html">Forms</a></li>
-        <li><a href="https://sake92.github.io/sharaf/tutorials/json.html">JSON</a></li>
-        <li><a href="https://sake92.github.io/sharaf/tutorials/validation.html">Validation</a></li>
-        <li><a href="https://sake92.github.io/sharaf/tutorials/openapi.html">OpenAPI</a></li>
-        <li><a href="https://sake92.github.io/sharaf/tutorials/sql.html">SQL</a></li>
-        <li><a href="https://sake92.github.io/sharaf/tutorials/tests.html">Tests</a></li>
-        <li><a href="https://sake92.github.io/sharaf/tutorials/htmx.html">HTMX</a></li>
-        <li><a href="https://sake92.github.io/sharaf/tutorials/sse.html">Server Sent Events</a></li>
-       </ul>
-      </li>
-      <li>
-       <p><a href="https://sake92.github.io/sharaf/howtos">How Tos</a></p>
-       <ul>
-        <li><a href="https://sake92.github.io/sharaf/howtos/not-found.html">NotFound</a></li>
-        <li><a href="https://sake92.github.io/sharaf/howtos/query-params.html">Query Parameters</a></li>
-        <li><a href="https://sake92.github.io/sharaf/howtos/iron-query-params.html">Iron Query Parameters</a></li>
-        <li><a href="https://sake92.github.io/sharaf/howtos/redirect.html">Redirect</a></li>
-        <li><a href="https://sake92.github.io/sharaf/howtos/response-body.html">Response Body</a></li>
-        <li><a href="https://sake92.github.io/sharaf/howtos/patch-requests.html">PATCH Requests</a></li>
-        <li><a href="https://sake92.github.io/sharaf/howtos/routes.html">Routes</a></li>
-        <li><a href="https://sake92.github.io/sharaf/howtos/upload-file.html">Upload File</a></li>
-        <li><a href="https://sake92.github.io/sharaf/howtos/external-config.html">External Config</a></li>
-        <li><a href="https://sake92.github.io/sharaf/howtos/cors.html">CORS</a></li>
-        <li><a href="https://sake92.github.io/sharaf/howtos/exception-handler.html">Exception Handler</a></li>
-        <li><a href="https://sake92.github.io/sharaf/howtos/authorization.html">Authorization</a></li>
-        <li><a href="https://sake92.github.io/sharaf/howtos/security.html">Secure a production application</a></li>
-       </ul>
-      </li>
-      <li>
-       <p><a href="https://sake92.github.io/sharaf/reference">Reference</a></p>
-       <ul>
-        <li><a href="https://sake92.github.io/sharaf/reference/dependencies.html">Dependencies</a></li>
-        <li><a href="https://sake92.github.io/sharaf/reference/routing.html">Routing</a></li>
-        <li><a href="https://sake92.github.io/sharaf/reference/request.html">Request</a></li>
-        <li><a href="https://sake92.github.io/sharaf/reference/response.html">Response</a></li>
-        <li><a href="https://sake92.github.io/sharaf/reference/errors.html">Errors</a></li>
-        <li><a href="https://sake92.github.io/sharaf/reference/servers.html">Servers and platforms</a></li>
-        <li><a href="https://sake92.github.io/sharaf/reference/native-footprint.html">Native footprint</a></li>
-        <li><a href="https://sake92.github.io/sharaf/reference/secure-production-defaults.html">Secure production defaults</a></li>
-        <li><a href="https://javadoc.io/doc/ba.sake/sharaf-core_3/latest/index.html">Scaladoc</a></li>
-       </ul>
-      </li>
-      <li>
-       <p><a href="https://sake92.github.io/sharaf/philosophy">Philosophy</a></p>
-       <ul>
-        <li><a href="https://sake92.github.io/sharaf/philosophy/why-sharaf.html">Why Sharaf?</a></li>
-        <li><a href="https://sake92.github.io/sharaf/philosophy/alternatives.html">Alternatives</a></li>
-        <li><a href="https://sake92.github.io/sharaf/philosophy/authentication.html">Authentication</a></li>
-        <li><a href="https://sake92.github.io/sharaf/philosophy/authorization.html">Authorization</a></li>
-        <li><a href="https://sake92.github.io/sharaf/philosophy/dependency-injection.html">Dependency Injection</a></li>
-        <li><a href="https://sake92.github.io/sharaf/philosophy/query-params-handling.html">Query Params Handling</a></li>
-        <li><a href="https://sake92.github.io/sharaf/philosophy/routes-matching.html">Routes Matching</a></li>
-       </ul>
-      </li>
-     </ul>
+     <link rel="stylesheet" href="https://sake92.github.io/sharaf/styles/home.css">
+     <div class="sharaf-home">
+      <section class="home-hero" aria-labelledby="hero-title">
+       <div class="home-hero-copy">
+        <p class="home-eyebrow">Sharaf · Scala 3 web framework</p>
+        <h1 id="hero-title">Start simple.
+         <br>
+         <span>Deploy anywhere.</span><a href="#hero-title" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
+        <p class="home-lead">Build web apps and APIs with readable routes, typed inputs, and ordinary Scala. From your first route to a single VPS or AWS Lambda.</p>
+        <div class="home-actions">
+         <a href="https://sake92.github.io/sharaf/tutorials/quickstart.html" class="home-button home-button-primary">Get started <span aria-hidden="true">→</span></a> <a href="#deployment" class="home-button">Explore deployments</a>
+        </div>
+        <p class="home-platforms">JVM &amp; native executables <span aria-hidden="true">·</span> Open source</p>
+       </div>
+       <div class="home-example">
+        <div class="home-example-title">
+         <span>hello.sc</span><span>A web app in a few lines.</span>
+        </div>
+        <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">scala</span> <span class="hljs-string">3.9.0</span>
+<span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">ba.sake::sharaf-undertow:0.20.0</span>
+
+<span class="hljs-keyword">import</span> ba.sake.sharaf.*
+<span class="hljs-keyword">import</span> ba.sake.sharaf.undertow.<span class="hljs-type">UndertowSharafServer</span>
+
+<span class="hljs-keyword">val</span> routes = <span class="hljs-type">Routes</span>:
+  <span class="hljs-keyword">case</span> <span class="hljs-type">GET</span> -&gt; <span class="hljs-type">Path</span>(<span class="hljs-string">"hello"</span>, name) =&gt;
+    <span class="hljs-type">Response</span>.withBody(<span class="hljs-string">s"Hello <span class="hljs-subst">$name</span>"</span>)
+  <span class="hljs-keyword">case</span> <span class="hljs-type">GET</span> -&gt; _ =&gt;
+    <span class="hljs-type">Response</span>.withBody(<span class="hljs-string">"Go to http://localhost:8181/hello/your-name"</span>)
+
+<span class="hljs-type">UndertowSharafServer</span>(<span class="hljs-string">"localhost"</span>, <span class="hljs-number">8181</span>, routes).start()
+
+println(<span class="hljs-string">s"Server started at http://localhost:8181"</span>)
+
+</code></pre>
+        <div class="home-example-run">
+         <span>Run it with Scala CLI</span><code>scala hello.sc</code>
+        </div>
+       </div>
+      </section>
+      <section class="home-section" aria-labelledby="why-title">
+       <p class="home-eyebrow">Start small. Grow as needed.</p>
+       <h2 id="why-title">Why Sharaf?<a href="#why-title" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+       <div class="home-benefits">
+        <article class="home-card">
+         <span class="home-card-icon" aria-hidden="true">⚡</span>
+         <h3>Simple by design</h3>
+         <p>Routes are Scala pattern matches. Application logic is ordinary Scala code. Start small and keep your app easy to follow.</p>
+         <a href="https://sake92.github.io/sharaf/philosophy/why-sharaf.html">The ideas behind Sharaf <span aria-hidden="true">→</span></a>
+        </article>
+        <article class="home-card">
+         <span class="home-card-icon" aria-hidden="true">🎯</span>
+         <h3>Typed where it matters</h3>
+         <p>Parse JSON, forms, and query parameters into case classes. Add validation and return useful errors.</p>
+         <a href="https://sake92.github.io/sharaf/tutorials/validation.html">Explore typed inputs <span aria-hidden="true">→</span></a>
+        </article>
+        <article class="home-card">
+         <span class="home-card-icon" aria-hidden="true">🧩</span>
+         <h3>Build the whole app</h3>
+         <p>JSON APIs, HTML pages, forms, cookies, and sessions—with libraries that fit together.</p>
+         <a href="https://sake92.github.io/sharaf/tutorials/">Explore the tutorials <span aria-hidden="true">→</span></a>
+        </article>
+        <article class="home-card">
+         <span class="home-card-icon" aria-hidden="true">🚀</span>
+         <h3>Choose your deployment</h3>
+         <p>Run on the JVM or compile a native executable. Use your own server, containers, or AWS Lambda.</p>
+         <a href="https://sake92.github.io/sharaf/reference/servers.html">Servers and platforms <span aria-hidden="true">→</span></a>
+        </article>
+       </div>
+      </section>
+      <section id="deployment" class="home-section home-deployment" aria-labelledby="deployment-title">
+       <p class="home-eyebrow">Your app. Your infrastructure.</p>
+       <h2 id="deployment-title">From a single VM to serverless.<a href="#deployment-title" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+       <p class="home-section-intro">Start with the setup that fits your app. These starters show two ways to put Sharaf to work.</p>
+       <div class="home-deployment-grid">
+        <article class="home-card">
+         <p class="home-tag">Your own server</p>
+         <h3>A small stack you control.</h3>
+         <p>A Scala Native Sharaf app behind Caddy HTTPS and VoidAuth authentication. Keep the app private behind your proxy and manage the stack with Docker Compose.</p>
+         <a href="https://github.com/sake92/sharaf-deployment-starter">Explore the VPS starter <span aria-hidden="true">↗</span></a>
+        </article>
+        <article class="home-card">
+         <p class="home-tag">AWS Lambda</p>
+         <h3>Let the platform handle capacity.</h3>
+         <p>Run your Sharaf app as a native executable on AWS Lambda. Write ordinary Scala routes and let AWS manage server capacity.</p>
+         <a href="https://github.com/sake92/sharaf-aws-lambda-starter">Explore the Lambda starter <span aria-hidden="true">↗</span></a>
+        </article>
+       </div>
+       <p class="home-footprint">Considering native? See <a href="https://sake92.github.io/sharaf/reference/native-footprint.html">measured startup, memory, and executable sizes</a>.</p>
+      </section>
+      <section class="home-section home-docs" aria-labelledby="docs-title">
+       <div>
+        <p class="home-eyebrow">Keep building</p>
+        <h2 id="docs-title">Find your next step.<a href="#docs-title" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+       </div>
+       <div class="home-doc-links">
+        <a href="https://sake92.github.io/sharaf/tutorials/"><strong>Tutorials <span aria-hidden="true">→</span></strong><span>Build your first app, then add more.</span></a> <a href="https://sake92.github.io/sharaf/howtos/"><strong>How-to guides <span aria-hidden="true">→</span></strong><span>Solve a specific problem.</span></a> <a href="https://sake92.github.io/sharaf/reference/"><strong>Reference <span aria-hidden="true">→</span></strong><span>Look up APIs, servers, and options.</span></a> <a href="https://sake92.github.io/sharaf/philosophy/"><strong>Philosophy <span aria-hidden="true">→</span></strong><span>Understand the design decisions.</span></a>
+       </div>
+      </section>
+     </div>
     </div>
     <aside aria-label="On this page">
      <details open>
       <summary>On this page</summary>
       <nav aria-label="Table of contents">
        <ul>
-        <li><a href="#sharaf">Sharaf</a>
+        <li><a href="#hero-title">Start simple. Deploy anywhere.</a>
          <ul>
-          <li><a href="#site-map">Site Map</a></li>
+          <li><a href="#why-title">Why Sharaf?</a>
+           <ul>
+            <li><a href="#">Simple by design</a></li>
+            <li><a href="#">Typed where it matters</a></li>
+            <li><a href="#">Build the whole app</a></li>
+            <li><a href="#">Choose your deployment</a></li>
+           </ul></li>
+          <li><a href="#deployment-title">From a single VM to serverless.</a>
+           <ul>
+            <li><a href="#">A small stack you control.</a></li>
+            <li><a href="#">Let the platform handle capacity.</a></li>
+           </ul></li>
+          <li><a href="#docs-title">Find your next step.</a></li>
          </ul></li>
        </ul>
       </nav>

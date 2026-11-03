@@ -1,0 +1,75 @@
+/* The landing page uses the full container; documentation keeps its reading column. */
+body > main:has(.sharaf-home) > div { grid-template-columns: minmax(0, 1fr); }
+body > main:has(.sharaf-home) .content { max-width: none; }
+body > main:has(.sharaf-home) > div > aside { display: none; }
+
+.sharaf-home { --home-accent: var(--pico-primary); }
+.sharaf-home .flatmark-anchor { display: none; }
+.sharaf-home h1, .sharaf-home h2, .sharaf-home h3 { text-wrap: balance; }
+.sharaf-home h2 { margin: 0 0 1.5rem; padding: 0; border: 0; font-size: clamp(1.65rem, 3vw, 2.15rem); }
+.sharaf-home h3 { margin: 0 0 .7rem; font-size: 1.2rem; }
+.sharaf-home p { color: var(--pico-muted-color); }
+.sharaf-home a { text-underline-offset: .2em; }
+.sharaf-home .home-eyebrow {
+  margin: 0 0 .85rem;
+  color: var(--home-accent);
+  font-size: .76rem;
+  font-weight: 700;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+.home-hero { display: grid; grid-template-columns: 1fr 1.1fr; align-items: center; gap: 3rem; padding: 3.75rem 0 4rem; }
+.sharaf-home h1 { margin: 0 0 1.4rem; font-size: clamp(2.5rem, 4.5vw, 3.55rem); font-weight: 700; line-height: 1.1; letter-spacing: -.045em; }
+.home-hero h1 span { color: var(--home-accent); }
+.home-lead { max-width: 42ch; font-size: 1.12rem; line-height: 1.7; }
+.home-actions { display: flex; flex-wrap: wrap; gap: .7rem; margin: 1.8rem 0 1rem; }
+.sharaf-home .home-button { display: inline-flex; align-items: center; justify-content: center; gap: .8rem; min-height: 2.9rem; padding: .65rem 1rem; border: 1px solid var(--pico-muted-border-color); border-radius: .6rem; color: var(--pico-color); font-weight: 600; text-decoration: none; }
+.sharaf-home .home-button-primary { background: var(--pico-primary-background); border-color: var(--pico-primary-background); color: var(--pico-primary-inverse); }
+.sharaf-home .home-button:hover { border-color: var(--pico-primary); }
+.sharaf-home .home-button-primary:hover { background: var(--pico-primary-hover-background); }
+.sharaf-home a:focus-visible { outline: 2px solid var(--pico-primary); outline-offset: 4px; }
+.home-platforms { font-size: .82rem; }
+.home-platforms span { padding-inline: .4rem; }
+.home-example { min-width: 0; overflow: hidden; border: 1px solid var(--pico-muted-border-color); border-radius: .9rem; background: var(--pico-code-background-color); box-shadow: 0 1rem 3rem -1.5rem color-mix(in srgb, var(--pico-color) 25%, transparent); }
+.home-example-title, .home-example-run { display: flex; justify-content: space-between; flex-wrap: wrap; gap: .5rem; padding: .9rem 1.1rem; font-size: .8rem; }
+.home-example-title { border-bottom: 1px solid var(--pico-muted-border-color); }
+.home-example-title span:first-child { font-family: var(--pico-font-family-monospace); font-weight: 600; }
+.home-example-title span:last-child, .home-example-run > span { color: var(--pico-muted-color); }
+.home-example pre { margin: 0; padding: 1.25rem 1.1rem; border: 0; border-radius: 0; font-size: .73rem; max-height: none; }
+.home-example figure { margin: 0 !important; }
+.home-example-run { align-items: center; border-top: 1px solid var(--pico-muted-border-color); }
+.home-example-run code { font-size: .8rem; }
+.home-section { padding: 3rem 0; border-top: 1px solid var(--pico-muted-border-color); }
+.home-benefits { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
+.sharaf-home .home-card { display: flex; flex-direction: column; min-width: 0; margin: 0; padding: 1.4rem; border: 1px solid var(--pico-muted-border-color); border-radius: .8rem; background: var(--pico-card-background-color); box-shadow: none; }
+.home-card-icon { margin-bottom: 1rem; font-size: 1.65rem; line-height: 1.2; }
+.home-card p { font-size: .95rem; line-height: 1.65; }
+.home-card > a { margin-top: auto; padding-top: .6rem; font-size: .87rem; font-weight: 600; text-decoration: none; }
+.home-card > a:hover { text-decoration: underline; }
+.home-section-intro { max-width: 65ch; margin: -.6rem 0 1.5rem; }
+.home-deployment-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.home-deployment .home-card { padding: 1.8rem; background: color-mix(in srgb, var(--pico-primary) 4%, var(--pico-card-background-color)); }
+.sharaf-home .home-tag { color: var(--home-accent); font-size: .8rem; font-weight: 600; }
+.home-footprint { margin: 1.4rem 0 0; font-size: .9rem; }
+.home-docs { display: grid; grid-template-columns: 1fr 2fr; gap: 2rem; }
+.home-doc-links { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.3rem 2rem; }
+.home-doc-links a { display: grid; gap: .3rem; text-decoration: none; }
+.home-doc-links a:hover strong { text-decoration: underline; }
+.home-doc-links a > span { color: var(--pico-muted-color); font-size: .9rem; }
+
+@media (max-width: 1000px) {
+  .home-hero { gap: 1.5rem; }
+  .home-benefits { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 760px) {
+  .home-hero { grid-template-columns: minmax(0, 1fr); gap: 2rem; padding: 2rem 0 2.5rem; }
+  .home-lead { max-width: 55ch; }
+  .home-section { padding: 2rem 0; }
+  .home-docs { grid-template-columns: minmax(0, 1fr); gap: .5rem; }
+}
+@media (max-width: 480px) {
+  .home-benefits, .home-deployment-grid, .home-doc-links { grid-template-columns: minmax(0, 1fr); }
+  .home-card-icon { margin-bottom: .8rem; }
+  .home-example-title, .home-example-run { padding: .8rem; }
+  .home-example pre { padding: 1rem .8rem; }
+}
