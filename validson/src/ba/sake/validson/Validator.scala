@@ -145,8 +145,11 @@ object Validator extends LowPriValidators {
 
   private def deriveNamedTupleMacro[T <: AnyNamedTuple: Type](using Quotes): Expr[Validator[T]] = {
     import quotes.reflect.*
-    TypeRepr.of[T].dealias match {
+    val tpe = TypeRepr.of[T].dealias
+    tpe match {
       case _: OrType => '{ Validator.dummyValidator[T] }
+      // Abstract named tuples cannot expand Names[T]; preserve the generic no-op fallback.
+      case _ if tpe.typeSymbol != TypeRepr.of[(field: Int)].typeSymbol => '{ Validator.dummyValidator[T] }
       case _ =>
         '{
           val labels = compiletime.constValueTuple[Names[T]].productIterator.asInstanceOf[Iterator[String]].toSeq

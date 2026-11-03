@@ -264,6 +264,19 @@ class QueryStringParseSuite extends munit.FunSuite {
 
     assertEquals(serialized.parseQueryStringMap[(person: Option[Named])], value)
 
+    val noBrackets = value.toQueryStringMap(DefaultQuersonConfig.withSeqNoBrackets)
+    assertEquals(
+      noBrackets,
+      Map("person.name" -> Seq("Ada"), "person.age" -> Seq("37"))
+    )
+    assertEquals(noBrackets.parseQueryStringMap[(person: Option[Named])], value)
+
+    val noBracketsInvalid = intercept[ParsingException] {
+      Map("person.name" -> Seq("Ada"), "person.age" -> Seq("not_an_int"))
+        .parseQueryStringMap[(person: Option[Named])]
+    }
+    assertEquals(noBracketsInvalid.errors, Seq(ParseError(".person.age", "invalid Int", Some("not_an_int"))))
+
     val absent = Map.empty[String, Seq[String]].parseQueryStringMap[(person: Option[Named])]
     assertEquals(absent, (person = None))
 
@@ -303,6 +316,27 @@ class QueryStringParseSuite extends munit.FunSuite {
        assertEquals(res1, (firstname = "Mujo"))
        val res2 = Map("lastname" -> Seq("Hrnjica")).parseQueryStringMap[(firstname: String) | (lastname: String)]
        assertEquals(res2, (lastname = "Hrnjica"))
+    }
+    locally {
+      val res = Map("right" -> Seq("value")).parseQueryStringMap[(left: Option[String]) | (right: String)]
+      assertEquals(res, (right = "value"))
+      val absent = Map.empty[String, Seq[String]].parseQueryStringMap[(left: Option[String]) | (right: String)]
+      assertEquals(absent, (left = None))
+      val ambiguous = Map("left" -> Seq("left"), "right" -> Seq("right"))
+        .parseQueryStringMap[(left: Option[String]) | (right: String)]
+      assertEquals(ambiguous, (left = Some("left")))
+    }
+    locally {
+      type First = (first: Option[String], marker: Option[Int])
+      type Second = (second: Option[String])
+      type Third = (third: String)
+
+      val suppliedFirst = Map("first" -> Seq("one"), "marker" -> Seq("2"))
+        .parseQueryStringMap[First | Second | Third]
+      assertEquals(suppliedFirst, (first = Some("one"), marker = Some(2)))
+
+      val suppliedThird = Map("third" -> Seq("three")).parseQueryStringMap[First | Second | Third]
+      assertEquals(suppliedThird, (third = "three"))
     }
     locally {
       val res = Map("status" -> Seq("2")).parseQueryStringMap[(status: 1 | 2 | 3)]

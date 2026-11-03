@@ -2,6 +2,11 @@ package ba.sake.validson
 
 class ValidsonSuite extends munit.FunSuite {
 
+  test("generic named tuple validation retains fallback") {
+    def check[T <: scala.NamedTuple.AnyNamedTuple](value: T): Seq[ValidationError] = value.validate
+    assertEquals(check((value = 1)), Seq.empty)
+  }
+
   // this is just so people can use this anywhere..
   // see LowPriValidators.dummyValidator
   test("validate should not care about data with no validation") {

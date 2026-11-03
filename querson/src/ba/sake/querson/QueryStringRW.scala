@@ -191,6 +191,8 @@ object QueryStringRW extends LowPriorityQueryStringRWInstances {
         Option.when(firstNonEmptyIndex >= 0) {
           fqsp.parse(s"$path[$firstNonEmptyIndex]", values(firstNonEmptyIndex))
         }
+      case obj: Obj =>
+        Some(fqsp.parse(path, obj))
       case other =>
         val firstNonEmptyIndex = QueryStringRW[Seq[String]].parse(path, other).indexWhere(_.nonEmpty)
         Option.when(firstNonEmptyIndex >= 0) {
@@ -385,17 +387,21 @@ object QueryStringRW extends LowPriorityQueryStringRWInstances {
           case '[l] =>
             right.asType match {
               case '[r] =>
+                val leftMatcher = matchingFieldsExpr[l]
+                val rightMatcher = matchingFieldsExpr[r]
                 '{
                   new QueryStringRW[T] {
                     override def write(path: String, value: T): QueryStringData = value match {
                       case a: l => summonInline[QueryStringRW[l]].write(path, a)
                       case b: r => summonInline[QueryStringRW[r]].write(path, b)
                     }
-                    override def parse(path: String, qsData: QueryStringData): T = try {
-                      summonInline[QueryStringRW[l]].parse(path, qsData).asInstanceOf[T]
-                    } catch {
-                      case _: QuersonException =>
-                        summonInline[QueryStringRW[r]].parse(path, qsData).asInstanceOf[T]
+                    override def parse(path: String, qsData: QueryStringData): T = {
+                      val leftRW = summonInline[QueryStringRW[l]]
+                      val rightRW = summonInline[QueryStringRW[r]]
+                      if !$leftMatcher(qsData) && $rightMatcher(qsData) then rightRW.parse(path, qsData).asInstanceOf[T]
+                      else
+                        try leftRW.parse(path, qsData).asInstanceOf[T]
+                        catch case _: QuersonException => rightRW.parse(path, qsData).asInstanceOf[T]
                     }
                   }
                 }
@@ -403,6 +409,48 @@ object QueryStringRW extends LowPriorityQueryStringRWInstances {
         }
       case _ =>
         report.errorAndAbort(s"Cannot automatically derive QueryStringRW for non-union type ${Type.show[T]}")
+    }
+  }
+
+  private def matchingFieldsExpr[T: Type](using Quotes): Expr[QueryStringData => Boolean] = {
+    import quotes.reflect.*
+    TypeRepr.of[T].dealias match {
+      case OrType(left, right) =>
+        left.asType match {
+          case '[l] =>
+            right.asType match {
+              case '[r] =>
+                val leftMatcher = matchingFieldsExpr[l]
+                val rightMatcher = matchingFieldsExpr[r]
+                '{ (qsData: QueryStringData) => $leftMatcher(qsData) || $rightMatcher(qsData) }
+            }
+        }
+      case tpe if tpe.typeSymbol == TypeRepr.of[(field: Int)].typeSymbol =>
+        val fieldNames = namedTupleFieldNames(tpe)
+        val fieldNamesExpr = Expr(fieldNames)
+        '{
+          (qsData: QueryStringData) => qsData match {
+            case Obj(fields) => $fieldNamesExpr.exists(fields.contains)
+            case _            => false
+          }
+        }
+      case _ => '{ (_: QueryStringData) => true }
+    }
+  }
+
+  private def namedTupleFieldNames(using quotes: Quotes)(tpe: quotes.reflect.TypeRepr): List[String] = {
+    import quotes.reflect.*
+    tpe match {
+      case AppliedType(_, namesType :: _ :: Nil) =>
+        namesType match {
+          case AppliedType(_, nameTypes) =>
+            nameTypes.flatMap(_.dealias match {
+              case ConstantType(StringConstant(name)) => Some(name)
+              case _                                  => None
+            })
+          case _ => Nil
+        }
+      case _ => Nil
     }
   }
 

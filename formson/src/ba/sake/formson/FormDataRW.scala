@@ -223,6 +223,8 @@ object FormDataRW extends LowPriorityFormDataRWInstances {
         Option.when(firstNonEmptyIndex >= 0) {
           rw.parse(s"$path[$firstNonEmptyIndex]", values(firstNonEmptyIndex))
         }
+      case obj: Obj =>
+        Some(rw.parse(path, obj))
       case other =>
         val firstNonEmptyIndex = FormDataRW[Seq[String]].parse(path, other).indexWhere(_.nonEmpty)
         Option.when(firstNonEmptyIndex >= 0) {
@@ -479,17 +481,21 @@ object FormDataRW extends LowPriorityFormDataRWInstances {
           case '[l] =>
             right.asType match {
               case '[r] =>
+                val leftMatcher = matchingFieldsExpr[l]
+                val rightMatcher = matchingFieldsExpr[r]
                 '{
                   new FormDataRW[T] {
                     override def write(path: String, value: T): FormData = value match {
                       case a: l => summonInline[FormDataRW[l]].write(path, a)
                       case b: r => summonInline[FormDataRW[r]].write(path, b)
                     }
-                    override def parse(path: String, formData: FormData): T = try {
-                      summonInline[FormDataRW[l]].parse(path, formData).asInstanceOf[T]
-                    } catch {
-                      case _: FormsonException =>
-                        summonInline[FormDataRW[r]].parse(path, formData).asInstanceOf[T]
+                    override def parse(path: String, formData: FormData): T = {
+                      val leftRW = summonInline[FormDataRW[l]]
+                      val rightRW = summonInline[FormDataRW[r]]
+                      if !$leftMatcher(formData) && $rightMatcher(formData) then rightRW.parse(path, formData).asInstanceOf[T]
+                      else
+                        try leftRW.parse(path, formData).asInstanceOf[T]
+                        catch case _: FormsonException => rightRW.parse(path, formData).asInstanceOf[T]
                     }
                   }
                 }
@@ -497,6 +503,48 @@ object FormDataRW extends LowPriorityFormDataRWInstances {
         }
       case _ =>
         report.errorAndAbort(s"Cannot automatically derive FormDataRW for non-union type ${Type.show[T]}")
+    }
+  }
+
+  private def matchingFieldsExpr[T: Type](using Quotes): Expr[FormData => Boolean] = {
+    import quotes.reflect.*
+    TypeRepr.of[T].dealias match {
+      case OrType(left, right) =>
+        left.asType match {
+          case '[l] =>
+            right.asType match {
+              case '[r] =>
+                val leftMatcher = matchingFieldsExpr[l]
+                val rightMatcher = matchingFieldsExpr[r]
+                '{ (formData: FormData) => $leftMatcher(formData) || $rightMatcher(formData) }
+            }
+        }
+      case tpe if tpe.typeSymbol == TypeRepr.of[(field: Int)].typeSymbol =>
+        val fieldNames = namedTupleFieldNames(tpe)
+        val fieldNamesExpr = Expr(fieldNames)
+        '{
+          (formData: FormData) => formData match {
+            case Obj(fields) => $fieldNamesExpr.exists(fields.contains)
+            case _            => false
+          }
+        }
+      case _ => '{ (_: FormData) => true }
+    }
+  }
+
+  private def namedTupleFieldNames(using quotes: Quotes)(tpe: quotes.reflect.TypeRepr): List[String] = {
+    import quotes.reflect.*
+    tpe match {
+      case AppliedType(_, namesType :: _ :: Nil) =>
+        namesType match {
+          case AppliedType(_, nameTypes) =>
+            nameTypes.flatMap(_.dealias match {
+              case ConstantType(StringConstant(name)) => Some(name)
+              case _                                  => None
+            })
+          case _ => Nil
+        }
+      case _ => Nil
     }
   }
 
