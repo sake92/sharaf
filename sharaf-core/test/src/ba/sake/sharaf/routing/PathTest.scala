@@ -6,7 +6,7 @@ import java.util.UUID
 class PathTest extends munit.FunSuite {
 
   test("path matching") {
-    val uuidValue = UUID.randomUUID
+    val uuidValue = UUID.fromString("01234567-89ab-cdef-0123-456789abcdef")
 
     Path("users", "1") match
       case Path("users", param[Int](id)) =>
