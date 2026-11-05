@@ -13,6 +13,10 @@ plugins {
   }
 }
 
+repositories {
+  new MavenRepository { url = "https://central.sonatype.com/repository/maven-snapshots/" }
+}
+
 local const publishRepo = if (read?("env:DEDER_PUBLISH_SNAPSHOT") == "true")
   new SonatypeSnapshotRepo { id = "sonatype" }
 else
@@ -432,7 +436,7 @@ local const sharafJdkHttpserverModules =
       scalaNativeVersion = versions.scalaNativeVersion
       multithreading = true
       moduleDeps = new { sharafCoreModules.native }
-      deps { "ba.sake::scalanative-httpserver::0.1.0-SNAPSHOT" }
+      deps { "ba.sake::scalanative-httpserver::0.0.0+28-3fff272e-SNAPSHOT" }
       publish = true
     }
     nativeTestTemplate = (nativeTemplate.asTest()) {

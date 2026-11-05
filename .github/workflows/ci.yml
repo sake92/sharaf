@@ -36,6 +36,10 @@ jobs:
         uses: Homebrew/actions/setup-homebrew@main
       - name: Install deder
         run: brew install sake92/tap/deder
+      - name: Install Native HTTP test dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libcurl4-openssl-dev libidn2-dev
       - name: Check versions
         id: version
         shell: bash
