@@ -100,7 +100,9 @@ jobs:
       - name: Install deder
         run: brew install sake92/tap/deder
       - name: Publish snapshots
-        run: deder exec -t publish -m formson% -m querson% -m validson% -m sharaf%
+        run: deder exec -t publish -m '~%-test%' -m '~examples%'
+      - name: Dependency update prompt
+        run: bash scripts/release-prompt.sh
   compile-scala-cli-examples:
     runs-on: ubuntu-latest
     steps:
