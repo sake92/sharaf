@@ -13,6 +13,10 @@ plugins {
   }
 }
 
+repositories {
+  new MavenRepository { url = "https://central.sonatype.com/repository/maven-snapshots/" }
+}
+
 local const publishRepo = if (read?("env:DEDER_PUBLISH_SNAPSHOT") == "true")
   new SonatypeSnapshotRepo { id = "sonatype" }
 else
@@ -333,7 +337,7 @@ local const sharafPac4jModules =
     testTemplate = (baseTemplate.asTest()) {
       moduleDeps {
         sharafCoreModules.jvm_test
-        sharafJdkHttpserverModules.main
+        sharafJdkHttpserverModules.jvm
       }
       deps {
         "org.scalameta::munit::\(versions.munit)"
@@ -409,7 +413,7 @@ local const sharafHelidonModules =
   }.get
 
 local const sharafJdkHttpserverModules =
-  new CreateScalaModules {
+  new CreateCrossModules {
     root = "sharaf-jdk-httpserver"
     template = (baseTemplate) {
       pomSettings {
@@ -423,9 +427,21 @@ local const sharafJdkHttpserverModules =
       publish = true
     }
     testTemplate = (baseTemplate.asTest()) {
+      deps { "org.scalameta::munit::\(versions.munit)" }
       moduleDeps {
         sharafCoreModules.jvm_test
       }
+    }
+    nativeTemplate = (template.asNative()) {
+      scalaNativeVersion = versions.scalaNativeVersion
+      multithreading = true
+      moduleDeps = new { sharafCoreModules.native }
+      deps { "ba.sake::scalanative-httpserver::0.0.0+28-3fff272e-SNAPSHOT" }
+      publish = true
+    }
+    nativeTestTemplate = (nativeTemplate.asTest()) {
+      moduleDeps { sharafCoreModules.native_test }
+      deps { "org.scalameta::munit::\(versions.munit)" }
     }
   }.get
 
@@ -532,7 +548,7 @@ local const jdkHttpserverExampleModules =
   new CreateScalaModules {
     root = "examples/jdk-httpserver"
     template = (baseExampleTemplate) {
-      moduleDeps { sharafJdkHttpserverModules.main }
+      moduleDeps { sharafJdkHttpserverModules.jvm }
     }
     testTemplate = (baseExampleTemplate.asTest()) {
       deps { "org.scalameta::munit::\(versions.munit)" }
@@ -586,7 +602,10 @@ modules {
   sharafHttp4sModules.native
   sharafHttp4sModules.native_test
   ...sharafHelidonModules.all
-  ...sharafJdkHttpserverModules.all
+  sharafJdkHttpserverModules.jvm
+  sharafJdkHttpserverModules.jvm_test
+  sharafJdkHttpserverModules.native
+  sharafJdkHttpserverModules.native_test
   ...sharafPac4jModules.all
   sharafSnunit
   ...apiExampleModules.all

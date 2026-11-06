@@ -46,9 +46,9 @@ final class JdkHttpServerSharafRequest(val underlyingHttpExchange: HttpExchange)
         .split("&")
         .map { param =>
           val parts = param.split("=", 2)
-          val key = URLDecoder.decode(parts(0), StandardCharsets.UTF_8)
+          val key = URLDecoder.decode(parts(0), StandardCharsets.UTF_8.name())
           val value =
-            if parts.length == 2 then URLDecoder.decode(parts(1), StandardCharsets.UTF_8)
+            if parts.length == 2 then URLDecoder.decode(parts(1), StandardCharsets.UTF_8.name())
             else ""
           (key, value)
         }
@@ -72,9 +72,9 @@ final class JdkHttpServerSharafRequest(val underlyingHttpExchange: HttpExchange)
           .split("&")
           .foreach { param =>
             val parts = param.split("=", 2)
-            val key = URLDecoder.decode(parts(0), StandardCharsets.UTF_8)
+            val key = URLDecoder.decode(parts(0), StandardCharsets.UTF_8.name())
             val value =
-              if parts.length == 2 then URLDecoder.decode(parts(1), StandardCharsets.UTF_8)
+              if parts.length == 2 then URLDecoder.decode(parts(1), StandardCharsets.UTF_8.name())
               else ""
             val formValue = FormValue.Str(value)
             map.updateWith(key) {
