@@ -461,6 +461,25 @@ local const sharafSnunit = (baseTemplate.asNative()) {
   publish = true
 }
 
+// Local-snapshot PoC; deliberately excluded from publication.
+local const sharafPotateh = (baseTemplate.asNative()) {
+  id = "sharaf-potateh"
+  root = "sharaf-potateh"
+  scalaNativeVersion = versions.scalaNativeVersion
+  multithreading = true
+  moduleDeps { sharafCoreModules.native }
+  deps { "ba.sake::potateh::0.1.0-SNAPSHOT" }
+}
+
+local const potatehExample = (baseTemplate.asNative()) {
+  id = "example-potateh"
+  root = "examples/potateh"
+  scalaNativeVersion = versions.scalaNativeVersion
+  multithreading = true
+  mainClass = "PotatehExample"
+  moduleDeps { sharafPotateh }
+}
+
 // examples
 local const baseExampleTemplate = (baseTemplate) {
   deps { "ch.qos.logback:logback-classic:\(versions.logback)" }
@@ -608,6 +627,8 @@ modules {
   sharafJdkHttpserverModules.native_test
   ...sharafPac4jModules.all
   sharafSnunit
+  sharafPotateh
+  potatehExample
   ...apiExampleModules.all
   ...fullstackExampleModules.all
   ...userPassFormExampleModules.all
