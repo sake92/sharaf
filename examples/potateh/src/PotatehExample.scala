@@ -45,7 +45,7 @@ object PotatehExample {
       case GET -> Path("empty") => Response.withStatus(StatusCode.NoContent)
       case GET -> Path("fail")  => throw new IllegalStateException("example failure")
     }
-    val server = PotatehSharafServer.start(ServerConfig(bindAddress = new InetSocketAddress("127.0.0.1", port)), routes)
+    val server = PotatehSharafServer.start(ServerConfig.Default.withBindAddress(new InetSocketAddress("127.0.0.1", port)), routes)
     val hook = new Thread(() => server.stop())
     Runtime.getRuntime.addShutdownHook(hook)
     println(s"LISTENING ${server.address.getPort}")
