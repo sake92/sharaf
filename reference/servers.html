@@ -79,6 +79,13 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
         <td>URL encoded; multipart unsupported</td>
        </tr>
        <tr>
+        <td><code>sharaf-potateh</code></td>
+        <td>Potateh</td>
+        <td>JVM, Scala Native</td>
+        <td>Experimental</td>
+        <td>URL encoded; multipart unsupported</td>
+       </tr>
+       <tr>
         <td><code>sharaf-snunit</code></td>
         <td>snunit</td>
         <td>Scala Native</td>
@@ -99,13 +106,22 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
      <p>Stable is the recommended server integration. Beta integrations support the listed platforms but have narrower form handling. Experimental integrations have incomplete request features and may change between releases.</p>
      <p>The <a href="https://sake92.github.io/sharaf/tutorials/quickstart.html">quickstart</a> uses Undertow. Adapter examples are in the <a href="https://github.com/sake92/sharaf/tree/main/examples">repository</a>.</p>
      <p>The <a href="https://github.com/sake92/sharaf-aws-lambda-starter">AWS Lambda starter</a> packages an Undertow/JVM application with AWS Lambda Web Adapter and includes Terraform configuration and local integration tests.</p>
+     <h2 id="potateh">Potateh<a href="#potateh" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p><code>PotatehSharafServer.start(config, routes)</code> and <code>start(config, handler)</code> return a Potateh <code>Server</code>. The caller stops it with <code>server.stop()</code>. Routes can also receive CORS settings, an exception mapper and a not-found handler.</p>
+     <p>The overloads <code>start(config, routes, executor)</code> and <code>start(config, handler, executor)</code> accept a caller-owned <code>java.util.concurrent.Executor</code>. A routes overload also accepts all middleware settings together with an executor. Stopping the server leaves the executor open. Each submitted task serves a whole persistent connection; a small fixed pool can starve other clients. Rejected submissions must throw.</p>
+     <p>Potateh owns connection and transfer framing. The adapter removes engine-owned and Connection-nominated headers, translates an explicit <code>Content-Length</code> to Potateh's writer length, and streams bodies without buffering them. Invalid or contradictory response lengths fail as server errors. Length mismatches during streaming terminate the connection. Response-requested <code>Connection: close</code>, upgrades and trailers are unsupported and fail as server errors. SSE uses chunked streaming on HTTP/1.1.</p>
+     <p>Malformed query/form encoding and invalid path UTF-8 return 400. Unsupported form media types, including multipart, return 415. Valid but unsupported HTTP methods return 501. Routes use the configured exception mapper for these adapter errors; with an already composed handler, errors before context creation use the default mapper. Malformed HTTP syntax rejected by Potateh uses its own protocol response.</p>
+     <p>Paths split on literal slashes before percent decoding each segment once. <code>%2F</code> stays within one segment and <code>+</code> remains literal. Empty interior segments are preserved; trailing slashes follow the existing split behavior. This policy is specific to Potateh; path decoding currently differs between server adapters.</p>
     </div>
     <aside aria-label="On this page">
      <details open>
       <summary>On this page</summary>
       <nav aria-label="Table of contents">
        <ul>
-        <li><a href="#servers-and-platforms">Servers and platforms</a></li>
+        <li><a href="#servers-and-platforms">Servers and platforms</a>
+         <ul>
+          <li><a href="#potateh">Potateh</a></li>
+         </ul></li>
        </ul>
       </nav>
      </details>
