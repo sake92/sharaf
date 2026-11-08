@@ -461,15 +461,26 @@ local const sharafSnunit = (baseTemplate.asNative()) {
   publish = true
 }
 
-// Snapshot PoC; deliberately excluded from publication.
-local const sharafPotateh = (baseTemplate.asNative()) {
-  id = "sharaf-potateh"
-  root = "sharaf-potateh"
-  scalaNativeVersion = versions.scalaNativeVersion
-  multithreading = true
-  moduleDeps { sharafCoreModules.native }
-  deps { "ba.sake::potateh::0.1.0" }
-}
+local const sharafPotatehModules =
+  new CreateCrossModules {
+    root = "sharaf-potateh"
+    template = (baseTemplate) {
+      pomSettings {
+        artifactId = "sharaf-potateh"
+        name = "Sharaf Potateh"
+        description = "Sharaf integration with Potateh"
+      }
+      moduleDeps { sharafCoreModules.jvm }
+      deps { "ba.sake::potateh::0.1.0" }
+      publish = true
+    }
+    nativeTemplate = (template.asNative()) {
+      scalaNativeVersion = versions.scalaNativeVersion
+      multithreading = true
+      moduleDeps = new { sharafCoreModules.native }
+      publish = true
+    }
+  }.get
 
 local const potatehExample = (baseTemplate.asNative()) {
   id = "example-potateh"
@@ -477,7 +488,7 @@ local const potatehExample = (baseTemplate.asNative()) {
   scalaNativeVersion = versions.scalaNativeVersion
   multithreading = true
   mainClass = "PotatehExample"
-  moduleDeps { sharafPotateh }
+  moduleDeps { sharafPotatehModules.native }
 }
 
 // examples
@@ -627,7 +638,8 @@ modules {
   sharafJdkHttpserverModules.native_test
   ...sharafPac4jModules.all
   sharafSnunit
-  sharafPotateh
+  sharafPotatehModules.jvm
+  sharafPotatehModules.native
   potatehExample
   ...apiExampleModules.all
   ...fullstackExampleModules.all
