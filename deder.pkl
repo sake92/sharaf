@@ -461,7 +461,7 @@ local const sharafSnunit = (baseTemplate.asNative()) {
   publish = true
 }
 
-// Local-snapshot PoC; deliberately excluded from publication.
+// Snapshot PoC; deliberately excluded from publication.
 local const sharafPotateh = (baseTemplate.asNative()) {
   id = "sharaf-potateh"
   root = "sharaf-potateh"
