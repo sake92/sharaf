@@ -468,7 +468,7 @@ local const sharafPotateh = (baseTemplate.asNative()) {
   scalaNativeVersion = versions.scalaNativeVersion
   multithreading = true
   moduleDeps { sharafCoreModules.native }
-  deps { "ba.sake::potateh::0.1.0-SNAPSHOT" }
+  deps { "ba.sake::potateh::0.1.0" }
 }
 
 local const potatehExample = (baseTemplate.asNative()) {
