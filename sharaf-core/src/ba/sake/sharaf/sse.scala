@@ -81,7 +81,6 @@ class SseSender private (
           try {
             while !_isDone do {
               Thread.sleep(interval.toMillis)
-              println(s"PINGING--")
               queue.put(ServerSentEvent.Comment("ping"))
             }
           } catch {
