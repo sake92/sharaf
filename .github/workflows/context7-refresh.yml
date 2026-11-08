@@ -6,9 +6,9 @@ on:
       - main
     paths:
       - context7.json
-      - docs/**
-      - examples/**
-      - .github/workflows/context7-refresh.yml
+      - '**/README*'
+      - docs/content/**
+      - docs/_includes/**
   workflow_dispatch:
 
 permissions: {}
