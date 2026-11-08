@@ -24,6 +24,12 @@ object ExceptionMapper {
    */
 
   val default: ExceptionMapper = {
+    case e: BadRequestException =>
+      Response.withBody(e.getMessage).withStatus(StatusCode.BadRequest)
+    case e: UnsupportedMediaTypeException =>
+      Response.withBody(e.getMessage).withStatus(StatusCode.UnsupportedMediaType)
+    case e: UnsupportedMethodException =>
+      Response.withBody(e.getMessage).withStatus(StatusCode.NotImplemented)
     case e: NotFoundException =>
       Response.withBody(e.getMessage).withStatus(StatusCode.NotFound)
     case e: RejectedException =>
@@ -57,6 +63,14 @@ object ExceptionMapper {
   }
 
   val json: ExceptionMapper = {
+    case e: BadRequestException =>
+      Response.withBody(ProblemDetails(400, "Bad Request", e.getMessage)).withStatus(StatusCode.BadRequest)
+    case e: UnsupportedMediaTypeException =>
+      Response
+        .withBody(ProblemDetails(415, "Unsupported Media Type", e.getMessage))
+        .withStatus(StatusCode.UnsupportedMediaType)
+    case e: UnsupportedMethodException =>
+      Response.withBody(ProblemDetails(501, "Not Implemented", e.getMessage)).withStatus(StatusCode.NotImplemented)
     case e: NotFoundException =>
       val problemDetails = ProblemDetails(StatusCode.NotFound.code, "Not Found", e.getMessage)
       Response.withBody(problemDetails).withStatus(StatusCode.NotFound)
