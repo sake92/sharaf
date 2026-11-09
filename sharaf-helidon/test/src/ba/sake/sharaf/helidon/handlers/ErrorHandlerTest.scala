@@ -31,5 +31,5 @@ class ErrorHandlerTest extends AbstractErrorHandlerTest {
   override def startServer(): Unit = server.start()
   override def stopServer(): Unit = server.stop()
 
-  override def supportsForms: Boolean = false // TODO
+  override def supportsMultipart: Boolean = false // TODO
 }

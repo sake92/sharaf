@@ -17,6 +17,7 @@ abstract class AbstractSharafHandlerTest extends munit.FunSuite {
   override def afterAll(): Unit = stopServer()
 
   val routes = Routes {
+    case GET -> Path("path", value) => Response.withBody(value)
     case GET -> Path("hello") => Response.withBody("hello")
     case GET -> Path("query") => Response.withBody(Request.current.queryParamsRaw("tag").mkString("|"))
     case POST -> Path("form") =>
@@ -47,6 +48,22 @@ abstract class AbstractSharafHandlerTest extends munit.FunSuite {
       .send()
     assertEquals(form.code, StatusCode.Ok)
     assertEquals(form.body, expected)
+  }
+
+  for scenario <- Seq(
+    (encoded = "a+b", decoded = "a+b"),
+    (encoded = "a%2Bb", decoded = "a+b"),
+    (encoded = "%C4%87", decoded = "ć"),
+    (encoded = "%252F", decoded = "%2F")
+  ) do test(s"path decodes exactly once: ${scenario.encoded}") {
+    val res = quickRequest.get(Uri.unsafeParse(s"$baseUrl/path/${scenario.encoded}")).send()
+    assertEquals(res.code, StatusCode.Ok)
+    assertEquals(res.body, scenario.decoded)
+  }
+
+  test("URL-encoded forms reject unsupported media types") {
+    val res = quickRequest.post(uri"$baseUrl/form").contentType("text/plain").body("tag=value").send()
+    assertEquals(res.code, StatusCode.UnsupportedMediaType)
   }
 
 }

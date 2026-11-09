@@ -17,7 +17,7 @@ abstract class AbstractErrorHandlerTest extends munit.FunSuite {
 
   def startServer(): Unit
   def stopServer(): Unit
-  def supportsForms: Boolean = true
+  def supportsMultipart: Boolean = true
 
   override def beforeAll(): Unit = startServer()
   override def afterAll(): Unit = stopServer()
@@ -51,14 +51,14 @@ abstract class AbstractErrorHandlerTest extends munit.FunSuite {
   }
 
   test("Default error mapper handles form parsing failure") {
-    assume(supportsForms, "Forms not supported by this server")
+    assume(supportsMultipart, "Forms not supported by this server")
     val res = quickRequest.post(uri"${baseUrl}/default/form").multipartBody(multipart("bla", "")).send()
     assertEquals(res.code, StatusCode.BadRequest)
     assertEquals(res.body, "Form parsing error: Key 'name' is missing")
     assertEquals(res.headers(HeaderNames.ContentType), Seq("text/plain; charset=utf-8"))
   }
   test("Default error mapper handles form validation failure") {
-    assume(supportsForms, "Forms not supported by this server")
+    assume(supportsMultipart, "Forms not supported by this server")
     val res = quickRequest.post(uri"${baseUrl}/default/form").multipartBody(TestForm("").toSttpMultipart()).send()
     assertEquals(res.code, StatusCode.UnprocessableEntity)
     assertEquals(res.body, "Validation errors: [ValidationError($.name,must be >= 3,)]")
@@ -99,7 +99,7 @@ abstract class AbstractErrorHandlerTest extends munit.FunSuite {
   }
 
   test("JSON error mapper handles form parsing failure") {
-    assume(supportsForms, "Forms not supported by this server")
+    assume(supportsMultipart, "Forms not supported by this server")
     val res = quickRequest.post(uri"${baseUrl}/json/form").multipartBody(multipart("bla", "")).send()
     assertEquals(res.code, StatusCode.BadRequest)
     assertEquals(
@@ -109,7 +109,7 @@ abstract class AbstractErrorHandlerTest extends munit.FunSuite {
     assertEquals(res.headers(HeaderNames.ContentType), Seq("application/json; charset=utf-8"))
   }
   test("JSON error mapper handles form validation failure") {
-    assume(supportsForms, "Forms not supported by this server")
+    assume(supportsMultipart, "Forms not supported by this server")
     val res = quickRequest.post(uri"${baseUrl}/json/form").multipartBody(TestForm("").toSttpMultipart()).send()
     assertEquals(res.code, StatusCode.UnprocessableEntity)
     assertEquals(
@@ -136,6 +136,63 @@ abstract class AbstractErrorHandlerTest extends munit.FunSuite {
       """{"instance":null,"invalidArguments":[{"reason":"must be >= 3","path":"$.name","value":""}],"detail":"","type":null,"title":"Validation errors","status":422}"""
     )
     assertEquals(res.headers(HeaderNames.ContentType), Seq("application/json; charset=utf-8"))
+  }
+
+  test("Default error mapper handles URL-encoded form parsing failure") {
+    val res = quickRequest.post(uri"${baseUrl}/default/form").contentType("application/x-www-form-urlencoded; charset=UTF-8").body("bla=").send()
+    assertEquals(res.code, StatusCode.BadRequest)
+    assertEquals(res.body, "Form parsing error: Key 'name' is missing")
+    assertEquals(res.headers(HeaderNames.ContentType), Seq("text/plain; charset=utf-8"))
+  }
+  test("Default error mapper handles URL-encoded form validation failure") {
+    val res = quickRequest.post(uri"${baseUrl}/default/form").contentType("application/x-www-form-urlencoded; charset=UTF-8").body("name=").send()
+    assertEquals(res.code, StatusCode.UnprocessableEntity)
+    assertEquals(res.body, "Validation errors: [ValidationError($.name,must be >= 3,)]")
+    assertEquals(res.headers(HeaderNames.ContentType), Seq("text/plain; charset=utf-8"))
+  }
+
+  test("JSON error mapper handles URL-encoded form parsing failure") {
+    val res = quickRequest.post(uri"${baseUrl}/json/form").contentType("application/x-www-form-urlencoded; charset=UTF-8").body("bla=").send()
+    assertEquals(res.code, StatusCode.BadRequest)
+    assertEquals(
+      res.body,
+      """{"instance":null,"invalidArguments":[{"reason":"is missing","path":"name","value":null}],"detail":"","type":null,"title":"Form parsing errors","status":400}"""
+    )
+    assertEquals(res.headers(HeaderNames.ContentType), Seq("application/json; charset=utf-8"))
+  }
+  test("JSON error mapper handles URL-encoded form validation failure") {
+    val res = quickRequest.post(uri"${baseUrl}/json/form").contentType("application/x-www-form-urlencoded; charset=UTF-8").body("name=").send()
+    assertEquals(res.code, StatusCode.UnprocessableEntity)
+    assertEquals(
+      res.body,
+      """{"instance":null,"invalidArguments":[{"reason":"must be >= 3","path":"$.name","value":""}],"detail":"","type":null,"title":"Validation errors","status":422}"""
+    )
+    assertEquals(res.headers(HeaderNames.ContentType), Seq("application/json; charset=utf-8"))
+  }
+
+
+
+  for mapper <- Seq("default", "json") do {
+    test(s"$mapper mapper rejects malformed URL-encoded escapes") {
+      for body <- Seq("name=%", "name=%0", "name=%ZZ") do {
+        val res = quickRequest.post(uri"$baseUrl/$mapper/form")
+          .contentType("application/x-www-form-urlencoded").body(body).send()
+        assertEquals(res.code, StatusCode.BadRequest)
+        val expectedType = if mapper == "json" then "application/json; charset=utf-8"
+          else "text/plain; charset=utf-8"
+        assertEquals(res.headers(HeaderNames.ContentType), Seq(expectedType))
+      }
+    }
+
+    test(s"$mapper mapper accepts typed query and URL-encoded form values") {
+      val query = quickRequest.get(uri"$baseUrl/$mapper/query?name=hello").send()
+      assertEquals(query.code, StatusCode.Ok)
+      assertEquals(query.body, "TestQuery(hello)")
+      val form = quickRequest.post(uri"$baseUrl/$mapper/form")
+        .contentType("application/x-www-form-urlencoded; charset=UTF-8").body("name=hello").send()
+      assertEquals(form.code, StatusCode.Ok)
+      assertEquals(form.body, "TestForm(hello)")
+    }
   }
 
   case class TestQuery(name: String) derives QueryStringRW

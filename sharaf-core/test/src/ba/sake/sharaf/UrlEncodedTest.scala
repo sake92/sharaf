@@ -57,7 +57,10 @@ class UrlEncodedTest extends munit.FunSuite {
   }
 
   test("URLDecoder replaces malformed encoded UTF-8 bytes") {
-    for encoded <- Seq("%FF", "%C0", "%C4") do assertEquals(UrlEncoded.query(s"x=$encoded"), Map("x" -> Seq("�")))
+    for encoded <- Seq("%FF", "%C0", "%C4") do {
+      assertEquals(UrlEncoded.query(s"x=$encoded"), Map("x" -> Seq("�")))
+      assertEquals(UrlEncoded.form(s"x=$encoded")("x"), Seq(FormValue.Str("�")))
+    }
     assertEquals(UrlEncoded.query("x=%C0%AF"), Map("x" -> Seq("��")))
     assertEquals(UrlEncoded.query("x=%ED%A0%80"), Map("x" -> Seq("�")))
     assertEquals(UrlEncoded.query("x=%EF%BF%BD"), Map("x" -> Seq("�")))
