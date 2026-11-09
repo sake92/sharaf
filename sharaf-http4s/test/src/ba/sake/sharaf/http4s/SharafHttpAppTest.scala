@@ -70,4 +70,23 @@ class SharafHttpAppTest extends munit.FunSuite {
     val response = Client.fromHttpApp(app).expect[String](request).unsafeRunSync()
     assertEquals(response, "one,two")
   }
+  test("query and form library parsers retain fields and replace malformed UTF-8") {
+    val routes = Routes {
+      case GET -> Path("query") => Response.withBody(Request.current.queryParamsRaw("tag").mkString("|"))
+      case POST -> Path("form") =>
+        val values = Request.current.bodyFormRaw("tag").collect { case ba.sake.formson.FormValue.Str(value) => value }
+        Response.withBody(values.mkString("|"))
+    }
+    val client = Client.fromHttpApp(SharafHttpApp(SharafHandler.routes(routes)))
+    val encoded = "tag=a%26b%3Dc&tag=%2B&tag=&tag=%252F&tag=%FF"
+    val query = HRequest[IO](uri = Uri.unsafeFromString(s"http://localhost/query?$encoded"))
+    val form = HRequest[IO](method = Method.POST, uri = Uri.unsafeFromString("http://localhost/form"))
+      .withEntity(encoded)
+      .putHeaders(org.http4s.Header.Raw(CIString("Content-Type"), "application/x-www-form-urlencoded"))
+    for request <- Seq(query, form) do {
+      val response = client.expect[String](request).unsafeRunSync()
+      assertEquals(response, "a&b=c|+||%2F|�")
+    }
+  }
+
 }

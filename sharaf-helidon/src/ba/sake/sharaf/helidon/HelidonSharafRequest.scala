@@ -1,16 +1,12 @@
 package ba.sake.sharaf.helidon
 
 import java.nio.charset.StandardCharsets
-import java.net.URLDecoder
-import scala.collection.immutable.SeqMap
-import scala.collection.mutable
-import scala.jdk.CollectionConverters.*
 import scala.jdk.StreamConverters.*
 import io.helidon.webserver.http.ServerRequest
 import ba.sake.formson.*
 import ba.sake.querson.*
 import ba.sake.sharaf.*
-import ba.sake.sharaf.exceptions.*
+import ba.sake.sharaf.exceptions.UnsupportedMediaTypeException
 
 class HelidonSharafRequest(underlyingRequest: ServerRequest) extends Request {
 
@@ -34,9 +30,7 @@ class HelidonSharafRequest(underlyingRequest: ServerRequest) extends Request {
 
   /* *** QUERY *** */
   override lazy val queryParamsRaw: QueryStringMap =
-    underlyingRequest.query().toMap.asScala.toMap.map { (k, v) =>
-      (k, v.asScala.toSeq)
-    }
+    UrlEncoded.query(underlyingRequest.query().rawValue())
 
   /* *** BODY *** */
   override lazy val bodyString: String =
@@ -44,19 +38,10 @@ class HelidonSharafRequest(underlyingRequest: ServerRequest) extends Request {
 
   override lazy val bodyFormRaw: FormDataMap =
     val contentType = headers.get(HttpString("Content-Type")).flatMap(_.headOption).getOrElse("")
-    if contentType.startsWith("application/x-www-form-urlencoded") then
-      val values = mutable.LinkedHashMap.empty[String, Seq[FormValue]]
-      bodyString.split("&").filter(_.nonEmpty).foreach { item =>
-        val parts = item.split("=", 2)
-        val key = URLDecoder.decode(parts(0), StandardCharsets.UTF_8)
-        val value = if parts.length == 2 then URLDecoder.decode(parts(1), StandardCharsets.UTF_8) else ""
-        values.updateWith(key) {
-          case Some(existing) => Some(existing :+ FormValue.Str(value))
-          case None           => Some(Seq(FormValue.Str(value)))
-        }
-      }
-      SeqMap.from(values)
-    else throw SharafException(s"Unsupported content type for form data in sharaf-helidon: $contentType")
+    val mediaType = contentType.takeWhile(_ != ';').trim
+    if mediaType.equalsIgnoreCase("application/x-www-form-urlencoded") then UrlEncoded.form(bodyString)
+    else throw UnsupportedMediaTypeException("Expected application/x-www-form-urlencoded")
+
 }
 
 object HelidonSharafRequest {

@@ -61,4 +61,54 @@ class JdkHttpServerTest extends munit.FunSuite {
       server.stop()
     }
   }
+  for ((label, mapper) <- Seq("default" -> ExceptionMapper.default, "json" -> ExceptionMapper.json)) {
+    test(s"$label mapper handles raw queries and URL-encoded form errors") {
+      val port = NetworkUtils.getFreePort()
+      val routes = Routes {
+        case GET -> Path("query") => Response.withBody(Request.current.queryParamsRaw("name").mkString("|"))
+        case POST -> Path("form") =>
+          val form = Request.current.bodyFormRaw
+          val values = form("name").collect { case ba.sake.formson.FormValue.Str(value) => value }
+          Response.withBody(form.keys.mkString(",") + ":" + values.mkString("|"))
+      }
+      val handler = SharafHandler.exceptions(SharafHandler.routes(routes), mapper)
+      val server = JdkHttpServerSharafServer("127.0.0.1", port, handler)
+      val backend = sttp.client4.DefaultSyncBackend()
+      server.start()
+      try {
+        val base = s"http://127.0.0.1:$port"
+        val queryUri = sttp.model.Uri.unsafeParse(base + "/query?name=a%26b%3Dc&name=%2B&name=%252F&name=%FF")
+        val query = quickRequest.get(queryUri).send(backend)
+        assertEquals(query.code.code, 200)
+        assertEquals(query.body, "a&b=c|+|%2F|�")
+        val form = quickRequest
+          .post(uri"$base/form")
+          .contentType("Application/X-WWW-Form-Urlencoded; charset=UTF-8")
+          .body("&name=one+two&other=x&name=%2B&name=&name=%252F&&")
+          .send(backend)
+        assertEquals(form.code.code, 200)
+        assertEquals(form.body, "name,other:one two|+||%2F")
+        for (
+          scenario <- Seq(
+            (contentType = "application/x-www-form-urlencoded", body = "name=%ZZ", status = 400),
+            (contentType = "text/plain", body = "name=x", status = 415),
+            (contentType = "multipart/form-data; boundary=x", body = "name=x", status = 415),
+            (contentType = "application/x-www-form-urlencodedevil", body = "name=x", status = 415)
+          )
+        ) {
+          val response =
+            quickRequest.post(uri"$base/form").contentType(scenario.contentType).body(scenario.body).send(backend)
+          assertEquals(response.code.code, scenario.status)
+          if label == "json" then {
+            val problem = response.body.parseJson[ba.sake.sharaf.exceptions.ProblemDetails]
+            assertEquals(problem.status, scenario.status)
+          }
+        }
+      } finally {
+        backend.close()
+        server.stop()
+      }
+    }
+  }
+
 }

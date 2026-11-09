@@ -2,7 +2,6 @@ package ba.sake.sharaf.potateh
 
 import java.net.URI
 import java.nio.charset.StandardCharsets.UTF_8
-import scala.collection.immutable.SeqMap
 import ba.sake.formson.*
 import ba.sake.querson.*
 import ba.sake.sharaf.*
@@ -38,27 +37,17 @@ final class PotatehSharafRequest(val underlying: ba.sake.potateh.Request) extend
     }
 
   override lazy val queryParamsRaw: QueryStringMap =
-    decodePairs(Option(uri.getRawQuery).getOrElse("")).groupMap(_._1)(_._2)
+    UrlEncoded.query(Option(uri.getRawQuery).getOrElse(""))
 
   private lazy val bodyBytes: Array[Byte] = underlying.body.readAllBytes()
 
   override lazy val bodyString: String = new String(bodyBytes, UTF_8)
 
   override lazy val bodyFormRaw: FormDataMap = {
-    val contentType = underlying.headers.first("Content-Type").getOrElse("").takeWhile(_ != ';').trim
-    if !contentType.equalsIgnoreCase("application/x-www-form-urlencoded") then
-      throw UnsupportedMediaTypeException("Expected application/x-www-form-urlencoded")
-    decodePairs(RequestDecoding.utf8(bodyBytes)).foldLeft(SeqMap.empty[String, Seq[FormValue]]) {
-      case (values, (key, value)) =>
-        values.updated(key, values.getOrElse(key, Seq.empty) :+ FormValue.Str(value))
-    }
+    val contentType = underlying.headers.first("Content-Type").getOrElse("")
+    val mediaType = contentType.takeWhile(_ != ';').trim
+    if mediaType.equalsIgnoreCase("application/x-www-form-urlencoded") then UrlEncoded.form(bodyString)
+    else throw UnsupportedMediaTypeException("Expected application/x-www-form-urlencoded")
   }
 
-  private def decodePairs(value: String): Seq[(String, String)] =
-    value.split('&').toSeq.filter(_.nonEmpty).map { item =>
-      val parts = item.split("=", 2)
-      val key = RequestDecoding.component(parts(0), plusAsSpace = true)
-      val decoded = if parts.length == 2 then RequestDecoding.component(parts(1), plusAsSpace = true) else ""
-      key -> decoded
-    }
 }

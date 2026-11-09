@@ -122,10 +122,10 @@ class PotatehSharafServerTest extends munit.FunSuite {
       withServer(mapper) { server =>
         for (
           (method, path, body, contentType, status) <- Seq(
-            ("GET", "/query?a=%FF", "", "", 400),
-            ("GET", "/typed-query?x=%FF", "", "", 400),
+            ("GET", "/query?a=%FF", "", "", 200),
+            ("GET", "/typed-query?x=%FF", "", "", 200),
             ("POST", "/form", "x=%ZZ", "application/x-www-form-urlencoded", 400),
-            ("POST", "/typed-form", "x=%FF", "application/x-www-form-urlencoded", 400),
+            ("POST", "/typed-form", "x=%FF", "application/x-www-form-urlencoded", 200),
             ("POST", "/form", "x=ok", "multipart/form-data; boundary=test", 415),
             ("POST", "/typed-form", "x=ok", "text/plain", 415),
             ("POST", "/json", "{", "application/json", 400),
@@ -154,6 +154,18 @@ class PotatehSharafServerTest extends munit.FunSuite {
         val response = connection.request("GET", "/query?a=one+two&a=&a=%C4%87&a=%252F")
         assertEquals(response.status, 200)
         assertEquals(response.body, "one two||ć|%2F")
+      }
+    }
+  }
+
+  test("query and form UTF-8 use replacement while malformed escapes still fail") {
+    withServer() { server =>
+      Using.resource(new Connection(server)) { connection =>
+        assertEquals(connection.request("GET", "/typed-query?x=%FF").body, "�")
+        val form =
+          connection.request("POST", "/typed-form", "x=%FF", "Application/X-WWW-Form-Urlencoded; charset=UTF-8")
+        assertEquals(form.status, 200)
+        assertEquals(form.body, "�")
       }
     }
   }
@@ -238,7 +250,7 @@ class PotatehSharafServerTest extends munit.FunSuite {
     }
     withServer(mapper) { server =>
       Using.resource(new Connection(server)) { connection =>
-        for ((method, target) <- Seq("FOO" -> "/ok", "GET" -> "/path/%FF", "GET" -> "/query?a=%FF")) {
+        for ((method, target) <- Seq("FOO" -> "/ok", "GET" -> "/path/%FF")) {
           val response = connection.request(method, target)
           assertEquals(response.status, 400)
           assertEquals(response.body, "custom")
