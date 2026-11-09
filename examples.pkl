@@ -1,0 +1,150 @@
+import "https://sake92.github.io/deder/config/v0.22.2/DederProject.pkl" as D
+
+class Examples {
+  libraryTemplate: D.ScalaModule
+  dependencyVersions: Dynamic
+  undertow: D.ScalaModule
+  pac4j: D.ScalaModule
+  jdkHttpserver: D.ScalaModule
+  snunit: D.ScalaNativeModule
+  http4s: D.ScalaModule
+  potateh: D.ScalaNativeModule
+
+  local potatehExample = (libraryTemplate.asNative()) {
+    id = "example-potateh"
+    root = "examples/potateh"
+    scalaNativeVersion = dependencyVersions.scalaNative
+    multithreading = true
+    mainClass = "PotatehExample"
+    moduleDeps { potateh }
+  }
+
+  local baseExampleTemplate = (libraryTemplate) {
+    deps { "ch.qos.logback:logback-classic:\(dependencyVersions.logback)" }
+  }
+
+  local apiExampleModules =
+    new D.CreateScalaModules {
+      root = "examples/api"
+      template = (baseExampleTemplate) {
+        moduleDeps { undertow }
+      }
+      testTemplate = (baseExampleTemplate.asTest()) {
+        deps { "org.scalameta::munit::\(dependencyVersions.munit)" }
+      }
+    }.get
+
+  local fullstackExampleModules =
+    new D.CreateScalaModules {
+      root = "examples/fullstack"
+      template = (baseExampleTemplate) {
+        moduleDeps { undertow }
+      }
+      testTemplate = (baseExampleTemplate.asTest()) {
+        deps { "org.scalameta::munit::\(dependencyVersions.munit)" }
+      }
+    }.get
+
+  local userPassFormExampleModules =
+    new D.CreateScalaModules {
+      root = "examples/user-pass-form"
+      template = (baseExampleTemplate) {
+        moduleDeps {
+          undertow
+          pac4j
+        }
+        deps {
+          "org.pac4j:pac4j-http:\(dependencyVersions.pac4j)"
+          "org.mindrot:jbcrypt:0.4"
+        }
+      }
+      testTemplate = (baseExampleTemplate.asTest()) {
+        deps { "org.scalameta::munit::\(dependencyVersions.munit)" }
+      }
+    }.get
+
+  local jwtExampleModules =
+    new D.CreateScalaModules {
+      root = "examples/jwt"
+      template = (baseExampleTemplate) {
+        moduleDeps {
+          undertow
+          pac4j
+        }
+        deps {
+          "org.pac4j:pac4j-http:\(dependencyVersions.pac4j)"
+          "org.pac4j:pac4j-jwt:\(dependencyVersions.pac4j)"
+        }
+      }
+      testTemplate = (baseExampleTemplate.asTest()) {
+        deps { "org.scalameta::munit::\(dependencyVersions.munit)" }
+      }
+    }.get
+
+  local oauth2ExampleModules =
+    new D.CreateScalaModules {
+      root = "examples/oauth2"
+      template = (baseExampleTemplate) {
+        moduleDeps {
+          undertow
+          pac4j
+        }
+        deps {
+          "org.pac4j:pac4j-oauth:\(dependencyVersions.pac4j)"
+        }
+      }
+      testTemplate = (baseExampleTemplate.asTest()) {
+        deps {
+          "org.scalameta::munit::\(dependencyVersions.munit)"
+          "no.nav.security:mock-oauth2-server:\(dependencyVersions.mockOauth2Server)"
+        }
+      }
+    }.get
+
+  local jdkHttpserverExampleModules =
+    new D.CreateScalaModules {
+      root = "examples/jdk-httpserver"
+      template = (baseExampleTemplate) {
+        moduleDeps { jdkHttpserver }
+      }
+      testTemplate = (baseExampleTemplate.asTest()) {
+        deps { "org.scalameta::munit::\(dependencyVersions.munit)" }
+      }
+    }.get
+
+  local snunitExampleModules =
+    new D.CreateScalaNativeModules {
+      root = "examples/snunit"
+      template = (baseExampleTemplate.asNative()) {
+        scalaNativeVersion = dependencyVersions.scalaNative
+        moduleDeps { snunit }
+      }
+      testTemplate = (template.asTest()) {
+        deps { "org.scalameta::munit::\(dependencyVersions.munit)" }
+      }
+    }.get
+
+  local http4sExampleModules =
+    new D.CreateScalaModules {
+      root = "examples/http4s"
+      template = (baseExampleTemplate) {
+        moduleDeps { http4s }
+        deps { "org.http4s::http4s-ember-server::\(dependencyVersions.http4s)" }
+      }
+      testTemplate = (baseExampleTemplate.asTest()) {
+        deps { "org.scalameta::munit::\(dependencyVersions.munit)" }
+      }
+    }.get
+
+  all: Listing<D.DederModule> = new {
+    potatehExample
+    ...apiExampleModules.all
+    ...fullstackExampleModules.all
+    ...userPassFormExampleModules.all
+    ...jwtExampleModules.all
+    ...oauth2ExampleModules.all
+    ...jdkHttpserverExampleModules.all
+    ...snunitExampleModules.all
+    ...http4sExampleModules.all
+  }
+}

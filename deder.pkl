@@ -4,12 +4,32 @@ import
   "https://sake92.github.io/deder-plugins/config/deder-web-dashboard/v0.6.0/WebDashboardPlugin.pkl"
   as WD
 
+import "examples.pkl" as Examples
+
+local const versions = new {
+  scala = "3.9.0"
+  scalaJs = "1.22.0"
+  scalaNative = "0.5.12"
+  fastparse = "3.1.1"
+  sourcecode = "0.4.4"
+  scalaJavaTime = "2.7.0"
+  munit = "1.3.6"
+  tupson = "0.31.0"
+  potateh = "0.2.0"
+  sttp = "4.0.27"
+  twirl = "2.1.0-M9"
+  undertow = "2.4.3.Final"
+  pac4j = "6.5.8"
+  http4s = "1.0.0-M48"
+  helidon = "4.5.5"
+  logback = "1.6.4"
+  mockOauth2Server = "6.0.3"
+  jquery = "4.0.0"
+}
+
 plugins {
   new WD.WebDashboardPlugin {
     version = "0.6.0"
-    config = new {
-//      enabled = false
-    }
   }
 }
 
@@ -23,7 +43,7 @@ else
   new SonatypeCentralRepo { id = "sonatype" }
 
 local const baseTemplate: ScalaModule = new {
-  scalaVersion = "3.9.0"
+  scalaVersion = versions.scala
   publishTo = publishRepo
   scalacOptions = new Listing<String> {
     "-Yretain-trees" // needed for default parameters
@@ -56,25 +76,6 @@ local const baseTemplate: ScalaModule = new {
   }
 }
 
-local const versions = new {
-  scalaJsVersion = "1.22.0"
-  scalaNativeVersion = "0.5.12"
-  sourcecode = "0.4.4"
-  scalaJavaTime = "2.7.0"
-  munit = "1.3.6"
-  tupson = "0.31.0"
-  potateh = "0.2.0"
-  sttp = "4.0.27"
-  twirl = "2.1.0-M9"
-  undertow = "2.4.3.Final"
-  pac4j = "6.5.8"
-  http4s = "1.0.0-M48"
-  helidon = "4.5.5"
-  logback = "1.6.4"
-  mockOauth2Server = "6.0.3"
-  jquery = "4.0.0"
-}
-
 local const validsonModules =
   new CreateCrossModules {
     root = "validson"
@@ -91,7 +92,7 @@ local const validsonModules =
       deps { "org.scalameta::munit::\(versions.munit)" }
     }
     jsTemplate = (template.asJs()) {
-      scalaJsVersion = versions.scalaJsVersion
+      scalaJsVersion = versions.scalaJs
       deps {
         "com.lihaoyi::sourcecode::\(versions.sourcecode)"
         "io.github.cquiroz::scala-java-time::\(versions.scalaJavaTime)"
@@ -102,7 +103,7 @@ local const validsonModules =
       deps { "org.scalameta::munit::\(versions.munit)" }
     }
     nativeTemplate = (template.asNative()) {
-      scalaNativeVersion = versions.scalaNativeVersion
+      scalaNativeVersion = versions.scalaNative
       deps {
         "com.lihaoyi::sourcecode::\(versions.sourcecode)"
         "io.github.cquiroz::scala-java-time::\(versions.scalaJavaTime)"
@@ -123,16 +124,16 @@ local const quersonModules =
         name = "Querson"
         description = "Sharaf query params library"
       }
-      deps { "com.lihaoyi::fastparse::3.1.1" }
+      deps { "com.lihaoyi::fastparse::\(versions.fastparse)" }
       publish = true
     }
     testTemplate = (baseTemplate.asTest()) {
       deps { "org.scalameta::munit::\(versions.munit)" }
     }
     jsTemplate = (template.asJs()) {
-      scalaJsVersion = versions.scalaJsVersion
+      scalaJsVersion = versions.scalaJs
       deps {
-        "com.lihaoyi::fastparse::3.1.1"
+        "com.lihaoyi::fastparse::\(versions.fastparse)"
         "io.github.cquiroz::scala-java-time::\(versions.scalaJavaTime)"
       }
       publish = true
@@ -141,9 +142,9 @@ local const quersonModules =
       deps { "org.scalameta::munit::\(versions.munit)" }
     }
     nativeTemplate = (template.asNative()) {
-      scalaNativeVersion = versions.scalaNativeVersion
+      scalaNativeVersion = versions.scalaNative
       deps {
-        "com.lihaoyi::fastparse::3.1.1"
+        "com.lihaoyi::fastparse::\(versions.fastparse)"
         "io.github.cquiroz::scala-java-time::\(versions.scalaJavaTime)"
       }
       publish = true
@@ -162,16 +163,16 @@ local const formsonModules =
         name = "Formson"
         description = "Sharaf form binding library"
       }
-      deps { "com.lihaoyi::fastparse::3.1.1" }
+      deps { "com.lihaoyi::fastparse::\(versions.fastparse)" }
       publish = true
     }
     testTemplate = (baseTemplate.asTest()) {
       deps { "org.scalameta::munit::\(versions.munit)" }
     }
     jsTemplate = (template.asJs()) {
-      scalaJsVersion = versions.scalaJsVersion
+      scalaJsVersion = versions.scalaJs
       deps {
-        "com.lihaoyi::fastparse::3.1.1"
+        "com.lihaoyi::fastparse::\(versions.fastparse)"
         "io.github.cquiroz::scala-java-time::\(versions.scalaJavaTime)"
       }
       publish = true
@@ -180,9 +181,9 @@ local const formsonModules =
       deps { "org.scalameta::munit::\(versions.munit)" }
     }
     nativeTemplate = (template.asNative()) {
-      scalaNativeVersion = versions.scalaNativeVersion
+      scalaNativeVersion = versions.scalaNative
       deps {
-        "com.lihaoyi::fastparse::3.1.1"
+        "com.lihaoyi::fastparse::\(versions.fastparse)"
         "io.github.cquiroz::scala-java-time::\(versions.scalaJavaTime)"
       }
       publish = true
@@ -222,7 +223,7 @@ local const sharafCoreModules =
       deps { "org.scalameta::munit::\(versions.munit)" }
     }
     nativeTemplate = (sharafCoreTemplate.asNative()) {
-      scalaNativeVersion = versions.scalaNativeVersion
+      scalaNativeVersion = versions.scalaNative
       moduleDeps {
         validsonModules.native
         quersonModules.native
@@ -262,7 +263,7 @@ local const sharafJdbcSessionModules =
       }
     }
     nativeTemplate = (template.asNative()) {
-      scalaNativeVersion = versions.scalaNativeVersion
+      scalaNativeVersion = versions.scalaNative
       moduleDeps = new { sharafCoreModules.native }
       publish = true
     }
@@ -370,7 +371,7 @@ local const sharafHttp4sModules =
       }
     }
     nativeTemplate = (template.asNative()) {
-      scalaNativeVersion = versions.scalaNativeVersion
+      scalaNativeVersion = versions.scalaNative
       moduleDeps = new { sharafCoreModules.native }
       deps {
         "org.http4s::http4s-server::\(versions.http4s)"
@@ -434,7 +435,7 @@ local const sharafJdkHttpserverModules =
       }
     }
     nativeTemplate = (template.asNative()) {
-      scalaNativeVersion = versions.scalaNativeVersion
+      scalaNativeVersion = versions.scalaNative
       multithreading = true
       moduleDeps = new { sharafCoreModules.native }
       deps { "ba.sake::scalanative-httpserver::0.0.0+28-3fff272e-SNAPSHOT" }
@@ -449,7 +450,7 @@ local const sharafJdkHttpserverModules =
 local const sharafSnunit = (baseTemplate.asNative()) {
   id = "sharaf-snunit"
   root = "sharaf-snunit"
-  scalaNativeVersion = versions.scalaNativeVersion
+  scalaNativeVersion = versions.scalaNative
   pomSettings {
     artifactId = "sharaf-snunit"
     name = "Sharaf Snunit"
@@ -479,7 +480,7 @@ local const sharafPotatehModules =
       deps { "org.scalameta::munit::\(versions.munit)" }
     }
     nativeTemplate = (template.asNative()) {
-      scalaNativeVersion = versions.scalaNativeVersion
+      scalaNativeVersion = versions.scalaNative
       multithreading = true
       moduleDeps = new { sharafCoreModules.native }
       publish = true
@@ -489,132 +490,16 @@ local const sharafPotatehModules =
     }
   }.get
 
-local const potatehExample = (baseTemplate.asNative()) {
-  id = "example-potateh"
-  root = "examples/potateh"
-  scalaNativeVersion = versions.scalaNativeVersion
-  multithreading = true
-  mainClass = "PotatehExample"
-  moduleDeps { sharafPotatehModules.native }
-}
-
-// examples
-local const baseExampleTemplate = (baseTemplate) {
-  deps { "ch.qos.logback:logback-classic:\(versions.logback)" }
-}
-
-local const apiExampleModules =
-  new CreateScalaModules {
-    root = "examples/api"
-    template = (baseExampleTemplate) {
-      moduleDeps { sharafUndertowModules.main }
-    }
-    testTemplate = (baseExampleTemplate.asTest()) {
-      deps { "org.scalameta::munit::\(versions.munit)" }
-    }
-  }.get
-
-local const fullstackExampleModules =
-  new CreateScalaModules {
-    root = "examples/fullstack"
-    template = (baseExampleTemplate) {
-      moduleDeps { sharafUndertowModules.main }
-    }
-    testTemplate = (baseExampleTemplate.asTest()) {
-      deps { "org.scalameta::munit::\(versions.munit)" }
-    }
-  }.get
-
-local const userPassFormExampleModules =
-  new CreateScalaModules {
-    root = "examples/user-pass-form"
-    template = (baseExampleTemplate) {
-      moduleDeps {
-        sharafUndertowModules.main
-        sharafPac4jModules.main
-      }
-      deps {
-        "org.pac4j:pac4j-http:\(versions.pac4j)"
-        "org.mindrot:jbcrypt:0.4"
-      }
-    }
-    testTemplate = (baseExampleTemplate.asTest()) {
-      deps { "org.scalameta::munit::\(versions.munit)" }
-    }
-  }.get
-
-local const jwtExampleModules =
-  new CreateScalaModules {
-    root = "examples/jwt"
-    template = (baseExampleTemplate) {
-      moduleDeps {
-        sharafUndertowModules.main
-        sharafPac4jModules.main
-      }
-      deps {
-        "org.pac4j:pac4j-http:\(versions.pac4j)"
-        "org.pac4j:pac4j-jwt:\(versions.pac4j)"
-      }
-    }
-    testTemplate = (baseExampleTemplate.asTest()) {
-      deps { "org.scalameta::munit::\(versions.munit)" }
-    }
-  }.get
-
-local const oauth2ExampleModules =
-  new CreateScalaModules {
-    root = "examples/oauth2"
-    template = (baseExampleTemplate) {
-      moduleDeps {
-        sharafUndertowModules.main
-        sharafPac4jModules.main
-      }
-      deps {
-        "org.pac4j:pac4j-oauth:\(versions.pac4j)"
-      }
-    }
-    testTemplate = (baseExampleTemplate.asTest()) {
-      deps {
-        "org.scalameta::munit::\(versions.munit)"
-        "no.nav.security:mock-oauth2-server:\(versions.mockOauth2Server)"
-      }
-    }
-  }.get
-
-local const jdkHttpserverExampleModules =
-  new CreateScalaModules {
-    root = "examples/jdk-httpserver"
-    template = (baseExampleTemplate) {
-      moduleDeps { sharafJdkHttpserverModules.jvm }
-    }
-    testTemplate = (baseExampleTemplate.asTest()) {
-      deps { "org.scalameta::munit::\(versions.munit)" }
-    }
-  }.get
-
-local const snunitExampleModules =
-  new CreateScalaNativeModules {
-    root = "examples/snunit"
-    template = (baseExampleTemplate.asNative()) {
-      scalaNativeVersion = versions.scalaNativeVersion
-      moduleDeps { sharafSnunit }
-    }
-    testTemplate = (template.asTest()) {
-      deps { "org.scalameta::munit::\(versions.munit)" }
-    }
-  }.get
-
-local const http4sExampleModules =
-  new CreateScalaModules {
-    root = "examples/http4s"
-    template = (baseExampleTemplate) {
-      moduleDeps { sharafHttp4sModules.jvm }
-      deps { "org.http4s::http4s-ember-server::\(versions.http4s)" }
-    }
-    testTemplate = (baseExampleTemplate.asTest()) {
-      deps { "org.scalameta::munit::\(versions.munit)" }
-    }
-  }.get
+local const exampleModules = new Examples.Examples {
+  libraryTemplate = baseTemplate
+  dependencyVersions = versions
+  undertow = sharafUndertowModules.main
+  pac4j = sharafPac4jModules.main
+  jdkHttpserver = sharafJdkHttpserverModules.jvm
+  snunit = sharafSnunit
+  http4s = sharafHttp4sModules.jvm
+  potateh = sharafPotatehModules.native
+}.all
 
 modules {
   ...validsonModules.all
@@ -649,13 +534,5 @@ modules {
   sharafPotatehModules.jvm_test
   sharafPotatehModules.native
   sharafPotatehModules.native_test
-  potatehExample
-  ...apiExampleModules.all
-  ...fullstackExampleModules.all
-  ...userPassFormExampleModules.all
-  ...jwtExampleModules.all
-  ...oauth2ExampleModules.all
-  ...jdkHttpserverExampleModules.all
-  ...snunitExampleModules.all
-  ...http4sExampleModules.all
+  ...exampleModules
 }
