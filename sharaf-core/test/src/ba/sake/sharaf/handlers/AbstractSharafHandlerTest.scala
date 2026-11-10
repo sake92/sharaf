@@ -21,6 +21,9 @@ abstract class AbstractSharafHandlerTest extends munit.FunSuite with ServerFixtu
     case GET -> Path("hello")       => Response.withBody("Hello Scala! čćž")
     case GET -> Path("query")       => Response.withBody(Request.current.queryParamsRaw("tag").mkString("|"))
     case POST -> Path("json")       => Response.withBody(Request.current.bodyJson[Greeting])
+    case POST -> Path("request-string") =>
+      val description = Request.current.toString
+      Response.withBody(description + "\n" + Request.current.bodyString)
     case POST -> Path("typed-form") =>
       val form = Request.current.bodyForm[Form]
       Response.withBody(s"${form.name}:${form.tag.mkString(",")}")
@@ -62,6 +65,23 @@ abstract class AbstractSharafHandlerTest extends munit.FunSuite with ServerFixtu
       val response = request.get(uri"$base/hello").send(httpBackend)
       assertEquals(response.code, StatusCode.Ok)
       assertEquals(response.body, "Hello Scala! čćž")
+    }
+  }
+
+  test("request string does not expose request data or consume its body") {
+    withServer(routes, ExceptionMapper.default) { base =>
+      val response = request
+        .post(uri"$base/request-string?token=query-secret")
+        .header("Authorization", "Bearer header-secret")
+        .header("Cookie", "session=cookie-secret")
+        .body("body-secret")
+        .send(httpBackend)
+      assertEquals(response.code, StatusCode.Ok)
+      val parts = response.body.split("\n", 2)
+      assertEquals(parts.length, 2)
+      for secret <- Seq("query-secret", "header-secret", "cookie-secret", "body-secret") do
+        assert(!parts(0).contains(secret), s"Request string exposed $secret")
+      assertEquals(parts(1), "body-secret")
     }
   }
 

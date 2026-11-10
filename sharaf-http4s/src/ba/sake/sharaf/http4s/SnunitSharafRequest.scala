@@ -47,7 +47,7 @@ class Http4sSharafRequest(underlyingRequest: Http4sRequest) extends Request {
     else throw UnsupportedMediaTypeException("Expected application/x-www-form-urlencoded or multipart/form-data")
 
   override def toString(): String =
-    s"Http4sSharafRequest(headers=${headers}, cookies=${cookies}, queryParamsRaw=${queryParamsRaw}, bodyString=...)"
+    "Http4sSharafRequest(...)"
 }
 
 object Http4sSharafRequest {

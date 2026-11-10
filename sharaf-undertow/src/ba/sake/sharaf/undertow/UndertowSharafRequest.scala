@@ -41,7 +41,7 @@ final class UndertowSharafRequest(val underlyingHttpServerExchange: HttpServerEx
     else throw UnsupportedMediaTypeException("Expected application/x-www-form-urlencoded or multipart/form-data")
 
   override def toString(): String =
-    s"UndertowSharafRequest(headers=${headers}, cookies=${cookies}, queryParamsRaw=${queryParamsRaw}, bodyString=...)"
+    "UndertowSharafRequest(...)"
 }
 
 object UndertowSharafRequest {

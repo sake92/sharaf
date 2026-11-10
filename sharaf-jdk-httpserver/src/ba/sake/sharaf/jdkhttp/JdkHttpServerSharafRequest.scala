@@ -40,7 +40,7 @@ final class JdkHttpServerSharafRequest(val underlyingHttpExchange: HttpExchange)
     else throw UnsupportedMediaTypeException("Expected application/x-www-form-urlencoded or multipart/form-data")
 
   override def toString(): String =
-    s"JdkHttpServerSharafRequest(headers=${headers}, cookies=${cookies}, queryParamsRaw=${queryParamsRaw}, bodyString=...)"
+    "JdkHttpServerSharafRequest(...)"
 }
 
 object JdkHttpServerSharafRequest {
