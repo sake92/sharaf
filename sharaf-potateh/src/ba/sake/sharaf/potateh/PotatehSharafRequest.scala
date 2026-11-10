@@ -32,14 +32,15 @@ final class PotatehSharafRequest(val underlying: ba.sake.potateh.Request) extend
   override lazy val queryParamsRaw: QueryStringMap =
     UrlEncoded.query(Option(uri.getRawQuery).getOrElse(""))
 
-  private lazy val bodyBytes: Array[Byte] = underlying.body.readAllBytes()
-
-  override lazy val bodyString: String = new String(bodyBytes, UTF_8)
+  override lazy val bodyString: String = {
+    val contentType = underlying.headers.first("Content-Type").getOrElse("")
+    if UrlEncoded.isForm(contentType) then UrlEncoded.readFormBody(underlying.body)
+    else new String(underlying.body.readAllBytes(), UTF_8)
+  }
 
   override lazy val bodyFormRaw: FormDataMap = {
     val contentType = underlying.headers.first("Content-Type").getOrElse("")
-    val mediaType = contentType.takeWhile(_ != ';').trim
-    if mediaType.equalsIgnoreCase("application/x-www-form-urlencoded") then UrlEncoded.form(bodyString)
+    if UrlEncoded.isForm(contentType) then UrlEncoded.form(bodyString)
     else if Multipart.isMultipart(contentType) then Multipart.parse(underlying.body, contentType, uploads)
     else throw UnsupportedMediaTypeException("Expected application/x-www-form-urlencoded or multipart/form-data")
   }

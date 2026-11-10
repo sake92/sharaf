@@ -17,6 +17,7 @@ final class SharafUndertowHandler(sharafHandler: SharafHandler, notFoundHandler:
     try {
       val res = sharafHandler.handle(requestContext)
       ResponseUtils.writeResponse(res, exchange)
+      if !exchange.isPersistent && res.status.code == 413 then exchange.getOutputStream.flush()
     } catch {
       case e: NotFoundException =>
         notFoundHandler match {

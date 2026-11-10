@@ -77,6 +77,10 @@ and empty values are retained; empty separator entries are ignored. Form keys
 retain their first insertion order. `+` represents a space; `%2B` represents `+`.
 Form media types are case-insensitive and may include parameters.
 
+Undertow and Potateh limit URL-encoded request bodies to 1 MiB when reading
+`bodyString` or parsing a form. Larger bodies return 413 through the configured
+exception mapper. Other adapters do not apply this Sharaf-side limit.
+
 Malformed percent escapes return 400 through the configured exception mapper.
 Unsupported form media types return 415. Malformed UTF-8
 bytes are replaced with `�`, following Java's

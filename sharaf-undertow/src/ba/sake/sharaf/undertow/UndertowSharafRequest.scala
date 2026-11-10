@@ -29,13 +29,22 @@ final class UndertowSharafRequest(val underlyingHttpServerExchange: HttpServerEx
 
   /* *** BODY *** */
 
-  override lazy val bodyString: String =
-    String(underlyingHttpServerExchange.getInputStream.readAllBytes(), StandardCharsets.UTF_8)
+  override lazy val bodyString: String = {
+    val input = underlyingHttpServerExchange.getInputStream
+    val contentType = headers.get(HttpString("Content-Type")).flatMap(_.headOption).getOrElse("")
+    if UrlEncoded.isForm(contentType) then
+      try UrlEncoded.readFormBody(input)
+      catch {
+        case error: PayloadTooLargeException =>
+          underlyingHttpServerExchange.setPersistent(false)
+          throw error
+      }
+    else String(input.readAllBytes(), StandardCharsets.UTF_8)
+  }
 
   override lazy val bodyFormRaw: FormDataMap =
     val contentType = headers.get(HttpString("Content-Type")).flatMap(_.headOption).getOrElse("")
-    val mediaType = contentType.takeWhile(_ != ';').trim
-    if mediaType.equalsIgnoreCase("application/x-www-form-urlencoded") then UrlEncoded.form(bodyString)
+    if UrlEncoded.isForm(contentType) then UrlEncoded.form(bodyString)
     else if Multipart.isMultipart(contentType) then
       Multipart.parse(underlyingHttpServerExchange.getInputStream, contentType, uploads)
     else throw UnsupportedMediaTypeException("Expected application/x-www-form-urlencoded or multipart/form-data")

@@ -1,14 +1,37 @@
 package ba.sake.sharaf
 
 import java.net.URLDecoder
+import java.io.{ByteArrayOutputStream, InputStream}
 import java.nio.charset.StandardCharsets.{ISO_8859_1, UTF_8}
 import scala.collection.immutable.SeqMap
 import ba.sake.formson.*
 import ba.sake.querson.QueryStringMap
-import ba.sake.sharaf.exceptions.BadRequestException
+import ba.sake.sharaf.exceptions.{BadRequestException, PayloadTooLargeException}
 
 /** Internal parsing of raw query strings and URL-encoded forms, never paths or whole URLs. */
 private[sharaf] object UrlEncoded {
+  val maxFormBytes: Int = 1024 * 1024
+
+  def isForm(contentType: String): Boolean =
+    contentType.takeWhile(_ != ';').trim.equalsIgnoreCase("application/x-www-form-urlencoded")
+
+  def readFormBody(input: InputStream): String = {
+    val output = new ByteArrayOutputStream()
+    val buffer = new Array[Byte](8192)
+    var done = false
+    while !done do {
+      val allowed = math.min(buffer.length, maxFormBytes - output.size() + 1)
+      val count = input.read(buffer, 0, allowed)
+      if count < 0 then done = true
+      else if count > 0 then {
+        if count > maxFormBytes - output.size() then
+          throw PayloadTooLargeException("URL-encoded form limit exceeded")
+        output.write(buffer, 0, count)
+      }
+    }
+    new String(output.toByteArray, UTF_8)
+  }
+
   def query(raw: String): QueryStringMap =
     pairs(raw).groupMap(_.name)(_.value)
 
