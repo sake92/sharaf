@@ -24,6 +24,8 @@ object ExceptionMapper {
    */
 
   val default: ExceptionMapper = {
+    case e: PayloadTooLargeException =>
+      Response.withBody(e.getMessage).withStatus(StatusCode.PayloadTooLarge)
     case e: BadRequestException =>
       Response.withBody(e.getMessage).withStatus(StatusCode.BadRequest)
     case e: UnsupportedMediaTypeException =>
@@ -63,6 +65,8 @@ object ExceptionMapper {
   }
 
   val json: ExceptionMapper = {
+    case e: PayloadTooLargeException =>
+      Response.withBody(ProblemDetails(413, "Payload Too Large", e.getMessage)).withStatus(StatusCode.PayloadTooLarge)
     case e: BadRequestException =>
       Response.withBody(ProblemDetails(400, "Bad Request", e.getMessage)).withStatus(StatusCode.BadRequest)
     case e: UnsupportedMediaTypeException =>

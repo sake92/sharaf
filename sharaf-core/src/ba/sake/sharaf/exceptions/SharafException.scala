@@ -20,3 +20,6 @@ final case class UnsupportedMediaTypeException(msg: String) extends SharafExcept
 
 /** A valid HTTP method token not implemented by Sharaf. */
 final case class UnsupportedMethodException(method: String) extends SharafException("Unsupported HTTP method")
+
+/** A bounded request parser rejected an oversized body or part. */
+final case class PayloadTooLargeException(msg: String) extends SharafException(msg)

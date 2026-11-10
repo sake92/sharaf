@@ -44,7 +44,7 @@ final class UndertowSharafRequest(val underlyingHttpServerExchange: HttpServerEx
     // createParser returns null if content-type is not suitable
     val parser = formBodyParserFactory.createParser(underlyingHttpServerExchange)
     Option(parser) match
-      case None => throw SharafException("The specified content type is not supported")
+      case None => throw UnsupportedMediaTypeException("The specified content type is not supported")
       case Some(parser) =>
         val uFormData = parser.parseBlocking()
         UndertowSharafRequest.undertowFormData2FormsonMap(uFormData)
@@ -66,8 +66,7 @@ object UndertowSharafRequest {
         if value.isFileItem then
           val fileItem = value.getFileItem
           if fileItem.isInMemory then
-            val byteArray = Array.ofDim[Byte](fileItem.getInputStream.available)
-            fileItem.getInputStream.read(byteArray)
+            val byteArray = scala.util.Using.resource(fileItem.getInputStream)(_.readAllBytes())
             FormValue.ByteArray(byteArray)
           else FormValue.File(fileItem.getFile)
         else FormValue.Str(value.getValue)

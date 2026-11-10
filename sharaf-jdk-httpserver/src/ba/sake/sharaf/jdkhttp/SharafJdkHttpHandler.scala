@@ -18,9 +18,9 @@ final class SharafJdkHttpHandler(sharafHandler: SharafHandler, next: Option[Http
       case e: NotFoundException =>
         next match {
           case Some(handler) => handler.handle(exchange)
-          case None => throw e
+          case None          => throw e
         }
-    }
+    } finally req.closeUploads()
 
   private def fillReqParams(exchange: HttpExchange): RequestParams = {
     val method = HttpMethod.valueOf(exchange.getRequestMethod)

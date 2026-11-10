@@ -11,11 +11,11 @@ import ba.sake.sharaf.jdkhttp.JdkHttpServerSharafRequest
 class ErrorHandlerTest extends AbstractErrorHandlerTest {
 
   private val httpServer = HttpServer.create(new InetSocketAddress("localhost", port), 0)
-  
+
   // Create handlers with different exception mappers
   val defaultHandler = SharafHandler.exceptions(SharafHandler.routes(routes))
   val jsonHandler = SharafHandler.exceptions(SharafHandler.routes(routes), ExceptionMapper.json)
-  
+
   // Custom handler that strips the prefix
   class PrefixStrippingHandler(prefix: String, handler: SharafHandler) extends HttpHandler {
     override def handle(exchange: HttpExchange): Unit = {
@@ -39,7 +39,7 @@ class ErrorHandlerTest extends AbstractErrorHandlerTest {
       (method, path)
     }
   }
-  
+
   // Register handlers at different contexts
   httpServer.createContext("/default", PrefixStrippingHandler("/default", defaultHandler))
   httpServer.createContext("/json", PrefixStrippingHandler("/json", jsonHandler))
@@ -48,5 +48,5 @@ class ErrorHandlerTest extends AbstractErrorHandlerTest {
   override def startServer(): Unit = httpServer.start()
   override def stopServer(): Unit = httpServer.stop(0)
 
-  override def supportsMultipart: Boolean = false // TODO
+  override def supportsMultipart: Boolean = true
 }

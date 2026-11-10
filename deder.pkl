@@ -365,9 +365,11 @@ local const sharafHttp4sModules =
       publish = true
     }
     testTemplate = (baseTemplate.asTest()) {
+      moduleDeps { sharafCoreModules.jvm_test }
       deps {
         "org.scalameta::munit::\(versions.munit)"
         "org.http4s::http4s-client::\(versions.http4s)"
+        "org.http4s::http4s-ember-server::\(versions.http4s)"
       }
     }
     nativeTemplate = (template.asNative()) {
@@ -381,10 +383,12 @@ local const sharafHttp4sModules =
       publish = true
     }
     nativeTestTemplate = (nativeTemplate.asTest()) {
+      moduleDeps { sharafCoreModules.native_test }
       multithreading = true
       deps {
         "org.scalameta::munit::\(versions.munit)"
         "org.http4s::http4s-client::\(versions.http4s)"
+        "org.http4s::http4s-ember-server::\(versions.http4s)"
       }
     }
   }.get
@@ -477,6 +481,7 @@ local const sharafPotatehModules =
       publish = true
     }
     testTemplate = (template.asTest()) {
+      moduleDeps { sharafCoreModules.jvm_test }
       deps { "org.scalameta::munit::\(versions.munit)" }
     }
     nativeTemplate = (template.asNative()) {
@@ -486,6 +491,7 @@ local const sharafPotatehModules =
       publish = true
     }
     nativeTestTemplate = (nativeTemplate.asTest()) {
+      moduleDeps { sharafCoreModules.native_test }
       deps { "org.scalameta::munit::\(versions.munit)" }
     }
   }.get

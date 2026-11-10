@@ -10,6 +10,9 @@ import ba.sake.sharaf.exceptions.UnsupportedMediaTypeException
 
 final class JdkHttpServerSharafRequest(val underlyingHttpExchange: HttpExchange) extends Request {
 
+  private val uploads = new MultipartUploads
+  private[sharaf] def closeUploads(): Unit = uploads.close()
+
   /* *** HEADERS *** */
   def headers: Map[HttpString, Seq[String]] =
     underlyingHttpExchange.getRequestHeaders.asScala.toMap.map { (name, values) =>
@@ -45,7 +48,9 @@ final class JdkHttpServerSharafRequest(val underlyingHttpExchange: HttpExchange)
     val contentType = headers.get(HttpString("Content-Type")).flatMap(_.headOption).getOrElse("")
     val mediaType = contentType.takeWhile(_ != ';').trim
     if mediaType.equalsIgnoreCase("application/x-www-form-urlencoded") then UrlEncoded.form(bodyString)
-    else throw UnsupportedMediaTypeException("Expected application/x-www-form-urlencoded")
+    else if Multipart.isMultipart(contentType) then
+      Multipart.parse(underlyingHttpExchange.getRequestBody, contentType, uploads)
+    else throw UnsupportedMediaTypeException("Expected application/x-www-form-urlencoded or multipart/form-data")
 
   override def toString(): String =
     s"JdkHttpServerSharafRequest(headers=${headers}, cookies=${cookies}, queryParamsRaw=${queryParamsRaw}, bodyString=...)"

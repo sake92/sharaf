@@ -8,11 +8,11 @@ description: Sharaf server modules and platform support
 | Module | Server integration | Platform | Support tier | Form bodies |
 | --- | --- | --- | --- | --- |
 | `sharaf-undertow` | Undertow | JVM | Stable | URL encoded and multipart |
-| `sharaf-http4s` | http4s | JVM, Scala Native | Beta | URL encoded |
-| `sharaf-jdk-httpserver` | JDK HTTP server | JVM, Scala Native | Beta | URL encoded; multipart unsupported |
-| `sharaf-helidon` | Helidon | JVM | Experimental | URL encoded; multipart unsupported |
-| `sharaf-potateh` | Potateh | JVM, Scala Native | Experimental | URL encoded; multipart unsupported |
-| `sharaf-snunit` | snunit | Scala Native | Experimental | URL encoded; multipart unsupported |
+| `sharaf-http4s` | http4s | JVM, Scala Native | Beta | URL encoded and multipart |
+| `sharaf-jdk-httpserver` | JDK HTTP server | JVM, Scala Native | Beta | URL encoded and multipart |
+| `sharaf-helidon` | Helidon | JVM | Experimental | URL encoded and multipart |
+| `sharaf-potateh` | Potateh | JVM, Scala Native | Experimental | URL encoded and multipart |
+| `sharaf-snunit` | snunit | Scala Native | Experimental | URL encoded and multipart |
 
 `sharaf-core` supports JVM and Scala Native. The companion libraries `formson`, `querson`, and `validson` also support Scala.js.
 
@@ -30,7 +30,7 @@ for every JVM adapter. The snunit example requires `libunit` at build time and a
 
 Local size, startup, and memory figures are listed in the [native footprint reference](/reference/native-footprint.html).
 
-Stable is the recommended server integration. Beta integrations support the listed platforms but have narrower form handling. Experimental integrations have incomplete request features and may change between releases.
+Stable is the recommended server integration. Beta integrations support the listed platforms with less production coverage. Experimental integrations have incomplete request features and may change between releases.
 
 The [quickstart](/tutorials/quickstart.html) uses Undertow. Adapter examples are in the [repository]({{site.data.project.gh.sourcesUrl}}/examples).
 
@@ -47,7 +47,7 @@ retain their first insertion order. `+` represents a space; `%2B` represents `+`
 Form media types are case-insensitive and may include parameters.
 
 Malformed percent escapes return 400 through the configured exception mapper.
-Unsupported form media types, including multipart, return 415. Malformed UTF-8
+Unsupported form media types return 415. Malformed UTF-8
 bytes are replaced with `�`, following Java's
 [URLDecoder contract](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/net/URLDecoder.html)
 and the UTF-8 replacement policy in the
@@ -56,8 +56,49 @@ Broken percent escapes are rejected more strictly than that standard's parser.
 Potateh previously rejected malformed query/form UTF-8 with 400; it now uses the
 same replacement policy as the other three adapters.
 
-Undertow and http4s retain their server-library parsers. Path decoding is separate
+Undertow and http4s retain their server-library URL-encoded parsers. Path decoding is separate
 and currently differs between adapters.
+
+## Multipart forms
+
+JDK HTTP server, Potateh, Helidon, snunit and http4s share a byte-oriented
+`multipart/form-data` parser. Text fields are decoded as UTF-8. Every part with a
+`filename` parameter becomes a temporary `FormValue.File(Path)`, including empty
+files. Repeated fields and the first insertion order of keys are retained.
+Upload filenames and content types are not exposed by `FormDataMap`.
+
+The parser streams uploads to disk without converting the body to text. snunit
+provides its body as an existing byte array; the shared parser wraps that array
+as a stream, but does not remove snunit's transport-level buffering.
+
+| Limit | Value |
+| --- | --- |
+| Total multipart body, including framing and epilogue | 32 MiB |
+| Each uploaded file | 16 MiB |
+| Each text field | 64 KiB |
+| Parts | 128 |
+| Headers per part, including line endings | 16 KiB |
+| Header count per part | 32 |
+| Boundary-line padding lookahead | 16 KiB |
+
+These parser limits are fixed defaults. Server and proxy limits may be lower.
+Malformed or truncated multipart input returns 400; exceeding a parser limit
+returns 413 through the default or JSON exception mapper. Unsupported part
+transfer encodings such as base64 are rejected with 400; identity encodings
+(`binary`, `8bit`, `7bit`) leave the bytes unchanged.
+
+Temporary uploads are deleted on parsing failures and after the adapter finishes
+response serialization, including handler and writer failures. Potateh 0.2.0
+has no exchange-completion hook: its uploads are deleted when the synchronous
+Sharaf handler returns. Read or copy Potateh uploads in the handler; do not use
+an upload path as a deferred response body. All adapters require an
+application-owned copy for background work or permanent storage.
+
+Undertow retains its own parser, limits, and cleanup. Its default threshold
+stores nonempty uploads on disk but represents empty uploads as `ByteArray`.
+Applications configuring in-memory Undertow uploads retain that behavior.
+
+See [upload a file](/howtos/upload-file.html) for typed `Path` parsing.
 
 ## Potateh
 
@@ -79,7 +120,7 @@ the connection. Response-requested `Connection: close`, upgrades and trailers ar
 unsupported and fail as server errors. SSE uses chunked streaming on HTTP/1.1.
 
 Malformed query/form percent escapes and invalid path UTF-8 return 400. Unsupported form
-media types, including multipart, return 415. Valid but unsupported HTTP methods
+media types return 415. Valid but unsupported HTTP methods
 return 501. Routes use the configured exception mapper for these adapter errors;
 with an already composed handler, errors before context creation use the default
 mapper. Malformed HTTP syntax rejected by Potateh uses its own protocol response.

@@ -39,7 +39,7 @@ jobs:
       - name: Install Native HTTP test dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libcurl4-openssl-dev libidn2-dev
+          sudo apt-get install -y curl libcurl4-openssl-dev libidn2-dev
       - name: Check versions
         id: version
         shell: bash

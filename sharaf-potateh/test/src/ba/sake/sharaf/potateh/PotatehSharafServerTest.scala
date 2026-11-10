@@ -126,7 +126,7 @@ class PotatehSharafServerTest extends munit.FunSuite {
             ("GET", "/typed-query?x=%FF", "", "", 200),
             ("POST", "/form", "x=%ZZ", "application/x-www-form-urlencoded", 400),
             ("POST", "/typed-form", "x=%FF", "application/x-www-form-urlencoded", 200),
-            ("POST", "/form", "x=ok", "multipart/form-data; boundary=test", 415),
+            ("POST", "/form", "x=ok", "multipart/form-data; boundary=test", 400),
             ("POST", "/typed-form", "x=ok", "text/plain", 415),
             ("POST", "/json", "{", "application/json", 400),
             ("FOO", "/ok", "", "", 501),

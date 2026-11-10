@@ -10,16 +10,18 @@ class SharafRequestHandler(sharafHandler: SharafHandler) extends RequestHandler 
     val reqParams = fillReqParams(snunitRequest)
     val req = SnunitSharafRequest.create(snunitRequest)
     val requestContext = RequestContext(reqParams, req)
-    val res = sharafHandler.handle(requestContext)
-    val headers = buildHeaders(res.headerUpdates)
-    res.body match {
-      case Some(body) =>
-        val aos = new ByteArrayOutputStream
-        res.rw.write(body, aos)
-        send(snunitRequest)(StatusCode(res.status.code), aos.toByteArray(), headers)
-      case None =>
-        send(snunitRequest)(StatusCode(res.status.code), "", headers)
-    }
+    try {
+      val res = sharafHandler.handle(requestContext)
+      val headers = buildHeaders(res.headerUpdates)
+      res.body match {
+        case Some(body) =>
+          val aos = new ByteArrayOutputStream
+          res.rw.write(body, aos)
+          send(snunitRequest)(StatusCode(res.status.code), aos.toByteArray(), headers)
+        case None =>
+          send(snunitRequest)(StatusCode(res.status.code), "", headers)
+      }
+    } finally req.closeUploads()
   }
 
   private def buildHeaders(hu: HeaderUpdates): Headers = {

@@ -69,22 +69,24 @@ object PotatehSharafServer {
       executor: Option[Executor]
   ): Server = {
     val handle: ba.sake.potateh.Request => ba.sake.potateh.Response = underlying => {
-      val context =
-        try {
-          val request = PotatehSharafRequest(underlying)
-          val method = HttpMethod.values
-            .find(_.name == underlying.method)
-            .getOrElse(throw UnsupportedMethodException(underlying.method))
-          Right(RequestContext((method, request.path), request))
-        } catch {
-          case error: BadRequestException        => Left(error)
-          case error: UnsupportedMethodException => Left(error)
+      val request = PotatehSharafRequest(underlying)
+      try {
+        val context =
+          try {
+            val method = HttpMethod.values
+              .find(_.name == underlying.method)
+              .getOrElse(throw UnsupportedMethodException(underlying.method))
+            Right(RequestContext((method, request.path), request))
+          } catch {
+            case error: BadRequestException        => Left(error)
+            case error: UnsupportedMethodException => Left(error)
+          }
+        val response = context match {
+          case Right(value) => handler.handle(value)
+          case Left(error)  => bootstrapMapper.applyOrElse(error, (unmapped: Throwable) => throw unmapped)
         }
-      val response = context match {
-        case Right(value) => handler.handle(value)
-        case Left(error)  => bootstrapMapper.applyOrElse(error, (unmapped: Throwable) => throw unmapped)
-      }
-      toResponse(response, underlying.method)
+        toResponse(response, underlying.method)
+      } finally request.closeUploads()
     }
     executor match {
       case Some(value) => Server.start(config, value)(handle)

@@ -23,14 +23,18 @@ object param:
 
 // session re-exports
 export ba.sake.sharaf.session.{
-  Session, SessionConfig, SessionStore, SessionImpl,
-  InMemorySessionStore, NoOpSessionStore
+  Session,
+  SessionConfig,
+  SessionStore,
+  SessionImpl,
+  InMemorySessionStore,
+  NoOpSessionStore
 }
 
 // conversions to STTP
 extension [T](value: T)(using rw: formson.FormDataRW[T])
   def toSttpMultipart(config: formson.Config = formson.DefaultFormsonConfig): Seq[Part[BasicBodyPart]] =
-    val multiParts = value.toFormDataMap(config).flatMap { case (key, values) =>
+    val multiParts = value.toFormDataMap(config).toSeq.flatMap { case (key, values) =>
       values.map {
         case formson.FormValue.Str(value)       => multipart(key, value)
         case formson.FormValue.File(value)      => multipartFile(key, value.toFile)

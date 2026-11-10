@@ -10,6 +10,9 @@ import ba.sake.sharaf.exceptions.{BadRequestException, UnsupportedMediaTypeExcep
 
 final class PotatehSharafRequest(val underlying: ba.sake.potateh.Request) extends Request {
 
+  private val uploads = new MultipartUploads
+  private[sharaf] def closeUploads(): Unit = uploads.close()
+
   private[potateh] lazy val uri: URI =
     try {
       val target = underlying.target
@@ -47,7 +50,8 @@ final class PotatehSharafRequest(val underlying: ba.sake.potateh.Request) extend
     val contentType = underlying.headers.first("Content-Type").getOrElse("")
     val mediaType = contentType.takeWhile(_ != ';').trim
     if mediaType.equalsIgnoreCase("application/x-www-form-urlencoded") then UrlEncoded.form(bodyString)
-    else throw UnsupportedMediaTypeException("Expected application/x-www-form-urlencoded")
+    else if Multipart.isMultipart(contentType) then Multipart.parse(underlying.body, contentType, uploads)
+    else throw UnsupportedMediaTypeException("Expected application/x-www-form-urlencoded or multipart/form-data")
   }
 
 }

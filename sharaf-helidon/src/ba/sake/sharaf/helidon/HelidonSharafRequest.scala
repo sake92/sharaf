@@ -10,6 +10,9 @@ import ba.sake.sharaf.exceptions.UnsupportedMediaTypeException
 
 class HelidonSharafRequest(underlyingRequest: ServerRequest) extends Request {
 
+  private val uploads = new MultipartUploads
+  private[sharaf] def closeUploads(): Unit = uploads.close()
+
   /* *** HEADERS *** */
   def headers: Map[HttpString, Seq[String]] =
     val underlyingHeaders = underlyingRequest.headers()
@@ -40,7 +43,9 @@ class HelidonSharafRequest(underlyingRequest: ServerRequest) extends Request {
     val contentType = headers.get(HttpString("Content-Type")).flatMap(_.headOption).getOrElse("")
     val mediaType = contentType.takeWhile(_ != ';').trim
     if mediaType.equalsIgnoreCase("application/x-www-form-urlencoded") then UrlEncoded.form(bodyString)
-    else throw UnsupportedMediaTypeException("Expected application/x-www-form-urlencoded")
+    else if Multipart.isMultipart(contentType) then
+      Multipart.parse(underlyingRequest.content().inputStream(), contentType, uploads)
+    else throw UnsupportedMediaTypeException("Expected application/x-www-form-urlencoded or multipart/form-data")
 
 }
 

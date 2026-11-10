@@ -11,6 +11,9 @@ import scala.collection.immutable.SeqMap
 
 class Http4sSharafRequest(underlyingRequest: Http4sRequest) extends Request {
 
+  private val uploads = new MultipartUploads
+  private[sharaf] def closeUploads(): Unit = uploads.close()
+
   /* *** HEADERS *** */
   def headers: Map[HttpString, Seq[String]] =
     underlyingRequest.headers.headers
@@ -32,7 +35,18 @@ class Http4sSharafRequest(underlyingRequest: Http4sRequest) extends Request {
   override lazy val bodyString: String =
     underlyingRequest.body.through(fs2.text.utf8.decode).compile.string.unsafeRunSync()
 
-  def bodyFormRaw: FormDataMap =
+  override lazy val bodyFormRaw: FormDataMap =
+    val contentType = headers.get(HttpString("Content-Type")).flatMap(_.headOption).getOrElse("")
+    if Multipart.isMultipart(contentType) then
+      fs2.io
+        .toInputStreamResource(underlyingRequest.body)
+        .use { input =>
+          IO.blocking(Multipart.parse(input, contentType, uploads))
+        }
+        .unsafeRunSync()
+    else urlEncodedForm
+
+  private def urlEncodedForm: FormDataMap =
     val urlForm = underlyingRequest.as[UrlForm].unsafeRunSync()
     SeqMap.from(urlForm.values.iterator.map { case (key, values) =>
       key -> values.map(FormValue.Str.apply).toList

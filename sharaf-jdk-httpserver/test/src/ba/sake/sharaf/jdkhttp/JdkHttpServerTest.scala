@@ -92,7 +92,7 @@ class JdkHttpServerTest extends munit.FunSuite {
           scenario <- Seq(
             (contentType = "application/x-www-form-urlencoded", body = "name=%ZZ", status = 400),
             (contentType = "text/plain", body = "name=x", status = 415),
-            (contentType = "multipart/form-data; boundary=x", body = "name=x", status = 415),
+            (contentType = "multipart/form-data; boundary=x", body = "name=x", status = 400),
             (contentType = "application/x-www-form-urlencodedevil", body = "name=x", status = 415)
           )
         ) {

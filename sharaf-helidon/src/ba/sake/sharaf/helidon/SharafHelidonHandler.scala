@@ -10,8 +10,10 @@ class SharafHelidonHandler(sharafHandler: SharafHandler) extends Handler {
     val reqParams = fillReqParams(helidonReq)
     val req = HelidonSharafRequest.create(helidonReq)
     val requestContext = RequestContext(reqParams, req)
-    val res = sharafHandler.handle(requestContext)
-    ResponseUtils.writeResponse(res, helidonRes)
+    try {
+      val res = sharafHandler.handle(requestContext)
+      ResponseUtils.writeResponse(res, helidonRes)
+    } finally req.closeUploads()
   }
 
   private def fillReqParams(req: ServerRequest): RequestParams = {
