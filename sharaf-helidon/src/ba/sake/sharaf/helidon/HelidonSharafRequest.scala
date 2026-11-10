@@ -14,7 +14,6 @@ class HelidonSharafRequest(underlyingRequest: ServerRequest) extends Request {
   private val uploads = new MultipartUploads
   private[sharaf] def closeUploads(): Unit = uploads.close()
 
-  /* *** HEADERS *** */
   def headers: Map[HttpString, Seq[String]] =
     val underlyingHeaders = underlyingRequest.headers()
     underlyingHeaders.stream
@@ -28,11 +27,9 @@ class HelidonSharafRequest(underlyingRequest: ServerRequest) extends Request {
     val values = underlyingRequest.headers().all(io.helidon.http.HeaderNames.COOKIE, () => java.util.List.of[String]())
     CookieHeaders.parse(values.asScala.toSeq)
 
-  /* *** QUERY *** */
   override lazy val queryParamsRaw: QueryStringMap =
     UrlEncoded.query(underlyingRequest.query().rawValue())
 
-  /* *** BODY *** */
   override lazy val bodyString: String =
     String(underlyingRequest.content().inputStream().readAllBytes(), StandardCharsets.UTF_8)
 

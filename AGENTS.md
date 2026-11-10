@@ -74,7 +74,7 @@ deder exec -t publishLocal                 # publish jars to local ~/.ivy2
 ## Development Workflow
 
 - **Worktrees**: Create isolated git worktrees in `.worktrees/` (already gitignored)
-- **SPL/plan files**: Store and review specs/plans in `docs/superpowers/` but never commit them (also gitignored)
+- **SPL/plan files**: Never commit specs/plans
 - PRs target `main`, merge when CI passes
 
 ## Release

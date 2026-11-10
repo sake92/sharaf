@@ -10,6 +10,7 @@ class JdkHttpServerSharafServer(host: String, listenPort: Int, handler: HttpHand
   private val server = HttpServer.create(new InetSocketAddress(host, listenPort), 0)
   server.createContext("/", handler)
   // Use a fixed thread pool executor for handling requests
+  // TODO make configurable executor
   server.setExecutor(Executors.newFixedThreadPool(10))
 
   /** The bound port; available after the server starts. */

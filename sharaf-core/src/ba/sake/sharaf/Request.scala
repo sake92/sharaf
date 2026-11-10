@@ -11,11 +11,14 @@ import org.typelevel.jawn.ast.JValue
 trait Request {
 
   /* *** HEADERS *** */
+  // TODO set default implementation since now we parse it
   def headers: Map[HttpString, Seq[String]]
 
+  // TODO set default implementation since now we parse it
   def cookies: Seq[Cookie]
 
   /* *** QUERY *** */
+  // TODO set default implementation since now we parse it
   def queryParamsRaw: QueryStringMap
 
   // must be a Product (case class)
@@ -28,7 +31,10 @@ trait Request {
     catch case e: ValidsonException => throw RequestHandlingException(e)
 
   /* *** BODY *** */
+  // TODO the only abstract method
   def bodyString: String
+
+  // TODO do we want InputStream for the body as well?
 
   // JSON
   def bodyJsonRaw: JValue = bodyJson[JValue]
@@ -42,6 +48,7 @@ trait Request {
     catch case e: ValidsonException => throw RequestHandlingException(e)
 
   // FORM
+  // TODO set default implementation since now we parse it
   def bodyFormRaw: FormDataMap
 
   // must be a Product (case class)

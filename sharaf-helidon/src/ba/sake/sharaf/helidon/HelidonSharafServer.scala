@@ -60,7 +60,6 @@ object HelidonSharafServer {
   def apply(host: String, port: Int, sharafHandler: SharafHandler): HelidonSharafServer =
     new HelidonSharafServer(host, port, SharafHelidonHandler(sharafHandler))
 
-  // if need tweaking
   def apply(host: String, port: Int, sharafHelidonHandler: SharafHelidonHandler): HelidonSharafServer =
     new HelidonSharafServer(host, port, sharafHelidonHandler)
 
