@@ -2,17 +2,16 @@ package ba.sake.sharaf.undertow
 
 import java.nio.charset.StandardCharsets
 import scala.jdk.CollectionConverters.*
-import scala.collection.mutable
-import scala.collection.immutable.SeqMap
 import io.undertow.server.HttpServerExchange
-import io.undertow.server.handlers.form.FormData as UFormData
-import io.undertow.server.handlers.form.FormParserFactory
 import ba.sake.formson.*
 import ba.sake.querson.*
 import ba.sake.sharaf.*
 import ba.sake.sharaf.exceptions.*
 
 final class UndertowSharafRequest(val underlyingHttpServerExchange: HttpServerExchange) extends Request {
+
+  private val uploads = new MultipartUploads
+  private[sharaf] def closeUploads(): Unit = uploads.close()
 
   /* *** HEADERS *** */
   def headers: Map[HttpString, Seq[String]] =
@@ -26,28 +25,20 @@ final class UndertowSharafRequest(val underlyingHttpServerExchange: HttpServerEx
 
   /* *** QUERY *** */
   override lazy val queryParamsRaw: QueryStringMap =
-    underlyingHttpServerExchange.getQueryParameters.asScala.toMap.map { (k, v) =>
-      (k, v.asScala.toSeq)
-    }
+    UrlEncoded.query(underlyingHttpServerExchange.getQueryString)
 
   /* *** BODY *** */
-  private val formBodyParserFactory = locally {
-    val parserFactoryBuilder = FormParserFactory.builder
-    parserFactoryBuilder.setDefaultCharset("utf-8")
-    parserFactoryBuilder.build
-  }
 
   override lazy val bodyString: String =
     String(underlyingHttpServerExchange.getInputStream.readAllBytes(), StandardCharsets.UTF_8)
 
   override lazy val bodyFormRaw: FormDataMap =
-    // createParser returns null if content-type is not suitable
-    val parser = formBodyParserFactory.createParser(underlyingHttpServerExchange)
-    Option(parser) match
-      case None => throw UnsupportedMediaTypeException("The specified content type is not supported")
-      case Some(parser) =>
-        val uFormData = parser.parseBlocking()
-        UndertowSharafRequest.undertowFormData2FormsonMap(uFormData)
+    val contentType = headers.get(HttpString("Content-Type")).flatMap(_.headOption).getOrElse("")
+    val mediaType = contentType.takeWhile(_ != ';').trim
+    if mediaType.equalsIgnoreCase("application/x-www-form-urlencoded") then UrlEncoded.form(bodyString)
+    else if Multipart.isMultipart(contentType) then
+      Multipart.parse(underlyingHttpServerExchange.getInputStream, contentType, uploads)
+    else throw UnsupportedMediaTypeException("Expected application/x-www-form-urlencoded or multipart/form-data")
 
   override def toString(): String =
     s"UndertowSharafRequest(headers=${headers}, cookies=${cookies}, queryParamsRaw=${queryParamsRaw}, bodyString=...)"
@@ -58,21 +49,4 @@ object UndertowSharafRequest {
   def create(underlyingHttpServerExchange: HttpServerExchange): UndertowSharafRequest =
     UndertowSharafRequest(underlyingHttpServerExchange)
 
-  private[sharaf] def undertowFormData2FormsonMap(uFormData: UFormData): FormDataMap = {
-    val map = mutable.LinkedHashMap.empty[String, Seq[FormValue]]
-    uFormData.forEach { key =>
-      val values = uFormData.get(key).asScala
-      val formValues = values.map { value =>
-        if value.isFileItem then
-          val fileItem = value.getFileItem
-          if fileItem.isInMemory then
-            val byteArray = scala.util.Using.resource(fileItem.getInputStream)(_.readAllBytes())
-            FormValue.ByteArray(byteArray)
-          else FormValue.File(fileItem.getFile)
-        else FormValue.Str(value.getValue)
-      }
-      map += (key -> formValues.toSeq)
-    }
-    SeqMap.from(map)
-  }
 }

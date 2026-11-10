@@ -3,11 +3,33 @@ package ba.sake.sharaf.handlers
 import sttp.client4.quick.*
 import sttp.model.StatusCode
 import ba.sake.sharaf.*
+import ba.sake.tupson.*
 
-abstract class AbstractResponseHeadersTest extends munit.FunSuite {
-  def withServer(routes: Routes, mapper: ExceptionMapper)(check: String => Unit): Unit
+abstract class AbstractResponseHeadersTest extends munit.FunSuite with ServerFixture {
 
-  private val request = quickRequest.httpVersion(sttp.model.HttpVersion.HTTP_1_1)
+  private case class Greeting(message: String) derives JsonRW
+
+  test("JSON body headers can be preserved, overridden or removed") {
+    for scenario <- Seq(
+        (path = "json", expected = Seq("application/json; charset=utf-8")),
+        (path = "override", expected = Seq("application/vnd.example+json")),
+        (path = "remove", expected = Seq.empty[String])
+      )
+    do {
+      val routes = Routes {
+        case GET -> Path("json") => Response.withBody(Greeting("Hello Scala"))
+        case GET -> Path("override") =>
+          Response.withBody(Greeting("Hello Scala")).settingHeader("content-type", "application/vnd.example+json")
+        case GET -> Path("remove") => Response.withBody(Greeting("Hello Scala")).removingHeader("CONTENT-TYPE")
+      }
+      withServer(routes, ExceptionMapper.default) { base =>
+        val response = request.get(uri"$base/${scenario.path}").send(httpBackend)
+        assertEquals(response.code, StatusCode.Ok)
+        assertEquals(response.body.parseJson[Greeting], Greeting("Hello Scala"))
+        assertEquals(response.headers("Content-Type"), scenario.expected)
+      }
+    }
+  }
 
   private val scenarios = Seq(
     (name = "body headers", response = Response.withBody("hello"), expected = Seq("text/plain; charset=utf-8")),
@@ -41,7 +63,7 @@ abstract class AbstractResponseHeadersTest extends munit.FunSuite {
     test(scenario.name) {
       val routes = Routes { case GET -> Path() => scenario.response }
       withServer(routes, ExceptionMapper.default) { baseUrl =>
-        val response = request.get(uri"$baseUrl/").send()
+        val response = request.get(uri"$baseUrl/").send(httpBackend)
         assertEquals(response.code, StatusCode.Ok)
         assertEquals(response.body, "hello")
         assertEquals(response.headers("Content-Type"), scenario.expected)
@@ -61,7 +83,7 @@ abstract class AbstractResponseHeadersTest extends munit.FunSuite {
         .settingCookie(Cookie("third", "three"))
       val routes = Routes { case GET -> Path() => result }
       withServer(routes, ExceptionMapper.default) { baseUrl =>
-        val response = request.get(uri"$baseUrl/").send()
+        val response = request.get(uri"$baseUrl/").send(httpBackend)
         assertEquals(response.code, StatusCode.Ok)
         assertEquals(response.body, if (withBody) "hello" else "")
         assertEquals(response.headers("X-Values").sorted, Seq("first", "second"))

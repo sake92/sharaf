@@ -15,6 +15,8 @@ private[sharaf] object MultipartRequests {
     try
       check { (path, body) =>
         Files.write(upload, body)
+        // curl may leave the output file untouched for a bodyless response such as 304.
+        Files.write(download, Array.emptyByteArray)
         val process = new ProcessBuilder(
           "curl",
           "--silent",

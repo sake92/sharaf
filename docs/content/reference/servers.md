@@ -56,7 +56,7 @@ remain specific to Undertow's cookie support.
 
 ## Query strings and URL-encoded forms
 
-Potateh, JDK HTTP server, Helidon and snunit share raw query and
+Undertow, Potateh, JDK HTTP server, Helidon and snunit share raw query and
 `application/x-www-form-urlencoded` parsing. Names and values are decoded once
 with UTF-8 after splitting on `&` and the first `=`. Repeated fields, empty names
 and empty values are retained; empty separator entries are ignored. Form keys
@@ -71,14 +71,16 @@ and the UTF-8 replacement policy in the
 [web form parsing standard](https://url.spec.whatwg.org/#application/x-www-form-urlencoded-parsing).
 Broken percent escapes are rejected more strictly than that standard's parser.
 Potateh previously rejected malformed query/form UTF-8 with 400; it now uses the
-same replacement policy as the other three adapters.
+same replacement policy as the other adapters.
 
-Undertow and http4s retain their server-library URL-encoded parsers. Path decoding is separate
-and currently differs between adapters.
+http4s uses its server-library query parser and the shared URL-encoded form parser.
+Undertow, http4s, JDK HTTP server, Helidon and Potateh split raw paths into segments
+before decoding each segment once. Encoded slashes remain within their segment;
+`+` remains a literal plus in paths.
 
 ## Multipart forms
 
-JDK HTTP server, Potateh, Helidon, snunit and http4s share a byte-oriented
+All adapters share a byte-oriented
 `multipart/form-data` parser. Text fields are decoded as UTF-8. Every part with a
 `filename` parameter becomes a temporary `FormValue.File(Path)`, including empty
 files. Repeated fields and the first insertion order of keys are retained.
@@ -104,16 +106,15 @@ returns 413 through the default or JSON exception mapper. Unsupported part
 transfer encodings such as base64 are rejected with 400; identity encodings
 (`binary`, `8bit`, `7bit`) leave the bytes unchanged.
 
-Temporary uploads are deleted on parsing failures and after the adapter finishes
-response serialization, including handler and writer failures. Potateh 0.2.0
-has no exchange-completion hook: its uploads are deleted when the synchronous
-Sharaf handler returns. Read or copy Potateh uploads in the handler; do not use
-an upload path as a deferred response body. All adapters require an
-application-owned copy for background work or permanent storage.
+Temporary uploads are deleted on parsing failures and after response processing,
+including handler and writer failures. Potateh uses its response-completion hook
+so uploads remain available to deferred response writers and are also cleaned
+when the engine skips the body. All adapters require an application-owned copy
+for background work or permanent storage.
 
-Undertow retains its own parser, limits, and cleanup. Its default threshold
-stores nonempty uploads on disk but represents empty uploads as `ByteArray`.
-Applications configuring in-memory Undertow uploads retain that behavior.
+Undertow uses the shared parser and limits, including `FormValue.File(Path)` for
+empty uploads. Undertow-specific in-memory upload thresholds do not apply to
+Sharaf form parsing.
 
 See [upload a file](/howtos/upload-file.html) for typed `Path` parsing.
 

@@ -1,28 +1,15 @@
 package ba.sake.sharaf.undertow
 
-import sttp.model.*
-import sttp.client4.quick.*
 import ba.sake.sharaf.*
-import ba.sake.sharaf.routing.*
-import ba.sake.sharaf.utils.*
+import ba.sake.sharaf.handlers.AbstractWebJarsTest
+import ba.sake.sharaf.utils.NetworkUtils
 
-class WebJarsTest extends munit.FunSuite {
-
-  val port = NetworkUtils.getFreePort()
-  val baseUrl = s"http://localhost:$port"
-  val routes = Routes { case GET -> Path() =>
-    Response.withBody("WebJars!")
-  }
-
-  val server = UndertowSharafServer("localhost", port, routes)
-
-  override def beforeAll(): Unit = server.start()
-
-  override def afterAll(): Unit = server.stop()
-
-  test("WebJars should work") {
-    val res = quickRequest.get(uri"${baseUrl}/jquery/4.0.0/jquery.js").send()
-    assert(res.body.length > 100)
-    assertEquals(res.headers(HeaderNames.ContentType), Seq("text/javascript"))
+class WebJarsTest extends AbstractWebJarsTest {
+  override def withRoutesServer(routes: Routes)(check: String => Unit): Unit = {
+    val port = NetworkUtils.getFreePort()
+    val server = UndertowSharafServer("127.0.0.1", port, routes)
+    server.start()
+    try check(s"http://127.0.0.1:$port")
+    finally server.stop()
   }
 }

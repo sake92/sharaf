@@ -20,7 +20,7 @@ class HelidonSharafRequest(underlyingRequest: ServerRequest) extends Request {
     underlyingHeaders.stream
       .toScala(LazyList)
       .map { header =>
-        HttpString(header.name()) -> header.values().split(",").toSeq
+        HttpString(header.name()) -> header.allValues().asScala.toSeq
       }
       .toMap
 

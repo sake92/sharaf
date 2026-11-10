@@ -6,10 +6,7 @@ import sttp.client4.quick.*
 import sttp.model.StatusCode
 import ba.sake.sharaf.*
 
-abstract class AbstractCookieTest extends munit.FunSuite {
-  def withServer(routes: Routes, mapper: ExceptionMapper)(check: String => Unit): Unit
-
-  private val request = quickRequest.httpVersion(sttp.model.HttpVersion.HTTP_1_1)
+abstract class AbstractCookieTest extends munit.FunSuite with ServerFixture {
 
   private val routes = Routes {
     case GET -> Path("request") =>
@@ -42,7 +39,7 @@ abstract class AbstractCookieTest extends munit.FunSuite {
       val response = request
         .get(uri"$baseUrl/request")
         .header("Cookie", "token=a=b==; empty=; opaque=a+b%2Fc; other=two")
-        .send()
+        .send(httpBackend)
       assertEquals(response.code, StatusCode.Ok)
       assertEquals(response.body, "empty=|opaque=a+b%2Fc|other=two|token=a=b==")
     }
@@ -54,7 +51,7 @@ abstract class AbstractCookieTest extends munit.FunSuite {
         .get(uri"$baseUrl/request")
         .header("Cookie", "first=one")
         .header("Cookie", "second=two", sttp.client4.DuplicateHeaderBehavior.Add)
-        .send()
+        .send(httpBackend)
       assertEquals(response.code, StatusCode.Ok)
       assertEquals(response.body, "first=one|second=two")
     }
@@ -62,7 +59,7 @@ abstract class AbstractCookieTest extends munit.FunSuite {
 
   test("absent cookies") {
     withServer(routes, ExceptionMapper.default) { baseUrl =>
-      val response = request.get(uri"$baseUrl/request").send()
+      val response = request.get(uri"$baseUrl/request").send(httpBackend)
       assertEquals(response.code, StatusCode.Ok)
       assertEquals(response.body, "")
     }
@@ -70,7 +67,7 @@ abstract class AbstractCookieTest extends munit.FunSuite {
 
   test("response cookies preserve attributes and existing headers") {
     withServer(routes, ExceptionMapper.default) { baseUrl =>
-      val response = request.get(uri"$baseUrl/response").send()
+      val response = request.get(uri"$baseUrl/response").send(httpBackend)
       assertEquals(response.code, StatusCode.Ok)
       assertEquals(response.body, "cookies")
       val cookies = response.headers.filter(_.is("Set-Cookie")).map(_.value)
@@ -100,7 +97,7 @@ abstract class AbstractCookieTest extends munit.FunSuite {
 
   test("cookies can be removed without a response body") {
     withServer(routes, ExceptionMapper.default) { baseUrl =>
-      val response = request.get(uri"$baseUrl/remove").send()
+      val response = request.get(uri"$baseUrl/remove").send(httpBackend)
       assertEquals(response.code, StatusCode.Ok)
       val cookies = response.headers.filter(_.is("Set-Cookie")).map(_.value)
       assertEquals(cookies.size, 2)

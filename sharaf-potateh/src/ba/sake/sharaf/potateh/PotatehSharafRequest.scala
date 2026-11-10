@@ -20,12 +20,8 @@ final class PotatehSharafRequest(val underlying: ba.sake.potateh.Request) extend
       URI.create(absolute)
     } catch case _: IllegalArgumentException => throw BadRequestException("Invalid request target")
 
-  private[potateh] def path: Path = {
-    val raw = Option(uri.getRawPath).getOrElse("")
-    val segments = raw.stripPrefix("/").split("/")
-    if segments.sameElements(Array("")) then Path()
-    else Path(segments.map(segment => RequestDecoding.component(segment, plusAsSpace = false))*)
-  }
+  private[potateh] def path: Path =
+    RequestDecoding.path(Option(uri.getRawPath).getOrElse(""))
 
   override lazy val headers: Map[HttpString, Seq[String]] =
     underlying.headers.fields.groupMap { case (name, _) => HttpString(name) } { case (_, value) => value }

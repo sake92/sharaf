@@ -2,18 +2,8 @@ package ba.sake.sharaf.handlers
 
 import sttp.client4.quick.*
 import ba.sake.sharaf.*
-import ba.sake.sharaf.utils.NetworkUtils
 
-abstract class AbstractSessionHandlerTest extends munit.FunSuite {
-
-  val port: Int = NetworkUtils.getFreePort()
-  def baseUrl: String = s"http://localhost:${port}"
-
-  def startServer(): Unit
-  def stopServer(): Unit
-
-  override def beforeAll(): Unit = startServer()
-  override def afterAll(): Unit = stopServer()
+abstract class AbstractSessionHandlerTest extends munit.FunSuite with ServerFixture {
 
   val routes = Routes {
     case GET -> Path("getopt-session-value") =>
@@ -35,17 +25,18 @@ abstract class AbstractSessionHandlerTest extends munit.FunSuite {
       Response.withBody(Session.current.id)
   }
 
-  private final class StatefulClient {
+  private final class StatefulClient(baseUrl: String) {
+    private val template = request
     private var sessionCookie: Option[String] = None
 
     def send(path: String): String = {
       // Build URL with separate path segments to avoid encoding slashes
       val fullUrl = path.split("/").foldLeft(uri"$baseUrl")(_.addPath(_))
       val request = sessionCookie
-        .fold(quickRequest.get(fullUrl)) { cookieHeader =>
-          quickRequest.get(fullUrl).header("Cookie", cookieHeader)
+        .fold(template.get(fullUrl)) { cookieHeader =>
+          template.get(fullUrl).header("Cookie", cookieHeader)
         }
-      val response = request.send()
+      val response = request.send(httpBackend)
       response.header("Set-Cookie").foreach { setCookieHeader =>
         val cookiePair = setCookieHeader
           .split(";", 2)
@@ -59,8 +50,10 @@ abstract class AbstractSessionHandlerTest extends munit.FunSuite {
     }
   }
 
-  private def withStatefulClient[T](f: StatefulClient => T): T =
-    f(new StatefulClient)
+  private def withStatefulClient(check: StatefulClient => Unit): Unit = {
+    val handler = SharafHandler.sessions(SharafHandler.routes(routes), config = SessionConfig.default.withSecure(false))
+    withHandler(handler)(base => check(new StatefulClient(base)))
+  }
 
   test("getOpt returns 'not found' when key is absent") {
     withStatefulClient { client =>

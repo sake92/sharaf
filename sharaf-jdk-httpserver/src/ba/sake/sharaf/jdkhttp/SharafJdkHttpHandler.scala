@@ -24,14 +24,7 @@ final class SharafJdkHttpHandler(sharafHandler: SharafHandler, next: Option[Http
 
   private def fillReqParams(exchange: HttpExchange): RequestParams = {
     val method = HttpMethod.valueOf(exchange.getRequestMethod)
-    val relPath =
-      val path = exchange.getRequestURI.getPath
-      if path.startsWith("/") then path.drop(1) else path
-    val pathSegments = relPath.split("/")
-    val path =
-      if pathSegments.size == 1 && pathSegments.head == ""
-      then Path()
-      else Path(pathSegments*)
+    val path = RequestDecoding.path(exchange.getRequestURI.getRawPath)
     (method, path)
   }
 }

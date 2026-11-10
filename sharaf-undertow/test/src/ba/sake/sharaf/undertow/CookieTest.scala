@@ -1,0 +1,5 @@
+package ba.sake.sharaf.undertow
+
+import ba.sake.sharaf.handlers.AbstractCookieTest
+
+class CookieTest extends AbstractCookieTest with UndertowServerFixture

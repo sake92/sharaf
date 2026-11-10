@@ -10,7 +10,7 @@ def SharafHttpApp(sharafHandler: SharafHandler) =
   Kleisli[IO, Http4sRequest, Http4sResponse] { (http4sRequest: Http4sRequest) =>
     IO(Http4sSharafRequest(http4sRequest)).bracket { request =>
       for
-        path <- IO.pure(Path(http4sRequest.uri.path.segments.map(_.encoded)*))
+        path <- IO.pure(RequestDecoding.path(http4sRequest.uri.path.renderString))
         method <- IO.pure(http4sRequest.method match {
           case org.http4s.Method.GET     => HttpMethod.GET
           case org.http4s.Method.POST    => HttpMethod.POST

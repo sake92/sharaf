@@ -1,34 +1,20 @@
 package ba.sake.sharaf.potateh
 
-import java.io.{BufferedInputStream, ByteArrayOutputStream}
-import java.net.{InetSocketAddress, Socket}
-import java.nio.charset.StandardCharsets.{UTF_8, ISO_8859_1}
+import java.net.InetSocketAddress
+import java.nio.file.{Files, Path as NioPath}
 import scala.util.Using
 import scala.concurrent.duration.*
 import java.util.concurrent.{CountDownLatch, Executor, Executors, RejectedExecutionException, TimeUnit}
-import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.{AtomicBoolean, AtomicInteger, AtomicReference}
 import sttp.model.StatusCode
-import sttp.client4.quick.*
 import ba.sake.potateh.{Server, ServerConfig}
 import ba.sake.sharaf.*
 import ba.sake.tupson.*
-import ba.sake.querson.*
-import ba.sake.formson.*
+import ba.sake.sharaf.handlers.HttpConnection
 
 class PotatehSharafServerTest extends munit.FunSuite {
-  case class Params(x: String) derives QueryStringRW, FormDataRW
-  case class Message(value: String) derives JsonRW
-  case class JsonItem(id: Int, text: String, tags: Seq[String]) derives JsonRW
-  case class JsonPayload(items: Seq[JsonItem], count: Int) derives JsonRW
-
   private val routes = Routes {
     case GET -> Path("ok")             => Response.withBody("ok")
-    case GET -> Path("query")          => Response.withBody(Request.current.queryParamsRaw("a").mkString("|"))
-    case GET -> Path("typed-query")    => Response.withBody(Request.current.queryParams[Params].x)
-    case POST -> Path("form")          => Response.withBody(Request.current.bodyFormRaw("x").mkString("|"))
-    case POST -> Path("typed-form")    => Response.withBody(Request.current.bodyForm[Params].x)
-    case POST -> Path("json")          => Response.withBody(Request.current.bodyJson[Message])
-    case GET -> Path("fail")           => throw new IllegalArgumentException("private application error")
     case GET -> Path("path", value)    => Response.withBody(value)
     case GET -> Path("length")         => Response.withBody("ok").settingHeader("Content-Length", "2")
     case GET -> Path("unicode-length") => Response.withBody("ć").settingHeader("Content-Length", "2")
@@ -45,11 +31,6 @@ class PotatehSharafServerTest extends munit.FunSuite {
         .settingHeader("Transfer-Encoding", "chunked")
     case GET -> Path("close")      => Response.withBody("ok").settingHeader("Connection", "close")
     case GET -> Path("bad-length") => Response.withBody("ok").settingHeader("Content-Length", "-2")
-    case GET -> Path("sse") =>
-      val sender = SseSender()
-      sender.send(ServerSentEvent.Message("hello"))
-      sender.send(ServerSentEvent.Done())
-      Response.withBody(sender)
     case GET -> Path("hop") =>
       Response
         .withBody("ok")
@@ -68,20 +49,9 @@ class PotatehSharafServerTest extends munit.FunSuite {
     finally server.stop()
   }
 
-  test("real adapter handles a normal request through sttp") {
-    withServer() { server =>
-      val response = quickRequest
-        .get(uri"http://127.0.0.1:${server.address.getPort}/ok")
-        .httpVersion(sttp.model.HttpVersion.HTTP_1_1)
-        .send()
-      assertEquals(response.code.code, 200)
-      assertEquals(response.body, "ok")
-    }
-  }
-
   test("explicit lengths use UTF-8 bytes and preserve keep-alive framing") {
     withServer() { server =>
-      Using.resource(new Connection(server)) { connection =>
+      Using.resource(new HttpConnection(server.address)) { connection =>
         for ((path, expected) <- Seq("/length" -> "ok", "/unicode-length" -> "ć", "/ok" -> "ok")) {
           val response = connection.request("GET", path)
           assertEquals(response.status, 200)
@@ -92,20 +62,9 @@ class PotatehSharafServerTest extends munit.FunSuite {
     }
   }
 
-  test("SSE delivers events and completes") {
-    withServer() { server =>
-      Using.resource(new Connection(server)) { connection =>
-        val response = connection.request("GET", "/sse")
-        assertEquals(response.status, 200)
-        assertEquals(response.headers.get("content-type"), Some("text/event-stream"))
-        assertEquals(response.body, "data: hello\n\nevent: stop\ndata:\n\n")
-      }
-    }
-  }
-
   test("engine-owned and Connection-nominated headers do not leak") {
     withServer() { server =>
-      Using.resource(new Connection(server)) { connection =>
+      Using.resource(new HttpConnection(server.address)) { connection =>
         val response = connection.request("GET", "/hop")
         assertEquals(response.status, 200)
         assertEquals(response.body, "ok")
@@ -117,70 +76,22 @@ class PotatehSharafServerTest extends munit.FunSuite {
     }
   }
 
-  for ((name, mapper) <- Seq("text" -> ExceptionMapper.default, "json" -> ExceptionMapper.json)) {
-    test(s"$name mapper handles malformed request data and preserves server errors") {
+  test("bootstrap rejects unsupported methods and invalid UTF-8 paths with either mapper") {
+    for mapper <- Seq(ExceptionMapper.default, ExceptionMapper.json) do {
       withServer(mapper) { server =>
-        for (
-          (method, path, body, contentType, status) <- Seq(
-            ("GET", "/query?a=%FF", "", "", 200),
-            ("GET", "/typed-query?x=%FF", "", "", 200),
-            ("POST", "/form", "x=%ZZ", "application/x-www-form-urlencoded", 400),
-            ("POST", "/typed-form", "x=%FF", "application/x-www-form-urlencoded", 200),
-            ("POST", "/form", "x=ok", "multipart/form-data; boundary=test", 400),
-            ("POST", "/typed-form", "x=ok", "text/plain", 415),
-            ("POST", "/json", "{", "application/json", 400),
-            ("FOO", "/ok", "", "", 501),
-            ("GET", "/fail", "", "", 500),
-            ("GET", "/ok", "", "", 200)
+        for scenario <- Seq(
+            (method = "FOO", target = "/ok", status = 501),
+            (method = "GET", target = "/path/%FF", status = 400),
+            (method = "GET", target = "/path/%C0%AF", status = 400),
+            (method = "GET", target = "/path/%ED%A0%80", status = 400)
           )
-        ) {
-          Using.resource(new Connection(server)) { connection =>
-            val response = connection.request(method, path, body, contentType)
-            assertEquals(response.status, status, s"$method $path $body")
-            assert(!response.body.contains("private application error"))
-            if name == "json" && status != 200 then {
-              val problem = response.body.parseJson[ba.sake.sharaf.exceptions.ProblemDetails]
-              assertEquals(problem.status, status)
-            }
+        do
+          Using.resource(new HttpConnection(server.address)) { connection =>
+            val response = connection.request(scenario.method, scenario.target)
+            assertEquals(response.status, scenario.status)
+            if mapper == ExceptionMapper.json then
+              assertEquals(response.body.parseJson[ba.sake.sharaf.exceptions.ProblemDetails].status, scenario.status)
           }
-        }
-      }
-    }
-  }
-
-  test("query decoding preserves repetition, empty values, plus and Unicode") {
-    withServer() { server =>
-      Using.resource(new Connection(server)) { connection =>
-        val response = connection.request("GET", "/query?a=one+two&a=&a=%C4%87&a=%252F")
-        assertEquals(response.status, 200)
-        assertEquals(response.body, "one two||ć|%2F")
-      }
-    }
-  }
-
-  test("query and form UTF-8 use replacement while malformed escapes still fail") {
-    withServer() { server =>
-      Using.resource(new Connection(server)) { connection =>
-        assertEquals(connection.request("GET", "/typed-query?x=%FF").body, "�")
-        val form =
-          connection.request("POST", "/typed-form", "x=%FF", "Application/X-WWW-Form-Urlencoded; charset=UTF-8")
-        assertEquals(form.status, 200)
-        assertEquals(form.body, "�")
-      }
-    }
-  }
-
-  test("paths split before strict decoding and retain plus and single decoding") {
-    withServer() { server =>
-      Using.resource(new Connection(server)) { connection =>
-        for ((path, value) <- Seq("a%2Fb" -> "a/b", "a+b" -> "a+b", "%252F" -> "%2F", "%C4%87" -> "ć")) {
-          val response = connection.request("GET", s"/path/$path")
-          assertEquals(response.status, 200)
-          assertEquals(response.body, value)
-        }
-        for (path <- Seq("%FF", "%C0%AF", "%ED%A0%80")) {
-          assertEquals(connection.request("GET", s"/path/$path").status, 400)
-        }
       }
     }
   }
@@ -188,19 +99,19 @@ class PotatehSharafServerTest extends munit.FunSuite {
   test("protocol-level malformed URI returns 400 and closes; server recovers") {
     withServer() { server =>
       for (target <- Seq("/query?a=%ZZ", "/path/%ZZ")) {
-        Using.resource(new Connection(server)) { connection =>
+        Using.resource(new HttpConnection(server.address)) { connection =>
           val response = connection.request("GET", target)
           assertEquals(response.status, 400)
           assertEquals(response.headers.get("connection"), Some("close"))
         }
       }
-      Using.resource(new Connection(server))(c => assertEquals(c.request("GET", "/ok").body, "ok"))
+      Using.resource(new HttpConnection(server.address))(c => assertEquals(c.request("GET", "/ok").body, "ok"))
     }
   }
 
   test("HEAD and bodyless status codes preserve the next response") {
     withServer() { server =>
-      Using.resource(new Connection(server)) { connection =>
+      Using.resource(new HttpConnection(server.address)) { connection =>
         val head = connection.request("HEAD", "/head")
         assertEquals(head.status, 200)
         assertEquals(head.headers.get("content-length"), Some("2"))
@@ -225,12 +136,12 @@ class PotatehSharafServerTest extends munit.FunSuite {
   test("invalid or contradictory framing fails safely before the body") {
     withServer() { server =>
       for (path <- Seq("/bad-length", "/conflict", "/close")) {
-        Using.resource(new Connection(server)) { connection =>
+        Using.resource(new HttpConnection(server.address)) { connection =>
           assertEquals(connection.request("GET", path).status, 500)
         }
       }
       for (path <- Seq("/short", "/long")) {
-        Using.resource(new Connection(server)) { connection =>
+        Using.resource(new HttpConnection(server.address)) { connection =>
           connection.send("GET", path)
           // A buffered head may never reach the peer when writing fails. Either way, no
           // complete body or second response may follow the mismatched length.
@@ -239,7 +150,7 @@ class PotatehSharafServerTest extends munit.FunSuite {
           assert(!wire.endsWith("\r\n\r\nok"))
         }
       }
-      Using.resource(new Connection(server))(c => assertEquals(c.request("GET", "/ok").body, "ok"))
+      Using.resource(new HttpConnection(server.address))(c => assertEquals(c.request("GET", "/ok").body, "ok"))
     }
   }
 
@@ -249,7 +160,7 @@ class PotatehSharafServerTest extends munit.FunSuite {
       Response.withBody("custom").withStatus(StatusCode.BadRequest)
     }
     withServer(mapper) { server =>
-      Using.resource(new Connection(server)) { connection =>
+      Using.resource(new HttpConnection(server.address)) { connection =>
         for ((method, target) <- Seq("FOO" -> "/ok", "GET" -> "/path/%FF")) {
           val response = connection.request(method, target)
           assertEquals(response.status, 400)
@@ -262,7 +173,7 @@ class PotatehSharafServerTest extends munit.FunSuite {
   test("composed handler uses default mapper for bootstrap failures") {
     val server = PotatehSharafServer.start(config, SharafHandler.routes(routes))
     try
-      Using.resource(new Connection(server)) { connection =>
+      Using.resource(new HttpConnection(server.address)) { connection =>
         assertEquals(connection.request("FOO", "/ok").status, 501)
         assertEquals(connection.request("GET", "/path/%FF").status, 400)
         assertEquals(connection.request("GET", "/ok").body, "ok")
@@ -282,7 +193,7 @@ class PotatehSharafServerTest extends munit.FunSuite {
         val server =
           if useRoutes then PotatehSharafServer.start(config, routes, executor = executor)
           else PotatehSharafServer.start(config, SharafHandler.routes(routes), executor)
-        try Using.resource(new Connection(server))(c => assertEquals(c.request("GET", "/ok").body, "ok"))
+        try Using.resource(new HttpConnection(server.address))(c => assertEquals(c.request("GET", "/ok").body, "ok"))
         finally server.stop()
       }
       assertEquals(dispatched.get(), 2)
@@ -296,19 +207,39 @@ class PotatehSharafServerTest extends munit.FunSuite {
     }
   }
 
-  test("executor rejection closes the admitted connection") {
+  test("executor rejection closes the admitted connection and the server remains usable") {
     val rejected = new CountDownLatch(1)
-    val executor: Executor = _ => {
-      rejected.countDown()
-      throw new RejectedExecutionException("test rejection")
+    val dispatched = new AtomicInteger()
+    val pool = Executors.newSingleThreadExecutor()
+    val executor: Executor = task => {
+      if dispatched.getAndIncrement() == 0 then {
+        rejected.countDown()
+        throw new RejectedExecutionException("test rejection")
+      } else pool.execute(task)
     }
-    val server = PotatehSharafServer.start(config, SharafHandler.routes(routes), executor)
-    try
-      Using.resource(new Connection(server)) { connection =>
-        assert(rejected.await(5, TimeUnit.SECONDS))
-        assertEquals(connection.remaining(), "")
-      }
-    finally server.stop()
+    try {
+      val server = PotatehSharafServer.start(config, SharafHandler.routes(routes), executor)
+      try {
+        // Native may report the immediate rejected close during connect or read.
+        try
+          Using.resource(new HttpConnection(server.address)) { connection =>
+            val remaining = connection.remaining()
+            assertEquals(remaining, "")
+          }
+        catch case _: java.net.SocketException => ()
+        val wasRejected = rejected.await(5, TimeUnit.SECONDS)
+        assert(wasRejected, "The server must actually reject an admitted connection")
+        Using.resource(new HttpConnection(server.address)) { connection =>
+          val response = connection.request("GET", "/ok")
+          assertEquals(response.status, 200)
+          assertEquals(response.body, "ok")
+        }
+      } finally server.stop()
+    } finally {
+      pool.shutdownNow()
+      val terminated = pool.awaitTermination(5, TimeUnit.SECONDS)
+      assert(terminated)
+    }
   }
 
   test("SSE flushes before completion and stops pinging after disconnect") {
@@ -327,7 +258,7 @@ class PotatehSharafServerTest extends munit.FunSuite {
     }
     val server = PotatehSharafServer.start(config, streaming)
     try {
-      Using.resource(new Connection(server)) { connection =>
+      Using.resource(new HttpConnection(server.address)) { connection =>
         connection.send("GET", "/events")
         assertEquals(connection.line().split(" ")(1), "200")
         var line = connection.line()
@@ -348,129 +279,79 @@ class PotatehSharafServerTest extends munit.FunSuite {
   test("SSE completion callback runs once and stops the ping producer") {
     val completed = new CountDownLatch(1)
     val errors = new AtomicInteger()
+    val completions = new AtomicInteger()
     val sender = SseSender()
       .withPingInterval(20.millis)
-      .onComplete(() => completed.countDown())
+      .onComplete(() => {
+        completions.incrementAndGet()
+        completed.countDown()
+      })
       .onError(_ => { errors.incrementAndGet(); () })
     sender.send(ServerSentEvent.Message("done"))
     sender.send(ServerSentEvent.Done())
     val streaming = Routes { case GET -> Path("events") => Response.withBody(sender) }
     val server = PotatehSharafServer.start(config, streaming)
     try
-      Using.resource(new Connection(server)) { connection =>
-        assertEquals(connection.request("GET", "/events").status, 200)
-        assert(completed.await(5, TimeUnit.SECONDS))
+      Using.resource(new HttpConnection(server.address)) { connection =>
+        val response = connection.request("GET", "/events")
+        assertEquals(response.status, 200)
+        val callbackRan = completed.await(5, TimeUnit.SECONDS)
+        assert(callbackRan)
         assertEquals(errors.get(), 0)
         assert(sender._isDone)
-        assertEquals(sender.queue.size(), 0)
+        // Pings can be queued behind Done before completion. They must stop accumulating afterwards.
+        val queued = sender.queue.size()
         Thread.sleep(100)
-        assertEquals(sender.queue.size(), 0)
+        assertEquals(sender.queue.size(), queued)
+        assertEquals(completions.get(), 1)
       }
     finally server.stop()
   }
 
-  test("concurrent JSON responses retain large nested payloads") {
-    val items = (0 until 50).map(i => JsonItem(i, "ćž\n\"\\" * 40, Seq("one", "two")))
-    val expected = JsonPayload(items, 50)
-    val jsonRoutes = Routes { case GET -> Path("json") => Response.withBody(expected) }
-    val server = PotatehSharafServer.start(config, jsonRoutes)
-    val pool = Executors.newFixedThreadPool(32)
-    val finished = new CountDownLatch(32)
-    val failures = new java.util.concurrent.ConcurrentLinkedQueue[Throwable]()
-    try {
-      for (_ <- 0 until 32) pool.execute(() => {
-        try
-          Using.resource(new Connection(server)) { connection =>
-            for (_ <- 0 until 10) {
-              val response = connection.request("GET", "/json")
-              assertEquals(response.status, 200)
-              assertEquals(response.body.parseJson[JsonPayload], expected)
-            }
+  for scenario <- Seq(
+      (name = "HEAD", method = "HEAD", status = 200),
+      (name = "204", method = "POST", status = 204),
+      (name = "304", method = "POST", status = 304),
+      (name = "response conversion failure", method = "POST", status = 500)
+    )
+  do {
+    test(s"upload cleanup runs when the response writer is skipped: ${scenario.name}") {
+      val observed = new AtomicReference[NioPath]()
+      val attempted = new AtomicBoolean(false)
+      val uploadRoutes = Routes { case _ -> Path("upload") =>
+        val file = Request.current
+          .bodyFormRaw("file")
+          .collectFirst { case ba.sake.formson.FormValue.File(path) =>
+            path
           }
-        catch {
-          case scala.util.control.NonFatal(error) =>
-            failures.add(error)
-            ()
-        } finally finished.countDown()
-      })
-      // MUnit evaluates assert's by-name argument while holding the suite monitor.
-      // Wait outside it so client workers can make their own assertions.
-      val allFinished = finished.await(20, TimeUnit.SECONDS)
-      assert(allFinished, "concurrent requests did not finish")
-      if !failures.isEmpty then throw failures.peek()
-    } finally {
-      server.stop()
-      pool.shutdownNow()
-      val terminated = pool.awaitTermination(5, TimeUnit.SECONDS)
-      assert(terminated)
+          .get
+        observed.set(file)
+        val response = Response.withBody(new java.io.InputStream {
+          override def read(): Int = {
+            attempted.set(true)
+            -1
+          }
+        })
+        if scenario.status == 500 then response.settingHeader("Content-Length", "-2")
+        else response.withStatus(StatusCode(scenario.status))
+      }
+      val server = PotatehSharafServer.start(config, uploadRoutes)
+      try {
+        Using.resource(new HttpConnection(server.address)) { connection =>
+          val body =
+            "--boundary\r\nContent-Disposition: form-data; name=\"file\"; filename=\"test.txt\"\r\n\r\nhello\r\n--boundary--\r\n"
+          val response = connection.request(scenario.method, "/upload", body, "multipart/form-data; boundary=boundary")
+          assertEquals(response.status, scenario.status)
+          if scenario.status != 500 then assertEquals(response.body, "")
+          assert(!attempted.get(), "The engine should skip the response writer")
+          val file = observed.get()
+          assert(file != null, "The route must parse the upload")
+          val deadline = System.nanoTime() + 5.seconds.toNanos
+          while Files.exists(file) && System.nanoTime() < deadline do Thread.sleep(5)
+          assert(!Files.exists(file), s"Upload survived response completion: $file")
+        }
+      } finally server.stop()
     }
   }
 
-  private case class WireResponse(status: Int, headers: Map[String, String], body: String)
-
-  // Raw sockets preserve malformed targets and expose framing hidden by HTTP clients.
-  private class Connection(server: Server) extends AutoCloseable {
-    val socket = new Socket()
-    socket.connect(server.address, 5000)
-    socket.setSoTimeout(5000)
-    private val input = new BufferedInputStream(socket.getInputStream)
-    private val output = socket.getOutputStream
-
-    def request(method: String, target: String, body: String = "", contentType: String = ""): WireResponse = {
-      send(method, target, body, contentType)
-      readResponse(method == "HEAD")
-    }
-
-    def send(method: String, target: String, body: String = "", contentType: String = ""): Unit = {
-      val bytes = body.getBytes(UTF_8)
-      val contentHeader = if contentType.isEmpty then "" else s"Content-Type: $contentType\r\n"
-      output.write(
-        s"$method $target HTTP/1.1\r\nHost: localhost\r\nContent-Length: ${bytes.length}\r\n$contentHeader\r\n"
-          .getBytes(ISO_8859_1)
-      )
-      if bytes.nonEmpty then output.write(bytes)
-      output.flush()
-    }
-
-    def remaining(): String = new String(input.readAllBytes(), UTF_8)
-    def readBytes(size: Int): String = new String(input.readNBytes(size), UTF_8)
-
-    def line(): String = {
-      val result = new ByteArrayOutputStream()
-      var next = input.read()
-      while next != '\n' && next != -1 do {
-        if next != '\r' then result.write(next)
-        next = input.read()
-      }
-      assert(next != -1, "unexpected connection close")
-      result.toString("ISO-8859-1")
-    }
-
-    def readResponse(head: Boolean = false): WireResponse = {
-      val status = line().split(" ")(1).toInt
-      val headers = Map.newBuilder[String, String]
-      var header = line()
-      while header.nonEmpty do {
-        val parts = header.split(":", 2)
-        headers += parts(0).toLowerCase(java.util.Locale.ROOT) -> parts(1).trim
-        header = line()
-      }
-      val fields = headers.result()
-      val body = new ByteArrayOutputStream()
-      if !head && !Set(204, 205, 304).contains(status) then {
-        if fields.get("transfer-encoding").contains("chunked") then {
-          var size = Integer.parseInt(line().takeWhile(_ != ';'), 16)
-          while size != 0 do {
-            body.write(input.readNBytes(size))
-            assertEquals(line(), "")
-            size = Integer.parseInt(line(), 16)
-          }
-          assertEquals(line(), "")
-        } else body.write(input.readNBytes(fields.getOrElse("content-length", "0").toInt))
-      }
-      WireResponse(status, fields, body.toString("UTF-8"))
-    }
-
-    override def close(): Unit = socket.close()
-  }
 }

@@ -7,7 +7,8 @@ import ba.sake.sharaf.routing.*
 import ba.sake.sharaf.undertow.*
 import ba.sake.sharaf.exceptions.NotFoundException
 
-final class SharafUndertowHandler(sharafHandler: SharafHandler, notFoundHandler: Option[HttpHandler] = None) extends HttpHandler {
+final class SharafUndertowHandler(sharafHandler: SharafHandler, notFoundHandler: Option[HttpHandler] = None)
+    extends HttpHandler {
 
   override def handleRequest(exchange: HttpServerExchange): Unit =
     val reqParams = fillReqParams(exchange)
@@ -22,18 +23,15 @@ final class SharafUndertowHandler(sharafHandler: SharafHandler, notFoundHandler:
           case Some(handler) => handler.handleRequest(exchange)
           case None          => throw e
         }
-    }
+    } finally req.closeUploads()
 
   private def fillReqParams(exchange: HttpServerExchange): RequestParams = {
     val method = HttpMethod.valueOf(exchange.getRequestMethod.toString)
-    val relPath =
-      if exchange.getRelativePath.startsWith("/") then exchange.getRelativePath.drop(1)
-      else exchange.getRelativePath
-    val pathSegments = relPath.split("/")
-    val path =
-      if pathSegments.size == 1 && pathSegments.head == ""
-      then Path()
-      else Path(pathSegments*)
+    val rawPath = java.net.URI.create(exchange.getRequestURI).getRawPath
+    val fullPath = RequestDecoding.path(rawPath)
+    // Undertow prefix handlers have already consumed this many path segments.
+    val resolvedSegments = exchange.getResolvedPath.split("/").count(_.nonEmpty)
+    val path = Path(fullPath.segments.drop(resolvedSegments)*)
     (method, path)
   }
 }
