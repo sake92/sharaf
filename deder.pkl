@@ -342,6 +342,8 @@ local const sharafPac4jModules =
       moduleDeps {
         sharafCoreModules.jvm_test
         sharafJdkHttpserverModules.jvm
+        sharafUndertowModules.main
+        sharafPotatehModules.jvm
       }
       deps {
         "org.scalameta::munit::\(versions.munit)"

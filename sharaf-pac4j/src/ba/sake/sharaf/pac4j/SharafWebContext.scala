@@ -5,6 +5,7 @@ import scala.jdk.CollectionConverters.*
 import scala.jdk.OptionConverters.*
 import org.pac4j.core.context.{Cookie as Pac4jCookie, FrameworkParameters, WebContext, WebContextFactory}
 import ba.sake.sharaf.{Cookie as SharafCookie, Request, Response, HttpString, HttpMethod}
+import ba.sake.sharaf.exceptions.UnsupportedMediaTypeException
 
 /** Adapts a Sharaf [[Request]] to pac4j's [[WebContext]].
   *
@@ -79,7 +80,7 @@ final class SharafWebContext(
           case _                                      => ""
         }
       }
-    } catch case _: Exception => Map.empty[String, Seq[String]]
+    } catch case _: UnsupportedMediaTypeException => Map.empty[String, Seq[String]]
     request.queryParamsRaw ++ bodyParams
 
   override def getRequestHeader(name: String): Optional[String] =
