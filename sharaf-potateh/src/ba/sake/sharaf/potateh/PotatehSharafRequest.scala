@@ -6,7 +6,7 @@ import ba.sake.formson.*
 import ba.sake.querson.*
 import ba.sake.sharaf.*
 import ba.sake.sharaf.routing.Path
-import ba.sake.sharaf.exceptions.{BadRequestException, UnsupportedMediaTypeException}
+import ba.sake.sharaf.exceptions.BadRequestException
 
 final class PotatehSharafRequest(val underlying: ba.sake.potateh.Request) extends Request {
 
@@ -26,9 +26,6 @@ final class PotatehSharafRequest(val underlying: ba.sake.potateh.Request) extend
   override lazy val headers: Map[HttpString, Seq[String]] =
     underlying.headers.fields.groupMap { case (name, _) => HttpString(name) } { case (_, value) => value }
 
-  override lazy val cookies: Seq[Cookie] =
-    CookieHeaders.parse(underlying.headers.all("Cookie"))
-
   override lazy val queryParamsRaw: QueryStringMap =
     UrlEncoded.query(Option(uri.getRawQuery).getOrElse(""))
 
@@ -40,9 +37,8 @@ final class PotatehSharafRequest(val underlying: ba.sake.potateh.Request) extend
 
   override lazy val bodyFormRaw: FormDataMap = {
     val contentType = underlying.headers.first("Content-Type").getOrElse("")
-    if UrlEncoded.isForm(contentType) then UrlEncoded.form(bodyString)
-    else if Multipart.isMultipart(contentType) then Multipart.parse(underlying.body, contentType, uploads)
-    else throw UnsupportedMediaTypeException("Expected application/x-www-form-urlencoded or multipart/form-data")
+    if Multipart.isMultipart(contentType) then Multipart.parse(underlying.body, contentType, uploads)
+    else super.bodyFormRaw
   }
 
 }

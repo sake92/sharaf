@@ -7,7 +7,6 @@ import io.helidon.webserver.http.ServerRequest
 import ba.sake.formson.*
 import ba.sake.querson.*
 import ba.sake.sharaf.*
-import ba.sake.sharaf.exceptions.UnsupportedMediaTypeException
 
 class HelidonSharafRequest(underlyingRequest: ServerRequest) extends Request {
 
@@ -23,7 +22,7 @@ class HelidonSharafRequest(underlyingRequest: ServerRequest) extends Request {
       }
       .toMap
 
-  def cookies: Seq[Cookie] =
+  override def cookies: Seq[Cookie] =
     val values = underlyingRequest.headers().all(io.helidon.http.HeaderNames.COOKIE, () => java.util.List.of[String]())
     CookieHeaders.parse(values.asScala.toSeq)
 
@@ -35,11 +34,9 @@ class HelidonSharafRequest(underlyingRequest: ServerRequest) extends Request {
 
   override lazy val bodyFormRaw: FormDataMap =
     val contentType = headers.get(HttpString("Content-Type")).flatMap(_.headOption).getOrElse("")
-    val mediaType = contentType.takeWhile(_ != ';').trim
-    if mediaType.equalsIgnoreCase("application/x-www-form-urlencoded") then UrlEncoded.form(bodyString)
-    else if Multipart.isMultipart(contentType) then
+    if Multipart.isMultipart(contentType) then
       Multipart.parse(underlyingRequest.content().inputStream(), contentType, uploads)
-    else throw UnsupportedMediaTypeException("Expected application/x-www-form-urlencoded or multipart/form-data")
+    else super.bodyFormRaw
 
 }
 

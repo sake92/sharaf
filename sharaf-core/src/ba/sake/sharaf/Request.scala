@@ -10,15 +10,11 @@ import org.typelevel.jawn.ast.JValue
 
 trait Request {
 
-  /* *** HEADERS *** */
-  // TODO set default implementation since now we parse it
   def headers: Map[HttpString, Seq[String]]
 
-  // TODO set default implementation since now we parse it
-  def cookies: Seq[Cookie]
+  def cookies: Seq[Cookie] =
+    CookieHeaders.parse(headers.getOrElse(HttpString("Cookie"), Seq.empty))
 
-  /* *** QUERY *** */
-  // TODO set default implementation since now we parse it
   def queryParamsRaw: QueryStringMap
 
   // must be a Product (case class)
@@ -30,13 +26,10 @@ trait Request {
     try queryParams[T].validateOrThrow
     catch case e: ValidsonException => throw RequestHandlingException(e)
 
-  /* *** BODY *** */
-  // TODO the only abstract method
   def bodyString: String
 
   // TODO do we want InputStream for the body as well?
 
-  // JSON
   def bodyJsonRaw: JValue = bodyJson[JValue]
 
   def bodyJson[T: JsonRW]: T =
@@ -47,9 +40,10 @@ trait Request {
     try bodyJson[T].validateOrThrow
     catch case e: ValidsonException => throw RequestHandlingException(e)
 
-  // FORM
-  // TODO set default implementation since now we parse it
-  def bodyFormRaw: FormDataMap
+  def bodyFormRaw: FormDataMap =
+    val contentType = headers.get(HttpString("Content-Type")).flatMap(_.headOption).getOrElse("")
+    if UrlEncoded.isForm(contentType) then UrlEncoded.form(bodyString)
+    else throw UnsupportedMediaTypeException("Expected application/x-www-form-urlencoded or multipart/form-data")
 
   // must be a Product (case class)
   def bodyForm[T <: Product | AnyNamedTuple: FormDataRW]: T =

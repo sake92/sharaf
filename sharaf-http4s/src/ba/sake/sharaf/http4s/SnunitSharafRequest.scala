@@ -5,7 +5,6 @@ import cats.effect.unsafe.implicits.global
 import ba.sake.formson.*
 import ba.sake.querson.*
 import ba.sake.sharaf.*
-import ba.sake.sharaf.exceptions.UnsupportedMediaTypeException
 
 class Http4sSharafRequest(underlyingRequest: Http4sRequest) extends Request {
 
@@ -20,7 +19,7 @@ class Http4sSharafRequest(underlyingRequest: Http4sRequest) extends Request {
         HttpString(name.toString) -> headers.map(_.value)
       }
 
-  def cookies: Seq[Cookie] =
+  override def cookies: Seq[Cookie] =
     underlyingRequest.cookies.map { cookie =>
       Cookie(name = cookie.name, value = cookie.content)
     }
@@ -35,16 +34,14 @@ class Http4sSharafRequest(underlyingRequest: Http4sRequest) extends Request {
 
   override lazy val bodyFormRaw: FormDataMap =
     val contentType = headers.get(HttpString("Content-Type")).flatMap(_.headOption).getOrElse("")
-    val mediaType = contentType.takeWhile(_ != ';').trim
-    if mediaType.equalsIgnoreCase("application/x-www-form-urlencoded") then UrlEncoded.form(bodyString)
-    else if Multipart.isMultipart(contentType) then
+    if Multipart.isMultipart(contentType) then
       fs2.io
         .toInputStreamResource(underlyingRequest.body)
         .use { input =>
           IO.blocking(Multipart.parse(input, contentType, uploads))
         }
         .unsafeRunSync()
-    else throw UnsupportedMediaTypeException("Expected application/x-www-form-urlencoded or multipart/form-data")
+    else super.bodyFormRaw
 
   override def toString(): String =
     "Http4sSharafRequest(...)"

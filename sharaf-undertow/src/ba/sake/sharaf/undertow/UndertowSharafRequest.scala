@@ -13,21 +13,17 @@ final class UndertowSharafRequest(val underlyingHttpServerExchange: HttpServerEx
   private val uploads = new MultipartUploads
   private[sharaf] def closeUploads(): Unit = uploads.close()
 
-  /* *** HEADERS *** */
   def headers: Map[HttpString, Seq[String]] =
     val hMap = underlyingHttpServerExchange.getRequestHeaders
     hMap.getHeaderNames.asScala.map { name =>
       HttpString(name.toString) -> hMap.get(name).asScala.toSeq
     }.toMap
 
-  def cookies: Seq[Cookie] =
+  override def cookies: Seq[Cookie] =
     underlyingHttpServerExchange.requestCookies().asScala.map(CookieUtils.fromUndertow).toSeq
 
-  /* *** QUERY *** */
   override lazy val queryParamsRaw: QueryStringMap =
     UrlEncoded.query(underlyingHttpServerExchange.getQueryString)
-
-  /* *** BODY *** */
 
   override lazy val bodyString: String = {
     val input = underlyingHttpServerExchange.getInputStream
@@ -44,10 +40,9 @@ final class UndertowSharafRequest(val underlyingHttpServerExchange: HttpServerEx
 
   override lazy val bodyFormRaw: FormDataMap =
     val contentType = headers.get(HttpString("Content-Type")).flatMap(_.headOption).getOrElse("")
-    if UrlEncoded.isForm(contentType) then UrlEncoded.form(bodyString)
-    else if Multipart.isMultipart(contentType) then
+    if Multipart.isMultipart(contentType) then
       Multipart.parse(underlyingHttpServerExchange.getInputStream, contentType, uploads)
-    else throw UnsupportedMediaTypeException("Expected application/x-www-form-urlencoded or multipart/form-data")
+    else super.bodyFormRaw
 
   override def toString(): String =
     "UndertowSharafRequest(...)"
