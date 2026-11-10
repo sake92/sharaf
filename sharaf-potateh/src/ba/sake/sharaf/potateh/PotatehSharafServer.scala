@@ -96,10 +96,7 @@ object PotatehSharafServer {
 
   private def toResponse[T](response: Response[T], requestMethod: String): ba.sake.potateh.Response = {
     val contentHeaders = response.body.toSeq.flatMap(response.rw.headers)
-    val initial = contentHeaders.foldLeft(Headers.empty) { case (headers, (name, values)) =>
-      setHeader(headers, name, values)
-    }
-    val updated = response.headerUpdates.updates.foldLeft(initial) {
+    val updated = response.headerUpdates.resolve(contentHeaders).foldLeft(Headers.empty) {
       case (headers, HeaderUpdate.Set(name, values)) => setHeader(headers, name, values)
       case (headers, HeaderUpdate.Remove(name))      => headers.remove(name.toString)
     }

@@ -8,12 +8,8 @@ import ba.sake.sharaf.*
 object ResponseUtils {
 
   def writeResponse(response: Response[?], exchange: HttpServerExchange): Unit = {
-    val bodyContentHeaders = response.body.flatMap(response.rw.headers)
-    bodyContentHeaders.foreach { case (name, values) =>
-      val undertowHttpString = UndertowHttpString(name.toString)
-      exchange.getResponseHeaders.putAll(undertowHttpString, values.asJava)
-    }
-    response.headerUpdates.updates.foreach {
+    val bodyContentHeaders = response.body.toSeq.flatMap(response.rw.headers)
+    response.headerUpdates.resolve(bodyContentHeaders).foreach {
       case HeaderUpdate.Set(name, values) =>
         val undertowHttpString = UndertowHttpString(name.toString)
         exchange.getResponseHeaders.putAll(undertowHttpString, values.asJava)

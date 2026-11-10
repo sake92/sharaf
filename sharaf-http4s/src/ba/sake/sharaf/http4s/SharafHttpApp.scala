@@ -24,13 +24,11 @@ def SharafHttpApp(sharafHandler: SharafHandler) =
         response <- IO.blocking(sharafHandler.handle(RequestContext(requestParams, request)))
 
         headers <- IO.pure {
-          val bodyHeaders = response.body.toSeq.flatMap(response.rw.headers).toMap
-          val finalHeaders = response.headerUpdates.updates.foldLeft(bodyHeaders) {
-            case (headers, HeaderUpdate.Set(name, values)) => headers.updated(name, values)
-            case (headers, HeaderUpdate.Remove(name))      => headers.removed(name)
-          }
-          val rawHeaders = finalHeaders.toSeq.flatMap { case (name, values) =>
-            values.map(value => Header.Raw(CIString(name.value), value))
+          val bodyHeaders = response.body.toSeq.flatMap(response.rw.headers)
+          val finalHeaders = response.headerUpdates.resolve(bodyHeaders)
+          val rawHeaders = finalHeaders.flatMap {
+            case HeaderUpdate.Set(name, values) => values.map(value => Header.Raw(CIString(name.value), value))
+            case HeaderUpdate.Remove(_)         => Seq.empty
           }
           val cookieHeaders = response.cookieUpdates.updates.map { cookie =>
             Header.Raw(CIString("Set-Cookie"), CookieHeaders.render(cookie))

@@ -8,6 +8,18 @@ package ba.sake.sharaf
   */
 private[sharaf] final case class HeaderUpdates(updates: Seq[HeaderUpdate]) {
 
+  /** Body headers precede explicit updates. Keep removals so adapters can clear headers from earlier handlers. */
+  def resolve(bodyHeaders: Seq[(HttpString, Seq[String])]): Seq[HeaderUpdate] = {
+    val initial = bodyHeaders.map { case (name, values) => HeaderUpdate.Set(name, values) }
+    val resolved = (initial ++ updates).foldLeft(Map.empty[HttpString, HeaderUpdate]) {
+      case (headers, HeaderUpdate.Set(name, values)) =>
+        val update = if (values.isEmpty) HeaderUpdate.Remove(name) else HeaderUpdate.Set(name, values)
+        headers.updated(name, update)
+      case (headers, update @ HeaderUpdate.Remove(name)) => headers.updated(name, update)
+    }
+    resolved.values.toSeq
+  }
+
   def setting(name: HttpString, values: Seq[String]): HeaderUpdates =
     copy(updates = updates.appended(HeaderUpdate.Set(name, values)))
 

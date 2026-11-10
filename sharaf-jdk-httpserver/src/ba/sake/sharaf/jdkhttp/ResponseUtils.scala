@@ -9,12 +9,8 @@ object ResponseUtils {
   def writeResponse(response: Response[?], exchange: HttpExchange): Unit = {
     val responseHeaders = exchange.getResponseHeaders
 
-    val bodyContentHeaders = response.body.flatMap(response.rw.headers)
-    bodyContentHeaders.foreach { case (name, values) =>
-      responseHeaders.put(name.toString, values.asJava)
-    }
-
-    response.headerUpdates.updates.foreach {
+    val bodyContentHeaders = response.body.toSeq.flatMap(response.rw.headers)
+    response.headerUpdates.resolve(bodyContentHeaders).foreach {
       case HeaderUpdate.Set(name, values) =>
         responseHeaders.put(name.toString, values.asJava)
       case HeaderUpdate.Remove(name) =>
