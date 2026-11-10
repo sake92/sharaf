@@ -36,28 +36,7 @@ object CookieUtils {
   }
 
   /** Formats a Cookie as a Set-Cookie header value */
-  def toSetCookieHeader(c: Cookie): String = {
-    val sb = new StringBuilder()
-    sb.append(s"${c.name}=${c.value}")
-
-    c.path.foreach(p => sb.append(s"; Path=$p"))
-    c.domain.foreach(d => sb.append(s"; Domain=$d"))
-    c.maxAge.foreach(ma => sb.append(s"; Max-Age=$ma"))
-    c.expires.foreach { exp =>
-      import java.time.format.DateTimeFormatter
-      import java.time.ZoneId
-      val formatter = DateTimeFormatter.RFC_1123_DATE_TIME.withZone(ZoneId.of("GMT"))
-      sb.append(s"; Expires=${formatter.format(exp)}")
-    }
-
-    if c.secure then sb.append("; Secure")
-    if c.httpOnly then sb.append("; HttpOnly")
-
-    c.sameSiteMode.foreach { mode =>
-      sb.append(s"; SameSite=$mode")
-    }
-
-    sb.toString
-  }
+  def toSetCookieHeader(c: Cookie): String =
+    ba.sake.sharaf.CookieHeaders.render(c)
 
 }

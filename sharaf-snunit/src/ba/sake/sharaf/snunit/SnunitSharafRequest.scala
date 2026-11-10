@@ -21,20 +21,11 @@ class SnunitSharafRequest(underlyingRequest: SnunitRequest) extends Request {
       }
 
   def cookies: Seq[Cookie] =
-    val builder = Seq.newBuilder[Cookie]
-    val underlyingHeaders = underlyingRequest.headers
-    // TODO: Use underlyingRequest.cookieFieldIndex when available
-    underlyingHeaders.foreach {
-      case (name, cookieString) if name.equalsIgnoreCase("Cookie") =>
-        cookieString.split(';').foreach {
-          case item if item.trim.nonEmpty =>
-            val parts = item.trim.split("=", 2)
-            builder += Cookie(name = parts(0).trim, value = if parts.length == 2 then parts(1).trim else "")
-          case _ => ()
-        }
-      case _ =>
+    val cookieHeaders = Seq.newBuilder[String]
+    underlyingRequest.headers.foreach { (name, value) =>
+      if name.equalsIgnoreCase("Cookie") then cookieHeaders += value
     }
-    builder.result()
+    CookieHeaders.parse(cookieHeaders.result())
 
   /* *** QUERY *** */
   override lazy val queryParamsRaw: QueryStringMap =

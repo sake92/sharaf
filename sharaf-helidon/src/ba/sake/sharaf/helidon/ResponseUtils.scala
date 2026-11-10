@@ -21,11 +21,9 @@ object ResponseUtils {
         val helidonHeaderName = HeaderNames.create(name.toString)
         helidonRes.headers().remove(helidonHeaderName)
     }
-    /* TODO
     response.cookieUpdates.updates.foreach { cookie =>
-      exchange.setResponseCookie(undertow.CookieUtils.toUndertow(cookie))
+      helidonRes.headers().add(HeaderNames.SET_COOKIE, CookieHeaders.render(cookie))
     }
-    */
 
     helidonRes.status(response.status.code)
     response.body match {

@@ -37,6 +37,23 @@ The [quickstart](/tutorials/quickstart.html) uses Undertow. Adapter examples are
 The [AWS Lambda starter](https://github.com/sake92/sharaf-aws-lambda-starter) packages an Undertow/JVM application
 with AWS Lambda Web Adapter and includes Terraform configuration and local integration tests.
 
+## Cookies
+
+All adapters expose request cookies through `Request.current.cookies` and support
+`Response.settingCookie` and `Response.removingCookie`. Multiple response cookies
+are sent as separate `Set-Cookie` headers, including on responses without a body.
+
+Supported response attributes are `path`, `domain`, `maxAge`, `expires`, `secure`,
+`httpOnly`, and `sameSiteMode` (`Strict`, `Lax`, or `None`). Cookie values are opaque;
+`+` and percent escapes are not URL-decoded. Removal sends an empty value with an
+expiry in the past; cookie path and domain must match the cookie being removed.
+For a scoped cookie, `settingCookie` with the matching path/domain and a past
+`expires` value supplies that scope.
+
+JDK, Potateh, Helidon, and snunit share request-cookie parsing. Undertow and http4s
+use their engine parsers. Legacy `discard`, `version`, and `comment` attributes
+remain specific to Undertow's cookie support.
+
 ## Query strings and URL-encoded forms
 
 Potateh, JDK HTTP server, Helidon and snunit share raw query and

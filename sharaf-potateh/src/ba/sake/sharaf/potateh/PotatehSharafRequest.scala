@@ -31,13 +31,7 @@ final class PotatehSharafRequest(val underlying: ba.sake.potateh.Request) extend
     underlying.headers.fields.groupMap { case (name, _) => HttpString(name) } { case (_, value) => value }
 
   override lazy val cookies: Seq[Cookie] =
-    underlying.headers.all("Cookie").flatMap { header =>
-      header.split(';').filter(_.trim.nonEmpty).map { item =>
-        val parts = item.trim.split("=", 2)
-        val value = if parts.length == 2 then parts(1).trim else ""
-        Cookie(parts(0).trim, value)
-      }
-    }
+    CookieHeaders.parse(underlying.headers.all("Cookie"))
 
   override lazy val queryParamsRaw: QueryStringMap =
     UrlEncoded.query(Option(uri.getRawQuery).getOrElse(""))

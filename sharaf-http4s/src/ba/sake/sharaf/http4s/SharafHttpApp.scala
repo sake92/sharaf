@@ -32,7 +32,10 @@ def SharafHttpApp(sharafHandler: SharafHandler) =
           val rawHeaders = finalHeaders.toSeq.flatMap { case (name, values) =>
             values.map(value => Header.Raw(CIString(name.value), value))
           }
-          Headers(rawHeaders)
+          val cookieHeaders = response.cookieUpdates.updates.map { cookie =>
+            Header.Raw(CIString("Set-Cookie"), CookieHeaders.render(cookie))
+          }
+          Headers(rawHeaders ++ cookieHeaders)
         }
 
         body <- response.body match {

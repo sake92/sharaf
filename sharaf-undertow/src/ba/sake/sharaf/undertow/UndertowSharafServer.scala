@@ -1,6 +1,6 @@
 package ba.sake.sharaf.undertow
 
-import io.undertow.Undertow
+import io.undertow.{Undertow, UndertowOptions}
 import io.undertow.server.handlers.BlockingHandler
 import ba.sake.sharaf.*
 
@@ -10,6 +10,7 @@ class UndertowSharafServer(host: String, port: Int, handler: SharafUndertowHandl
   private val server = Undertow
     .builder()
     .addHttpListener(port, host)
+    .setServerOption(UndertowOptions.ALLOW_EQUALS_IN_COOKIE_VALUE, java.lang.Boolean.TRUE)
     .setHandler(finalHandler)
     .build()
 

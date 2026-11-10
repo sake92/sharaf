@@ -20,20 +20,7 @@ final class JdkHttpServerSharafRequest(val underlyingHttpExchange: HttpExchange)
     }
 
   def cookies: Seq[Cookie] =
-    headers
-      .get(HttpString("Cookie"))
-      .toSeq
-      .flatten
-      .flatMap { cookieHeader =>
-        cookieHeader
-          .split(";")
-          .map(_.trim)
-          .map { cookieStr =>
-            val parts = cookieStr.split("=", 2)
-            if parts.length == 2 then Cookie(name = parts(0).trim, value = parts(1).trim)
-            else Cookie(name = parts(0).trim, value = "")
-          }
-      }
+    CookieHeaders.parse(headers.getOrElse(HttpString("Cookie"), Seq.empty))
 
   /* *** QUERY *** */
   override lazy val queryParamsRaw: QueryStringMap =

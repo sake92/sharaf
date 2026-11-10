@@ -2,6 +2,7 @@ package ba.sake.sharaf.helidon
 
 import java.nio.charset.StandardCharsets
 import scala.jdk.StreamConverters.*
+import scala.jdk.CollectionConverters.*
 import io.helidon.webserver.http.ServerRequest
 import ba.sake.formson.*
 import ba.sake.querson.*
@@ -24,12 +25,8 @@ class HelidonSharafRequest(underlyingRequest: ServerRequest) extends Request {
       .toMap
 
   def cookies: Seq[Cookie] =
-    headers.get(HttpString("Cookie")).toSeq.flatten.flatMap { header =>
-      header.split(";").toSeq.map(_.trim).filter(_.nonEmpty).map { item =>
-        val parts = item.split("=", 2)
-        Cookie(parts(0).trim, if parts.length == 2 then parts(1).trim else "")
-      }
-    }
+    val values = underlyingRequest.headers().all(io.helidon.http.HeaderNames.COOKIE, () => java.util.List.of[String]())
+    CookieHeaders.parse(values.asScala.toSeq)
 
   /* *** QUERY *** */
   override lazy val queryParamsRaw: QueryStringMap =

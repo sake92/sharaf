@@ -12,7 +12,7 @@ class SharafRequestHandler(sharafHandler: SharafHandler) extends RequestHandler 
     val requestContext = RequestContext(reqParams, req)
     try {
       val res = sharafHandler.handle(requestContext)
-      val headers = buildHeaders(res.headerUpdates)
+      val headers = buildHeaders(res.headerUpdates, res.cookieUpdates)
       res.body match {
         case Some(body) =>
           val aos = new ByteArrayOutputStream
@@ -24,13 +24,14 @@ class SharafRequestHandler(sharafHandler: SharafHandler) extends RequestHandler 
     } finally req.closeUploads()
   }
 
-  private def buildHeaders(hu: HeaderUpdates): Headers = {
+  private def buildHeaders(hu: HeaderUpdates, cookies: CookieUpdates): Headers = {
     val headerValues = hu.updates.flatMap {
       case HeaderUpdate.Set(name, values) =>
         Seq(name.value -> values.head)
       case _ => Seq.empty
     }
-    Headers(headerValues*)
+    val cookieHeaders = cookies.updates.map(cookie => "Set-Cookie" -> CookieHeaders.render(cookie))
+    Headers((headerValues ++ cookieHeaders)*)
   }
 
   private def fillReqParams(req: SnunitRequest): RequestParams = {

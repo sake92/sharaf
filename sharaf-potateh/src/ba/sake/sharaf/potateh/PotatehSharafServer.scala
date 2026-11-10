@@ -104,7 +104,7 @@ object PotatehSharafServer {
       case (headers, HeaderUpdate.Remove(name))      => headers.remove(name.toString)
     }
     val withCookies = response.cookieUpdates.updates.foldLeft(updated) { (headers, cookie) =>
-      headers.add("Set-Cookie", renderCookie(cookie))
+      headers.add("Set-Cookie", CookieHeaders.render(cookie))
     }
     val connectionFields = withCookies.all("Connection").flatMap(_.split(',')).map(_.trim)
     require(!connectionFields.exists(_.equalsIgnoreCase("close")), "Potateh does not support response-requested close")
@@ -135,20 +135,4 @@ object PotatehSharafServer {
   private def setHeader(headers: Headers, name: HttpString, values: Seq[String]): Headers =
     values.foldLeft(headers.remove(name.toString)) { (result, value) => result.add(name.toString, value) }
 
-  private def renderCookie(cookie: Cookie): String = {
-    import java.time.ZoneOffset
-    import java.time.format.DateTimeFormatter
-    val result = new StringBuilder(s"${cookie.name}=${cookie.value}")
-    cookie.path.foreach(value => result.append(s"; Path=$value"))
-    cookie.domain.foreach(value => result.append(s"; Domain=$value"))
-    cookie.maxAge.foreach(value => result.append(s"; Max-Age=$value"))
-    cookie.expires.foreach { value =>
-      val expires = DateTimeFormatter.RFC_1123_DATE_TIME.withZone(ZoneOffset.UTC).format(value)
-      result.append(s"; Expires=$expires")
-    }
-    if cookie.secure then result.append("; Secure")
-    if cookie.httpOnly then result.append("; HttpOnly")
-    cookie.sameSiteMode.foreach(value => result.append(s"; SameSite=$value"))
-    result.toString
-  }
 }
