@@ -3,12 +3,10 @@ package ba.sake.sharaf.undertow
 import java.nio.charset.StandardCharsets
 import sttp.client4.quick.*
 import ba.sake.sharaf.*
-import ba.sake.sharaf.utils.NetworkUtils
 
 class UndertowExchangeWriteTest extends munit.FunSuite {
 
-  val port = NetworkUtils.getFreePort()
-  val baseUrl = s"http://localhost:$port"
+  def baseUrl = s"http://localhost:${server.port}"
 
   val routes = Routes { case GET -> Path("imperative") =>
     Request.current
@@ -19,7 +17,7 @@ class UndertowExchangeWriteTest extends munit.FunSuite {
     Response.default
   }
 
-  val server = UndertowSharafServer("localhost", port, routes)
+  val server = UndertowSharafServer("localhost", routes)
 
   override def beforeAll(): Unit = server.start()
 

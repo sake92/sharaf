@@ -13,11 +13,10 @@ import org.pac4j.core.profile.CommonProfile
 import org.pac4j.http.client.direct.HeaderClient
 import ba.sake.sharaf.*
 import ba.sake.sharaf.jdkhttp.JdkHttpServerSharafServer
-import ba.sake.sharaf.utils.NetworkUtils
 
 class Pac4jSecurityHandlerTest extends munit.FunSuite:
 
-  val port: Int = NetworkUtils.getFreePort()
+  def port: Int = server.get.port
   def baseUrl: String = s"http://localhost:${port}"
 
   val authHeader = "Authorization"
@@ -48,7 +47,7 @@ class Pac4jSecurityHandlerTest extends munit.FunSuite:
   var server: Option[JdkHttpServerSharafServer] = None
 
   override def beforeAll(): Unit =
-    val s = JdkHttpServerSharafServer("localhost", port, handler)
+    val s = JdkHttpServerSharafServer("localhost", handler)
     s.start()
     server = Some(s)
 

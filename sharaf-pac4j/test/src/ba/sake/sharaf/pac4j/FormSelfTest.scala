@@ -10,7 +10,6 @@ import org.pac4j.testkit.TestConfigs
 import ba.sake.sharaf.*
 import ba.sake.sharaf.jdkhttp.JdkHttpServerSharafServer
 import ba.sake.sharaf.session.InMemorySessionStore
-import ba.sake.sharaf.utils.NetworkUtils
 import sttp.model.StatusCode
 
 class FormSelfTest extends munit.FunSuite:
@@ -21,8 +20,6 @@ class FormSelfTest extends munit.FunSuite:
   override def beforeAll(): Unit =
     this.getClass.getClassLoader.setDefaultAssertionStatus(true)
 
-    val port = NetworkUtils.getFreePort()
-    serverUrl = s"http://localhost:$port"
 
     // Shared session store so Pac4jSecurityHandler and login handler see the same session
     val sessionStore = InMemorySessionStore()
@@ -82,8 +79,9 @@ class FormSelfTest extends munit.FunSuite:
     // Wrap with session handler so cookies are loaded/saved across requests
     val handler = SharafHandler.sessions(combinedHandler)
 
-    val s = JdkHttpServerSharafServer("localhost", port, handler)
+    val s = JdkHttpServerSharafServer("localhost", handler)
     s.start()
+    serverUrl = s"http://localhost:${s.port}"
     server = Some(s)
 
   override def afterAll(): Unit =

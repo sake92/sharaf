@@ -4,15 +4,18 @@ import io.undertow.{Undertow, UndertowOptions}
 import io.undertow.server.handlers.BlockingHandler
 import ba.sake.sharaf.*
 
-class UndertowSharafServer(host: String, port: Int, handler: SharafUndertowHandler) {
+class UndertowSharafServer(host: String, listenPort: Int, handler: SharafUndertowHandler) {
 
   private val finalHandler = BlockingHandler(handler)
   private val server = Undertow
     .builder()
-    .addHttpListener(port, host)
+    .addHttpListener(listenPort, host)
     .setServerOption(UndertowOptions.ALLOW_EQUALS_IN_COOKIE_VALUE, java.lang.Boolean.TRUE)
     .setHandler(finalHandler)
     .build()
+
+  /** The bound port; available after the server starts. */
+  def port: Int = server.getListenerInfo.get(0).getAddress.asInstanceOf[java.net.InetSocketAddress].getPort
 
   def start(): Unit = server.start()
 
@@ -20,6 +23,10 @@ class UndertowSharafServer(host: String, port: Int, handler: SharafUndertowHandl
 }
 
 object UndertowSharafServer {
+
+  def apply(host: String, handler: SharafHandler): UndertowSharafServer = apply(host, 0, handler)
+
+  def apply(host: String, routes: Routes): UndertowSharafServer = apply(host, 0, routes)
 
   def apply(host: String, port: Int, sharafHandler: SharafHandler): UndertowSharafServer =
     new UndertowSharafServer(host, port, SharafUndertowHandler(sharafHandler))

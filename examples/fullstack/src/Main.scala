@@ -13,7 +13,7 @@ import fullstack.views.*
 
 class FullstackModule(port: Int) {
 
-  val baseUrl = s"http://localhost:${port}"
+  def baseUrl = s"http://localhost:${server.port}"
 
   private val routes = Routes:
     case GET -> Path() =>

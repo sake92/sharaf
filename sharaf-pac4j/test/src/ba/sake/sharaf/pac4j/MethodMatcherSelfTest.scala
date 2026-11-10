@@ -6,7 +6,6 @@ import org.pac4j.testkit.AuthorizerScenarios
 import org.pac4j.testkit.TestConfigs
 import ba.sake.sharaf.*
 import ba.sake.sharaf.jdkhttp.JdkHttpServerSharafServer
-import ba.sake.sharaf.utils.NetworkUtils
 
 class MethodMatcherSelfTest extends munit.FunSuite:
 
@@ -16,8 +15,6 @@ class MethodMatcherSelfTest extends munit.FunSuite:
   override def beforeAll(): Unit =
     this.getClass.getClassLoader.setDefaultAssertionStatus(true)
 
-    val port = NetworkUtils.getFreePort()
-    serverUrl = s"http://localhost:$port"
 
     val pac4jConfig = TestConfigs.methodMatcherConfig()
     // Fix for pac4j 6.5.2: extract "roles" claim into profile roles
@@ -38,8 +35,9 @@ class MethodMatcherSelfTest extends munit.FunSuite:
     }
     val handler = Pac4jSecurityHandler(securityConfig, SharafHandler.routes(routes))
 
-    val s = JdkHttpServerSharafServer("localhost", port, handler)
+    val s = JdkHttpServerSharafServer("localhost", handler)
     s.start()
+    serverUrl = s"http://localhost:${s.port}"
     server = Some(s)
 
   override def afterAll(): Unit =

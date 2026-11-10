@@ -2,12 +2,10 @@ package ba.sake.sharaf.undertow
 
 import sttp.client4.quick.*
 import ba.sake.sharaf.*
-import ba.sake.sharaf.utils.NetworkUtils
 
 class UndertowHeadersTest extends munit.FunSuite {
 
   test("response updates preserve and remove headers set by an earlier Undertow handler") {
-    val enginePort = NetworkUtils.getFreePort()
     val routes = Routes { case GET -> Path() =>
       Response
         .withBody("hello")
@@ -18,7 +16,7 @@ class UndertowHeadersTest extends munit.FunSuite {
     val handler = SharafUndertowHandler(SharafHandler.routes(routes))
     val engine = io.undertow.Undertow
       .builder()
-      .addHttpListener(enginePort, "127.0.0.1")
+      .addHttpListener(0, "127.0.0.1")
       .setHandler(new io.undertow.server.handlers.BlockingHandler(exchange => {
         Seq("X-Keep", "X-Remove", "X-Empty", "X-Replace").foreach { name =>
           exchange.getResponseHeaders.put(new io.undertow.util.HttpString(name), "engine")
@@ -27,8 +25,9 @@ class UndertowHeadersTest extends munit.FunSuite {
       }))
       .build()
     engine.start()
+    val port = engine.getListenerInfo.get(0).getAddress.asInstanceOf[java.net.InetSocketAddress].getPort
     try {
-      val response = quickRequest.get(uri"http://127.0.0.1:$enginePort/").send()
+      val response = quickRequest.get(uri"http://127.0.0.1:$port/").send()
       assertEquals(response.body, "hello")
       assertEquals(response.headers("X-Keep"), Seq("engine"))
       assertEquals(response.headers("X-Remove"), Seq.empty)
@@ -38,17 +37,17 @@ class UndertowHeadersTest extends munit.FunSuite {
   }
 
   test("mounted handler splits encoded path segments before decoding") {
-    val port = NetworkUtils.getFreePort()
     val routes = Routes { case GET -> Path("a/b") => Response.withBody("mounted") }
     val handler = SharafUndertowHandler(SharafHandler.routes(routes))
     val engine = io.undertow.Undertow
       .builder()
-      .addHttpListener(port, "127.0.0.1")
+      .addHttpListener(0, "127.0.0.1")
       .setHandler(
         io.undertow.Handlers.path().addPrefixPath("/mount", new io.undertow.server.handlers.BlockingHandler(handler))
       )
       .build()
     engine.start()
+    val port = engine.getListenerInfo.get(0).getAddress.asInstanceOf[java.net.InetSocketAddress].getPort
     try {
       val response = quickRequest
         .httpVersion(sttp.model.HttpVersion.HTTP_1_1)

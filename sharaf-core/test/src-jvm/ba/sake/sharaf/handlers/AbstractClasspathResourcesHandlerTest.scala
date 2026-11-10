@@ -3,11 +3,10 @@ package ba.sake.sharaf.handlers
 import sttp.client4.quick.*
 import sttp.model.{HeaderNames, StatusCode}
 import ba.sake.sharaf.*
-import ba.sake.sharaf.utils.NetworkUtils
 
 abstract class AbstractClasspathResourcesHandlerTest extends munit.FunSuite {
 
-  val port: Int = NetworkUtils.getFreePort()
+  def port: Int
   def baseUrl: String = s"http://localhost:$port"
 
   def startServer(): Unit

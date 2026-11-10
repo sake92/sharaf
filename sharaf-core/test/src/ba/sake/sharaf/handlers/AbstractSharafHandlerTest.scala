@@ -39,6 +39,16 @@ abstract class AbstractSharafHandlerTest extends munit.FunSuite with ServerFixtu
       Response.withBody(sender)
   }
 
+  test("concurrent servers use distinct bound ports") {
+    withServer(routes, ExceptionMapper.default) { first =>
+      withServer(routes, ExceptionMapper.default) { second =>
+        assertNotEquals(first, second)
+        assertEquals(request.get(uri"$first/hello").send(httpBackend).body, "Hello Scala! čćž")
+        assertEquals(request.get(uri"$second/hello").send(httpBackend).body, "Hello Scala! čćž")
+      }
+    }
+  }
+
   test("unknown route returns 404") {
     withServer(routes, ExceptionMapper.default) { base =>
       val response = request.get(uri"$base/does-not-exist").send(httpBackend)

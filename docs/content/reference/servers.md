@@ -37,6 +37,20 @@ The [quickstart](/tutorials/quickstart.html) uses Undertow. Adapter examples are
 The [AWS Lambda starter](https://github.com/sake92/sharaf-aws-lambda-starter) packages an Undertow/JVM application
 with AWS Lambda Web Adapter and includes Terraform configuration and local integration tests.
 
+## Choosing a port
+
+Undertow, Helidon, and JDK HTTP server wrappers accept port `0` to let the operating system
+choose a port. Their overloads without a port do the same. Read `server.port` after starting:
+
+```scala
+val server = UndertowSharafServer("127.0.0.1", routes)
+server.start()
+println(server.port)
+```
+
+Pass an explicit port for a fixed address. Potateh exposes its bound port through
+`server.address.getPort`.
+
 ## Cookies
 
 All adapters expose request cookies through `Request.current.cookies` and support

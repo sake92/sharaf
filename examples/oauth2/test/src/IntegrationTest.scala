@@ -8,7 +8,6 @@ import no.nav.security.mock.oauth2.token.DefaultOAuth2TokenCallback
 import org.pac4j.core.client.Clients
 import org.pac4j.oauth.client.GenericOAuth20Client
 import org.pac4j.core.profile.definition.CommonProfileDefinition
-import ba.sake.sharaf.utils.*
 
 object TestData {
   val username = "testUser"
@@ -51,10 +50,10 @@ trait IntegrationTest extends munit.FunSuite {
       client.setTokenUrl(mockOauth2server.tokenEndpointUrl(issuerId).toString)
       client.setProfileUrl(mockOauth2server.userInfoUrl(issuerId).toString)
 
-      val port = NetworkUtils.getFreePort()
-      val clients = Clients(s"http://localhost:${port}/callback", client)
-      module = AppModule(port, clients)
+      val clients = Clients("/callback", client)
+      module = AppModule(0, clients)
       module.server.start()
+      clients.setCallbackUrl(s"${module.baseUrl}/callback")
 
     override def afterEach(context: AfterEach): Unit =
       module.server.stop()

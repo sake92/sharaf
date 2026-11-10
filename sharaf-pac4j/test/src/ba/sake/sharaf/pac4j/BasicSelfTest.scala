@@ -6,7 +6,6 @@ import org.pac4j.http.client.direct.DirectBasicAuthClient
 import org.pac4j.testkit.BasicAuthScenarios
 import ba.sake.sharaf.*
 import ba.sake.sharaf.jdkhttp.JdkHttpServerSharafServer
-import ba.sake.sharaf.utils.NetworkUtils
 
 class BasicSelfTest extends munit.FunSuite:
 
@@ -16,8 +15,6 @@ class BasicSelfTest extends munit.FunSuite:
   override def beforeAll(): Unit =
     this.getClass.getClassLoader.setDefaultAssertionStatus(true)
 
-    val port = NetworkUtils.getFreePort()
-    serverUrl = s"http://localhost:$port"
 
     // Don't use TestConfigs.basicConfig() — it creates IndirectBasicAuthClient which works
     // differently in pac4j 6.5.2. Create our own config with DirectBasicAuthClient.
@@ -37,8 +34,9 @@ class BasicSelfTest extends munit.FunSuite:
     }
 
     val handler = Pac4jSecurityHandler(securityConfig, SharafHandler.routes(routes))
-    val s = JdkHttpServerSharafServer("localhost", port, handler)
+    val s = JdkHttpServerSharafServer("localhost", handler)
     s.start()
+    serverUrl = s"http://localhost:${s.port}"
     server = Some(s)
 
   override def afterAll(): Unit =

@@ -8,9 +8,9 @@ class ClasspathResourcesHandlerTest extends AbstractClasspathResourcesHandlerTes
   val server =
     JdkHttpServerSharafServer(
       "localhost",
-      port,
       SharafHandler.exceptions(classpathResourcesHandler, ExceptionMapper.default)
     )
+  override def port: Int = server.port
   override def startServer(): Unit = server.start()
   override def stopServer(): Unit = server.stop()
 }

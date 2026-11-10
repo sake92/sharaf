@@ -7,7 +7,7 @@ import ba.sake.sharaf.undertow.UndertowSharafServer
 
 class AppModule(port: Int, clients: Clients) {
 
-  val baseUrl = s"http://localhost:${port}"
+  def baseUrl = s"http://localhost:${server.port}"
 
   private val securityConfig = SecurityConfig(clients)
   private val appRoutes = AppRoutes()

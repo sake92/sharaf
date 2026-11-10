@@ -30,7 +30,7 @@ deder exec -t publishLocal                 # publish jars to local ~/.ivy2
 - Framework: **munit** (`munit.FunSuite`) — not ScalaTest
 - Assertions use `assertEquals`, `assertNotEquals`, `test("name") { ... }`
 - Integration tests use **sttp client4** (`sttp.client4.quick.*`) against locally-started servers
-- Start the application's real Sharaf server/handler composition (e.g. `UndertowSharafServer`); use `NetworkUtils.getFreePort()` where supported and stop the server after testing. Reuse `sharaf-pac4j/test/` security helpers for auth tests.
+- Start the application's real Sharaf server/handler composition (e.g. `UndertowSharafServer`); bind to port `0` and read the server's bound port and stop the server after testing. Reuse `sharaf-pac4j/test/` security helpers for auth tests.
 - **Abstract test base classes** live in `sharaf-core/test/`. Each server module's tests extend these classes, providing a concrete server. Example: `AbstractSharafHandlerTest` in core → `SharafHandlerTest` in undertow/helidon/jdk-httpserver
 
 ## Code Conventions

@@ -6,7 +6,6 @@ import sttp.model.*
 import sttp.client4.quick.*
 import ba.sake.formson.*
 import ba.sake.sharaf.*
-import ba.sake.sharaf.utils.*
 
 class FullstackSuite extends munit.FunSuite {
 
@@ -35,7 +34,7 @@ class FullstackSuite extends munit.FunSuite {
     def apply() = module
 
     override def beforeEach(context: BeforeEach): Unit =
-      module = FullstackModule(NetworkUtils.getFreePort())
+      module = FullstackModule(0)
       module.server.start()
     override def afterEach(context: AfterEach): Unit =
       module.server.stop()

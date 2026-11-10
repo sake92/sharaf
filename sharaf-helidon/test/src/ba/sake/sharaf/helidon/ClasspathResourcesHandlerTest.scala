@@ -6,7 +6,8 @@ import ba.sake.sharaf.helidon.HelidonSharafServer
 
 class ClasspathResourcesHandlerTest extends AbstractClasspathResourcesHandlerTest {
   val server =
-    HelidonSharafServer("localhost", port, SharafHandler.exceptions(classpathResourcesHandler, ExceptionMapper.default))
+    HelidonSharafServer("localhost", SharafHandler.exceptions(classpathResourcesHandler, ExceptionMapper.default))
+  def port: Int = server.port
   def startServer(): Unit = server.start()
   def stopServer(): Unit = server.stop()
 }

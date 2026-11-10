@@ -8,9 +8,9 @@ class ClasspathResourcesHandlerTest extends AbstractClasspathResourcesHandlerTes
   val server =
     UndertowSharafServer(
       "localhost",
-      port,
       SharafHandler.exceptions(classpathResourcesHandler, ExceptionMapper.default)
     )
+  def port: Int = server.port
   def startServer(): Unit = server.start()
   def stopServer(): Unit = server.stop()
 }

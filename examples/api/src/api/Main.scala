@@ -13,7 +13,7 @@ import ba.sake.tupson.toJson
 
 class JsonApiModule(port: Int) {
 
-  val baseUrl = s"http://localhost:${port}"
+  def baseUrl = s"http://localhost:${server.port}"
 
   // don't do this at home!
   private var db = Seq.empty[ProductRes]

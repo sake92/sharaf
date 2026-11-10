@@ -5,15 +5,12 @@ import io.helidon.webserver.WebServer
 import io.helidon.webserver.http.HttpRouting
 import ba.sake.sharaf.*
 
-class HelidonSharafServer(host: String, port: Int, sharafHelidonHandler: SharafHelidonHandler) {
-
- // System.setProperty("server.host", host)
- // System.setProperty("server.port", port.toString)
+class HelidonSharafServer(host: String, listenPort: Int, sharafHelidonHandler: SharafHelidonHandler) {
 
   private val server = WebServer
     .builder()
     .host(host)
-    .port(port)
+    .port(listenPort)
     .config(Config.create().get("server"))
     .routing { (builder: HttpRouting.Builder) =>
       builder.any(sharafHelidonHandler)
@@ -21,12 +18,22 @@ class HelidonSharafServer(host: String, port: Int, sharafHelidonHandler: SharafH
     }
     .build()
 
+  /** The bound port; available after the server starts. */
+  def port: Int = server.port()
+
   def start(): Unit = server.start()
 
   def stop(): Unit = server.stop()
 }
 
 object HelidonSharafServer {
+
+  def apply(host: String, handler: SharafHandler): HelidonSharafServer = apply(host, 0, handler)
+
+  def apply(host: String, routes: Routes): HelidonSharafServer = apply(host, 0, routes)
+
+  def apply(host: String, handler: SharafHelidonHandler): HelidonSharafServer = apply(host, 0, handler)
+
   def apply(
       host: String,
       port: Int,

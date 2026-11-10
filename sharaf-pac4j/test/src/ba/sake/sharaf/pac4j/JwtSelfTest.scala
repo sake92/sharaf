@@ -6,7 +6,6 @@ import org.pac4j.testkit.JwtScenarios
 import org.pac4j.testkit.TestConfigs
 import ba.sake.sharaf.*
 import ba.sake.sharaf.jdkhttp.JdkHttpServerSharafServer
-import ba.sake.sharaf.utils.NetworkUtils
 
 class JwtSelfTest extends munit.FunSuite:
 
@@ -16,8 +15,6 @@ class JwtSelfTest extends munit.FunSuite:
   override def beforeAll(): Unit =
     this.getClass.getClassLoader.setDefaultAssertionStatus(true)
 
-    val port = NetworkUtils.getFreePort()
-    serverUrl = s"http://localhost:$port"
 
     val pac4jConfig = TestConfigs.jwtConfig()
     // Fix for pac4j 6.5.2: JwtProfileDefinition no longer has setRolesClaimName.
@@ -53,8 +50,9 @@ class JwtSelfTest extends munit.FunSuite:
         else userHandler.handle(ctx)
     }
 
-    val s = JdkHttpServerSharafServer("localhost", port, handler)
+    val s = JdkHttpServerSharafServer("localhost", handler)
     s.start()
+    serverUrl = s"http://localhost:${s.port}"
     server = Some(s)
 
   override def afterAll(): Unit =

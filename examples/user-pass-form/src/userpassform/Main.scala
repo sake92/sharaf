@@ -22,7 +22,7 @@ import ba.sake.sharaf.undertow.*
 
 class UserPassFormModule(port: Int):
 
-  val baseUrl = s"http://localhost:${port}"
+  def baseUrl = s"http://localhost:${server.port}"
 
   // just a dummy user store
   private val profileService = locally {

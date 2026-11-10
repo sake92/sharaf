@@ -7,7 +7,6 @@ import ba.sake.querson.*
 import ba.sake.tupson.*
 import ba.sake.sharaf.*
 import ba.sake.sharaf.exceptions.*
-import ba.sake.sharaf.utils.*
 
 class JsonApiSuite extends munit.FunSuite {
 
@@ -17,7 +16,7 @@ class JsonApiSuite extends munit.FunSuite {
     def apply() = module
 
     override def beforeEach(context: BeforeEach): Unit =
-      module = JsonApiModule(NetworkUtils.getFreePort())
+      module = JsonApiModule(0)
       module.server.start()
 
     override def afterEach(context: AfterEach): Unit =

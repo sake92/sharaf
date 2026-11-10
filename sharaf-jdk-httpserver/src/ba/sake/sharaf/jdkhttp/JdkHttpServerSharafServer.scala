@@ -5,12 +5,15 @@ import java.util.concurrent.Executors
 import com.sun.net.httpserver.{HttpServer, HttpHandler}
 import ba.sake.sharaf.*
 
-class JdkHttpServerSharafServer(host: String, port: Int, handler: HttpHandler) {
+class JdkHttpServerSharafServer(host: String, listenPort: Int, handler: HttpHandler) {
 
-  private val server = HttpServer.create(new InetSocketAddress(host, port), 0)
+  private val server = HttpServer.create(new InetSocketAddress(host, listenPort), 0)
   server.createContext("/", handler)
   // Use a fixed thread pool executor for handling requests
   server.setExecutor(Executors.newFixedThreadPool(10))
+
+  /** The bound port; available after the server starts. */
+  def port: Int = server.getAddress.getPort
 
   def start(): Unit = server.start()
 
@@ -18,6 +21,12 @@ class JdkHttpServerSharafServer(host: String, port: Int, handler: HttpHandler) {
 }
 
 object JdkHttpServerSharafServer {
+
+  def apply(host: String, handler: SharafHandler): JdkHttpServerSharafServer = apply(host, 0, handler)
+
+  def apply(host: String, routes: Routes): JdkHttpServerSharafServer = apply(host, 0, routes)
+
+  def apply(host: String, handler: SharafJdkHttpHandler): JdkHttpServerSharafServer = apply(host, 0, handler)
 
   def apply(
       host: String,

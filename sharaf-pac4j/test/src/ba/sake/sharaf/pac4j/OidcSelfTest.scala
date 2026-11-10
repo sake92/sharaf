@@ -7,7 +7,6 @@ import org.pac4j.testkit.OidcScenarios
 import org.pac4j.testkit.TestConfigs
 import ba.sake.sharaf.*
 import ba.sake.sharaf.jdkhttp.JdkHttpServerSharafServer
-import ba.sake.sharaf.utils.NetworkUtils
 
 class OidcSelfTest extends munit.FunSuite:
 
@@ -23,12 +22,9 @@ class OidcSelfTest extends munit.FunSuite:
     mockOAuthServer = Some(mockServer)
     val mockServerUrl = mockServer.baseUrl().toString
 
-    val port = NetworkUtils.getFreePort()
-    serverUrl = s"http://localhost:$port"
 
     val pac4jConfig = TestConfigs.oidcConfig(mockServerUrl)
     val oidcClient = pac4jConfig.getClients.findClient("OidcClient").get.asInstanceOf[OidcClient]
-    oidcClient.setCallbackUrl(s"http://localhost:$port/callback")
 
     val secConfig = Pac4jSecurityConfig(
       pac4jConfig,
@@ -44,8 +40,10 @@ class OidcSelfTest extends munit.FunSuite:
       }))
     )
 
-    val s = JdkHttpServerSharafServer("localhost", port, handler)
+    val s = JdkHttpServerSharafServer("localhost", handler)
     s.start()
+    serverUrl = s"http://localhost:${s.port}"
+    oidcClient.setCallbackUrl(s"$serverUrl/callback")
     sharafServer = Some(s)
 
   override def afterAll(): Unit =
