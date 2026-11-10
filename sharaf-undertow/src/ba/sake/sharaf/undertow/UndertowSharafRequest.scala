@@ -20,7 +20,9 @@ final class UndertowSharafRequest(val underlyingHttpServerExchange: HttpServerEx
     }.toMap
 
   override def cookies: Seq[Cookie] =
-    underlyingHttpServerExchange.requestCookies().asScala.map(CookieUtils.fromUndertow).toSeq
+    // Retain Undertow's configured cookie-count check before parsing the raw headers.
+    underlyingHttpServerExchange.requestCookies()
+    super.cookies
 
   override lazy val queryParamsRaw: QueryStringMap =
     UrlEncoded.query(underlyingHttpServerExchange.getQueryString)
