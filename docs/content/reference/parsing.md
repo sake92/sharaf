@@ -115,6 +115,21 @@ request targets.
 These checks did not run the original browser test harness, verify global pair
 ordering, or cover the full URL test corpus.
 
+### HTTP/1.1 framing comparison
+
+In November 2026, [HTTP Garden](https://github.com/narfindustries/http-garden/tree/b417e806c1b15e8ea0b9312f81a91fbdcbc7a83e)
+compared its Undertow echo handler using Undertow 2.4.3.Final with a Sharaf
+Potateh 0.2.1-SNAPSHOT echo handler on the JVM and Scala Native. For eight
+selected HTTP/1.1 cases, Garden reported no differences: all accepted a GET,
+fixed-length and chunked bodies, and a two-request pipeline; all returned 400
+for duplicate identical or conflicting content lengths, combined content length
+and chunked encoding, and whitespace before a header colon.
+
+The Undertow comparison used Garden's handler directly, without the Sharaf
+Undertow adapter. The temporary Sharaf echo handler covered only the selected
+paths, HTTP/1.1 and ASCII bodies. This was a small direct-server check, not
+fuzzing, proxy testing or a complete HTTP conformance assessment.
+
 ### Multipart forms in a browser
 
 In November 2026, Playwright drove Chromium 156.0.8078.4 to submit four multipart
