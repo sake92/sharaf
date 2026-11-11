@@ -3,7 +3,6 @@ package api
 import scala.compiletime.uninitialized
 import sttp.model.*
 import sttp.client4.quick.*
-import ba.sake.querson.*
 import ba.sake.tupson.*
 import ba.sake.sharaf.*
 import ba.sake.sharaf.exceptions.*

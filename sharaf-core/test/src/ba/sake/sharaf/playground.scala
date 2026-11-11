@@ -8,8 +8,6 @@ object Playground {
   val routes = Routes {
     case GET -> Path("hello") =>
       Response.withBody("")
-    case GET -> Path("hello") =>
-      Response.withBody("Unreachable case")
     case GET -> Path("qp") =>
       case class MyQP(id: Int) derives QueryStringRW
       Request.current.queryParams[MyQP]

@@ -78,7 +78,6 @@ private class RoleExtractingJwtProfileDefinition extends org.pac4j.jwt.profile.J
     super.convertAndAdd(profile, location, name, value)
     // Extract "roles" claim into profile roles for RequireAnyRoleAuthorizer
     if name == "roles" && value.isInstanceOf[java.util.List[?]] then
-      import scala.jdk.CollectionConverters.*
       val rolesList = value.asInstanceOf[java.util.List[String]]
       profile.addRoles(rolesList)
 

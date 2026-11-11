@@ -1,6 +1,7 @@
 package ba.sake.sharaf.session.jdbc
 
 import java.time.Instant
+import scala.language.implicitConversions
 import javax.sql.DataSource
 import ba.sake.sharaf.session.{Session, SessionConfig, SessionStore}
 import ba.sake.squery.{*, given}

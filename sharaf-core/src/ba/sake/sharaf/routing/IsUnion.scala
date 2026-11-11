@@ -18,8 +18,8 @@ object IsUnion {
     import quotes.reflect.*
     val tpe: TypeRepr = TypeRepr.of[A]
     tpe.dealias match {
-      case o: OrType => '{ IsUnion.singleton.asInstanceOf[IsUnion[A]] }.asExprOf[IsUnion[A]]
-      case other     => report.errorAndAbort(s"${tpe.show} is not a Union")
+      case _: OrType => '{ IsUnion.singleton.asInstanceOf[IsUnion[A]] }.asExprOf[IsUnion[A]]
+      case _         => report.errorAndAbort(s"${tpe.show} is not a Union")
     }
   }
 

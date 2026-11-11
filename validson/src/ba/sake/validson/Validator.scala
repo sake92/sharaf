@@ -100,6 +100,7 @@ object Validator extends LowPriValidators {
   /* macro derived instances */
   inline def derived[T]: Validator[T] = ${ derivedMacro[T] }
 
+  @annotation.nowarn("msg=unused pattern variable")
   private def derivedMacro[T: Type](using Quotes): Expr[Validator[T]] = {
     import quotes.reflect.*
 

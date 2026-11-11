@@ -1,11 +1,8 @@
 package jwt
 
-import java.util.Optional
-import scala.jdk.CollectionConverters.*
 import org.pac4j.core.client.Clients
 import org.pac4j.core.config.Config
 import org.pac4j.http.client.direct.HeaderClient
-import org.pac4j.core.matching.matcher.{DefaultMatchers, PathMatcher}
 import org.pac4j.core.matching.matcher.{DefaultMatchers, PathMatcher}
 import org.pac4j.core.profile.BasicUserProfile
 import org.pac4j.jwt.config.signature.SecretSignatureConfiguration

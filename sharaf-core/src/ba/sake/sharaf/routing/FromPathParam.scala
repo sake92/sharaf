@@ -59,6 +59,7 @@ object FromPathParam {
   /* macro derivation */
   inline def derived[T]: FromPathParam[T] = ${ derivedMacro[T] }
 
+  @annotation.nowarn("msg=unused pattern variable")
   private def derivedMacro[T: Type](using Quotes): Expr[FromPathParam[T]] = {
     import quotes.reflect.*
 

@@ -13,7 +13,7 @@ final class FilesHandler(
     notFoundHandler: SharafHandler,
     enableCaching: Boolean = true,
     maxCacheAge: Long = FilesHandler.DefaultMaxCacheAge,
-    enableRangeRequests: Boolean = true
+    @annotation.nowarn("msg=unused") enableRangeRequests: Boolean = true
 ) extends SharafHandler {
 
   private val absoluteRoot = rootPath.toAbsolutePath.normalize()
@@ -169,6 +169,7 @@ final class FilesHandler(
 
   /** Parses a Range header (e.g., "bytes=0-1023").
     */
+  @annotation.nowarn("msg=unused")
   private def parseRange(rangeHeader: String, fileSize: Long): Option[(start: Long, end: Long)] = {
     val rangePattern = "bytes=(\\d*)-(\\d*)".r
     rangeHeader match {

@@ -44,7 +44,7 @@ final class Pac4jSecurityHandler(
         else if securityConfig.logoutPath.contains(pathStr) then
           handleLogoutLogic(pac4jConfig, frameworkParams)
         else
-          handleSecurityLogic(context, pac4jConfig, webContext, frameworkParams)
+          handleSecurityLogic(context, pac4jConfig, frameworkParams)
 
       result match
         case res: Response[?] =>
@@ -84,7 +84,6 @@ final class Pac4jSecurityHandler(
   private def handleSecurityLogic(
       context: RequestContext,
       pac4jConfig: org.pac4j.core.config.Config,
-      webContext: SharafWebContext,
       params: SharafFrameworkParameters
   ): AnyRef =
     val accessAdapter = new SecurityGrantedAccessAdapter:

@@ -1,7 +1,7 @@
 package ba.sake.sharaf.session
 
 import java.time.Instant
-import ba.sake.tupson.{*, given}
+import ba.sake.tupson.*
 
 /** Mutable session implementation backed by a JSON-serialized key-value map. */
 final class SessionImpl(

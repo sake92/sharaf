@@ -4,7 +4,6 @@ import java.nio.file.Path
 import scala.compiletime.uninitialized
 import sttp.model.*
 import sttp.client4.quick.*
-import ba.sake.formson.*
 import ba.sake.sharaf.*
 
 class FullstackSuite extends munit.FunSuite {

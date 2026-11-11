@@ -1,7 +1,6 @@
 package ba.sake.sharaf.pac4j
 
-import scala.jdk.CollectionConverters.*
-import org.pac4j.core.profile.{UserProfile, CommonProfile}
+import org.pac4j.core.profile.CommonProfile
 
 class SecurityServiceTest extends munit.FunSuite:
 
