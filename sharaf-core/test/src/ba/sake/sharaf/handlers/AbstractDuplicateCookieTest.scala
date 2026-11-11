@@ -26,6 +26,27 @@ abstract class AbstractDuplicateCookieTest extends munit.FunSuite with ServerFix
     }
   }
 
+  test("cookie fuzzer input with an empty dollar-prefixed value is accepted") {
+    withServer(routes, ExceptionMapper.default) { base =>
+      val response = request.get(uri"$base/cookies").header("Cookie", "$=;=foo").send(httpBackend)
+      assertEquals(response.code, StatusCode.Ok)
+      assertEquals(response.body, "")
+    }
+  }
+
+  test("cookie limit counts duplicates across headers") {
+    withServer(routes, ExceptionMapper.default) { base =>
+      val cookies = Seq.fill(200)("SESSION=x").mkString("; ")
+      val allowed = request.get(uri"$base/cookies").header("Cookie", cookies).send(httpBackend)
+      assertEquals(allowed.code, StatusCode.Ok)
+      val excessive = request.get(uri"$base/cookies")
+        .header("Cookie", cookies)
+        .header("Cookie", "SESSION=y", DuplicateHeaderBehavior.Add)
+        .send(httpBackend)
+      assertEquals(excessive.code, StatusCode.BadRequest)
+    }
+  }
+
   test("session lookup uses the first duplicate cookie") {
     withHandler(SharafHandler.sessions(SharafHandler.routes(routes))) { base =>
       val first = request.get(uri"$base/session").send(httpBackend).body

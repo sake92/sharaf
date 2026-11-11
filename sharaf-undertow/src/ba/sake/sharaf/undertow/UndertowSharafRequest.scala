@@ -3,6 +3,7 @@ package ba.sake.sharaf.undertow
 import java.nio.charset.StandardCharsets
 import scala.jdk.CollectionConverters.*
 import io.undertow.server.HttpServerExchange
+import io.undertow.UndertowOptions
 import ba.sake.formson.*
 import ba.sake.querson.*
 import ba.sake.sharaf.*
@@ -20,9 +21,9 @@ final class UndertowSharafRequest(val underlyingHttpServerExchange: HttpServerEx
     }.toMap
 
   override def cookies: Seq[Cookie] =
-    // Retain Undertow's configured cookie-count check before parsing the raw headers.
-    underlyingHttpServerExchange.requestCookies()
-    super.cookies
+    val limit = underlyingHttpServerExchange.getConnection.getUndertowOptions
+      .get(UndertowOptions.MAX_COOKIES, UndertowOptions.DEFAULT_MAX_COOKIES)
+    CookieHeaders.parse(headers.getOrElse(HttpString("Cookie"), Seq.empty), limit)
 
   override lazy val queryParamsRaw: QueryStringMap =
     UrlEncoded.query(underlyingHttpServerExchange.getQueryString)

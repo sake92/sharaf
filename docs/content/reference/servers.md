@@ -64,9 +64,11 @@ expiry in the past; cookie path and domain must match the cookie being removed.
 For a scoped cookie, `settingCookie` with the matching path/domain and a past
 `expires` value supplies that scope.
 
-JDK, Potateh, Helidon, and snunit share request-cookie parsing. Undertow and http4s
-use their engine parsers. Legacy `discard`, `version`, and `comment` attributes
-remain specific to Undertow's cookie support.
+Undertow, Potateh, JDK HTTP server, Helidon, and snunit share request-cookie
+parsing; http4s uses its engine parser. The shared parser accepts up to 200 named
+cookie pairs, including duplicates, across all Cookie headers. It returns 400 via
+the configured exception mapper if the limit is exceeded. Undertow uses its
+configured `MAX_COOKIES` value instead. This limit applies when cookies are read.
 
 ## Query strings and URL-encoded forms
 

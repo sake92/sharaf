@@ -2,18 +2,34 @@ package ba.sake.sharaf
 
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
+import ba.sake.sharaf.exceptions.BadRequestException
 
 /** Wire format shared by adapters without their own cookie support. */
 private[sharaf] object CookieHeaders {
-  def parse(headers: Seq[String]): Seq[Cookie] =
-    headers.flatMap { header =>
-      header.split(';').toSeq.flatMap { item =>
-        val parts = item.trim.split("=", 2)
-        val name = parts(0).trim
-        val value = if parts.length == 2 then parts(1).trim else ""
-        Option.when(name.nonEmpty)(Cookie(name, value))
+  val defaultMaxCookies: Int = 200
+
+  def parse(headers: Seq[String], maxCookies: Int = defaultMaxCookies): Seq[Cookie] = {
+    val cookies = Seq.newBuilder[Cookie]
+    var count = 0
+    headers.foreach { header =>
+      var start = 0
+      while start <= header.length do {
+        val separator = header.indexOf(';', start)
+        val end = if separator < 0 then header.length else separator
+        val item = header.substring(start, end).trim
+        val equals = item.indexOf('=')
+        val name = (if equals < 0 then item else item.substring(0, equals)).trim
+        if name.nonEmpty then {
+          count += 1
+          if count > maxCookies then throw BadRequestException("Cookie count limit exceeded")
+          val value = if equals < 0 then "" else item.substring(equals + 1).trim
+          cookies += Cookie(name, value)
+        }
+        start = if separator < 0 then header.length + 1 else separator + 1
       }
     }
+    cookies.result()
+  }
 
   def render(cookie: Cookie): String = {
     val result = new StringBuilder(s"${cookie.name}=${cookie.value}")
