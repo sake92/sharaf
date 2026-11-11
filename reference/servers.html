@@ -96,6 +96,7 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
      </table>
      <p><code>sharaf-core</code> supports JVM and Scala Native. The companion libraries <code>formson</code>, <code>querson</code>, and <code>validson</code> also support Scala.js.</p>
      <p>On Scala Native, JDK HTTP server uses an explicitly composed <code>SharafHandler</code>. Its routes convenience overload wires classpath resources and requires JVM APIs.</p>
+     <p>The JDK HTTP server uses a ten-thread pool by default and shuts it down when stopped. To supply your own <code>java.util.concurrent.Executor</code>, pass <code>Some(executor)</code> when creating the server; you own its shutdown.</p>
      <p>Native executable examples cover three deployment paths:</p>
      <ul>
       <li><a href="https://github.com/sake92/sharaf/tree/main/examples/scala-cli/hello-undertow-graalvm.scala">GraalVM Native Image with Undertow</a></li>
