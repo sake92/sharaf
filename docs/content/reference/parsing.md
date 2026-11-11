@@ -144,18 +144,18 @@ multipart bodies.
 
 ### Cookie parsing comparison
 
-In November 2026, Sharaf Potateh on the JVM and Werkzeug 3.1.8 received the same
-59,319 generated cookie headers. The inputs used the three-character name alphabet
-from [Cookie Crumbles](https://github.com/SecPriv/cookiecrumbles/tree/main/reflectors),
+In November 2026, Sharaf Potateh on the JVM and Scala Native and Werkzeug 3.1.8
+received the same 59,319 generated cookie headers. The inputs used the
+three-character name alphabet from [Cookie Crumbles](https://github.com/SecPriv/cookiecrumbles/tree/main/reflectors),
 with a fixed value of `foo`. Both returned the same sorted name/value pairs for all
 cases, with no request errors. The comparison used an adapted harness, not the
 upstream fuzzer or its older reflector versions.
 
-In a separate comparison of 16 selected headers, the parsers agreed on 13. The
+In a separate comparison of 16 selected headers on both platforms, the parsers agreed on 13. The
 three differences involved quoted values: Sharaf preserves the quotes, while
 Werkzeug removes them; for a quoted value containing a semicolon, Sharaf also
 splits at the semicolon. These differences alone do not establish a defect.
 
 The generated comparison did not check duplicate headers, ordering, other values,
-Scala Native, or conformance against a specification. Clients and servers may
+or conformance against a specification. Clients and servers may
 normalize headers before parsing.
