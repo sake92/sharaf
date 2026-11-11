@@ -3,7 +3,6 @@ package ba.sake.sharaf.handlers
 import java.nio.file.{Files, Path}
 import java.time.{Instant, ZoneId, ZonedDateTime}
 import java.time.format.DateTimeFormatter
-import scala.util.Try
 import ba.sake.sharaf.*
 import ba.sake.sharaf.exceptions.*
 import sttp.model.*
@@ -59,7 +58,7 @@ final class FilesHandler(
   private def serveFile(filePath: Path, withBody: Boolean)(using request: Request): Response[?] = boundary {
     val fileSize = Files.size(filePath)
     val lastModified = Files.getLastModifiedTime(filePath).toInstant
-    val mimeType = detectMimeType(filePath)
+    val mimeType = FileMimeTypes.forPath(filePath)
 
     val etag = Option.when(enableCaching) {
       generateETag(fileSize, lastModified)
@@ -180,10 +179,6 @@ final class FilesHandler(
       case _ => None
     }
   }
-
-  private def detectMimeType(filePath: Path): String =
-    Try(Files.probeContentType(filePath)).toOption
-      .getOrElse("application/octet-stream")
 
   private def generateETag(size: Long, lastModified: Instant): String =
     s"""W/"$size-${lastModified.getEpochSecond}-${lastModified.getNano}""""
