@@ -40,38 +40,19 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
     <div class="content">
      <h1 id="patch-requests">PATCH Requests<a href="#patch-requests" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
      <p>A <code>PUT</code> request normally replaces a whole resource, but a client often needs to update just one field. With ordinary optional fields, JSON cannot distinguish an omitted key (leave the existing value unchanged) from <code>null</code> (replace a nullable value with no value). Model whether the field was sent separately from its nullability so a PATCH endpoint can preserve that intent.</p>
-     <p>Starting with the next Sharaf release, import <code>ba.sake.sharaf.Patch</code> from core. Its JSON codec defaults a missing key to <code>Keep</code>; every present key becomes <code>Set(value)</code>. Use <code>Patch[String]</code> for a required field and <code>Patch[Option[String]]</code> for a nullable field, so JSON <code>null</code> becomes <code>Set(None)</code>. Your request model can derive <code>JsonRW</code> as usual:</p>
+     <p>Import <code>ba.sake.sharaf.Patch</code> from core. Its JSON codec defaults a missing key to <code>Keep</code>; every present key becomes <code>Set(value)</code>. Use <code>Patch[String]</code> for a required field and <code>Patch[Option[String]]</code> for a nullable field, so JSON <code>null</code> becomes <code>Set(None)</code>. Your request model can derive <code>JsonRW</code> as usual:</p>
      <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">import</span> ba.sake.sharaf.<span class="hljs-type">Patch</span>
 <span class="hljs-keyword">import</span> ba.sake.tupson.<span class="hljs-type">JsonRW</span>
 
 <span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">UserPatch</span>(<span class="hljs-params">name: <span class="hljs-type">Patch</span>[<span class="hljs-type">String</span>], address: <span class="hljs-type">Patch</span>[<span class="hljs-type">Option</span>[<span class="hljs-type">String</span>]]</span>) <span class="hljs-title">derives</span> <span class="hljs-title">JsonRW</span></span>
 </code></pre>
-     <p>The runnable Scala CLI example below pins Sharaf 0.20.0 and defines the equivalent standalone codec. After upgrading to a release containing core's <code>Patch</code>, remove that local enum and companion. The example applies the patch to a user resource:</p>
+     <p>The runnable Scala CLI example applies the patch to a user resource:</p>
      <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">scala</span> <span class="hljs-string">3.9.0</span>
-<span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">ba.sake::sharaf-undertow:0.20.0</span>
-<span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">ba.sake::tupson:0.31.0</span>
+<span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">ba.sake::sharaf-undertow:0.21.0</span>
 
 <span class="hljs-keyword">import</span> ba.sake.sharaf.*
 <span class="hljs-keyword">import</span> ba.sake.sharaf.undertow.<span class="hljs-type">UndertowSharafServer</span>
 <span class="hljs-keyword">import</span> ba.sake.tupson.{<span class="hljs-keyword">given</span>, *}
-<span class="hljs-keyword">import</span> org.typelevel.jawn.ast.*
-
-<span class="hljs-keyword">enum</span> <span class="hljs-type">Patch</span>[+<span class="hljs-type">T</span>]:
-  <span class="hljs-keyword">case</span> <span class="hljs-type">Set</span>(value: <span class="hljs-type">T</span>)
-  <span class="hljs-keyword">case</span> <span class="hljs-type">Keep</span>
-
-<span class="hljs-class"><span class="hljs-keyword">object</span> <span class="hljs-title">Patch</span></span>:
-  <span class="hljs-keyword">given</span> [<span class="hljs-type">T</span>](<span class="hljs-keyword">using</span> valueRW: <span class="hljs-type">JsonRW</span>[<span class="hljs-type">T</span>]): <span class="hljs-type">JsonRW</span>[<span class="hljs-type">Patch</span>[<span class="hljs-type">T</span>]] <span class="hljs-keyword">with</span>
-    <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">write</span></span>(value: <span class="hljs-type">Patch</span>[<span class="hljs-type">T</span>]): <span class="hljs-type">JValue</span> = value <span class="hljs-keyword">match</span>
-      <span class="hljs-keyword">case</span> <span class="hljs-type">Set</span>(value) =&gt; valueRW.write(value)
-      <span class="hljs-keyword">case</span> <span class="hljs-type">Keep</span>       =&gt; <span class="hljs-keyword">throw</span> <span class="hljs-type">TupsonException</span>(<span class="hljs-string">"Patch.Keep can only be written as an object field"</span>)
-
-    <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">shouldWriteField</span></span>(value: <span class="hljs-type">Patch</span>[<span class="hljs-type">T</span>]): <span class="hljs-type">Boolean</span> = value != <span class="hljs-type">Keep</span>
-
-    <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">parse</span></span>(path: <span class="hljs-type">String</span>, jValue: <span class="hljs-type">JValue</span>): <span class="hljs-type">Patch</span>[<span class="hljs-type">T</span>] =
-      <span class="hljs-type">Set</span>(valueRW.parse(path, jValue))
-
-    <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">default</span></span>: <span class="hljs-type">Option</span>[<span class="hljs-type">Patch</span>[<span class="hljs-type">T</span>]] = <span class="hljs-type">Some</span>(<span class="hljs-type">Keep</span>)
 
 <span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">User</span>(<span class="hljs-params">name: <span class="hljs-type">String</span>, address: <span class="hljs-type">Option</span>[<span class="hljs-type">String</span>]</span>) <span class="hljs-title">derives</span> <span class="hljs-title">JsonRW</span></span>
 <span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">UserPatch</span>(<span class="hljs-params">name: <span class="hljs-type">Patch</span>[<span class="hljs-type">String</span>], address: <span class="hljs-type">Patch</span>[<span class="hljs-type">Option</span>[<span class="hljs-type">String</span>]]</span>) <span class="hljs-title">derives</span> <span class="hljs-title">JsonRW</span></span>
