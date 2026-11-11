@@ -39,7 +39,7 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
    <div>
     <div class="content">
      <h1 id="upload-file">Upload File<a href="#upload-file" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
-     <p>Uploading a file is usually done via <code>multipart/form-data</code> form submission.</p>
+     <p>Submit the form as <code>multipart/form-data</code> and parse the upload as a NIO <code>Path</code>. The server adapter must support multipart forms; see the <a href="https://sake92.github.io/sharaf/reference/parsing.html#multipart-forms">parsing reference</a>.</p>
      <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">// 1. somewhere in a view, use enctype="multipart/form-data"</span>
 <span class="hljs-string">html""</span><span class="hljs-string">"
     &lt;form action="</span>/form-<span class="hljs-string">submit" method="</span><span class="hljs-type">POST</span><span class="hljs-string">" enctype="</span>multipart/form-<span class="hljs-string">data"&gt;
@@ -48,10 +48,10 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
 "</span><span class="hljs-string">""</span>
 
 <span class="hljs-comment">// 2. define form data class with a NIO Path file</span>
-<span class="hljs-keyword">import</span> java.nio.file.<span class="hljs-type">Path</span>
+<span class="hljs-keyword">import</span> java.nio.file.{<span class="hljs-type">Files</span>, <span class="hljs-type">Path</span> as <span class="hljs-type">FilePath</span>}
 <span class="hljs-keyword">import</span> ba.sake.formson.*
 
-<span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyData</span>(<span class="hljs-params">file: <span class="hljs-type">Path</span></span>) <span class="hljs-title">derives</span> <span class="hljs-title">FormDataRW</span></span>
+<span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">MyData</span>(<span class="hljs-params">file: <span class="hljs-type">FilePath</span></span>) <span class="hljs-title">derives</span> <span class="hljs-title">FormDataRW</span></span>
 
 <span class="hljs-comment">// 3. handle the file however you want</span>
 <span class="hljs-keyword">case</span> <span class="hljs-type">POST</span> -&gt; <span class="hljs-type">Path</span>(<span class="hljs-string">"form-submit"</span>) =&gt;
@@ -59,6 +59,13 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
   <span class="hljs-keyword">val</span> fileAsString = <span class="hljs-type">Files</span>.readString(formData.file)
 </code></pre>
      <p>You can find a working example in the <a href="https://github.com/sake92/sharaf/tree/main/examples/fullstack">repo</a>.</p>
+     <p>Read or copy the upload while handling the request. The temporary file is owned by the adapter and deleted automatically, including on parsing and handler failures. Potateh deletes uploads before deferred response writing, so copy an upload first if the response or background work needs it later.</p>
+     <p>To keep an upload, copy it into application-owned storage before returning:</p>
+     <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">val</span> formData = <span class="hljs-type">Request</span>.current.bodyForm[<span class="hljs-type">MyData</span>]
+<span class="hljs-keyword">val</span> destination = <span class="hljs-type">Files</span>.createTempFile(applicationUploadDirectory, <span class="hljs-string">"upload-"</span>, <span class="hljs-string">".bin"</span>)
+<span class="hljs-type">Files</span>.copy(formData.file, destination, java.nio.file.<span class="hljs-type">StandardCopyOption</span>.<span class="hljs-type">REPLACE_EXISTING</span>)
+</code></pre>
+     <p>Choose <code>applicationUploadDirectory</code> in your application configuration. Do not use a client-supplied filename as a storage path. The shared parser always creates files on disk, including empty uploads; its limits and Undertow's separate upload behavior are listed in the <a href="https://sake92.github.io/sharaf/reference/parsing.html#multipart-forms">parsing reference</a>.</p>
      <div role="group">
       <a role="button" href="https://sake92.github.io/sharaf/howtos/routes.html">⬅️ Routes</a> <span></span> <a role="button" href="https://sake92.github.io/sharaf/howtos/external-config.html">External Config ➡️</a>
      </div>

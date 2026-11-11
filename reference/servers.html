@@ -62,39 +62,40 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
         <td>http4s</td>
         <td>JVM, Scala Native</td>
         <td>Beta</td>
-        <td>URL encoded</td>
+        <td>URL encoded and multipart</td>
        </tr>
        <tr>
         <td><code>sharaf-jdk-httpserver</code></td>
         <td>JDK HTTP server</td>
-        <td>JVM</td>
+        <td>JVM, Scala Native</td>
         <td>Beta</td>
-        <td>URL encoded</td>
+        <td>URL encoded and multipart</td>
        </tr>
        <tr>
         <td><code>sharaf-helidon</code></td>
         <td>Helidon</td>
         <td>JVM</td>
         <td>Experimental</td>
-        <td>URL encoded; multipart unsupported</td>
+        <td>URL encoded and multipart</td>
        </tr>
        <tr>
         <td><code>sharaf-potateh</code></td>
         <td>Potateh</td>
         <td>JVM, Scala Native</td>
         <td>Experimental</td>
-        <td>URL encoded; multipart unsupported</td>
+        <td>URL encoded and multipart</td>
        </tr>
        <tr>
         <td><code>sharaf-snunit</code></td>
         <td>snunit</td>
         <td>Scala Native</td>
         <td>Experimental</td>
-        <td>URL encoded; multipart unsupported</td>
+        <td>URL encoded and multipart</td>
        </tr>
       </tbody>
      </table>
      <p><code>sharaf-core</code> supports JVM and Scala Native. The companion libraries <code>formson</code>, <code>querson</code>, and <code>validson</code> also support Scala.js.</p>
+     <p>On Scala Native, JDK HTTP server uses an explicitly composed <code>SharafHandler</code>. Its routes convenience overload wires classpath resources and requires JVM APIs.</p>
      <p>Native executable examples cover three deployment paths:</p>
      <ul>
       <li><a href="https://github.com/sake92/sharaf/tree/main/examples/scala-cli/hello-undertow-graalvm.scala">GraalVM Native Image with Undertow</a></li>
@@ -103,14 +104,22 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
      </ul>
      <p>The GraalVM example covers Undertow and its example dependencies; it does not establish Native Image compatibility for every JVM adapter. The snunit example requires <code>libunit</code> at build time and a separately configured Unit daemon.</p>
      <p>Local size, startup, and memory figures are listed in the <a href="https://sake92.github.io/sharaf/reference/native-footprint.html">native footprint reference</a>.</p>
-     <p>Stable is the recommended server integration. Beta integrations support the listed platforms but have narrower form handling. Experimental integrations have incomplete request features and may change between releases.</p>
+     <p>Stable is the recommended server integration. Beta integrations support the listed platforms with less production coverage. Experimental integrations have incomplete request features and may change between releases.</p>
      <p>The <a href="https://sake92.github.io/sharaf/tutorials/quickstart.html">quickstart</a> uses Undertow. Adapter examples are in the <a href="https://github.com/sake92/sharaf/tree/main/examples">repository</a>.</p>
      <p>The <a href="https://github.com/sake92/sharaf-aws-lambda-starter">AWS Lambda starter</a> packages an Undertow/JVM application with AWS Lambda Web Adapter and includes Terraform configuration and local integration tests.</p>
+     <h2 id="choosing-a-port">Choosing a port<a href="#choosing-a-port" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p>Undertow, Helidon, and JDK HTTP server wrappers accept port <code>0</code> to let the operating system choose a port. Their overloads without a port do the same. Read <code>server.port</code> after starting:</p>
+     <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">val</span> server = <span class="hljs-type">UndertowSharafServer</span>(<span class="hljs-string">"127.0.0.1"</span>, routes)
+server.start()
+println(server.port)
+</code></pre>
+     <p>Pass an explicit port for a fixed address. Potateh exposes its bound port through <code>server.address.getPort</code>.</p>
+     <p>Request parsing behavior and verification are described in the <a href="https://sake92.github.io/sharaf/reference/parsing.html">parsing reference</a>.</p>
      <h2 id="potateh">Potateh<a href="#potateh" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
      <p><code>PotatehSharafServer.start(config, routes)</code> and <code>start(config, handler)</code> return a Potateh <code>Server</code>. The caller stops it with <code>server.stop()</code>. Routes can also receive CORS settings, an exception mapper and a not-found handler.</p>
      <p>The overloads <code>start(config, routes, executor)</code> and <code>start(config, handler, executor)</code> accept a caller-owned <code>java.util.concurrent.Executor</code>. A routes overload also accepts all middleware settings together with an executor. Stopping the server leaves the executor open. Each submitted task serves a whole persistent connection; a small fixed pool can starve other clients. Rejected submissions must throw.</p>
      <p>Potateh owns connection and transfer framing. The adapter removes engine-owned and Connection-nominated headers, translates an explicit <code>Content-Length</code> to Potateh's writer length, and streams bodies without buffering them. Invalid or contradictory response lengths fail as server errors. Length mismatches during streaming terminate the connection. Response-requested <code>Connection: close</code>, upgrades and trailers are unsupported and fail as server errors. SSE uses chunked streaming on HTTP/1.1.</p>
-     <p>Malformed query/form encoding and invalid path UTF-8 return 400. Unsupported form media types, including multipart, return 415. Valid but unsupported HTTP methods return 501. Routes use the configured exception mapper for these adapter errors; with an already composed handler, errors before context creation use the default mapper. Malformed HTTP syntax rejected by Potateh uses its own protocol response.</p>
+     <p>Malformed query/form percent escapes and invalid path UTF-8 return 400. Unsupported form media types return 415. Valid but unsupported HTTP methods return 501. Routes use the configured exception mapper for these adapter errors; with an already composed handler, errors before context creation use the default mapper. Malformed HTTP syntax rejected by Potateh uses its own protocol response.</p>
      <p>Paths split on literal slashes before percent decoding each segment once. <code>%2F</code> stays within one segment and <code>+</code> remains literal. Empty interior segments are preserved; trailing slashes follow the existing split behavior. This policy is specific to Potateh; path decoding currently differs between server adapters.</p>
     </div>
     <aside aria-label="On this page">
@@ -120,6 +129,7 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
        <ul>
         <li><a href="#servers-and-platforms">Servers and platforms</a>
          <ul>
+          <li><a href="#choosing-a-port">Choosing a port</a></li>
           <li><a href="#potateh">Potateh</a></li>
          </ul></li>
        </ul>

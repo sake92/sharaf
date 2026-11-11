@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Request parsing behavior and verification">
+  <title>Request parsing | Sharaf Documentation</title>
+  <link rel="shortcut icon" href="https://sake92.github.io/sharaf/images/favicon.png" type="image/png">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-dark.min.css" media="(prefers-color-scheme: dark)" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-light.min.css" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.conditional.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://sake92.github.io/sharaf/styles/default.css">
+ </head>
+ <body>
+  <header class="pico container">
+   <nav aria-label="Main navigation">
+    <a href="https://sake92.github.io/sharaf/">Sharaf Documentation</a>
+    <div>
+     <a href="https://sake92.github.io/sharaf/tutorials">Tutorials</a> <a href="https://sake92.github.io/sharaf/howtos">How-Tos</a> <a href="https://sake92.github.io/sharaf/reference">Reference</a> <a href="https://sake92.github.io/sharaf/philosophy">Philosophy</a>
+    </div>
+    <form action="https://sake92.github.io/sharaf/search/results.html" method="get" role="search">
+     <input name="q" type="search" placeholder="Search" aria-label="Search this site">
+    </form>
+   </nav>
+  </header>
+  <script>
+for (const link of document.querySelectorAll('body > header > nav > div > a')) {
+    const path = new URL(link.href).pathname.replace(/\/$/, '');
+    const current = window.location.pathname;
+    if (current === path || current.startsWith(path + '/')) link.setAttribute('aria-current', 'page');
+}
+</script>
+  <main class="pico container">
+   <div>
+    <div class="content">
+     <h1 id="request-parsing">Request parsing<a href="#request-parsing" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
+     <h2 id="cookies">Cookies<a href="#cookies" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p>All adapters expose request cookies through <code>Request.current.cookies</code> and support <code>Response.settingCookie</code> and <code>Response.removingCookie</code>. Multiple response cookies are sent as separate <code>Set-Cookie</code> headers, including on responses without a body.</p>
+     <p>Supported response attributes are <code>path</code>, <code>domain</code>, <code>maxAge</code>, <code>expires</code>, <code>secure</code>, <code>httpOnly</code>, and <code>sameSiteMode</code> (<code>Strict</code>, <code>Lax</code>, or <code>None</code>). Cookie values are opaque; <code>+</code> and percent escapes are not URL-decoded. Removal sends an empty value with an expiry in the past; cookie path and domain must match the cookie being removed. For a scoped cookie, <code>settingCookie</code> with the matching path/domain and a past <code>expires</code> value supplies that scope.</p>
+     <p>Undertow, Potateh, JDK HTTP server, Helidon, and snunit share request-cookie parsing; http4s uses its engine parser. The shared parser accepts up to 200 named cookie pairs, including duplicates, across all Cookie headers. It returns 400 via the configured exception mapper if the limit is exceeded. Undertow uses its configured <code>MAX_COOKIES</code> value instead. This limit applies when cookies are read.</p>
+     <h2 id="query-strings-and-url-encoded-forms">Query strings and URL-encoded forms<a href="#query-strings-and-url-encoded-forms" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p>Undertow, Potateh, JDK HTTP server, Helidon and snunit share raw query and <code>application/x-www-form-urlencoded</code> parsing. Names and values are decoded once with UTF-8 after splitting on <code>&amp;</code> and the first <code>=</code>. Repeated fields, empty names and empty values are retained; empty separator entries are ignored. Form keys retain their first insertion order. <code>+</code> represents a space; <code>%2B</code> represents <code>+</code>. Form media types are case-insensitive and may include parameters.</p>
+     <p>Undertow and Potateh limit URL-encoded request bodies to 1 MiB when reading <code>bodyString</code> or parsing a form. Larger bodies return 413 through the configured exception mapper. Other adapters do not apply this Sharaf-side limit.</p>
+     <p>Malformed percent escapes return 400 through the configured exception mapper. Unsupported form media types return 415. Malformed UTF-8 bytes are replaced with <code>�</code>, following Java's <a href="https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/net/URLDecoder.html">URLDecoder contract</a> and the UTF-8 replacement policy in the <a href="https://url.spec.whatwg.org/#application/x-www-form-urlencoded-parsing">web form parsing standard</a>. Broken percent escapes are rejected more strictly than that standard's parser. Potateh previously rejected malformed query/form UTF-8 with 400; it now uses the same replacement policy as the other adapters.</p>
+     <p>http4s uses its server-library query parser and the shared URL-encoded form parser. Undertow, http4s, JDK HTTP server, Helidon and Potateh split raw paths into segments before decoding each segment once. Encoded slashes remain within their segment; <code>+</code> remains a literal plus in paths.</p>
+     <h2 id="multipart-forms">Multipart forms<a href="#multipart-forms" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p>All adapters share a byte-oriented <code>multipart/form-data</code> parser. Text fields are decoded as UTF-8. Every part with a <code>filename</code> parameter becomes a temporary <code>FormValue.File(Path)</code>, including empty files. Repeated fields and the first insertion order of keys are retained. Upload filenames and content types are not exposed by <code>FormDataMap</code>.</p>
+     <p>The parser streams uploads to disk without converting the body to text. snunit provides its body as an existing byte array; the shared parser wraps that array as a stream, but does not remove snunit's transport-level buffering.</p>
+     <table>
+      <thead>
+       <tr>
+        <th>Limit</th>
+        <th>Value</th>
+       </tr>
+      </thead>
+      <tbody>
+       <tr>
+        <td>Total multipart body, including framing and epilogue</td>
+        <td>32 MiB</td>
+       </tr>
+       <tr>
+        <td>Each uploaded file</td>
+        <td>16 MiB</td>
+       </tr>
+       <tr>
+        <td>Each text field</td>
+        <td>64 KiB</td>
+       </tr>
+       <tr>
+        <td>Parts</td>
+        <td>128</td>
+       </tr>
+       <tr>
+        <td>Headers per part, including line endings</td>
+        <td>16 KiB</td>
+       </tr>
+       <tr>
+        <td>Header count per part</td>
+        <td>32</td>
+       </tr>
+       <tr>
+        <td>Boundary-line padding lookahead</td>
+        <td>16 KiB</td>
+       </tr>
+      </tbody>
+     </table>
+     <p>These parser limits are fixed defaults. Server and proxy limits may be lower. Malformed or truncated multipart input returns 400; exceeding a parser limit returns 413 through the default or JSON exception mapper. Unsupported part transfer encodings such as base64 are rejected with 400; identity encodings (<code>binary</code>, <code>8bit</code>, <code>7bit</code>) leave the bytes unchanged.</p>
+     <p>Temporary uploads are deleted on parsing failures and after response processing, including handler and writer failures. Potateh uses its response-completion hook so uploads remain available to deferred response writers and are also cleaned when the engine skips the body. All adapters require an application-owned copy for background work or permanent storage.</p>
+     <p>Undertow uses the shared parser and limits, including <code>FormValue.File(Path)</code> for empty uploads. Undertow-specific in-memory upload thresholds do not apply to Sharaf form parsing.</p>
+     <p>See <a href="https://sake92.github.io/sharaf/howtos/upload-file.html">upload a file</a> for typed <code>Path</code> parsing.</p>
+     <h2 id="verification">Verification<a href="#verification" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p>These local checks complement Sharaf's automated tests. They cover selected inputs and configurations, not complete protocol conformance.</p>
+     <h3 id="url-encoded-parsing-vectors">URL-encoded parsing vectors<a href="#url-encoded-parsing-vectors" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h3>
+     <p>In November 2026, the shared query and form parsers on the JVM and Scala Native were checked against the 35 inputs in <a href="https://github.com/web-platform-tests/wpt/blob/130c0e258c7ae25bb852dc543129031a9915d9ca/url/urlencoded-parser.any.js">Web Platform Tests' URL-encoded parser cases</a>. Both matched the expected grouped values for 28 inputs. For the other seven, both rejected malformed percent escapes that the browser-oriented tests accept, consistent with Sharaf's documented stricter behavior.</p>
+     <p>The same vectors were also sent over HTTP/1.1 to Undertow 2.4.3.Final on the JVM and Potateh 0.2.1-SNAPSHOT on the JVM and Scala Native. All three returned the expected grouped values for 28 form bodies and rejected the seven malformed escapes with 400. For queries, 26 matched and the same seven returned 400; the two inputs containing literal non-ASCII characters were excluded from raw request targets.</p>
+     <p>These checks did not run the original browser test harness, verify global pair ordering, or cover the full URL test corpus.</p>
+     <h3 id="http11-framing-comparison">HTTP/1.1 framing comparison<a href="#http11-framing-comparison" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h3>
+     <p>In November 2026, <a href="https://github.com/narfindustries/http-garden/tree/b417e806c1b15e8ea0b9312f81a91fbdcbc7a83e">HTTP Garden</a> compared its Undertow echo handler using Undertow 2.4.3.Final with a Sharaf Potateh 0.2.1-SNAPSHOT echo handler on the JVM and Scala Native. For eight selected HTTP/1.1 cases, Garden reported no differences: all accepted a GET, fixed-length and chunked bodies, and a two-request pipeline; all returned 400 for duplicate identical or conflicting content lengths, combined content length and chunked encoding, and whitespace before a header colon.</p>
+     <p>The Undertow comparison used Garden's handler directly, without the Sharaf Undertow adapter. The temporary Sharaf echo handler covered only the selected paths, HTTP/1.1 and ASCII bodies. This was a small direct-server check, not fuzzing, proxy testing or a complete HTTP conformance assessment.</p>
+     <h3 id="multipart-forms-in-a-browser">Multipart forms in a browser<a href="#multipart-forms-in-a-browser" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h3>
+     <p>In November 2026, Playwright drove Chromium 156.0.8078.4 to submit four multipart forms to Undertow 2.4.3.Final on the JVM and Potateh 0.2.1-SNAPSHOT on the JVM and Scala Native. All returned the expected fields and file bytes for empty inputs, Unicode and reserved field names, a binary upload, and multiple files under one name. The scenarios were inspired by <a href="https://github.com/rack/multifail">Rack multifail</a>; its generator was not run. Uploaded filenames and content types were not checked.</p>
+     <p>This check did not cover other browsers, legacy charsets, or malformed multipart bodies.</p>
+     <h3 id="cookie-parsing-comparison">Cookie parsing comparison<a href="#cookie-parsing-comparison" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h3>
+     <p>In November 2026, Sharaf Potateh on the JVM and Scala Native and Werkzeug 3.1.8 received the same 59,319 generated cookie headers. The inputs used the three-character name alphabet from <a href="https://github.com/SecPriv/cookiecrumbles/tree/main/reflectors">Cookie Crumbles</a>, with a fixed value of <code>foo</code>. Both returned the same sorted name/value pairs for all cases, with no request errors. The comparison used an adapted harness, not the upstream fuzzer or its older reflector versions.</p>
+     <p>In a separate comparison of 16 selected headers on both platforms, the parsers agreed on 13. The three differences involved quoted values: Sharaf preserves the quotes, while Werkzeug removes them; for a quoted value containing a semicolon, Sharaf also splits at the semicolon. These differences alone do not establish a defect.</p>
+     <p>The generated comparison did not check duplicate headers, ordering, other values, or conformance against a specification. Clients and servers may normalize headers before parsing.</p>
+    </div>
+    <aside aria-label="On this page">
+     <details open>
+      <summary>On this page</summary>
+      <nav aria-label="Table of contents">
+       <ul>
+        <li><a href="#request-parsing">Request parsing</a>
+         <ul>
+          <li><a href="#cookies">Cookies</a></li>
+          <li><a href="#query-strings-and-url-encoded-forms">Query strings and URL-encoded forms</a></li>
+          <li><a href="#multipart-forms">Multipart forms</a></li>
+          <li><a href="#verification">Verification</a>
+           <ul>
+            <li><a href="#url-encoded-parsing-vectors">URL-encoded parsing vectors</a></li>
+            <li><a href="#http11-framing-comparison">HTTP/1.1 framing comparison</a></li>
+            <li><a href="#multipart-forms-in-a-browser">Multipart forms in a browser</a></li>
+            <li><a href="#cookie-parsing-comparison">Cookie parsing comparison</a></li>
+           </ul></li>
+         </ul></li>
+       </ul>
+      </nav>
+     </details>
+    </aside>
+   </div>
+  </main>
+  <style>
+  body > footer.site-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding-block: 1.5rem 2rem;
+  }
+
+  .site-footer__identity {
+    display: grid;
+    gap: .1rem;
+  }
+
+  .site-footer__identity strong {
+    color: var(--pico-color);
+    font-size: 1rem;
+  }
+
+  .site-footer__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .65rem;
+  }
+
+  .site-footer__links a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .55rem;
+    min-height: 2.75rem;
+    padding: .55rem .85rem;
+    border: 1px solid var(--pico-muted-border-color);
+    border-radius: .7rem;
+    background: var(--pico-card-background-color);
+    color: var(--pico-color);
+    font-weight: 600;
+    line-height: 1;
+    text-decoration: none;
+    transition: border-color .15s ease, background-color .15s ease, transform .15s ease;
+  }
+
+  .site-footer__links a:hover {
+    border-color: var(--pico-primary);
+    background: var(--pico-secondary-background);
+    color: var(--pico-color);
+    transform: translateY(-2px);
+  }
+
+  .site-footer__links a:focus-visible {
+    outline: 2px solid var(--pico-primary);
+    outline-offset: 3px;
+  }
+
+  .site-footer__links svg {
+    width: 1.2rem;
+    height: 1.2rem;
+    flex: none;
+  }
+
+  .site-footer__links a[href*="discord"] svg {
+    color: #5865f2;
+  }
+
+  @media (max-width: 600px) {
+    body > footer.site-footer {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 1rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .site-footer__links a { transition: none; }
+    .site-footer__links a:hover { transform: none; }
+  }
+</style>
+  <footer class="pico container site-footer">
+   <div class="site-footer__identity">
+    <strong>Sharaf</strong> <span>Scala 3 web framework</span>
+   </div>
+   <nav class="site-footer__links" aria-label="Community links">
+    <a href="https://github.com/sake92/sharaf" target="_blank" rel="noopener noreferrer"> 
+     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23A10.94 10.94 0 0 1 12.03 5.79c1.02 0 2.04.135 3 .405 2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57C20.595 21.795 24 17.31 24 12 24 5.37 18.63 0 12 0Z" />
+     </svg> 
+     <span>GitHub</span> 
+    </a> <a href="https://discord.gg/g9KVY3WkMG" target="_blank" rel="noopener noreferrer"> 
+     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+      <path d="M19.73 5.29a17.4 17.4 0 0 0-4.27-1.32 12.1 12.1 0 0 0-.55 1.12 16.1 16.1 0 0 0-4.82 0 12.1 12.1 0 0 0-.55-1.12 17.4 17.4 0 0 0-4.27 1.32C2.57 9.29 1.84 13.2 2.2 17.05a17.7 17.7 0 0 0 5.23 2.67c.42-.57.8-1.17 1.12-1.8a11 11 0 0 1-1.7-.82c.14-.1.27-.21.4-.32 3.28 1.54 6.83 1.54 10.07 0 .13.11.26.22.4.32-.54.32-1.11.59-1.7.82.32.63.7 1.23 1.12 1.8a17.7 17.7 0 0 0 5.24-2.67c.42-4.46-.72-8.34-3.1-11.76ZM8.94 14.68c-.98 0-1.78-.89-1.78-1.98 0-1.1.78-1.99 1.78-1.99s1.8.9 1.78 1.99c0 1.09-.79 1.98-1.78 1.98Zm6.12 0c-.98 0-1.78-.89-1.78-1.98 0-1.1.78-1.99 1.78-1.99s1.8.9 1.78 1.99c0 1.09-.79 1.98-1.78 1.98Z" />
+     </svg> 
+     <span>Discord</span> 
+    </a>
+   </nav>
+  </footer>
+  <script src="https://context7.com/widget.js" data-library="/sake92/sharaf" data-color="#059669" data-position="bottom-right" async></script>
+  <script>
+if (window.matchMedia('(max-width: 850px)').matches) {
+    document.querySelectorAll('body > main > div > aside > details').forEach(details => { details.open = false; });
+}
+</script>
+  <script src="https://sake92.github.io/sharaf/scripts/code-copy.js"></script>
+ </body>
+</html>
