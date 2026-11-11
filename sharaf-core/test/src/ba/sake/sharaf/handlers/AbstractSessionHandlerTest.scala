@@ -97,7 +97,7 @@ abstract class AbstractSessionHandlerTest extends munit.FunSuite with ServerFixt
   test("invalidation deletes the stored session when the handler fails") {
     val store = InMemorySessionStore(SessionConfig.default)
     val handler = SharafHandler.sessions(SharafHandler.routes(routes), store = Some(store))
-    withHandler(handler) { base =>
+    withHandler(SharafHandler.exceptions(handler)) { base =>
       val initial = request.get(uri"$base/session-id").send(httpBackend)
       val id = initial.body
       assert(store.load(id).nonEmpty)

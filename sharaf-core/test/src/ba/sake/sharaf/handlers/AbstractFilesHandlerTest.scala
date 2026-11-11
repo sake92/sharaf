@@ -26,7 +26,7 @@ abstract class AbstractFilesHandlerTest extends munit.FunSuite with ServerFixtur
 
   test("GET text_file.txt should work") {
     withFiles { baseUrl =>
-      val res = request.get(uri"$baseUrl/text_file.txt").send()
+      val res = request.get(uri"$baseUrl/text_file.txt").send(httpBackend)
       assertEquals(res.body, "a text file")
       assertEquals(res.headers(HeaderNames.ContentType), Seq("text/plain"))
     }
@@ -34,7 +34,7 @@ abstract class AbstractFilesHandlerTest extends munit.FunSuite with ServerFixtur
 
   test("HEAD text_file.txt should return headers only") {
     withFiles { baseUrl =>
-      val res = request.head(uri"$baseUrl/text_file.txt").send()
+      val res = request.head(uri"$baseUrl/text_file.txt").send(httpBackend)
       assertEquals(res.body, "")
       assertEquals(res.headers(HeaderNames.ContentType), Seq("text/plain"))
     }
@@ -42,10 +42,10 @@ abstract class AbstractFilesHandlerTest extends munit.FunSuite with ServerFixtur
 
   test("file ETag is weak and supports conditional GET") {
     withFiles { baseUrl =>
-      val initial = request.get(uri"$baseUrl/text_file.txt").send()
+      val initial = request.get(uri"$baseUrl/text_file.txt").send(httpBackend)
       val etag = initial.header(HeaderNames.Etag).getOrElse(fail("Expected an ETag header"))
       assert(etag.startsWith("W/\""))
-      val cached = request.get(uri"$baseUrl/text_file.txt").header(HeaderNames.IfNoneMatch, etag).send()
+      val cached = request.get(uri"$baseUrl/text_file.txt").header(HeaderNames.IfNoneMatch, etag).send(httpBackend)
       assertEquals(cached.code, StatusCode.NotModified)
       assertEquals(cached.header(HeaderNames.Etag), Some(etag))
     }
@@ -53,15 +53,20 @@ abstract class AbstractFilesHandlerTest extends munit.FunSuite with ServerFixtur
 
   test("POST text_file.txt should be rejected") {
     withFiles { baseUrl =>
-      val res = request.post(uri"$baseUrl/text_file.txt").send()
+      val res = request.post(uri"$baseUrl/text_file.txt").send(httpBackend)
       assertEquals(res.code, StatusCode.MethodNotAllowed)
     }
   }
 
   test("Suspicious path should be rejected") {
     withFiles { baseUrl =>
-      val res = request.get(uri"$baseUrl/../text_file.txt").send()
-      assertEquals(res.code, StatusCode.Forbidden)
+      // Send the path unchanged; the Native HTTP client normalizes dot segments.
+      val address = java.net.URI.create(baseUrl)
+      val connection = new HttpConnection(new java.net.InetSocketAddress(address.getHost, address.getPort))
+      try {
+        val res = connection.request("GET", "/../text_file.txt")
+        assertEquals(res.status, StatusCode.Forbidden.code)
+      } finally connection.close()
     }
   }
 
