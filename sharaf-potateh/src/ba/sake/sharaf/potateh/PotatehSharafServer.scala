@@ -76,7 +76,7 @@ object PotatehSharafServer {
           val method = HttpMethod.values
             .find(_.name == underlying.method)
             .getOrElse(throw UnsupportedMethodException(underlying.method))
-          Right(RequestContext((method, request.path), request))
+          Right(RequestContext((method = method, path = request.path), request))
         } catch {
           case error: BadRequestException        => Left(error)
           case error: UnsupportedMethodException => Left(error)

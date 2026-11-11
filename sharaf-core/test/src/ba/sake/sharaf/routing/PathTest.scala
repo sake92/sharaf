@@ -5,6 +5,16 @@ import java.util.UUID
 
 class PathTest extends munit.FunSuite {
 
+  test("named request parameters retain route pattern matching") {
+    val params: RequestParams = (method = HttpMethod.GET, path = Path("users", "42"))
+    assertEquals(params.method, HttpMethod.GET)
+    assertEquals(params.path, Path("users", "42"))
+    val matched = params match
+      case HttpMethod.GET -> Path("users", id) => id
+      case _                                  => "no match"
+    assertEquals(matched, "42")
+  }
+
   test("path matching") {
     val uuidValue = UUID.fromString("01234567-89ab-cdef-0123-456789abcdef")
 

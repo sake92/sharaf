@@ -6,7 +6,8 @@ import ba.sake.sharaf.{SharafHandler, RequestContext, Response, HttpString}
 final class Pac4jCallbackHandler(securityConfig: Pac4jSecurityConfig) extends SharafHandler:
 
   override def handle(context: RequestContext): Response[?] =
-    val (method, path) = context.params
+    val method = context.params.method
+    val path = context.params.path
     val fullUrl = buildFullUrl(context.request, path)
     val webContext = new SharafWebContext(context.request, fullUrl, method)
     val pac4jConfig = securityConfig.pac4jConfig

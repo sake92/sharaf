@@ -20,7 +20,7 @@ def SharafHttpApp(sharafHandler: SharafHandler) =
           case org.http4s.Method.PATCH   => HttpMethod.PATCH
           case org.http4s.Method.HEAD    => HttpMethod.HEAD
         })
-        requestParams <- IO.pure((method, path))
+        requestParams <- IO.pure((method = method, path = path))
         response <- IO.blocking(sharafHandler.handle(RequestContext(requestParams, request)))
 
         headers <- IO.pure {

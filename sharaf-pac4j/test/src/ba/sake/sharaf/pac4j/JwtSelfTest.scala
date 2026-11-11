@@ -45,7 +45,7 @@ class JwtSelfTest extends munit.FunSuite:
     // Combined handler dispatches by path prefix
     val handler = new SharafHandler {
       override def handle(ctx: RequestContext): Response[?] =
-        val pathStr = "/" + ctx.params._2.segments.mkString("/")
+        val pathStr = "/" + ctx.params.path.segments.mkString("/")
         if pathStr == "/protected/admin" then adminHandler.handle(ctx)
         else userHandler.handle(ctx)
     }

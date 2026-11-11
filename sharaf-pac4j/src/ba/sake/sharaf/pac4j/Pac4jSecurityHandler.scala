@@ -22,7 +22,8 @@ final class Pac4jSecurityHandler(
 ) extends SharafHandler:
 
   override def handle(context: RequestContext): Response[?] =
-    val (method, path) = context.params
+    val method = context.params.method
+    val path = context.params.path
     context.request.cookies.find(_.name == "SHARAF_SESSION")
       .flatMap(cookie => securityConfig.sessionStore.load(cookie.value))
       .foreach { session =>

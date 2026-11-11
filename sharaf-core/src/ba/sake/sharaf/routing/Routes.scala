@@ -2,7 +2,7 @@ package ba.sake.sharaf.routing
 
 import ba.sake.sharaf.{HttpMethod, Request, Response}
 
-type RequestParams = (HttpMethod, Path)
+type RequestParams = (method: HttpMethod, path: Path)
 
 type RoutesDefinition = Request ?=> PartialFunction[RequestParams, Response[?]]
 

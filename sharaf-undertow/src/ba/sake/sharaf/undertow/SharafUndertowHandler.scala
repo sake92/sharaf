@@ -33,6 +33,6 @@ final class SharafUndertowHandler(sharafHandler: SharafHandler, notFoundHandler:
     // Undertow prefix handlers have already consumed this many path segments.
     val resolvedSegments = exchange.getResolvedPath.split("/").count(_.nonEmpty)
     val path = Path(fullPath.segments.drop(resolvedSegments)*)
-    (method, path)
+    (method = method, path = path)
   }
 }

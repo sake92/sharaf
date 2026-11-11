@@ -35,7 +35,7 @@ deder exec -t publishLocal                 # publish jars to local ~/.ivy2
 
 ## Code Conventions
 
-- Prefer named tuples with descriptive field access for meaningful multi-value results and test cases; keep ordinary key-value pairs for maps.
+- Prefer named tuples with descriptive field access over positional tuples wherever practical; keep ordinary key-value pairs for maps.
 - **Scalafmt 3.7.15**, Scala 3 dialect, max 120 chars per line. Format with `deder exec -t runMvnApp fmt`
 - **Immutable builder pattern** for `Response`, `CorsSettings`, `Cookie` — use `.withStatus()`, `.settingHeader()`, `.settingCookie()` etc.
 - **Context functions** for `Request` access: route handlers get `given Request`, use `Request.current` anywhere
@@ -79,6 +79,7 @@ deder exec -t publishLocal                 # publish jars to local ~/.ivy2
 
 ## Release
 
+- Scala CLI examples use published Sharaf releases; use only APIs available in their declared dependency version, and update them for new APIs after release.
 - Tag-based release: `./scripts/release.sh <version>` — commits, tags, and pushes
 - On tag push, CI runs tests then publishes non-example modules to Sonatype
 

@@ -22,7 +22,8 @@ final class ClasspathResourcesHandler(
 
   override def handle(context: RequestContext): Response[?] =
     given Request = context.request
-    val (method, path) = context.params
+    val method = context.params.method
+    val path = context.params.path
     if method != HttpMethod.GET && method != HttpMethod.HEAD then
       throw MethodNotAllowedException("Invalid method", s"Only GET and HEAD are supported, got: $method")
     val withBody = method == HttpMethod.GET

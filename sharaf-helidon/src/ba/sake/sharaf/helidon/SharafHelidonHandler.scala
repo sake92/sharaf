@@ -19,6 +19,6 @@ class SharafHelidonHandler(sharafHandler: SharafHandler) extends Handler {
   private def fillReqParams(req: ServerRequest): RequestParams = {
     val method = HttpMethod.valueOf(req.prologue().method().text())
     val path = RequestDecoding.path(req.path().rawPath())
-    (method, path)
+    (method = method, path = path)
   }
 }

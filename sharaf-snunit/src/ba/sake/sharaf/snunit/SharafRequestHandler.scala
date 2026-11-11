@@ -45,6 +45,6 @@ class SharafRequestHandler(sharafHandler: SharafHandler) extends RequestHandler 
       if pathSegments.size == 1 && pathSegments.head == ""
       then Path()
       else Path(pathSegments*)
-    (method, path)
+    (method = method, path = path)
   }
 }

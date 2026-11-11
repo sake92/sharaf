@@ -42,7 +42,7 @@ class PathMatcherSelfTest extends munit.FunSuite:
     // Combined handler dispatches by path prefix
     val handler = new SharafHandler {
       override def handle(ctx: RequestContext): Response[?] =
-        val pathStr = "/" + ctx.params._2.segments.mkString("/")
+        val pathStr = "/" + ctx.params.path.segments.mkString("/")
         if pathStr == TestConstants.UNPROTECTED_PATH then publicHandler.handle(ctx)
         else protectedHandler.handle(ctx)
     }

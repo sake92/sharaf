@@ -4,6 +4,7 @@ import java.io.{BufferedInputStream, ByteArrayOutputStream}
 import java.net.{InetSocketAddress, Socket}
 import java.nio.charset.StandardCharsets.{UTF_8, ISO_8859_1}
 
+// sttp has bug in handling options on scalanative
 private[sharaf] object HttpConnection {
   type Response = (status: Int, headers: Map[String, String], body: String)
 }

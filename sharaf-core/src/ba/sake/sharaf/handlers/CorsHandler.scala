@@ -7,10 +7,10 @@ import ba.sake.sharaf.*
 final class CorsHandler(corsSettings: CorsSettings, next: SharafHandler) extends SharafHandler {
 
   override def handle(context: RequestContext): Response[?] = {
-    val path = "/" + context.params._2.segments.mkString("/")
+    val path = "/" + context.params.path.segments.mkString("/")
     val applies = corsSettings.pathPrefixes.exists(path.startsWith)
     val headers = context.request.headers
-    val preflight = context.params._1 == HttpMethod.OPTIONS &&
+    val preflight = context.params.method == HttpMethod.OPTIONS &&
       headers.get(HttpString(HeaderNames.Origin)).exists(_.nonEmpty) &&
       headers.get(HttpString(HeaderNames.AccessControlRequestMethod)).exists(_.nonEmpty)
     if !applies then next.handle(context)

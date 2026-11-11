@@ -24,7 +24,8 @@ final class FilesHandler(
 
   override def handle(context: RequestContext): Response[?] =
     given Request = context.request
-    val (method, path) = context.params
+    val method = context.params.method
+    val path = context.params.path
     if method != HttpMethod.GET && method != HttpMethod.HEAD then
       throw MethodNotAllowedException("Invalid method", s"Only GET and HEAD are supported, got: $method")
     val withBody = method == HttpMethod.GET
@@ -168,7 +169,7 @@ final class FilesHandler(
 
   /** Parses a Range header (e.g., "bytes=0-1023").
     */
-  private def parseRange(rangeHeader: String, fileSize: Long): Option[(Long, Long)] = {
+  private def parseRange(rangeHeader: String, fileSize: Long): Option[(start: Long, end: Long)] = {
     val rangePattern = "bytes=(\\d*)-(\\d*)".r
     rangeHeader match {
       case rangePattern(startStr, endStr) =>
@@ -179,7 +180,7 @@ final class FilesHandler(
           if (start >= fileSize || start > end) {
             None
           } else {
-            Some((start, end))
+            Some((start = start, end = end))
           }
         } catch {
           case _: NumberFormatException => None
