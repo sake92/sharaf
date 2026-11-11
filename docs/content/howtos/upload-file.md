@@ -7,7 +7,7 @@ description: Sharaf How To Upload File
 # {{ page.title }}
 
 Submit the form as `multipart/form-data` and parse the upload as a NIO `Path`.
-The server adapter must support multipart forms; see the [server reference](/reference/servers.html#multipart-forms).
+The server adapter must support multipart forms; see the [parsing reference](/reference/parsing.html#multipart-forms).
 
 ```scala
 // 1. somewhere in a view, use enctype="multipart/form-data"
@@ -47,4 +47,4 @@ Files.copy(formData.file, destination, java.nio.file.StandardCopyOption.REPLACE_
 Choose `applicationUploadDirectory` in your application configuration. Do not use
 a client-supplied filename as a storage path. The shared parser always creates
 files on disk, including empty uploads; its limits and Undertow's separate
-upload behavior are listed in the [server reference](/reference/servers.html#multipart-forms).
+upload behavior are listed in the [parsing reference](/reference/parsing.html#multipart-forms).

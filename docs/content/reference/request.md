@@ -23,7 +23,7 @@ Route handlers have a contextual `Request`; `Request.current` retrieves it.
 | `bodyFormValidated[T]` | Parsed and validated form data; also requires `Validator[T]` |
 
 The raw maps contain decoded names and values before typed conversion. URL-encoded
-parsing and error behavior are listed in [Servers and platforms](/reference/servers.html#query-strings-and-url-encoded-forms).
+parsing and error behavior are listed in [Request parsing](/reference/parsing.html#query-strings-and-url-encoded-forms).
 
 Query and form target types are products such as case classes or named tuples. Parsing and validation failures are mapped by the server's `ExceptionMapper`.
 
