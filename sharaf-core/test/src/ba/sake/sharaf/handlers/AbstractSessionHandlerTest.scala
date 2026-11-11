@@ -19,6 +19,9 @@ abstract class AbstractSessionHandlerTest extends munit.FunSuite with ServerFixt
     case GET -> Path("invalidate-session") =>
       Session.current.invalidate()
       Response.default
+    case GET -> Path("invalidate-and-fail") =>
+      Session.current.invalidate()
+      throw RuntimeException("expected failure")
     case GET -> Path("regenerate-session") =>
       Session.current.regenerate()
       Response.default
@@ -78,6 +81,28 @@ abstract class AbstractSessionHandlerTest extends munit.FunSuite with ServerFixt
       client.send("invalidate-session")
       val body = client.send("getopt-session-value")
       assertEquals(body, "not found")
+    }
+  }
+
+  test("invalidation removes the cookie at its configured path") {
+    val config = SessionConfig.default.withSecure(false).withCookiePath("/account")
+    val handler = SharafHandler.sessions(SharafHandler.routes(routes), config = config)
+    withHandler(handler) { base =>
+      val response = request.get(uri"$base/invalidate-session").send(httpBackend)
+      val cookie = response.header("Set-Cookie").getOrElse(fail("Missing Set-Cookie"))
+      assert(cookie.contains("Path=/account"), cookie)
+    }
+  }
+
+  test("invalidation deletes the stored session when the handler fails") {
+    val store = InMemorySessionStore(SessionConfig.default)
+    val handler = SharafHandler.sessions(SharafHandler.routes(routes), store = Some(store))
+    withHandler(handler) { base =>
+      val initial = request.get(uri"$base/session-id").send(httpBackend)
+      val id = initial.body
+      assert(store.load(id).nonEmpty)
+      request.get(uri"$base/invalidate-and-fail").header("Cookie", s"SESSION=$id").send(httpBackend)
+      assertEquals(store.load(id), None)
     }
   }
 

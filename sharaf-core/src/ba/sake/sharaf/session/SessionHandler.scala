@@ -1,5 +1,7 @@
 package ba.sake.sharaf.session
 
+import java.time.Instant
+import scala.util.control.NonFatal
 import ba.sake.sharaf.*
 
 /** A [[SharafHandler]] decorator that provides session management.
@@ -33,12 +35,20 @@ final class SessionHandler(
     SessionHolder.set(session)
     val res =
       try next.handle(context)
+      catch
+        case NonFatal(error) =>
+          if session.isInvalid then
+            try {
+              store.delete(session.id)
+              session.previousId.foreach(store.delete)
+            } catch case NonFatal(cleanup) => error.addSuppressed(cleanup)
+          throw error
       finally SessionHolder.clear()
 
     if session.isInvalid then
       store.delete(session.id)
       session.previousId.foreach(store.delete)
-      res.removingCookie(config.cookieName)
+      res.settingCookie(Cookie(config.cookieName, "", path = Some(config.cookiePath), expires = Some(Instant.EPOCH)))
     else
       store.save(session)
       if session.isRegenerated then session.previousId.foreach(store.delete)
