@@ -38,8 +38,8 @@ jobs:
         run: brew install sake92/tap/deder
       - name: Install Native HTTP test dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install -y curl libcurl4-openssl-dev libidn2-dev
+          sudo apt-get -o Acquire::Retries=3 update
+          sudo apt-get -o Acquire::Retries=3 install -y curl libcurl4-openssl-dev libidn2-dev
       - name: Check versions
         id: version
         shell: bash
