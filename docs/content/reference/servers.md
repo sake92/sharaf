@@ -19,6 +19,9 @@ description: Sharaf server modules and platform support
 On Scala Native, JDK HTTP server uses an explicitly composed `SharafHandler`.
 Its routes convenience overload wires classpath resources and requires JVM APIs.
 
+The JDK HTTP server uses a ten-thread pool by default and shuts it down when stopped. To supply your own
+`java.util.concurrent.Executor`, pass `Some(executor)` when creating the server; you own its shutdown.
+
 Native executable examples cover three deployment paths:
 
 - [GraalVM Native Image with Undertow]({{site.data.project.gh.sourcesUrl}}/examples/scala-cli/hello-undertow-graalvm.scala)
