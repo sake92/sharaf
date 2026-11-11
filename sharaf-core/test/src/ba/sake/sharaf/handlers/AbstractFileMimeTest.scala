@@ -7,6 +7,33 @@ import sttp.model.{HeaderNames, StatusCode}
 import ba.sake.sharaf.*
 
 abstract class AbstractFileMimeTest extends munit.FunSuite with ServerFixture {
+  test("static files cannot follow symlinks outside the root") {
+    val directory = Files.createTempDirectory("sharaf-file-links")
+    val root = Files.createDirectory(directory.resolve("root"))
+    val inside = Files.write(root.resolve("inside.txt"), "inside".getBytes(UTF_8))
+    val outside = Files.write(directory.resolve("outside.txt"), "outside".getBytes(UTF_8))
+    val insideLink = Files.createSymbolicLink(root.resolve("inside-link.txt"), inside)
+    val outsideLink = Files.createSymbolicLink(root.resolve("outside-link.txt"), outside)
+    val outsideDirectory = Files.createSymbolicLink(root.resolve("outside-dir"), directory)
+    val rootLink = Files.createSymbolicLink(directory.resolve("root-link"), root)
+    val brokenLink = Files.createSymbolicLink(root.resolve("broken.txt"), directory.resolve("missing.txt"))
+    try {
+      withHandler(SharafHandler.exceptions(SharafHandler.files(rootLink))) { base =>
+        val escaped = request.get(uri"$base/outside-link.txt").send()
+        assertEquals(escaped.code, StatusCode.Forbidden)
+        assertEquals(request.get(uri"$base/outside-dir/outside.txt").send().code, StatusCode.Forbidden)
+        val allowed = request.get(uri"$base/inside-link.txt").send()
+        assertEquals(allowed.code, StatusCode.Ok)
+        assertEquals(allowed.body, "inside")
+        assertEquals(request.get(uri"$base/broken.txt").send().code, StatusCode.NotFound)
+        assertEquals(request.get(uri"$base/missing.txt").send().code, StatusCode.NotFound)
+      }
+    } finally {
+      Seq(insideLink, outsideLink, outsideDirectory, rootLink, brokenLink, inside, outside, root, directory)
+        .foreach(Files.deleteIfExists(_))
+    }
+  }
+
   test("static files use extension-based content types") {
     val examples = Seq(
       (name = "page.html", mime = "text/html"),

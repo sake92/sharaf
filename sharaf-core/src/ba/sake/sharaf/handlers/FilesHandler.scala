@@ -20,6 +20,7 @@ final class FilesHandler(
   if !Files.exists(absoluteRoot) then throw IllegalArgumentException(s"Root path does not exist: $absoluteRoot")
   if !Files.isDirectory(absoluteRoot) then
     throw IllegalArgumentException(s"Root path is not a directory: $absoluteRoot")
+  private val realRoot = absoluteRoot.toRealPath()
 
   override def handle(context: RequestContext): Response[?] =
     given Request = context.request
@@ -38,7 +39,11 @@ final class FilesHandler(
     if !Files.exists(filePath) then throw NotFoundException("File")
     else if !Files.isRegularFile(filePath) then throw RejectedException("Invalid path", "Not a regular file")
     else if !Files.isReadable(filePath) then throw RejectedException("Invalid path", "File not readable")
-    else serveFile(filePath, withBody)
+    else {
+      val realPath = filePath.toRealPath()
+      if !realPath.startsWith(realRoot) then throw RejectedException("Invalid path", "Path traversal attempt")
+      serveFile(realPath, FileMimeTypes.forPath(filePath), withBody)
+    }
   }
 
   /** Resolves and validates a path, preventing directory traversal attacks etc.
@@ -55,10 +60,13 @@ final class FilesHandler(
     resolvedPath
   }
 
-  private def serveFile(filePath: Path, withBody: Boolean)(using request: Request): Response[?] = boundary {
+  private def serveFile(
+      filePath: Path,
+      mimeType: String,
+      withBody: Boolean
+  )(using request: Request): Response[?] = boundary {
     val fileSize = Files.size(filePath)
     val lastModified = Files.getLastModifiedTime(filePath).toInstant
-    val mimeType = FileMimeTypes.forPath(filePath)
 
     val etag = Option.when(enableCaching) {
       generateETag(fileSize, lastModified)
