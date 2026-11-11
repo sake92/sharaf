@@ -42,10 +42,10 @@ object SharafHandler:
 
   def sessions(
       next: SharafHandler,
-      store: SessionStore = InMemorySessionStore(),
+      store: Option[SessionStore] = None,
       config: SessionConfig = SessionConfig.default
   ): SharafHandler =
-    SessionHandler(store, config, next)
+    SessionHandler(store.getOrElse(InMemorySessionStore(config)), config, next)
 
 case class RequestContext(
     params: RequestParams,

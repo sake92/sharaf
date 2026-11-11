@@ -1,5 +1,6 @@
 package ba.sake.sharaf.handlers
 
+import java.time.Duration
 import sttp.client4.quick.*
 import ba.sake.sharaf.*
 
@@ -89,6 +90,27 @@ abstract class AbstractSessionHandlerTest extends munit.FunSuite with ServerFixt
       assertNotEquals(idBefore, idAfter)
       val data = client.send("get-session-value")
       assertEquals(data, "myValue")
+    }
+  }
+
+  test("default session store uses the configured absolute timeout") {
+    val config = SessionConfig.default.withSecure(false).withAbsoluteTimeout(Some(Duration.ofSeconds(-1)))
+    val handler = SharafHandler.sessions(SharafHandler.routes(routes), config = config)
+    withHandler(handler) { base =>
+      val client = new StatefulClient(base)
+      client.send("set-session-value/value1")
+      assertEquals(client.send("getopt-session-value"), "not found")
+    }
+  }
+
+  test("an explicitly supplied session store keeps its own expiration policy") {
+    val config = SessionConfig.default.withSecure(false).withAbsoluteTimeout(Some(Duration.ofSeconds(-1)))
+    val store = InMemorySessionStore(SessionConfig.default)
+    val handler = SharafHandler.sessions(SharafHandler.routes(routes), store = Some(store), config = config)
+    withHandler(handler) { base =>
+      val client = new StatefulClient(base)
+      client.send("set-session-value/value1")
+      assertEquals(client.send("getopt-session-value"), "value1")
     }
   }
 }
