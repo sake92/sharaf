@@ -22,16 +22,29 @@ private[sharaf] final class HttpConnection(address: InetSocketAddress) extends A
   private val input = new BufferedInputStream(socket.getInputStream)
   private val output = socket.getOutputStream
 
-  def request(method: String, target: String, body: String = "", contentType: String = ""): HttpConnection.Response = {
-    send(method, target, body, contentType)
+  def request(
+      method: String,
+      target: String,
+      body: String = "",
+      contentType: String = "",
+      headers: Seq[(String, String)] = Seq.empty
+  ): HttpConnection.Response = {
+    send(method, target, body, contentType, headers)
     readResponse(method == "HEAD")
   }
 
-  def send(method: String, target: String, body: String = "", contentType: String = ""): Unit = {
+  def send(
+      method: String,
+      target: String,
+      body: String = "",
+      contentType: String = "",
+      headers: Seq[(String, String)] = Seq.empty
+  ): Unit = {
     val bytes = body.getBytes(UTF_8)
     val contentHeader = if contentType.isEmpty then "" else s"Content-Type: $contentType\r\n"
+    val extraHeaders = headers.map { case (name, value) => s"$name: $value\r\n" }.mkString
     output.write(
-      s"$method $target HTTP/1.1\r\nHost: localhost\r\nContent-Length: ${bytes.length}\r\n$contentHeader\r\n"
+      s"$method $target HTTP/1.1\r\nHost: localhost\r\nContent-Length: ${bytes.length}\r\n$contentHeader$extraHeaders\r\n"
         .getBytes(ISO_8859_1)
     )
     if bytes.nonEmpty then output.write(bytes)
