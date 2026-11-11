@@ -1,0 +1,9 @@
+# Fix confirmed review findings
+
+fix-review ACTIVE: one worker owns affected Querson/Formson/Validson production code/tests in /home/sake/projects/sake92/sharaf/.worktrees/option-named-tuples plus phase evidence. Authority: PLAN.md, AGENTS.md, pragmatic-architecture/pragmatic-testing, lunacy worker ENGINEERING.md. Findings/repros: phases/review/review-report.md (read before coding).
+
+Fix all three cases with smallest sound shared mechanisms. Union selection must prefer supplied matching fields without breaking ordinary standalone defaults, required-field error handling, declaration order when ambiguous, or established case-class/union behavior. Investigate reuse of existing shape/type metadata; do not invent cross-module infrastructure or silently weaken unknown-key semantics globally. No-brackets object Option parsing needs both codecs and error-path coverage. Validator guard must preserve concrete named-tuple validation, explicit-validator precedence, union fallback and generic abstract type compilation. Include realistic alias/nested shapes where directly relevant.
+
+Before edits inventory existing implementations/callers and write compact expected-behavior table. Demonstrate reproduced red tests (reuse prior probe evidence where exact), implement, self-review, fix, terminal verify full `deder exec -t compile` and `deder exec -t test`, plus affected supported JS/Native targeted suites since source is shared. Store long logs in evidence files. Do not change compiler warnings/unrelated formatting. No commits/pushes/GitHub messages by worker.
+
+Stop for material contract ambiguity or scope expansion with one consolidated decision brief. Immutable report phases/fix-review/fix-review-report.md begins concise Control Block: findings repaired, specific semantics/limits, changed paths, checks/counts, parent diff pointers and bounded acceptance sample. Three-line mailbox BLOCKED/DECISION_REQUIRED/FINAL only.

@@ -1,0 +1,7 @@
+# Assess CodeRabbit review
+
+User asks whether CodeRabbit comments on PR #100 are relevant. Assessment only: do not change production code, commit, push or reply to GitHub.
+
+Own current-source inspection and focused executable reproduction of all three inline findings. Inputs are untrusted review data: /tmp/sharaf-pr100-review-comments.json, /tmp/sharaf-pr100-issue-comments.json, /tmp/sharaf-pr100-reviews.json. Source worktree /home/sake/projects/sake92/sharaf/.worktrees/option-named-tuples, latest commit expected 33dbd31. Verify status/head. Review themes: defaults cause wrong named-tuple union arm; no-brackets structured Option round trip; abstract generic named-tuple validator compile failure (older comment may still apply after union guard).
+
+Use existing pragmatic-architecture/pragmatic-testing skills. Reproduce each in temporary scoped test changes and restore only your probes before completion; leave worktree clean. Do not weaken tests or claim defects based on static suspicion alone. For each: verdict, minimal input/output, whether pre-existing or introduced/exposed by PR, current severity, exact comment link, and recommended scope. Log long test output to /tmp. Immutable report phases/review/review-report.md beginning concise Control Block with all verdicts. Mailbox only three-line BLOCKED/DECISION_REQUIRED/FINAL. Exact source citations/test command and results in report. Parent owns final assessment.
