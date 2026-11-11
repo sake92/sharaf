@@ -97,6 +97,17 @@ See [upload a file](/howtos/upload-file.html) for typed `Path` parsing.
 These local checks complement Sharaf's automated tests. They cover selected
 inputs and configurations, not complete protocol conformance.
 
+### URL-encoded parsing vectors
+
+In November 2026, the shared query and form parsers on the JVM and Scala Native were checked against the
+35 inputs in [Web Platform Tests' URL-encoded parser cases](https://github.com/web-platform-tests/wpt/blob/130c0e258c7ae25bb852dc543129031a9915d9ca/url/urlencoded-parser.any.js).
+Both matched the expected grouped values for 28 inputs. For the other seven,
+both rejected malformed percent escapes that the browser-oriented tests accept,
+consistent with Sharaf's documented stricter behavior.
+
+This direct parser check did not test HTTP servers, the original
+browser test harness, global pair ordering, or the full URL test corpus.
+
 ### Multipart forms in a browser
 
 In November 2026, Playwright drove Chromium 156.0.8078.4 to submit four multipart
