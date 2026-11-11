@@ -74,6 +74,7 @@ deder exec -t publishLocal                 # publish jars to local ~/.ivy2
 ## Development Workflow
 
 - **Worktrees**: Create isolated git worktrees in `.worktrees/` (already gitignored)
+- Shut down any Deder server you start in a worktree with `deder shutdown` from that worktree when finished.
 - **SPL/plan files**: Never commit specs/plans
 - PRs target `main`, merge when CI passes
 

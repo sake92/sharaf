@@ -28,8 +28,6 @@ trait Request {
 
   def bodyString: String
 
-  // TODO do we want InputStream for the body as well?
-
   def bodyJsonRaw: JValue = bodyJson[JValue]
 
   def bodyJson[T: JsonRW]: T =
