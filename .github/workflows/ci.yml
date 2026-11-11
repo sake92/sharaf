@@ -23,8 +23,6 @@ jobs:
         with:
           path: .deder/out
           key: deder-${{ github.sha }}
-          restore-keys: |
-            deder-
       - uses: coursier/cache-action@v7
         with:
           extraFiles: deder.pkl
@@ -93,8 +91,6 @@ jobs:
         with:
           path: .deder/out
           key: deder-${{ github.sha }}
-          restore-keys: |
-            deder-
       - uses: actions/setup-java@v3
         with:
           distribution: temurin
