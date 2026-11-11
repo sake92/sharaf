@@ -105,8 +105,15 @@ Both matched the expected grouped values for 28 inputs. For the other seven,
 both rejected malformed percent escapes that the browser-oriented tests accept,
 consistent with Sharaf's documented stricter behavior.
 
-This direct parser check did not test HTTP servers, the original
-browser test harness, global pair ordering, or the full URL test corpus.
+The same vectors were also sent over HTTP/1.1 to Undertow 2.4.3.Final on the
+JVM and Potateh 0.2.1-SNAPSHOT on the JVM and Scala Native. All three returned
+the expected grouped values for 28 form bodies and rejected the seven malformed
+escapes with 400. For queries, 26 matched and the same seven returned 400; the
+two inputs containing literal non-ASCII characters were excluded from raw
+request targets.
+
+These checks did not run the original browser test harness, verify global pair
+ordering, or cover the full URL test corpus.
 
 ### Multipart forms in a browser
 
