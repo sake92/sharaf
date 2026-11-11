@@ -1,5 +1,5 @@
 //> using scala 3.9.0
-//> using dep ba.sake::sharaf-undertow:0.20.0
+//> using dep ba.sake::sharaf-undertow:0.21.0
 
 // example of BS5 modal with a form
 // https://htmx.org/examples/modal-bootstrap/

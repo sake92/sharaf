@@ -1,6 +1,6 @@
 //> using scala 3.9.0
 //> using dep com.h2database:h2:2.4.240
-//> using dep ba.sake::sharaf-undertow:0.20.0
+//> using dep ba.sake::sharaf-undertow:0.21.0
 //> using dep ba.sake::squery:0.8.2
 
 import ba.sake.tupson.JsonRW

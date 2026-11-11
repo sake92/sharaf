@@ -6,7 +6,7 @@
 //> using scala 3.9.0
 //> using platform native
 //> using nativeVersion 0.5.12
-//> using dep ba.sake::sharaf-http4s::0.20.0
+//> using dep ba.sake::sharaf-http4s::0.21.0
 //> using dep org.http4s::http4s-ember-server::1.0.0-M48
 
 import cats.effect.*
@@ -23,18 +23,12 @@ case class Greeting(message: String) derives JsonRW
 
 val routes = Routes:
   case GET -> Path("plaintext") =>
-    Response.withBody("Hello Scala").settingHeader("Content-Type", "text/plain; charset=utf-8")
+    Response.withBody("Hello Scala")
   case GET -> Path("hello", name) =>
-    Response.withBody(Greeting(s"Hello $name")).settingHeader("Content-Type", "application/json; charset=utf-8")
+    Response.withBody(Greeting(s"Hello $name"))
   case POST -> Path("hello") =>
     val request = Request.current.bodyJson[GreetingRequest]
-    Response
-      .withBody(Greeting(s"Hello ${request.name}"))
-      .settingHeader("Content-Type", "application/json; charset=utf-8")
-
-// Published Sharaf 0.20.0's http4s adapter needs explicit body headers.
-val jsonErrors: ExceptionMapper =
-  ExceptionMapper.json.andThen(_.settingHeader("Content-Type", "application/json; charset=utf-8"))
+    Response.withBody(Greeting(s"Hello ${request.name}"))
 
 given LoggerFactory[IO] = NoOpFactory[IO]
 
@@ -44,7 +38,7 @@ object Main extends IOApp.Simple:
       .default[cats.effect.IO]
       .withHost(ipv4"127.0.0.1")
       .withPort(port"8181")
-      .withHttpApp(SharafHttpApp(SharafHandler.exceptions(SharafHandler.routes(routes), jsonErrors)))
+      .withHttpApp(SharafHttpApp(SharafHandler.exceptions(SharafHandler.routes(routes), ExceptionMapper.json)))
       .build
       .evalTap(server => IO.println(s"Server started at ${server.address}"))
       .useForever
