@@ -133,13 +133,13 @@ fuzzing, proxy testing or a complete HTTP conformance assessment.
 ### Multipart forms in a browser
 
 In November 2026, Playwright drove Chromium 156.0.8078.4 to submit four multipart
-forms to Undertow 2.4.3.Final and Potateh 0.2.1-SNAPSHOT on the JVM. Both adapters
-returned the expected fields and file bytes for empty inputs, Unicode and reserved
-field names, a binary upload, and multiple files under one name. The scenarios were
+forms to Undertow 2.4.3.Final on the JVM and Potateh 0.2.1-SNAPSHOT on the JVM
+and Scala Native. All returned the expected fields and file bytes for empty inputs,
+Unicode and reserved field names, a binary upload, and multiple files under one name. The scenarios were
 inspired by [Rack multifail](https://github.com/rack/multifail); its generator was
 not run. Uploaded filenames and content types were not checked.
 
-This check did not cover other browsers, Scala Native, legacy charsets, or malformed
+This check did not cover other browsers, legacy charsets, or malformed
 multipart bodies.
 
 ### Cookie parsing comparison
