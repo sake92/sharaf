@@ -39,7 +39,7 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
    <div>
     <div class="content">
      <h1 id="native-footprint">Native footprint<a href="#native-footprint" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
-     <p>Local Linux x86_64 measurements from 2026-10-25 for a small application with plain-text and JSON GET/POST routes.</p>
+     <p>Local Linux x86_64 measurements for a small application with plain-text and JSON GET/POST routes.</p>
      <table>
       <thead>
        <tr>
@@ -92,11 +92,20 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
         <td align="right">30.5</td>
         <td align="right">43.2</td>
        </tr>
+       <tr>
+        <td>Potateh / Scala Native, release-fast</td>
+        <td align="right">6.51</td>
+        <td align="right">5.20</td>
+        <td align="right">12.3</td>
+        <td align="right">11.4</td>
+        <td align="right">15.4</td>
+       </tr>
       </tbody>
      </table>
      <p>Startup and RSS are medians over five fresh processes on a warm host/filesystem. First HTTP is a successful <code>GET /plaintext</code>; idle RSS is sampled one second later. Post-request RSS is sampled one second after 300 sequential mixed plain-text/JSON GET/JSON POST requests. Successful requests, Unicode JSON, invalid input (400), and missing routes (404) were checked over real HTTP. The stripped Scala Native copies passed the same HTTP checks; GraalVM output is already stripped.</p>
      <p>JVM sizes are fat JARs and exclude the JVM. Native executables require OS shared libraries. Stripped sizes use <code>strip --strip-unneeded</code>; startup/RSS figures refer to the original packaged executables. These are small example applications; the figures do not describe concurrent-load throughput, container size, or Lambda cold starts.</p>
-     <p>Environment: Intel Core i7-1165G7, Scala CLI 1.16.0, Scala 3.9.0, Sharaf 0.20.0, Temurin 21.0.10, GraalVM CE 25.0.2 (O2, Serial GC, compatibility CPU target), http4s/Ember 1.0.0-M48, Scala Native 0.5.12 with multithreading, Immix GC and no LTO. Local Clang 14 emitted a deprecation warning; Scala Native recommends Clang 16 or newer. The http4s examples explicitly set body headers for compatibility with published Sharaf 0.20.0.</p>
+     <p>Measurements except Potateh are from 2026-10-25. Environment: Intel Core i7-1165G7, Scala CLI 1.16.0, Scala 3.9.0, Sharaf 0.20.0, Temurin 21.0.10, GraalVM CE 25.0.2 (O2, Serial GC, compatibility CPU target), http4s/Ember 1.0.0-M48, Scala Native 0.5.12 with multithreading, Immix GC and no LTO. Local Clang 14 emitted a deprecation warning; Scala Native recommends Clang 16 or newer. The http4s examples explicitly set body headers for compatibility with published Sharaf 0.20.0.</p>
+     <p>Potateh was measured on 2026-11-11 on the same CPU, using Sharaf checkout <code>be844b8</code>, Potateh 0.3.0, Deder 0.22.2, Scala 3.9.0, Scala Native 0.5.12, Clang 18, multithreading, Immix GC and no LTO. Its Sharaf version and compiler differ from the earlier measurements.</p>
      <p>snunit is excluded: its example compiled, but linking required the missing local <code>libunit</code> dependency. A snunit comparison must include the Unit daemon and application workers together.</p>
     </div>
     <aside aria-label="On this page">
