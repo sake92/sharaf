@@ -40,6 +40,17 @@ abstract class AbstractFilesHandlerTest extends munit.FunSuite with ServerFixtur
     }
   }
 
+  test("file ETag is weak and supports conditional GET") {
+    withFiles { baseUrl =>
+      val initial = request.get(uri"$baseUrl/text_file.txt").send()
+      val etag = initial.header(HeaderNames.Etag).getOrElse(fail("Expected an ETag header"))
+      assert(etag.startsWith("W/\""))
+      val cached = request.get(uri"$baseUrl/text_file.txt").header(HeaderNames.IfNoneMatch, etag).send()
+      assertEquals(cached.code, StatusCode.NotModified)
+      assertEquals(cached.header(HeaderNames.Etag), Some(etag))
+    }
+  }
+
   test("POST text_file.txt should be rejected") {
     withFiles { baseUrl =>
       val res = request.post(uri"$baseUrl/text_file.txt").send()

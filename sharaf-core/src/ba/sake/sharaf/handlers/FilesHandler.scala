@@ -1,7 +1,6 @@
 package ba.sake.sharaf.handlers
 
 import java.nio.file.{Files, Path}
-import java.security.MessageDigest
 import java.time.{Instant, ZoneId, ZonedDateTime}
 import java.time.format.DateTimeFormatter
 import scala.util.Try
@@ -63,11 +62,11 @@ final class FilesHandler(
     val mimeType = detectMimeType(filePath)
 
     val etag = Option.when(enableCaching) {
-      generateETag(filePath.toString, fileSize, lastModified)
+      generateETag(fileSize, lastModified)
     }
     etag.filter(_ => enableCaching).foreach { tag =>
       request.headers.get(HttpString(HeaderNames.IfNoneMatch)) match {
-        case Some(Seq(clientETag, _)) if clientETag == tag =>
+        case Some(Seq(clientETag, _*)) if clientETag == tag =>
           boundary.break(
             Response
               .withStatus(StatusCode.NotModified)
@@ -186,12 +185,8 @@ final class FilesHandler(
     Try(Files.probeContentType(filePath)).toOption
       .getOrElse("application/octet-stream")
 
-  private def generateETag(path: String, size: Long, lastModified: Instant): String = {
-    val data = s"$path-$size-${lastModified.toEpochMilli}"
-    val md = MessageDigest.getInstance("MD5")
-    val hash = md.digest(data.getBytes("UTF-8"))
-    s""""${hash.map("%02x".format(_)).mkString}""""
-  }
+  private def generateETag(size: Long, lastModified: Instant): String =
+    s"""W/"$size-${lastModified.getEpochSecond}-${lastModified.getNano}""""
 
   /** Formats an Instant as HTTP date (RFC 7231).
     */
