@@ -3,6 +3,8 @@ package ba.sake.sharaf.handlers
 import java.nio.file.{Files, Path as NioPath}
 import java.nio.charset.StandardCharsets.UTF_8
 import java.util.concurrent.atomic.{AtomicBoolean, AtomicReference}
+import java.util.concurrent.{ConcurrentLinkedQueue, CountDownLatch, Executors, TimeUnit}
+import scala.jdk.CollectionConverters.*
 import scala.concurrent.duration.*
 import sttp.model.StatusCode
 import ba.sake.sharaf.*
@@ -30,6 +32,70 @@ abstract class AbstractMultipartTest extends munit.FunSuite with ServerFixture {
     val deadline = System.nanoTime() + 5.seconds.toNanos
     while Files.exists(path) && System.nanoTime() < deadline do Thread.sleep(5)
     assert(!Files.exists(path), s"Upload survived request completion: $path")
+  }
+
+  test("concurrent uploads retain their own contents and are cleaned") {
+    val arrived = new CountDownLatch(3)
+    val observed = new ConcurrentLinkedQueue[NioPath]()
+    val routes = Routes { case POST -> Path("upload") =>
+      val form = Request.current.bodyForm[Upload]
+      observed.add(form.file)
+      arrived.countDown()
+      if !arrived.await(10, TimeUnit.SECONDS) then throw new IllegalStateException("Uploads did not overlap")
+      Response.withBody(s"${form.name}:${new String(Files.readAllBytes(form.file), UTF_8)}")
+    }
+    withServer(routes, ExceptionMapper.default) { base =>
+      val executor = Executors.newFixedThreadPool(3)
+      try {
+        val results = (1 to 3).map { index =>
+          executor.submit(new java.util.concurrent.Callable[(status: Int, body: Array[Byte])] {
+            override def call(): (status: Int, body: Array[Byte]) = {
+              val result = new AtomicReference[Option[(status: Int, body: Array[Byte])]](None)
+              MultipartRequests.withClient(base) { send =>
+                result.set(Some(send("upload", body(s"name$index", s"payload$index".getBytes(UTF_8)))))
+              }
+              result.get().getOrElse(throw new IllegalStateException("Missing upload response"))
+            }
+          })
+        }
+        results.zipWithIndex.foreach { (future, index) =>
+          val response = future.get(20, TimeUnit.SECONDS)
+          assertEquals(response.status, 200)
+          assertEquals(new String(response.body, UTF_8), s"name${index + 1}:payload${index + 1}")
+        }
+        val paths = observed.iterator().asScala.toSeq
+        assertEquals(paths.size, 3)
+        assertEquals(paths.distinct.size, 3)
+        paths.foreach(path => assertCleaned(new AtomicReference(path)))
+      } finally {
+        executor.shutdownNow()
+        executor.awaitTermination(10, TimeUnit.SECONDS)
+      }
+    }
+  }
+
+  test("multipart limits reject excessive input after an uploaded file") {
+    val prefix =
+      "--upload-boundary\r\nContent-Disposition: form-data; name=\"file\"; filename=\"a\"\r\n\r\ndata\r\n"
+    val field = "--upload-boundary\r\nContent-Disposition: form-data; name=\"name\"\r\n\r\n"
+    val end = "\r\n--upload-boundary--\r\n"
+    val cases = Seq(
+      (name = "field", body = prefix + field + ("x" * (64 * 1024 + 1)) + end),
+      (name = "parts", body = prefix + ((field + "x\r\n") * 128) + "--upload-boundary--\r\n"),
+      (name = "boundary padding", body = prefix + "--upload-boundary" + (" " * (16 * 1024 + 1)) + "\r\n")
+    )
+    val routes = Routes { case POST -> Path("upload") =>
+      Request.current.bodyForm[Upload]
+      Response.default
+    }
+    withServer(routes, ExceptionMapper.default) { base =>
+      MultipartRequests.withClient(base) { send =>
+        cases.foreach { scenario =>
+          val response = send("upload", scenario.body.getBytes(UTF_8))
+          assertEquals(response.status, 413, scenario.name)
+        }
+      }
+    }
   }
 
   for mapper <- Seq((name = "default", value = ExceptionMapper.default), (name = "json", value = ExceptionMapper.json))
