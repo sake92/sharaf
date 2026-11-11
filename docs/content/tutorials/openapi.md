@@ -73,7 +73,7 @@ lazy val api = project
   .enablePlugins(OpenApi4sPlugin)
   .settings(
     scalaVersion := "3.9.0",
-    libraryDependencies += "ba.sake" %% "sharaf-undertow" % "0.20.0",
+    libraryDependencies += "ba.sake" %% "sharaf-undertow" % "0.21.0",
     openApi4sPackage := "com.example.greetings",
     openApi4sFile := canonicalOpenApiFile,
     openApi4sModels := "tupson",

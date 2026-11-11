@@ -1,28 +1,9 @@
 //> using scala 3.9.0
-//> using dep ba.sake::sharaf-undertow:0.20.0
-//> using dep ba.sake::tupson:0.31.0
+//> using dep ba.sake::sharaf-undertow:0.21.0
 
 import ba.sake.sharaf.*
 import ba.sake.sharaf.undertow.UndertowSharafServer
 import ba.sake.tupson.{given, *}
-import org.typelevel.jawn.ast.*
-
-enum Patch[+T]:
-  case Set(value: T)
-  case Keep
-
-object Patch:
-  given [T](using valueRW: JsonRW[T]): JsonRW[Patch[T]] with
-    override def write(value: Patch[T]): JValue = value match
-      case Set(value) => valueRW.write(value)
-      case Keep       => throw TupsonException("Patch.Keep can only be written as an object field")
-
-    override def shouldWriteField(value: Patch[T]): Boolean = value != Keep
-
-    override def parse(path: String, jValue: JValue): Patch[T] =
-      Set(valueRW.parse(path, jValue))
-
-    override def default: Option[Patch[T]] = Some(Keep)
 
 case class User(name: String, address: Option[String]) derives JsonRW
 case class UserPatch(name: Patch[String], address: Patch[Option[String]]) derives JsonRW

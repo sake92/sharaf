@@ -1,5 +1,5 @@
 //> using scala 3.9.0
-//> using dep ba.sake::sharaf-undertow:0.20.0
+//> using dep ba.sake::sharaf-undertow:0.21.0
 
 // https://htmx.org/examples/inline-validation/
 

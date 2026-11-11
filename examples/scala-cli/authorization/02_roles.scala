@@ -1,6 +1,6 @@
 //> using scala 3.9.0
-//> using dep ba.sake::sharaf-undertow:0.20.0
-//> using dep ba.sake::sharaf-pac4j:0.20.0
+//> using dep ba.sake::sharaf-undertow:0.21.0
+//> using dep ba.sake::sharaf-pac4j:0.21.0
 //> using dep org.pac4j:pac4j-http:6.5.8
 //> using options -Yretain-trees
 
