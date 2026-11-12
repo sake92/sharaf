@@ -12,6 +12,16 @@ class QueryStringParseSuite extends munit.FunSuite {
   val period = Period.ofDays(1).plusMonths(4)
   val duration = Duration.ofHours(5).plusSeconds(2)
 
+  test("flat keys preserve repeated and empty values in the query tree") {
+    val input = Map("a" -> Seq("1", "2"), "é" -> Seq.empty[String], "b" -> Seq(""))
+    val expected = QueryStringData.Obj(Map(
+      "a" -> QueryStringData.Sequence(Seq(QueryStringData.Simple("1"), QueryStringData.Simple("2"))),
+      "é" -> QueryStringData.Sequence(Seq.empty),
+      "b" -> QueryStringData.Sequence(Seq(QueryStringData.Simple("")))
+    ))
+    assertEquals(parseQSMap(input), expected)
+  }
+
   test("parseQueryStringMap should parse simple key/values") {
     Seq[(QueryStringMap, QuerySimple)](
       (

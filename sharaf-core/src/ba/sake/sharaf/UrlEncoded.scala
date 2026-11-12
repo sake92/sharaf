@@ -24,16 +24,30 @@ private[sharaf] object UrlEncoded {
       val count = input.read(buffer, 0, allowed)
       if count < 0 then done = true
       else if count > 0 then {
-        if count > maxFormBytes - output.size() then
-          throw PayloadTooLargeException("URL-encoded form limit exceeded")
+        if count > maxFormBytes - output.size() then throw PayloadTooLargeException("URL-encoded form limit exceeded")
         output.write(buffer, 0, count)
       }
     }
     new String(output.toByteArray, UTF_8)
   }
 
-  def query(raw: String): QueryStringMap =
-    pairs(raw).groupMap(_.name)(_.value)
+  def query(raw: String): QueryStringMap = {
+    val values = scala.collection.mutable.Map.empty[String, scala.collection.mutable.ArrayBuffer[String]]
+    var start = 0
+    while (start < raw.length) {
+      val separator = raw.indexOf('&', start)
+      val end = if (separator < 0) raw.length else separator
+      if (end > start) {
+        var split = start
+        while (split < end && raw.charAt(split) != '=') split += 1
+        val name = component(raw.substring(start, split))
+        val value = if (split == end) "" else component(raw.substring(split + 1, end))
+        values.getOrElseUpdate(name, scala.collection.mutable.ArrayBuffer.empty[String]) += value
+      }
+      start = end + 1
+    }
+    values.iterator.map { (key, entries) => key -> entries.toVector }.toMap
+  }
 
   def form(raw: String): FormDataMap =
     pairs(raw).foldLeft(SeqMap.empty[String, Seq[FormValue]]) { (values, pair) =>
@@ -49,13 +63,15 @@ private[sharaf] object UrlEncoded {
     }
 
   private def component(value: String): String =
-    try URLDecoder.decode(value, "UTF-8")
-    catch
-      case _: IllegalArgumentException =>
-        // Scala Native 0.5.12 reports malformed UTF-8 as an illegal escape instead of replacing it.
-        // Decode each escaped byte run through Latin-1, then apply UTF-8 replacement explicitly.
-        try componentWithReplacement(value)
-        catch case _: IllegalArgumentException => throw BadRequestException("Invalid percent escape in request")
+    if (!value.contains('%') && !value.contains('+')) value
+    else
+      try URLDecoder.decode(value, "UTF-8")
+      catch
+        case _: IllegalArgumentException =>
+          // Scala Native 0.5.12 reports malformed UTF-8 as an illegal escape instead of replacing it.
+          // Decode each escaped byte run through Latin-1, then apply UTF-8 replacement explicitly.
+          try componentWithReplacement(value)
+          catch case _: IllegalArgumentException => throw BadRequestException("Invalid percent escape in request")
 
   private def componentWithReplacement(value: String): String = {
     val result = new StringBuilder()

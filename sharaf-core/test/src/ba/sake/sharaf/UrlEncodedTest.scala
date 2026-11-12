@@ -49,6 +49,14 @@ class UrlEncodedTest extends munit.FunSuite {
     assertEquals(UrlEncoded.query("="), Map("" -> Seq("")))
   }
 
+  test("query accepts many bare fields and decodes repeated names") {
+    val bare = (1 to 2000).map(i => s"k$i").mkString("&")
+    val parsed = UrlEncoded.query(s"$bare&a=1&%61=2")
+    assertEquals(parsed.size, 2001)
+    assertEquals(parsed("k2000"), Seq(""))
+    assertEquals(parsed("a"), Seq("1", "2"))
+  }
+
   test("malformed percent escapes in names or values are bad requests") {
     for raw <- Seq("x=%", "x=%0", "x=%ZZ", "%GG=x", "x=%C4%") do {
       intercept[BadRequestException](UrlEncoded.query(raw))

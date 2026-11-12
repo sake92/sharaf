@@ -9,7 +9,7 @@ import "examples.pkl" as Examples
 local const versions = new {
   scala = "3.9.0"
   scalaJs = "1.22.0"
-  scalaNative = "0.5.12"
+  scalaNative = read?("env:SHARAF_SCALA_NATIVE_VERSION") ?? "0.5.12"
   fastparse = "3.1.1"
   sourcecode = "0.4.4"
   scalaJavaTime = "2.7.0"
@@ -506,6 +506,13 @@ local const sharafPotatehModules =
     }
   }.get
 
+local const microBenchmarks = (baseTemplate.asNative()) {
+  id = "micro-benchmarks"
+  root = "microbenchmarks"
+  scalaNativeVersion = versions.scalaNative
+  moduleDeps { sharafCoreModules.native }
+}
+
 local const exampleModules = new Examples.Examples {
   libraryTemplate = baseTemplate
   dependencyVersions = versions
@@ -549,5 +556,6 @@ modules {
   sharafPotatehModules.jvm_test
   sharafPotatehModules.native
   sharafPotatehModules.native_test
+  microBenchmarks
   ...exampleModules
 }

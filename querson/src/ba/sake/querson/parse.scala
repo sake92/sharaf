@@ -14,13 +14,22 @@ import fastparse.Parsed.Failure
   */
 
 def parseQSMap(queryStringMap: QueryStringMap): QueryStringData =
-  val parser = QuersonParser(queryStringMap)
-  val qsInternal = parser.parse()
-  fromInternal(qsInternal)
+  if queryStringMap.keysIterator.forall(isFlatKey) then
+    QueryStringData.Obj(queryStringMap.iterator.map { (key, values) =>
+      key -> QueryStringData.Sequence(values.map(QueryStringData.Simple.apply))
+    }.toMap)
+  else
+    val parser = QuersonParser(queryStringMap)
+    val qsInternal = parser.parse()
+    fromInternal(qsInternal)
+
+private def isFlatKey(key: String): Boolean =
+  key.nonEmpty && key.toIntOption.isEmpty &&
+    !key.exists(c => c == '[' || c == ']' || c == '.' || c.isWhitespace)
 
 private def fromInternal(qsi: QueryStringInternal): QueryStringData = qsi match
-  case QueryStringInternal.Simple(value)       => QueryStringData.Simple(value)
-  case QueryStringInternal.Obj(values)         =>
+  case QueryStringInternal.Simple(value) => QueryStringData.Simple(value)
+  case QueryStringInternal.Obj(values) =>
     QueryStringData.Obj(values.iterator.map { case (key, value) => key -> fromInternal(value) }.toMap)
   case QueryStringInternal.Sequence(valuesMap) =>
     // TODO doesnt work for List[List[T]]
