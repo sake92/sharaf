@@ -26,6 +26,7 @@ Native executable examples cover three deployment paths:
 
 - [GraalVM Native Image with Undertow]({{site.data.project.gh.sourcesUrl}}/examples/scala-cli/hello-undertow-graalvm.scala)
 - [Scala Native with http4s/Ember]({{site.data.project.gh.sourcesUrl}}/examples/scala-cli/hello-http4s-native.scala)
+- [Scala Native with Potateh]({{site.data.project.gh.sourcesUrl}}/examples/scala-cli/hello-potateh-native.scala)
 - [Scala Native with snunit and external Unit]({{site.data.project.gh.sourcesUrl}}/examples/snunit)
 
 The GraalVM example covers Undertow and its example dependencies; it does not establish Native Image compatibility
@@ -51,37 +52,8 @@ server.start()
 println(server.port)
 ```
 
-Pass an explicit port for a fixed address. Potateh exposes its bound port through
-`server.address.getPort`.
+Potateh also accepts port `0` in its bind address and exposes the bound port through
+`server.address.getPort`. With http4s Ember, use port `0` and read `server.address.port.value`.
+Pass an explicit port for a fixed address.
 
 Request parsing behavior and verification are described in the [parsing reference](/reference/parsing.html).
-
-## Potateh
-
-`PotatehSharafServer.start(config, routes)` and `start(config, handler)` return a
-Potateh `Server`. The caller stops it with `server.stop()`. Routes can also receive
-CORS settings, an exception mapper and a not-found handler.
-
-The overloads `start(config, routes, executor)` and `start(config, handler, executor)`
-accept a caller-owned `java.util.concurrent.Executor`. A routes overload also accepts
-all middleware settings together with an executor. Stopping the server leaves the
-executor open. Each submitted task serves a whole persistent connection; a small
-fixed pool can starve other clients. Rejected submissions must throw.
-
-Potateh owns connection and transfer framing. The adapter removes engine-owned and
-Connection-nominated headers, translates an explicit `Content-Length` to Potateh's
-writer length, and streams bodies without buffering them. Invalid or contradictory
-response lengths fail as server errors. Length mismatches during streaming terminate
-the connection. Response-requested `Connection: close`, upgrades and trailers are
-unsupported and fail as server errors. SSE uses chunked streaming on HTTP/1.1.
-
-Malformed query/form percent escapes and invalid path UTF-8 return 400. Unsupported form
-media types return 415. Valid but unsupported HTTP methods
-return 501. Routes use the configured exception mapper for these adapter errors;
-with an already composed handler, errors before context creation use the default
-mapper. Malformed HTTP syntax rejected by Potateh uses its own protocol response.
-
-Paths split on literal slashes before percent decoding each segment once. `%2F`
-stays within one segment and `+` remains literal. Empty interior segments are
-preserved; trailing slashes follow the existing split behavior. This policy is
-specific to Potateh; path decoding currently differs between server adapters.

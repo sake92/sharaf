@@ -1,3 +1,12 @@
+// scala --power package hello-potateh-native.scala --server=false --native-mode release-size \
+//   --native-multithreading -o /tmp/sharaf-potateh
+// /tmp/sharaf-potateh
+// curl http://localhost:8080/hello/Scala
+//> using scala 3.9.0
+//> using platform native
+//> using nativeVersion 0.5.12
+//> using dep ba.sake::sharaf-potateh::0.21.0
+
 import java.net.InetSocketAddress
 import java.io.ByteArrayInputStream
 import java.nio.charset.StandardCharsets.UTF_8

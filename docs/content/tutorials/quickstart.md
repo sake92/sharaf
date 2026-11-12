@@ -32,17 +32,23 @@ The route matches a GET request whose path begins with `hello` and captures the 
 
 ## More examples
 
-- [Scala CLI examples]({{site.data.project.gh.sourcesUrl}}/examples/scala-cli), standalone examples using Scala CLI
-- [Scala CLI HTMX examples]({{site.data.project.gh.sourcesUrl}}/examples/htmx), standalone examples featuring HTMX
-- [API example]({{site.data.project.gh.sourcesUrl}}/examples/api) featuring JSON and validation
-- [OpenAPI API starter](https://github.com/sake92/sharaf-api-starter), a spec-first Postgres application with generated
-  Sharaf routes and STTP client, Swagger UI, Docker, and integration tests
-- [full-stack example]({{site.data.project.gh.sourcesUrl}}/examples/fullstack) featuring HTML, static files and forms
-- [sharaf-todo-backend](https://github.com/sake92/sharaf-todo-backend), implementation of the [todobackend.com](http://todobackend.com/) spec, featuring CORS handling
-- [Username+Password form login]({{site.data.project.gh.sourcesUrl}}/examples/user-pass-form) with [Pac4J](https://www.pac4j.org/)
-- [JWT auth]({{site.data.project.gh.sourcesUrl}}/examples/jwt) with [Pac4J](https://www.pac4j.org/)
-- [OAuth2 login]({{site.data.project.gh.sourcesUrl}}/examples/oauth2) with [Pac4J](https://www.pac4j.org/)
-- [Snunit]({{site.data.project.gh.sourcesUrl}}/examples/snunit) demo app
-- [Http4s]({{site.data.project.gh.sourcesUrl}}/examples/http4s) demo app
-- [PetClinic](https://github.com/sake92/sharaf-petclinic) implementation, featuring full-stack app with Postgres db, config, integration tests etc.
-- [Giter8 template for fullstack app](https://github.com/sake92/sharaf-fullstack.g8)
+Try a standalone example:
+
+- [Scala CLI examples]({{site.data.project.gh.sourcesUrl}}/examples/scala-cli) cover routes, JSON, forms, validation, and native executables.
+- [HTMX examples]({{site.data.project.gh.sourcesUrl}}/examples/htmx) demonstrate interactive HTML.
+- [Authorization examples]({{site.data.project.gh.sourcesUrl}}/examples/scala-cli/authorization) cover roles, ownership, and access policies.
+
+Explore a larger application:
+
+- [API example]({{site.data.project.gh.sourcesUrl}}/examples/api): JSON and validation.
+- [Full-stack example]({{site.data.project.gh.sourcesUrl}}/examples/fullstack): HTML, static files, and forms.
+- [OpenAPI API starter](https://github.com/sake92/sharaf-api-starter): generated routes and client, PostgreSQL, and integration tests.
+- [Todo backend](https://github.com/sake92/sharaf-todo-backend): a TodoBackend implementation with CORS.
+- [PetClinic](https://github.com/sake92/sharaf-petclinic): a full-stack application with PostgreSQL and integration tests.
+- [Full-stack Giter8 template](https://github.com/sake92/sharaf-fullstack.g8): a starting point for a new application.
+
+For specific integrations, see [form login]({{site.data.project.gh.sourcesUrl}}/examples/user-pass-form),
+[JWT]({{site.data.project.gh.sourcesUrl}}/examples/jwt), and [OAuth2]({{site.data.project.gh.sourcesUrl}}/examples/oauth2)
+with pac4j; or the [http4s]({{site.data.project.gh.sourcesUrl}}/examples/http4s) and
+[snunit]({{site.data.project.gh.sourcesUrl}}/examples/snunit) server examples. See also the
+[server reference](/reference/servers.html) for platform support and native examples.

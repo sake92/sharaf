@@ -514,7 +514,6 @@ local const exampleModules = new Examples.Examples {
   jdkHttpserver = sharafJdkHttpserverModules.jvm
   snunit = sharafSnunit
   http4s = sharafHttp4sModules.jvm
-  potateh = sharafPotatehModules.native
 }.all
 
 modules {

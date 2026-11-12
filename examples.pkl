@@ -8,17 +8,6 @@ class Examples {
   jdkHttpserver: D.ScalaModule
   snunit: D.ScalaNativeModule
   http4s: D.ScalaModule
-  potateh: D.ScalaNativeModule
-
-  local potatehExample = (libraryTemplate.asNative()) {
-    id = "example-potateh"
-    root = "examples/potateh"
-    scalaNativeVersion = dependencyVersions.scalaNative
-    multithreading = true
-    mainClass = "PotatehExample"
-    moduleDeps { potateh }
-  }
-
   local baseExampleTemplate = (libraryTemplate) {
     deps { "ch.qos.logback:logback-classic:\(dependencyVersions.logback)" }
   }
@@ -137,7 +126,6 @@ class Examples {
     }.get
 
   all: Listing<D.DederModule> = new {
-    potatehExample
     ...apiExampleModules.all
     ...fullstackExampleModules.all
     ...userPassFormExampleModules.all

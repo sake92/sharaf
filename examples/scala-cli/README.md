@@ -23,8 +23,9 @@ Native executable examples (build and run commands are at the top of each file):
 
 - [GraalVM Native Image with Undertow](hello-undertow-graalvm.scala)
 - [Scala Native with http4s/Ember](hello-http4s-native.scala)
+- [Scala Native with Potateh](hello-potateh-native.scala)
 
-Both examples demonstrate plain-text and JSON routes, including JSON input and error handling.
+These examples demonstrate plain-text and JSON routes, including JSON input and error handling.
 See the [measured footprint](../../docs/content/reference/native-footprint.md) for local size, startup, and memory figures.
 
 Keep `graalvm-resources/` alongside the Undertow example: its metadata registers the generated Undertow/XNIO loggers,
