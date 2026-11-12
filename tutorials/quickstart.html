@@ -67,21 +67,22 @@ println(<span class="hljs-string">s"Server started at http://localhost:8181"</sp
      <p>The response is <code>Hello Bob</code>. Stop the server with Ctrl-C.</p>
      <p>The route matches a GET request whose path begins with <code>hello</code> and captures the next segment as <code>name</code>. Continue with <a href="https://sake92.github.io/sharaf/tutorials/path-params.html">path parameters</a>, or see <a href="https://sake92.github.io/sharaf/reference/dependencies.html">dependency setup</a> for Mill and sbt.</p>
      <h2 id="more-examples">More examples<a href="#more-examples" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p>Try a standalone example:</p>
      <ul>
-      <li><a href="https://github.com/sake92/sharaf/tree/main/examples/scala-cli">Scala CLI examples</a>, standalone examples using Scala CLI</li>
-      <li><a href="https://github.com/sake92/sharaf/tree/main/examples/htmx">Scala CLI HTMX examples</a>, standalone examples featuring HTMX</li>
-      <li><a href="https://github.com/sake92/sharaf/tree/main/examples/api">API example</a> featuring JSON and validation</li>
-      <li><a href="https://github.com/sake92/sharaf-api-starter">OpenAPI API starter</a>, a spec-first Postgres application with generated Sharaf routes and STTP client, Swagger UI, Docker, and integration tests</li>
-      <li><a href="https://github.com/sake92/sharaf/tree/main/examples/fullstack">full-stack example</a> featuring HTML, static files and forms</li>
-      <li><a href="https://github.com/sake92/sharaf-todo-backend">sharaf-todo-backend</a>, implementation of the <a href="http://todobackend.com/">todobackend.com</a> spec, featuring CORS handling</li>
-      <li><a href="https://github.com/sake92/sharaf/tree/main/examples/user-pass-form">Username+Password form login</a> with <a href="https://www.pac4j.org/">Pac4J</a></li>
-      <li><a href="https://github.com/sake92/sharaf/tree/main/examples/jwt">JWT auth</a> with <a href="https://www.pac4j.org/">Pac4J</a></li>
-      <li><a href="https://github.com/sake92/sharaf/tree/main/examples/oauth2">OAuth2 login</a> with <a href="https://www.pac4j.org/">Pac4J</a></li>
-      <li><a href="https://github.com/sake92/sharaf/tree/main/examples/snunit">Snunit</a> demo app</li>
-      <li><a href="https://github.com/sake92/sharaf/tree/main/examples/http4s">Http4s</a> demo app</li>
-      <li><a href="https://github.com/sake92/sharaf-petclinic">PetClinic</a> implementation, featuring full-stack app with Postgres db, config, integration tests etc.</li>
-      <li><a href="https://github.com/sake92/sharaf-fullstack.g8">Giter8 template for fullstack app</a></li>
+      <li><a href="https://github.com/sake92/sharaf/tree/main/examples/scala-cli">Scala CLI examples</a> cover routes, JSON, forms, validation, and native executables.</li>
+      <li><a href="https://github.com/sake92/sharaf/tree/main/examples/htmx">HTMX examples</a> demonstrate interactive HTML.</li>
+      <li><a href="https://github.com/sake92/sharaf/tree/main/examples/scala-cli/authorization">Authorization examples</a> cover roles, ownership, and access policies.</li>
      </ul>
+     <p>Explore a larger application:</p>
+     <ul>
+      <li><a href="https://github.com/sake92/sharaf/tree/main/examples/api">API example</a>: JSON and validation.</li>
+      <li><a href="https://github.com/sake92/sharaf/tree/main/examples/fullstack">Full-stack example</a>: HTML, static files, and forms.</li>
+      <li><a href="https://github.com/sake92/sharaf-api-starter">OpenAPI API starter</a>: generated routes and client, PostgreSQL, and integration tests.</li>
+      <li><a href="https://github.com/sake92/sharaf-todo-backend">Todo backend</a>: a TodoBackend implementation with CORS.</li>
+      <li><a href="https://github.com/sake92/sharaf-petclinic">PetClinic</a>: a full-stack application with PostgreSQL and integration tests.</li>
+      <li><a href="https://github.com/sake92/sharaf-fullstack.g8">Full-stack Giter8 template</a>: a starting point for a new application.</li>
+     </ul>
+     <p>For specific integrations, see <a href="https://github.com/sake92/sharaf/tree/main/examples/user-pass-form">form login</a>, <a href="https://github.com/sake92/sharaf/tree/main/examples/jwt">JWT</a>, and <a href="https://github.com/sake92/sharaf/tree/main/examples/oauth2">OAuth2</a> with pac4j; or the <a href="https://github.com/sake92/sharaf/tree/main/examples/http4s">http4s</a> and <a href="https://github.com/sake92/sharaf/tree/main/examples/snunit">snunit</a> server examples. See also the <a href="https://sake92.github.io/sharaf/reference/servers.html">server reference</a> for platform support and native examples.</p>
      <div role="group">
       <span></span> <span></span> <a role="button" href="https://sake92.github.io/sharaf/tutorials/hello-world.html">Hello World ➡️</a>
      </div>

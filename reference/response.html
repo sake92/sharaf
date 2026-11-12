@@ -88,6 +88,9 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
      </table>
      <p><code>ResponseWritable[T]</code> defines <code>write(value: T, outputStream: OutputStream): Unit</code> and <code>headers(value: T): Seq[(HttpString, Seq[String])]</code>. Instances include strings, JSON-serializable types, streams, file paths, and server-sent events. See <a href="https://sake92.github.io/sharaf/howtos/response-body.html">custom response bodies</a>.</p>
      <p>Body-generated headers are applied before explicit header updates. Header names are case-insensitive; updates run in builder order, with the last set or removal taking effect. Setting a sequence replaces all previous values for that name; an empty sequence removes the header. Repeated values are retained, and cookie updates append to explicit <code>Set-Cookie</code> headers. Explicit headers also apply without a body. These rules apply to Undertow, Potateh, JDK HTTP server, http4s, and Helidon; transport framing remains managed by each server.</p>
+     <div role="group">
+      <a role="button" href="https://sake92.github.io/sharaf/reference/request.html">⬅️ Request</a> <span></span> <a role="button" href="https://sake92.github.io/sharaf/reference/errors.html">Errors ➡️</a>
+     </div>
     </div>
     <aside aria-label="On this page">
      <details open>

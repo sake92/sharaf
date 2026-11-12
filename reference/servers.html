@@ -101,6 +101,7 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
      <ul>
       <li><a href="https://github.com/sake92/sharaf/tree/main/examples/scala-cli/hello-undertow-graalvm.scala">GraalVM Native Image with Undertow</a></li>
       <li><a href="https://github.com/sake92/sharaf/tree/main/examples/scala-cli/hello-http4s-native.scala">Scala Native with http4s/Ember</a></li>
+      <li><a href="https://github.com/sake92/sharaf/tree/main/examples/scala-cli/hello-potateh-native.scala">Scala Native with Potateh</a></li>
       <li><a href="https://github.com/sake92/sharaf/tree/main/examples/snunit">Scala Native with snunit and external Unit</a></li>
      </ul>
      <p>The GraalVM example covers Undertow and its example dependencies; it does not establish Native Image compatibility for every JVM adapter. The snunit example requires <code>libunit</code> at build time and a separately configured Unit daemon.</p>
@@ -114,14 +115,11 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
 server.start()
 println(server.port)
 </code></pre>
-     <p>Pass an explicit port for a fixed address. Potateh exposes its bound port through <code>server.address.getPort</code>.</p>
+     <p>Potateh also accepts port <code>0</code> in its bind address and exposes the bound port through <code>server.address.getPort</code>. With http4s Ember, use port <code>0</code> and read <code>server.address.port.value</code>. Pass an explicit port for a fixed address.</p>
      <p>Request parsing behavior and verification are described in the <a href="https://sake92.github.io/sharaf/reference/parsing.html">parsing reference</a>.</p>
-     <h2 id="potateh">Potateh<a href="#potateh" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
-     <p><code>PotatehSharafServer.start(config, routes)</code> and <code>start(config, handler)</code> return a Potateh <code>Server</code>. The caller stops it with <code>server.stop()</code>. Routes can also receive CORS settings, an exception mapper and a not-found handler.</p>
-     <p>The overloads <code>start(config, routes, executor)</code> and <code>start(config, handler, executor)</code> accept a caller-owned <code>java.util.concurrent.Executor</code>. A routes overload also accepts all middleware settings together with an executor. Stopping the server leaves the executor open. Each submitted task serves a whole persistent connection; a small fixed pool can starve other clients. Rejected submissions must throw.</p>
-     <p>Potateh owns connection and transfer framing. The adapter removes engine-owned and Connection-nominated headers, translates an explicit <code>Content-Length</code> to Potateh's writer length, and streams bodies without buffering them. Invalid or contradictory response lengths fail as server errors. Length mismatches during streaming terminate the connection. Response-requested <code>Connection: close</code>, upgrades and trailers are unsupported and fail as server errors. SSE uses chunked streaming on HTTP/1.1.</p>
-     <p>Malformed query/form percent escapes and invalid path UTF-8 return 400. Unsupported form media types return 415. Valid but unsupported HTTP methods return 501. Routes use the configured exception mapper for these adapter errors; with an already composed handler, errors before context creation use the default mapper. Malformed HTTP syntax rejected by Potateh uses its own protocol response.</p>
-     <p>Paths split on literal slashes before percent decoding each segment once. <code>%2F</code> stays within one segment and <code>+</code> remains literal. Empty interior segments are preserved; trailing slashes follow the existing split behavior. This policy is specific to Potateh; path decoding currently differs between server adapters.</p>
+     <div role="group">
+      <a role="button" href="https://sake92.github.io/sharaf/reference/errors.html">⬅️ Errors</a> <span></span> <a role="button" href="https://sake92.github.io/sharaf/reference/parsing.html">Request parsing ➡️</a>
+     </div>
     </div>
     <aside aria-label="On this page">
      <details open>
@@ -131,7 +129,6 @@ println(server.port)
         <li><a href="#servers-and-platforms">Servers and platforms</a>
          <ul>
           <li><a href="#choosing-a-port">Choosing a port</a></li>
-          <li><a href="#potateh">Potateh</a></li>
          </ul></li>
        </ul>
       </nav>

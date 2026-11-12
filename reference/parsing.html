@@ -109,6 +109,9 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
      <p>In November 2026, Sharaf Potateh on the JVM and Scala Native and Werkzeug 3.1.8 received the same 59,319 generated cookie headers. The inputs used the three-character name alphabet from <a href="https://github.com/SecPriv/cookiecrumbles/tree/main/reflectors">Cookie Crumbles</a>, with a fixed value of <code>foo</code>. Both returned the same sorted name/value pairs for all cases, with no request errors. The comparison used an adapted harness, not the upstream fuzzer or its older reflector versions.</p>
      <p>In a separate comparison of 16 selected headers on both platforms, the parsers agreed on 13. The three differences involved quoted values: Sharaf preserves the quotes, while Werkzeug removes them; for a quoted value containing a semicolon, Sharaf also splits at the semicolon. These differences alone do not establish a defect.</p>
      <p>The generated comparison did not check duplicate headers, ordering, other values, or conformance against a specification. Clients and servers may normalize headers before parsing.</p>
+     <div role="group">
+      <a role="button" href="https://sake92.github.io/sharaf/reference/servers.html">⬅️ Servers and platforms</a> <span></span> <a role="button" href="https://sake92.github.io/sharaf/reference/native-footprint.html">Native footprint ➡️</a>
+     </div>
     </div>
     <aside aria-label="On this page">
      <details open>
