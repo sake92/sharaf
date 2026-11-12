@@ -1,4 +1,5 @@
 ---
+layout: reference.html
 title: Servers and platforms
 description: Sharaf server modules and platform support
 ---

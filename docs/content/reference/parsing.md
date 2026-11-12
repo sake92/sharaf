@@ -1,4 +1,5 @@
 ---
+layout: reference.html
 title: Request parsing
 description: Request parsing behavior and verification
 ---

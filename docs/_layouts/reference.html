@@ -1,0 +1,11 @@
+{% import "macros.html" as ui %}
+
+{% extends "base.html" %}
+
+{% block content %}
+
+{{page.content}}
+
+{{ ui.prev_next(items=site.data.project.references) }}
+
+{% endblock %}

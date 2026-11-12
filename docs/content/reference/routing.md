@@ -1,4 +1,5 @@
 ---
+layout: reference.html
 title: Routing
 description: Sharaf route and path reference
 ---

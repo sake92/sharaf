@@ -1,4 +1,5 @@
 ---
+layout: reference.html
 title: Errors
 description: Sharaf exception mapping reference
 ---

@@ -1,4 +1,5 @@
 ---
+layout: reference.html
 title: Native footprint
 description: Measured Sharaf executable sizes, startup, and memory usage
 ---

@@ -1,11 +1,12 @@
 ---
+layout: reference.html
 title: Dependencies
 description: Sharaf artifact coordinates and build settings
 ---
 
 # {{ page.title }}
 
-The examples use Scala 3.9.0 and Sharaf {{site.data.project.artifact.version}}. Artifact group: `{{site.data.project.artifact.org}}`.
+The coordinates below use Scala 3.9.0 and Sharaf {{site.data.project.artifact.version}}. Artifact group: `{{site.data.project.artifact.org}}`.
 
 | Build tool | Undertow dependency |
 | --- | --- |

@@ -1,4 +1,5 @@
 ---
+layout: reference.html
 title: Response
 description: Sharaf response API reference
 ---
