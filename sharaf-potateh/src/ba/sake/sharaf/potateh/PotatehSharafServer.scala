@@ -6,6 +6,8 @@ import ba.sake.sharaf.*
 import ba.sake.sharaf.exceptions.{BadRequestException, UnsupportedMethodException}
 
 object PotatehSharafServer {
+  private val ManagedHeaders =
+    Vector("Content-Length", "Transfer-Encoding", "Connection", "Keep-Alive", "Upgrade", "Trailer")
 
   /** Starts a server owned by the caller. Call stop() on the returned server at shutdown. Failures before a request
     * context exists use the default exception mapper.
@@ -104,18 +106,17 @@ object PotatehSharafServer {
 
   private def toResponse[T](response: Response[T], requestMethod: String): ba.sake.potateh.Response = {
     val contentHeaders = response.body.toSeq.flatMap(response.rw.headers)
-    val updated = response.headerUpdates.resolve(contentHeaders).foldLeft(Headers.empty) {
-      case (headers, HeaderUpdate.Set(name, values)) => setHeader(headers, name, values)
-      case (headers, HeaderUpdate.Remove(name))      => headers.remove(name.toString)
-    }
-    val withCookies = response.cookieUpdates.updates.foldLeft(updated) { (headers, cookie) =>
-      headers.add("Set-Cookie", CookieHeaders.render(cookie))
-    }
-    val connectionFields = withCookies.all("Connection").flatMap(_.split(',')).map(_.trim)
+    val resolved = response.headerUpdates.resolve(contentHeaders)
+    def values(name: String): Seq[String] = resolved.collect {
+      case HeaderUpdate.Set(headerName, headerValues) if headerName.toString.equalsIgnoreCase(name) =>
+        headerValues
+    }.flatten
+
+    val connectionFields = values("Connection").flatMap(_.split(',')).map(_.trim)
     require(!connectionFields.exists(_.equalsIgnoreCase("close")), "Potateh does not support response-requested close")
-    require(withCookies.all("Upgrade").isEmpty, "Potateh does not support protocol upgrades")
-    require(withCookies.all("Trailer").isEmpty, "Potateh does not support response trailers")
-    val lengths = withCookies.all("Content-Length")
+    require(values("Upgrade").isEmpty, "Potateh does not support protocol upgrades")
+    require(values("Trailer").isEmpty, "Potateh does not support response trailers")
+    val lengths = values("Content-Length")
     val length = lengths.headOption.map { text =>
       require(
         lengths.size == 1 && text.nonEmpty && text.forall(c => c >= '0' && c <= '9'),
@@ -123,9 +124,19 @@ object PotatehSharafServer {
       )
       text.toLongOption.getOrElse(throw new IllegalArgumentException("Response Content-Length overflow"))
     }
-    require(length.isEmpty || withCookies.all("Transfer-Encoding").isEmpty, "Conflicting response framing")
-    val managed = Seq("Content-Length", "Transfer-Encoding", "Connection", "Keep-Alive", "Upgrade", "Trailer")
-    val headers = (managed ++ connectionFields).foldLeft(withCookies)((result, name) => result.remove(name))
+    require(length.isEmpty || values("Transfer-Encoding").isEmpty, "Conflicting response framing")
+
+    val fields = Vector.newBuilder[(name: String, value: String)]
+    resolved.foreach {
+      case HeaderUpdate.Set(name, headerValues) if !isManaged(name.toString, connectionFields) =>
+        val headerName = name.toString
+        headerValues.foreach(value => fields += ((name = headerName, value = value)))
+      case _ => ()
+    }
+    response.cookieUpdates.updates.foreach { cookie =>
+      fields += ((name = "Set-Cookie", value = CookieHeaders.render(cookie)))
+    }
+    val headers = Headers.from(fields.result())
     val body = response.body match {
       case None if length.nonEmpty && (requestMethod == "HEAD" || response.status.code == 304) =>
         ResponseBody.Writer(length)(_ => ())
@@ -137,7 +148,8 @@ object PotatehSharafServer {
     ba.sake.potateh.Response(response.status.code, headers, body)
   }
 
-  private def setHeader(headers: Headers, name: HttpString, values: Seq[String]): Headers =
-    values.foldLeft(headers.remove(name.toString)) { (result, value) => result.add(name.toString, value) }
+  private def isManaged(name: String, connectionFields: Seq[String]): Boolean =
+    ManagedHeaders.exists(name.equalsIgnoreCase) ||
+      connectionFields.exists(name.equalsIgnoreCase)
 
 }
