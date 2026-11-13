@@ -7,6 +7,26 @@ import ba.sake.sharaf.*
 
 abstract class AbstractCorsTest extends munit.FunSuite with ServerFixture {
 
+  test("CORS is a no-op when disabled") {
+    val next = SharafHandler.routes(Routes { case GET -> Path("cors") => Response.withBody("CORS") })
+    val handler = SharafHandler.cors(next, CorsSettings.disabled)
+    assert(handler eq next)
+  }
+
+  test("route server convenience methods disable CORS by default") {
+    val routes = Routes { case GET -> Path("cors") => Response.withBody("CORS") }
+    withDefaultRoutes(routes) { base =>
+      val response = request
+        .get(uri"$base/cors")
+        .header(HeaderNames.Origin, "http://example.com")
+        .send(httpBackend)
+      assertEquals(response.code, StatusCode.Ok)
+      assertEquals(response.header(HeaderNames.AccessControlAllowOrigin), None)
+      assertEquals(response.header(HeaderNames.AccessControlAllowCredentials), None)
+      assertEquals(response.headers(HeaderNames.Vary), Seq.empty)
+    }
+  }
+
   for origin <- Seq(None, Some("http://example.com"), Some("http://example2.com")) do {
     test(s"CORS response for origin $origin") {
       val routes = Routes { case GET -> Path("cors") => Response.withBody("CORS") }

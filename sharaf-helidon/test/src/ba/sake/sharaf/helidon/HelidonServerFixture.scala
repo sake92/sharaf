@@ -5,6 +5,13 @@ import ba.sake.sharaf.handlers.ServerFixture
 import ba.sake.sharaf.helidon.HelidonSharafServer
 
 trait HelidonServerFixture extends ServerFixture {
+  override def withDefaultRoutes(routes: Routes)(check: String => Unit): Unit = {
+    val server = HelidonSharafServer("127.0.0.1", routes)
+    server.start()
+    try check(s"http://127.0.0.1:${server.port}")
+    finally server.stop()
+  }
+
   override def withHandler(handler: SharafHandler)(check: String => Unit): Unit = {
     val server = HelidonSharafServer("127.0.0.1", handler)
     server.start()

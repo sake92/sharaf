@@ -35,7 +35,7 @@ object UndertowSharafServer {
       host: String,
       port: Int,
       routes: Routes,
-      corsSettings: CorsSettings = CorsSettings.default,
+      corsSettings: CorsSettings = CorsSettings.disabled,
       exceptionMapper: ExceptionMapper = ExceptionMapper.default,
       notFoundHandler: SharafHandler = SharafHandler.DefaultNotFoundHandler
   ): UndertowSharafServer = {

@@ -45,7 +45,7 @@ object JdkHttpServerSharafServer {
       host: String,
       port: Int,
       routes: Routes,
-      corsSettings: CorsSettings = CorsSettings.default,
+      corsSettings: CorsSettings = CorsSettings.disabled,
       exceptionMapper: ExceptionMapper = ExceptionMapper.default,
       notFoundHandler: SharafHandler = SharafHandler.DefaultNotFoundHandler
   ): JdkHttpServerSharafServer =
@@ -53,7 +53,7 @@ object JdkHttpServerSharafServer {
 
   def apply(host: String, port: Int, routes: Routes, executor: Option[Executor]): JdkHttpServerSharafServer =
     apply(
-      host, port, routes, CorsSettings.default, ExceptionMapper.default, SharafHandler.DefaultNotFoundHandler, executor
+      host, port, routes, CorsSettings.disabled, ExceptionMapper.default, SharafHandler.DefaultNotFoundHandler, executor
     )
 
   def apply(

@@ -14,6 +14,9 @@ trait ServerFixture {
 
   def withHandler(handler: SharafHandler)(check: String => Unit): Unit
 
+  def withDefaultRoutes(routes: Routes)(check: String => Unit): Unit =
+    withHandler(SharafHandler.routes(routes))(check)
+
   final def withServer(routes: Routes, mapper: ExceptionMapper)(check: String => Unit): Unit =
     withHandler(SharafHandler.exceptions(SharafHandler.routes(routes), mapper))(check)
 }

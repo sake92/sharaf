@@ -22,7 +22,7 @@ object PotatehSharafServer {
   def start(
       config: ServerConfig,
       routes: Routes,
-      corsSettings: CorsSettings = CorsSettings.default,
+      corsSettings: CorsSettings = CorsSettings.disabled,
       exceptionMapper: ExceptionMapper = ExceptionMapper.default,
       notFoundHandler: SharafHandler = SharafHandler.DefaultNotFoundHandler
   ): Server = startRoutes(config, routes, corsSettings, exceptionMapper, notFoundHandler, None)
@@ -32,7 +32,7 @@ object PotatehSharafServer {
     startRoutes(
       config,
       routes,
-      CorsSettings.default,
+      CorsSettings.disabled,
       ExceptionMapper.default,
       SharafHandler.DefaultNotFoundHandler,
       Some(executor)

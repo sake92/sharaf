@@ -8,6 +8,24 @@ package ba.sake.sharaf
   */
 private[sharaf] final case class HeaderUpdates(updates: Seq[HeaderUpdate]) {
 
+  def effective(name: HttpString, bodyHeaders: Seq[(HttpString, Seq[String])]): Option[Seq[String]] = {
+    var effectiveValues = Option.empty[Seq[String]]
+    bodyHeaders.foreach { case (headerName, values) =>
+      if name == headerName then {
+        effectiveValues = Option.when(values.nonEmpty)(values)
+      }
+    }
+    updates.foreach {
+      case HeaderUpdate.Set(headerName, values) if name == headerName =>
+        effectiveValues = Option.when(values.nonEmpty)(values)
+      case HeaderUpdate.Remove(headerName) if name == headerName =>
+        effectiveValues = None
+      case _ =>
+        ()
+    }
+    effectiveValues
+  }
+
   /** Body headers precede explicit updates. Keep removals so adapters can clear headers from earlier handlers. */
   def resolve(bodyHeaders: Seq[(HttpString, Seq[String])]): Seq[HeaderUpdate] = {
     val initial = bodyHeaders.map { case (name, values) => HeaderUpdate.Set(name, values) }

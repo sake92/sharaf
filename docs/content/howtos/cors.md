@@ -6,8 +6,8 @@ description: Sharaf How To CORS
 
 # {{ page.title }}
 
-By default, Sharaf sets no permitted origins.  
-This means you can only use the API/website from the same domain.
+CORS middleware is disabled by default on the server route convenience methods, so requests do not pay for CORS
+processing unless you configure it.
 
 If you want it to be available for other domains, 
 use the `corsSettings` parameter to set desired config:

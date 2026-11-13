@@ -66,6 +66,19 @@ object CorsSettings:
   private val allowedHttpHeaders =
     Set(HeaderNames.Accept, HeaderNames.AcceptLanguage, HeaderNames.ContentLanguage, HeaderNames.ContentType)
       .map(HttpString.apply)
+
+  /** Sentinel for removing CORS processing. [[SharafHandler.cors]] returns its wrapped handler unchanged when passed
+    * this value.
+    */
+  val disabled: CorsSettings = new CorsSettings(
+    pathPrefixes = Set.empty,
+    allowedOrigins = Set.empty,
+    allowedHttpMethods = Set.empty,
+    allowedHttpHeaders = Set.empty,
+    allowCredentials = false,
+    preflightMaxAge = Duration.ZERO
+  )
+
   val default: CorsSettings = new CorsSettings(
     pathPrefixes = Set("/"),
     allowedOrigins = Set.empty,

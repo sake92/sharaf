@@ -38,7 +38,8 @@ object SharafHandler:
     ExceptionHandler(exceptionMapper, wrappedHandler)
 
   def cors(next: SharafHandler, corsSettings: CorsSettings = CorsSettings.default): SharafHandler =
-    CorsHandler(corsSettings, next)
+    if corsSettings eq CorsSettings.disabled then next
+    else CorsHandler(corsSettings, next)
 
   def sessions(
       next: SharafHandler,
