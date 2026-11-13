@@ -124,7 +124,12 @@ object PotatehSharafServer {
       )
       text.toLongOption.getOrElse(throw new IllegalArgumentException("Response Content-Length overflow"))
     }
-    require(length.isEmpty || values("Transfer-Encoding").isEmpty, "Conflicting response framing")
+    val transferEncoding = values("Transfer-Encoding")
+    require(length.isEmpty || transferEncoding.isEmpty, "Conflicting response framing")
+    val bodyLength =
+      if length.nonEmpty then length
+      else if transferEncoding.nonEmpty then None
+      else response.body.flatMap(KnownBodyLength.of)
 
     val fields = Vector.newBuilder[(name: String, value: String)]
     resolved.foreach {
@@ -143,7 +148,7 @@ object PotatehSharafServer {
       case None =>
         require(length.forall(_ == 0), "Nonzero Content-Length without a body")
         ResponseBody.Empty
-      case Some(value) => ResponseBody.Writer(length) { output => response.rw.write(value, output) }
+      case Some(value) => ResponseBody.Writer(bodyLength) { output => response.rw.write(value, output) }
     }
     ba.sake.potateh.Response(response.status.code, headers, body)
   }

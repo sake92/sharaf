@@ -49,14 +49,15 @@ class PotatehSharafServerTest extends munit.FunSuite {
     finally server.stop()
   }
 
-  test("explicit lengths use UTF-8 bytes and preserve keep-alive framing") {
+  test("known lengths use UTF-8 bytes and preserve keep-alive framing") {
     withServer() { server =>
       Using.resource(new HttpConnection(server.address)) { connection =>
         for ((path, expected) <- Seq("/length" -> "ok", "/unicode-length" -> "ć", "/ok" -> "ok")) {
           val response = connection.request("GET", path)
           assertEquals(response.status, 200)
           assertEquals(response.body, expected)
-          if path != "/ok" then assertEquals(response.headers.get("content-length"), Some("2"))
+          assertEquals(response.headers.get("content-length"), Some("2"))
+          assert(!response.headers.contains("transfer-encoding"))
         }
       }
     }
