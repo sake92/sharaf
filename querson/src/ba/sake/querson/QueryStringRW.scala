@@ -25,6 +25,15 @@ trait QueryStringRW[T] {
 
   def parse(path: String, qsData: QueryStringData): T
 
+  /** Parses a flat map without constructing the intermediate query-string AST. Returns None when the map requires the
+    * general nested-key parser.
+    */
+  def parseFlat(qsMap: QueryStringMap): Option[T] = None
+
+  /** Parses the raw values belonging to one key. */
+  def parseValues(path: String, values: Seq[String]): T =
+    parse(path, Sequence(values.map(Simple.apply)))
+
   /** Global default for `T` when key is missing.
     */
   def default: Option[T] = None
@@ -35,6 +44,10 @@ trait QueryStringRW[T] {
     new QueryStringRW[U] {
       override def parse(path: String, qsData: QueryStringData): U =
         g(self.parse(path, qsData))
+      override def parseFlat(qsMap: QueryStringMap): Option[U] =
+        self.parseFlat(qsMap).map(g)
+      override def parseValues(path: String, values: Seq[String]): U =
+        g(self.parseValues(path, values))
       override def write(path: String, value: U): QueryStringData =
         self.write(path, f(value))
       override def default: Option[U] = _default
@@ -69,6 +82,9 @@ object QueryStringRW extends LowPriorityQueryStringRWInstances {
       case Sequence(Seq(Simple(value), _*)) => value
       case Sequence(Seq())                  => parseError(path, s"is missing")
       case other                            => parseError(path, s"has invalid type: ${other.tpe}")
+
+    override def parseValues(path: String, values: Seq[String]): String =
+      values.headOption.getOrElse(parseError(path, s"is missing"))
   }
 
   given QueryStringRW[Boolean] with {
@@ -77,6 +93,10 @@ object QueryStringRW extends LowPriorityQueryStringRWInstances {
 
     override def parse(path: String, qsData: QueryStringData): Boolean =
       val str = QueryStringRW[String].parse(path, qsData)
+      str.toBooleanOption.getOrElse(typeError(path, "Boolean", str))
+
+    override def parseValues(path: String, values: Seq[String]): Boolean =
+      val str = QueryStringRW[String].parseValues(path, values)
       str.toBooleanOption.getOrElse(typeError(path, "Boolean", str))
   }
 
@@ -87,6 +107,10 @@ object QueryStringRW extends LowPriorityQueryStringRWInstances {
     override def parse(path: String, qsData: QueryStringData): Int =
       val str = QueryStringRW[String].parse(path, qsData)
       str.toIntOption.getOrElse(typeError(path, "Int", str))
+
+    override def parseValues(path: String, values: Seq[String]): Int =
+      val str = QueryStringRW[String].parseValues(path, values)
+      str.toIntOption.getOrElse(typeError(path, "Int", str))
   }
 
   given QueryStringRW[Long] with {
@@ -95,6 +119,10 @@ object QueryStringRW extends LowPriorityQueryStringRWInstances {
 
     override def parse(path: String, qsData: QueryStringData): Long =
       val str = QueryStringRW[String].parse(path, qsData)
+      str.toLongOption.getOrElse(typeError(path, "Long", str))
+
+    override def parseValues(path: String, values: Seq[String]): Long =
+      val str = QueryStringRW[String].parseValues(path, values)
       str.toLongOption.getOrElse(typeError(path, "Long", str))
   }
 
@@ -105,6 +133,10 @@ object QueryStringRW extends LowPriorityQueryStringRWInstances {
     override def parse(path: String, qsData: QueryStringData): Double =
       val str = QueryStringRW[String].parse(path, qsData)
       str.toDoubleOption.getOrElse(typeError(path, "Double", str))
+
+    override def parseValues(path: String, values: Seq[String]): Double =
+      val str = QueryStringRW[String].parseValues(path, values)
+      str.toDoubleOption.getOrElse(typeError(path, "Double", str))
   }
 
   given QueryStringRW[UUID] with {
@@ -113,6 +145,10 @@ object QueryStringRW extends LowPriorityQueryStringRWInstances {
 
     override def parse(path: String, qsData: QueryStringData): UUID =
       val str = QueryStringRW[String].parse(path, qsData)
+      Try(UUID.fromString(str)).toOption.getOrElse(typeError(path, "UUID", str))
+
+    override def parseValues(path: String, values: Seq[String]): UUID =
+      val str = QueryStringRW[String].parseValues(path, values)
       Try(UUID.fromString(str)).toOption.getOrElse(typeError(path, "UUID", str))
   }
 
@@ -124,6 +160,10 @@ object QueryStringRW extends LowPriorityQueryStringRWInstances {
     override def parse(path: String, qsData: QueryStringData): URI =
       val str = QueryStringRW[String].parse(path, qsData)
       Try(URI(str)).toOption.getOrElse(typeError(path, "URI", str))
+
+    override def parseValues(path: String, values: Seq[String]): URI =
+      val str = QueryStringRW[String].parseValues(path, values)
+      Try(URI(str)).toOption.getOrElse(typeError(path, "URI", str))
   }
 
   // java.time
@@ -134,6 +174,10 @@ object QueryStringRW extends LowPriorityQueryStringRWInstances {
     override def parse(path: String, qsData: QueryStringData): Instant =
       val str = QueryStringRW[String].parse(path, qsData)
       Try(Instant.parse(str)).toOption.getOrElse(typeError(path, "Instant", str))
+
+    override def parseValues(path: String, values: Seq[String]): Instant =
+      val str = QueryStringRW[String].parseValues(path, values)
+      Try(Instant.parse(str)).toOption.getOrElse(typeError(path, "Instant", str))
   }
 
   given QueryStringRW[LocalDate] with {
@@ -142,6 +186,10 @@ object QueryStringRW extends LowPriorityQueryStringRWInstances {
 
     override def parse(path: String, qsData: QueryStringData): LocalDate =
       val str = QueryStringRW[String].parse(path, qsData)
+      Try(LocalDate.parse(str)).toOption.getOrElse(typeError(path, "LocalDate", str))
+
+    override def parseValues(path: String, values: Seq[String]): LocalDate =
+      val str = QueryStringRW[String].parseValues(path, values)
       Try(LocalDate.parse(str)).toOption.getOrElse(typeError(path, "LocalDate", str))
   }
 
@@ -152,6 +200,10 @@ object QueryStringRW extends LowPriorityQueryStringRWInstances {
     override def parse(path: String, qsData: QueryStringData): LocalDateTime =
       val str = QueryStringRW[String].parse(path, qsData)
       Try(LocalDateTime.parse(str)).toOption.getOrElse(typeError(path, "LocalDateTime", str))
+
+    override def parseValues(path: String, values: Seq[String]): LocalDateTime =
+      val str = QueryStringRW[String].parseValues(path, values)
+      Try(LocalDateTime.parse(str)).toOption.getOrElse(typeError(path, "LocalDateTime", str))
   }
 
   given QueryStringRW[Duration] with {
@@ -161,6 +213,10 @@ object QueryStringRW extends LowPriorityQueryStringRWInstances {
     override def parse(path: String, qsData: QueryStringData): Duration =
       val str = QueryStringRW[String].parse(path, qsData)
       Try(Duration.parse(str)).toOption.getOrElse(typeError(path, "Duration", str))
+
+    override def parseValues(path: String, values: Seq[String]): Duration =
+      val str = QueryStringRW[String].parseValues(path, values)
+      Try(Duration.parse(str)).toOption.getOrElse(typeError(path, "Duration", str))
   }
 
   given QueryStringRW[Period] with {
@@ -169,6 +225,10 @@ object QueryStringRW extends LowPriorityQueryStringRWInstances {
 
     override def parse(path: String, qsData: QueryStringData): Period =
       val str = QueryStringRW[String].parse(path, qsData)
+      Try(Period.parse(str)).toOption.getOrElse(typeError(path, "Period", str))
+
+    override def parseValues(path: String, values: Seq[String]): Period =
+      val str = QueryStringRW[String].parseValues(path, values)
       Try(Period.parse(str)).toOption.getOrElse(typeError(path, "Period", str))
   }
 
@@ -326,6 +386,53 @@ object QueryStringRW extends LowPriorityQueryStringRWInstances {
 
               $m.fromProduct(Tuple.fromArray(arguments.toArray))
             }
+
+            override def parseFlat(qsMap: QueryStringMap): Option[T] = {
+              if !qsMap.keysIterator.forall(isFlatKey) then None
+              else {
+                val arguments = ArrayDeque.empty[Any]
+                val keyErrors = ArrayDeque.empty[ParseError]
+                val defaultValuesMap = $defaultValues.toMap
+
+                $labels.zip($rwInstances).foreach { case (label, rw) =>
+                  val keyPath = label
+                  val keyPresent = qsMap.contains(label)
+
+                  val globalDefault = rw.default
+                  val hasGlobalDefault = globalDefault.nonEmpty
+
+                  val defaultOpt = defaultValuesMap(label)
+                  val hasLocalDefault = defaultOpt.isDefined
+
+                  if !keyPresent && !hasGlobalDefault && !hasLocalDefault then
+                    keyErrors += ParseError(keyPath, "is missing")
+                  else {
+                    val argOpt = qsMap
+                      .get(label)
+                      .flatMap { values =>
+                        try {
+                          Some(rw.parseValues(keyPath, values))
+                        } catch {
+                          case pe: ParsingException =>
+                            keyErrors ++= pe.errors
+                            None
+                        }
+                      }
+
+                    argOpt
+                      .orElse(defaultOpt.map(_()))
+                      .orElse(globalDefault)
+                      .foreach { arg =>
+                        arguments += arg
+                      }
+                  }
+                }
+
+                if keyErrors.nonEmpty then throw ParsingException(keyErrors.toSeq)
+
+                Some($m.fromProduct(Tuple.fromArray(arguments.toArray)))
+              }
+            }
           }
         }
 
@@ -398,7 +505,8 @@ object QueryStringRW extends LowPriorityQueryStringRWInstances {
                     override def parse(path: String, qsData: QueryStringData): T = {
                       val leftRW = summonInline[QueryStringRW[l]]
                       val rightRW = summonInline[QueryStringRW[r]]
-                      if !$leftMatcher(qsData) && $rightMatcher(qsData) then rightRW.parse(path, qsData).asInstanceOf[T]
+                      if ! $leftMatcher(qsData) && $rightMatcher(qsData) then
+                        rightRW.parse(path, qsData).asInstanceOf[T]
                       else
                         try leftRW.parse(path, qsData).asInstanceOf[T]
                         catch case _: QuersonException => rightRW.parse(path, qsData).asInstanceOf[T]
@@ -428,10 +536,10 @@ object QueryStringRW extends LowPriorityQueryStringRWInstances {
       case tpe if tpe.typeSymbol == TypeRepr.of[(field: Int)].typeSymbol =>
         val fieldNames = namedTupleFieldNames(tpe)
         val fieldNamesExpr = Expr(fieldNames)
-        '{
-          (qsData: QueryStringData) => qsData match {
+        '{ (qsData: QueryStringData) =>
+          qsData match {
             case Obj(fields) => $fieldNamesExpr.exists(fields.contains)
-            case _            => false
+            case _           => false
           }
         }
       case _ => '{ (_: QueryStringData) => true }
@@ -555,6 +663,21 @@ private[querson] trait LowPriorityQueryStringRWInstances {
           withNames(tupleValue).asInstanceOf[T]
         case _ =>
           throw QuersonException(s"Expected object at path '$path', found: $qsData")
+      }
+
+      override def parseFlat(qsMap: QueryStringMap): Option[T] = {
+        if !qsMap.keysIterator.forall(isFlatKey) then None
+        else {
+          val parsedValues = fieldNames.zip(tcInstances).map { case (name, rw) =>
+            qsMap.get(name) match {
+              case Some(values) => rw.parseValues(s".$name", values)
+              case None =>
+                rw.default.getOrElse(throw QuersonException(s"Missing field '$name' at path ''"))
+            }
+          }
+          val tupleValue = Tuple.fromArray(parsedValues.toArray)
+          Some(withNames(tupleValue).asInstanceOf[T])
+        }
       }
     }
 

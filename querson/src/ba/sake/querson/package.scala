@@ -10,8 +10,10 @@ extension (queryStringMap: QueryStringMap) {
   /** Parses `T` from a QueryStringMap map.
     */
   def parseQueryStringMap[T](using rw: QueryStringRW[T]): T =
-    val obj = parseQSMap(queryStringMap)
-    rw.parse("", obj)
+    rw.parseFlat(queryStringMap).getOrElse {
+      val obj = parseQSMap(queryStringMap)
+      rw.parse("", obj)
+    }
 }
 
 extension [T](value: T)(using rw: QueryStringRW[T]) {

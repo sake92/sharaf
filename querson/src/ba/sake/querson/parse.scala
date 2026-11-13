@@ -23,7 +23,7 @@ def parseQSMap(queryStringMap: QueryStringMap): QueryStringData =
     val qsInternal = parser.parse()
     fromInternal(qsInternal)
 
-private def isFlatKey(key: String): Boolean =
+private[querson] def isFlatKey(key: String): Boolean =
   key.nonEmpty && key.toIntOption.isEmpty &&
     !key.exists(c => c == '[' || c == ']' || c == '.' || c.isWhitespace)
 
