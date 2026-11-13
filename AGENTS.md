@@ -35,6 +35,8 @@ deder exec -t publishLocal                 # publish jars to local ~/.ivy2
 
 ## Code Conventions
 
+- In hot paths, avoid `boundary.break` across `try` blocks or nested functions: it can throw and unwind on Scala Native. Never let a broad catch intercept a `break`.
+
 - Prefer named tuples with descriptive field access over positional tuples wherever practical; keep ordinary key-value pairs for maps.
 - **Scalafmt 3.7.15**, Scala 3 dialect, max 120 chars per line. Format with `deder exec -t runMvnApp fmt`
 - **Immutable builder pattern** for `Response`, `CorsSettings`, `Cookie` — use `.withStatus()`, `.settingHeader()`, `.settingCookie()` etc.

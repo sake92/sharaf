@@ -6,7 +6,6 @@ import java.time.format.DateTimeFormatter
 import ba.sake.sharaf.*
 import ba.sake.sharaf.exceptions.*
 import sttp.model.*
-import scala.util.boundary
 
 final class FilesHandler(
     rootPath: Path,
@@ -65,22 +64,17 @@ final class FilesHandler(
       filePath: Path,
       mimeType: String,
       withBody: Boolean
-  )(using request: Request): Response[?] = boundary {
+  )(using request: Request): Response[?] = {
     val fileSize = Files.size(filePath)
     val lastModified = Files.getLastModifiedTime(filePath).toInstant
 
     val etag = Option.when(enableCaching) {
       generateETag(fileSize, lastModified)
     }
-    etag.filter(_ => enableCaching).foreach { tag =>
+    val matchingETag = etag.filter { tag =>
       request.headers.get(HttpString(HeaderNames.IfNoneMatch)) match {
-        case Some(Seq(clientETag, _*)) if clientETag == tag =>
-          boundary.break(
-            Response
-              .withStatus(StatusCode.NotModified)
-              .settingHeader("ETag", tag)
-          )
-        case _ =>
+        case Some(Seq(clientETag, _*)) => clientETag == tag
+        case _                         => false
       }
     }
     /*
@@ -93,7 +87,10 @@ final class FilesHandler(
         serveFullFile(filePath, fileSize, mimeType, etag, lastModified)
     }*/
 
-    serveFullFile(filePath, fileSize, mimeType, etag, lastModified, withBody)
+    matchingETag match {
+      case Some(tag) => Response.withStatus(StatusCode.NotModified).settingHeader("ETag", tag)
+      case None      => serveFullFile(filePath, fileSize, mimeType, etag, lastModified, withBody)
+    }
   }
 
   private def serveFullFile(
