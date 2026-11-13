@@ -9,10 +9,29 @@ import ba.sake.sharaf.routing.Path
 
 private[sharaf] object RequestDecoding {
   def path(raw: String): Path = {
-    val segments = raw.stripPrefix("/").split("/")
-    if segments.sameElements(Array("")) then Path()
-    else Path(segments.map(segment => component(segment, plusAsSpace = false))*)
+    val start = if raw.startsWith("/") then 1 else 0
+    var end = raw.length
+    while end > start && raw.charAt(end - 1) == '/' do end -= 1
+    if end == start then Path()
+    else {
+      val segments = Vector.newBuilder[String]
+      var segmentStart = start
+      var index = start
+      while index < end do {
+        if raw.charAt(index) == '/' then {
+          segments += pathComponent(raw.substring(segmentStart, index))
+          segmentStart = index + 1
+        }
+        index += 1
+      }
+      segments += pathComponent(raw.substring(segmentStart, end))
+      Path(segments.result()*)
+    }
   }
+
+  private def pathComponent(value: String): String =
+    if value.indexOf('%') < 0 then value
+    else component(value, plusAsSpace = false)
 
   private def utf8(bytes: Array[Byte]): String =
     try

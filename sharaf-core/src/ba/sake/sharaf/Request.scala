@@ -12,6 +12,9 @@ trait Request {
 
   def headers: Map[HttpString, Seq[String]]
 
+  private[sharaf] def headerValues(name: HttpString): Option[Seq[String]] =
+    headers.get(name)
+
   def cookies: Seq[Cookie] =
     CookieHeaders.parse(headers.getOrElse(HttpString("Cookie"), Seq.empty))
 

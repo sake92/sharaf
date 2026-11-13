@@ -73,9 +73,7 @@ object PotatehSharafServer {
       underlying.onResponseComplete(request.closeUploads())
       val context =
         try {
-          val method = HttpMethod.values
-            .find(_.name == underlying.method)
-            .getOrElse(throw UnsupportedMethodException(underlying.method))
+          val method = parseMethod(underlying.method)
           Right(RequestContext((method = method, path = request.path), request))
         } catch {
           case error: BadRequestException        => Left(error)
@@ -91,6 +89,17 @@ object PotatehSharafServer {
       case Some(value) => Server.start(config, value)(handle)
       case None        => Server.start(config)(handle)
     }
+  }
+
+  private def parseMethod(value: String): HttpMethod = value match {
+    case "GET"     => HttpMethod.GET
+    case "POST"    => HttpMethod.POST
+    case "PUT"     => HttpMethod.PUT
+    case "DELETE"  => HttpMethod.DELETE
+    case "OPTIONS" => HttpMethod.OPTIONS
+    case "PATCH"   => HttpMethod.PATCH
+    case "HEAD"    => HttpMethod.HEAD
+    case _         => throw UnsupportedMethodException(value)
   }
 
   private def toResponse[T](response: Response[T], requestMethod: String): ba.sake.potateh.Response = {
