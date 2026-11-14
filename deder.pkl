@@ -449,7 +449,7 @@ local const sharafJdkHttpserverModules =
       multithreading = true
       moduleDeps = new { sharafCoreModules.native }
       deps { "ba.sake::scalanative-httpserver::0.0.0+28-3fff272e-SNAPSHOT" }
-      publish = true
+      publish = false
     }
     nativeTestTemplate = (nativeTemplate.asTest()) {
       // Real-server suites own threads and clients; keep Native suite execution bounded.

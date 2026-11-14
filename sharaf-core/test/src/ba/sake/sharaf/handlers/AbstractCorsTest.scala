@@ -13,7 +13,7 @@ abstract class AbstractCorsTest extends munit.FunSuite with ServerFixture {
     assert(handler eq next)
   }
 
-  test("route server convenience methods disable CORS by default") {
+  test("route handlers disable CORS by default") {
     val routes = Routes { case GET -> Path("cors") => Response.withBody("CORS") }
     withDefaultRoutes(routes) { base =>
       val response = request
