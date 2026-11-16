@@ -41,6 +41,14 @@ object SharafHandler:
     if corsSettings eq CorsSettings.disabled then next
     else CorsHandler(corsSettings, next)
 
+  /** Compresses eligible response bodies with gzip when the request accepts it.
+    *
+    * Compression is streamed to the response body. For that reason the compressed response length is not known in
+    * advance and HTTP/1.1 adapters may use chunked transfer encoding.
+    */
+  def gzip(next: SharafHandler, settings: GzipSettings = GzipSettings.default): SharafHandler =
+    GzipHandler(settings, next)
+
   def sessions(
       next: SharafHandler,
       store: Option[SessionStore] = None,

@@ -2,8 +2,11 @@ package ba.sake.sharaf.handlers
 
 import scala.concurrent.duration.*
 import scala.util.Using
+import java.io.ByteArrayInputStream
 import java.net.{InetSocketAddress, URI}
+import java.nio.charset.StandardCharsets.UTF_8
 import java.util.concurrent.{CountDownLatch, Executors, TimeUnit}
+import java.util.zip.GZIPInputStream
 import sttp.model.*
 import sttp.client4.quick.*
 import ba.sake.sharaf.*
@@ -233,6 +236,52 @@ abstract class AbstractSharafHandlerTest extends munit.FunSuite with ServerFixtu
         pool.shutdownNow()
         val terminated = pool.awaitTermination(5, TimeUnit.SECONDS)
         assert(terminated)
+      }
+    }
+  }
+
+  test("gzip compresses eligible JSON and preserves its content type") {
+    val payload = JsonPayload(
+      items = (0 until 50).map(i => JsonItem(i, "compressible text " * 20, Seq("one", "two"))),
+      count = 50
+    )
+    val handler = SharafHandler.gzip(
+      SharafHandler.routes(Routes { case GET -> Path("json") => Response.withBody(payload) }),
+      GzipSettings.default.withLevel(1)
+    )
+    withHandler(handler) { base =>
+      val uri = URI.create(base)
+      Using.resource(new HttpConnection(new InetSocketAddress(uri.getHost, uri.getPort))) { connection =>
+        val response = connection.request("GET", "/json", headers = Seq("Accept-Encoding" -> "gzip"))
+        assertEquals(response.status, 200)
+        assertEquals(response.headers.get("content-encoding"), Some("gzip"))
+        assertEquals(response.headers.get("content-type"), Some("application/json; charset=utf-8"))
+        assert(response.headers("vary").split(",").map(_.trim.toLowerCase).contains("accept-encoding"))
+        val compressed = new ByteArrayInputStream(response.bodyBytes)
+        val decoded = Using.resource(new GZIPInputStream(compressed))(_.readAllBytes())
+        assertEquals(new String(decoded, UTF_8).parseJson[JsonPayload], payload)
+      }
+    }
+  }
+
+  test("gzip leaves responses unchanged when it is not accepted") {
+    val handler = SharafHandler.gzip(
+      SharafHandler.routes(Routes { case GET -> Path("json") => Response.withBody(JsonItem(1, "plain", Seq.empty)) })
+    )
+    withHandler(handler) { base =>
+      val uri = URI.create(base)
+      Using.resource(new HttpConnection(new InetSocketAddress(uri.getHost, uri.getPort))) { connection =>
+        for acceptEncoding <- Seq("gzip;q=0", "identity") do {
+          val response = connection.request(
+            "GET",
+            "/json",
+            headers = Seq("Accept-Encoding" -> acceptEncoding)
+          )
+          assertEquals(response.status, 200)
+          assertEquals(response.headers.get("content-encoding"), None)
+          assert(response.headers("vary").split(",").map(_.trim.toLowerCase).contains("accept-encoding"))
+          assertEquals(response.body.parseJson[JsonItem], JsonItem(1, "plain", Seq.empty))
+        }
       }
     }
   }

@@ -37,6 +37,9 @@ final class Response[T] private (
   def withBody[T2: ResponseWritable](body: T2): Response[T2] =
     copy(body = Some(body))
 
+  private[sharaf] def mapBody[T2: ResponseWritable](transform: (T, ResponseWritable[T]) => T2): Response[T2] =
+    copy(body = body.map(value => transform(value, rw)))
+
   private def copy[T2](
       status: StatusCode = status,
       headerUpdates: HeaderUpdates = headerUpdates,

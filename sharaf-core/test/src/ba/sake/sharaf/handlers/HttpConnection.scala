@@ -6,7 +6,7 @@ import java.nio.charset.StandardCharsets.{UTF_8, ISO_8859_1}
 
 // sttp has bug in handling options on scalanative
 private[sharaf] object HttpConnection {
-  type Response = (status: Int, headers: Map[String, String], body: String)
+  type Response = (status: Int, headers: Map[String, String], body: String, bodyBytes: Array[Byte])
 }
 
 /** Raw HTTP/1.1 exposes framing and persistent connections without client normalization or buffering. */
@@ -88,7 +88,8 @@ private[sharaf] final class HttpConnection(address: InetSocketAddress) extends A
         if line().nonEmpty then throw new java.io.IOException("Invalid chunk terminator")
       } else body.write(input.readNBytes(fields.getOrElse("content-length", "0").toInt))
     }
-    (status = status, headers = fields, body = body.toString("UTF-8"))
+    val bodyBytes = body.toByteArray
+    (status = status, headers = fields, body = body.toString("UTF-8"), bodyBytes = bodyBytes)
   }
 
   override def close(): Unit = socket.close()
