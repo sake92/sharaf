@@ -144,10 +144,10 @@ class PotatehSharafServerTest extends munit.FunSuite {
       for (path <- Seq("/short", "/long")) {
         Using.resource(new HttpConnection(server.address)) { connection =>
           connection.send("GET", path)
-          // A buffered head may never reach the peer when writing fails. Either way, no
-          // complete body or second response may follow the mismatched length.
+          // A buffered head may never reach the peer. If it does, validation must reject the
+          // mismatch before any successful response body or second response can follow.
           val wire = connection.remaining()
-          assert(wire.isEmpty || wire.startsWith("HTTP/1.1 200"))
+          assert(wire.isEmpty || wire.startsWith("HTTP/1.1 500"))
           assert(!wire.endsWith("\r\n\r\nok"))
         }
       }

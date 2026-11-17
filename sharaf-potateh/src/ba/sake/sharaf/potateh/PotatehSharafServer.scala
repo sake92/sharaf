@@ -126,10 +126,18 @@ object PotatehSharafServer {
     }
     val transferEncoding = values("Transfer-Encoding")
     require(length.isEmpty || transferEncoding.isEmpty, "Conflicting response framing")
+    val knownBodyLength = response.body.flatMap(KnownBodyLength.of)
+    val bodyIsSuppressed =
+      requestMethod == "HEAD" || response.status.code == 204 || response.status.code == 205 ||
+        response.status.code == 304
+    require(
+      bodyIsSuppressed || length.isEmpty || knownBodyLength.isEmpty || length == knownBodyLength,
+      "Response Content-Length does not match body length"
+    )
     val bodyLength =
       if length.nonEmpty then length
       else if transferEncoding.nonEmpty then None
-      else response.body.flatMap(KnownBodyLength.of)
+      else knownBodyLength
 
     val fields = Vector.newBuilder[(name: String, value: String)]
     resolved.foreach {
