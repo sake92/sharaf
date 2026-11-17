@@ -31,9 +31,9 @@ final class GzipHandler(settings: GzipSettings, next: SharafHandler) extends Sha
       if !acceptsGzip(context.request.headerValues(acceptEncodingHeader)) then variedResponse
       else {
         val encodedBody = variedResponse.mapBody { (value, writer) =>
-          GzipBody(
-            bodyHeaders,
-            output => {
+          val gzipBody: GzipBody = (
+            headers = bodyHeaders,
+            writeTo = output => {
               val gzip = new LevelGzipOutputStream(output, settings.bufferSize, settings.level)
               try {
                 writer.write(value, gzip)
@@ -41,6 +41,7 @@ final class GzipHandler(settings: GzipSettings, next: SharafHandler) extends Sha
               } finally gzip.endDeflater()
             }
           )
+          gzipBody
         }
         encodedBody
           .removingHeader(contentLengthHeader)
@@ -59,7 +60,7 @@ final class GzipHandler(settings: GzipSettings, next: SharafHandler) extends Sha
     val noTransform = headerValues(cacheControlHeader, response, bodyHeaders).exists { value =>
       value.toLowerCase(Locale.ROOT).contains("no-transform")
     }
-    hasBody && !hasContentEncoding && !noTransform && contentType.exists(isCompressibleMediaType)
+    hasBody && !hasContentEncoding && !noTransform && contentType.exists(settings.isCompressibleMediaType)
   }
 
   private def headerValues(
@@ -72,18 +73,6 @@ final class GzipHandler(settings: GzipSettings, next: SharafHandler) extends Sha
       .getOrElse(Seq.empty)
       .map(_.trim)
       .filter(_.nonEmpty)
-
-  private def isCompressibleMediaType(contentType: String): Boolean = {
-    val mediaType = contentType.takeWhile(_ != ';').trim.toLowerCase(Locale.ROOT)
-    (mediaType.startsWith("text/") && mediaType != "text/event-stream") ||
-    mediaType == "application/json" ||
-    mediaType.endsWith("+json") ||
-    mediaType == "application/xml" ||
-    mediaType.endsWith("+xml") ||
-    mediaType == "application/javascript" ||
-    mediaType == "application/x-javascript" ||
-    mediaType == "image/svg+xml"
-  }
 
   private def acceptsGzip(values: Option[Seq[String]]): Boolean = {
     var explicitQuality = Option.empty[Double]
@@ -125,19 +114,17 @@ final class GzipHandler(settings: GzipSettings, next: SharafHandler) extends Sha
     }
 }
 
-private final case class GzipBody(
+private type GzipBody = (
     headers: Seq[(HttpString, Seq[String])],
     writeTo: OutputStream => Unit
 )
 
-private object GzipBody {
-  given ResponseWritable[GzipBody] with {
-    override def write(value: GzipBody, outputStream: OutputStream): Unit =
-      value.writeTo(outputStream)
+private given ResponseWritable[GzipBody] with {
+  override def write(value: GzipBody, outputStream: OutputStream): Unit =
+    value.writeTo(outputStream)
 
-    override def headers(value: GzipBody): Seq[(HttpString, Seq[String])] =
-      value.headers
-  }
+  override def headers(value: GzipBody): Seq[(HttpString, Seq[String])] =
+    value.headers
 }
 
 private final class LevelGzipOutputStream(outputStream: OutputStream, bufferSize: Int, level: Int)

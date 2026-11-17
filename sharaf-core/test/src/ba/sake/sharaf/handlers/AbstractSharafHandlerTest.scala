@@ -285,4 +285,25 @@ abstract class AbstractSharafHandlerTest extends munit.FunSuite with ServerFixtu
       }
     }
   }
+
+  test("gzip media types are configurable") {
+    val settings = GzipSettings.default.withCompressibleMediaTypes(Set("application/octet-stream"))
+    val handler = SharafHandler.gzip(
+      SharafHandler.routes(Routes { case GET -> Path("binary") =>
+        Response.withBody("compressible").settingHeader("Content-Type", "application/octet-stream")
+      }),
+      settings
+    )
+    withHandler(handler) { base =>
+      val uri = URI.create(base)
+      Using.resource(new HttpConnection(new InetSocketAddress(uri.getHost, uri.getPort))) { connection =>
+        val response = connection.request("GET", "/binary", headers = Seq("Accept-Encoding" -> "gzip"))
+        assertEquals(response.status, 200)
+        assertEquals(response.headers.get("content-encoding"), Some("gzip"))
+        val compressed = new ByteArrayInputStream(response.bodyBytes)
+        val decoded = Using.resource(new GZIPInputStream(compressed))(_.readAllBytes())
+        assertEquals(new String(decoded, UTF_8), "compressible")
+      }
+    }
+  }
 }

@@ -15,9 +15,9 @@ val handler = SharafHandler.exceptions(
 )
 ```
 
-Sharaf compresses eligible text, JSON, XML, JavaScript, and SVG responses when the request accepts gzip. It preserves
-`Vary: Accept-Encoding`, skips responses that are already encoded or marked `no-transform`, and does not compress
-server-sent events.
+By default, Sharaf compresses eligible text, JSON, XML, JavaScript, and SVG responses when the request accepts gzip.
+Use `withCompressibleMediaTypes` to replace that media-range set. Sharaf preserves `Vary: Accept-Encoding`, skips
+responses that are already encoded or marked `no-transform`, and does not compress server-sent events.
 
 Compression streams directly into the response body, so its compressed length is not known in advance. HTTP/1.1
 servers can use chunked transfer encoding for those responses.
@@ -28,3 +28,6 @@ The default gzip level is 6. Applications that prefer lower CPU use over smaller
 val settings = GzipSettings.default.withLevel(1)
 val handler = SharafHandler.gzip(SharafHandler.routes(routes), settings)
 ```
+
+Media ranges support exact values, subtype wildcards such as `text/*`, and structured suffix wildcards such as
+`application/*+json`.

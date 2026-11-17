@@ -37,6 +37,7 @@ final class Response[T] private (
   def withBody[T2: ResponseWritable](body: T2): Response[T2] =
     copy(body = Some(body))
 
+  /** Replaces the body while preserving response metadata. Used by body-transforming middleware. */
   private[sharaf] def mapBody[T2: ResponseWritable](transform: (T, ResponseWritable[T]) => T2): Response[T2] =
     copy(body = body.map(value => transform(value, rw)))
 
