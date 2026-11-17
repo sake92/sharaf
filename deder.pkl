@@ -53,6 +53,7 @@ local const baseTemplate: ScalaModule = new {
   pomSettings = new {
     artifactId = "dummy"
     name = "dummy"
+    version = read?("env:SHARAF_VERSION")
     groupId = "ba.sake"
     url = "https://github.com/sake92/sharaf"
     licenses {

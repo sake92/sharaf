@@ -70,6 +70,19 @@ class Pac4jSecurityHandlerTest extends munit.FunSuite:
     assertEquals(res.code, StatusCode.Ok)
     assertEquals(res.body, "secret data")
 
+  test("authenticated response uses the shared session cookie"):
+    val res = quickRequest.get(uri"${baseUrl}/protected")
+      .header(authHeader, "user123")
+      .send()
+    val setCookies = res.headers.filter(_.name.equalsIgnoreCase("Set-Cookie")).map(_.value)
+    val sessionCookie = setCookies
+      .find(_.startsWith("SESSION="))
+      .getOrElse(fail(s"Expected a SESSION cookie, got: $setCookies"))
+    assert(sessionCookie.contains("Path=/"), sessionCookie)
+    assert(sessionCookie.contains("Secure"), sessionCookie)
+    assert(sessionCookie.contains("HttpOnly"), sessionCookie)
+    assert(sessionCookie.contains("SameSite=Lax"), sessionCookie)
+
   // --- Security headers tests ---
 
   test("security headers present on success response (authenticated)"):

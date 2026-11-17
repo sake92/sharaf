@@ -5,7 +5,11 @@ on:
   push:
     branches: main
   pull_request:
-  workflow_call:  # allow this workflow to be called from other workflows
+  workflow_call: # allow this workflow to be called from other workflows
+    outputs:
+      version:
+        description: "Version resolved once before compilation and tests"
+        value: ${{ jobs.test.outputs.version }}
 
 jobs:
   test:
@@ -13,6 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       snapshot: ${{ steps.version.outputs.snapshot }}
+      version: ${{ steps.version.outputs.version }}
     steps:
       - uses: actions/checkout@v5
         with:
@@ -56,6 +61,10 @@ jobs:
           else
             echo "snapshot=false" >> "$GITHUB_OUTPUT"
           fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "SHARAF_VERSION=$version" >> "$GITHUB_ENV"
+          # Restart Deder so the following tasks inherit the locked version.
+          deder shutdown
       - name: Compile
         run: deder exec -t compile
       - name: Test
@@ -82,6 +91,7 @@ jobs:
       contents: read
     env:
       DEDER_PUBLISH_SNAPSHOT: ${{ needs.test.outputs.snapshot }}
+      SHARAF_VERSION: ${{ needs.test.outputs.version }}
       DEDER_SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
       DEDER_SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
     steps:

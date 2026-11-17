@@ -8,7 +8,7 @@ import org.pac4j.core.engine.SecurityGrantedAccessAdapter
 import org.pac4j.core.profile.UserProfile
 import ba.sake.sharaf.{SharafHandler, RequestContext, Response, Cookie, HttpString}
 import ba.sake.sharaf.routing.Path
-import ba.sake.sharaf.session.{SessionHolder, NoOpSessionStore}
+import ba.sake.sharaf.session.{SessionConfig, SessionHolder, NoOpSessionStore}
 
 object Pac4jSecurityHandler:
   private[pac4j] val currentProfiles = new ThreadLocal[List[UserProfile]]()
@@ -21,10 +21,15 @@ final class Pac4jSecurityHandler(
     next: SharafHandler
 ) extends SharafHandler:
 
+  private val sessionCookieConfig =
+    SessionConfig.default
+      .withSecure(securityConfig.secureSessionCookie)
+      .withSameSite("Lax")
+
   override def handle(context: RequestContext): Response[?] =
     val method = context.params.method
     val path = context.params.path
-    context.request.cookies.find(_.name == "SHARAF_SESSION")
+    context.request.cookies.find(_.name == sessionCookieConfig.cookieName)
       .flatMap(cookie => securityConfig.sessionStore.load(cookie.value))
       .foreach { session =>
         session.touch()
@@ -132,16 +137,17 @@ final class Pac4jSecurityHandler(
           case _: NoOpSessionStore => supplemented
           case store =>
             store.save(s)
+            val maxAgeSeconds = sessionCookieConfig.maxAge.map(_.getSeconds.toInt)
             supplemented.settingCookie(
               Cookie(
-                name = "SHARAF_SESSION",
+                name = sessionCookieConfig.cookieName,
                 value = s.id,
-                path = Some("/"),
-                maxAge = Some(1800),
-                secure = securityConfig.secureSessionCookie,
-                httpOnly = true,
+                path = Some(sessionCookieConfig.cookiePath),
+                maxAge = maxAgeSeconds,
+                secure = sessionCookieConfig.secure,
+                httpOnly = sessionCookieConfig.httpOnly,
                 sameSite = true,
-                sameSiteMode = Some("Lax")
+                sameSiteMode = Some(sessionCookieConfig.sameSite)
               )
             )
       case None => supplemented
