@@ -65,20 +65,6 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
         <td>URL encoded and multipart</td>
        </tr>
        <tr>
-        <td><code>sharaf-jdk-httpserver</code></td>
-        <td>JDK HTTP server</td>
-        <td>JVM, Scala Native</td>
-        <td>Beta</td>
-        <td>URL encoded and multipart</td>
-       </tr>
-       <tr>
-        <td><code>sharaf-helidon</code></td>
-        <td>Helidon</td>
-        <td>JVM</td>
-        <td>Experimental</td>
-        <td>URL encoded and multipart</td>
-       </tr>
-       <tr>
         <td><code>sharaf-potateh</code></td>
         <td>Potateh</td>
         <td>JVM, Scala Native</td>
@@ -95,9 +81,7 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
       </tbody>
      </table>
      <p><code>sharaf-core</code> supports JVM and Scala Native. The companion libraries <code>formson</code>, <code>querson</code>, and <code>validson</code> also support Scala.js.</p>
-     <p>On Scala Native, JDK HTTP server uses an explicitly composed <code>SharafHandler</code>. Its routes convenience overload wires classpath resources and requires JVM APIs.</p>
-     <p>The JDK HTTP server uses a ten-thread pool by default and shuts it down when stopped. To supply your own <code>java.util.concurrent.Executor</code>, pass <code>Some(executor)</code> when creating the server; you own its shutdown.</p>
-     <p>Native executable examples cover three deployment paths:</p>
+     <p>Native executable examples cover these deployment paths:</p>
      <ul>
       <li><a href="https://github.com/sake92/sharaf/tree/main/examples/scala-cli/hello-undertow-graalvm.scala">GraalVM Native Image with Undertow</a></li>
       <li><a href="https://github.com/sake92/sharaf/tree/main/examples/scala-cli/hello-http4s-native.scala">Scala Native with http4s/Ember</a></li>
@@ -110,7 +94,7 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
      <p>The <a href="https://sake92.github.io/sharaf/tutorials/quickstart.html">quickstart</a> uses Undertow. Adapter examples are in the <a href="https://github.com/sake92/sharaf/tree/main/examples">repository</a>.</p>
      <p>The <a href="https://github.com/sake92/sharaf-aws-lambda-starter">AWS Lambda starter</a> packages an Undertow/JVM application with AWS Lambda Web Adapter and includes Terraform configuration and local integration tests.</p>
      <h2 id="choosing-a-port">Choosing a port<a href="#choosing-a-port" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
-     <p>Undertow, Helidon, and JDK HTTP server wrappers accept port <code>0</code> to let the operating system choose a port. Their overloads without a port do the same. Read <code>server.port</code> after starting:</p>
+     <p>The Undertow wrapper accepts port <code>0</code> to let the operating system choose a port. Its overload without a port does the same. Read <code>server.port</code> after starting:</p>
      <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">val</span> server = <span class="hljs-type">UndertowSharafServer</span>(<span class="hljs-string">"127.0.0.1"</span>, routes)
 server.start()
 println(server.port)
