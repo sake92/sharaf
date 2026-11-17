@@ -66,16 +66,14 @@ A newcomer currently encounters conflicting signals:
   [deder.pkl](deder.pkl#L258)
 - The API-reference URL ends in `index.`: [project.yaml](docs/_data/project.yaml#L71)
 - Scala CLI example compilation is explicitly allowed to fail in CI: [ci.yml](.github/workflows/ci.yml#L40)
-- Helidon has public `???` implementations for cookies and forms:
-  [HelidonSharafRequest.scala](sharaf-helidon/src/ba/sake/sharaf/helidon/HelidonSharafRequest.scala#L23)
 - snunit form handling is also `???`:
   [SnunitSharafRequest.scala](sharaf-snunit/src/ba/sake/sharaf/snunit/SnunitSharafRequest.scala#L50)
 
 These matter more than adding WebSockets or another server backend. Establish explicit support tiers:
 
 - Stable: Undertow
-- Beta: http4s/JDK server
-- Experimental: Helidon/snunit/native, until complete
+- Beta: http4s
+- Experimental: Potateh/snunit/native, until complete
 
 A narrow framework that works completely is much more compelling than a wide framework with runtime holes.
 

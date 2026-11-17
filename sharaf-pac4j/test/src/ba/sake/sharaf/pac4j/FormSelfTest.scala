@@ -8,13 +8,13 @@ import org.pac4j.http.client.indirect.FormClient
 import org.pac4j.testkit.FormScenarios
 import org.pac4j.testkit.TestConfigs
 import ba.sake.sharaf.*
-import ba.sake.sharaf.jdkhttp.JdkHttpServerSharafServer
+import ba.sake.sharaf.undertow.UndertowSharafServer
 import ba.sake.sharaf.session.InMemorySessionStore
 import sttp.model.StatusCode
 
 class FormSelfTest extends munit.FunSuite:
 
-  var server: Option[JdkHttpServerSharafServer] = None
+  var server: Option[UndertowSharafServer] = None
   var serverUrl: String = uninitialized
 
   override def beforeAll(): Unit =
@@ -79,7 +79,7 @@ class FormSelfTest extends munit.FunSuite:
     // Wrap with session handler so cookies are loaded/saved across requests
     val handler = SharafHandler.sessions(combinedHandler)
 
-    val s = JdkHttpServerSharafServer("localhost", handler)
+    val s = UndertowSharafServer("localhost", handler)
     s.start()
     serverUrl = s"http://localhost:${s.port}"
     server = Some(s)

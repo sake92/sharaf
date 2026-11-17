@@ -19,7 +19,7 @@ expiry in the past; cookie path and domain must match the cookie being removed.
 For a scoped cookie, `settingCookie` with the matching path/domain and a past
 `expires` value supplies that scope.
 
-Undertow, Potateh, JDK HTTP server, Helidon, and snunit share request-cookie
+Undertow, Potateh, and snunit share request-cookie
 parsing; http4s uses its engine parser. The shared parser accepts up to 200 named
 cookie pairs, including duplicates, across all Cookie headers. It returns 400 via
 the configured exception mapper if the limit is exceeded. Undertow uses its
@@ -27,7 +27,7 @@ configured `MAX_COOKIES` value instead. This limit applies when cookies are read
 
 ## Query strings and URL-encoded forms
 
-Undertow, Potateh, JDK HTTP server, Helidon and snunit share raw query and
+Undertow, Potateh and snunit share raw query and
 `application/x-www-form-urlencoded` parsing. Names and values are decoded once
 with UTF-8 after splitting on `&` and the first `=`. Repeated fields, empty names
 and empty values are retained; empty separator entries are ignored. Form keys
@@ -49,7 +49,7 @@ Potateh previously rejected malformed query/form UTF-8 with 400; it now uses the
 same replacement policy as the other adapters.
 
 http4s uses its server-library query parser and the shared URL-encoded form parser.
-Undertow, http4s, JDK HTTP server, Helidon and Potateh split raw paths into segments
+Undertow, http4s and Potateh split raw paths into segments
 before decoding each segment once. Encoded slashes remain within their segment;
 `+` remains a literal plus in paths.
 

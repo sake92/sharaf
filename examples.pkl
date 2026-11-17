@@ -5,7 +5,6 @@ class Examples {
   dependencyVersions: Dynamic
   undertow: D.ScalaModule
   pac4j: D.ScalaModule
-  jdkHttpserver: D.ScalaModule
   snunit: D.ScalaNativeModule
   http4s: D.ScalaModule
   local baseExampleTemplate = (libraryTemplate) {
@@ -90,17 +89,6 @@ class Examples {
       }
     }.get
 
-  local jdkHttpserverExampleModules =
-    new D.CreateScalaModules {
-      root = "examples/jdk-httpserver"
-      template = (baseExampleTemplate) {
-        moduleDeps { jdkHttpserver }
-      }
-      testTemplate = (baseExampleTemplate.asTest()) {
-        deps { "org.scalameta::munit::\(dependencyVersions.munit)" }
-      }
-    }.get
-
   local snunitExampleModules =
     new D.CreateScalaNativeModules {
       root = "examples/snunit"
@@ -131,7 +119,6 @@ class Examples {
     ...userPassFormExampleModules.all
     ...jwtExampleModules.all
     ...oauth2ExampleModules.all
-    ...jdkHttpserverExampleModules.all
     ...snunitExampleModules.all
     ...http4sExampleModules.all
   }

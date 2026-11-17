@@ -12,7 +12,7 @@ import org.pac4j.core.matching.matcher.{DefaultMatchers, PathMatcher}
 import org.pac4j.core.profile.CommonProfile
 import org.pac4j.http.client.direct.HeaderClient
 import ba.sake.sharaf.*
-import ba.sake.sharaf.jdkhttp.JdkHttpServerSharafServer
+import ba.sake.sharaf.undertow.UndertowSharafServer
 
 class Pac4jSecurityHandlerTest extends munit.FunSuite:
 
@@ -44,10 +44,10 @@ class Pac4jSecurityHandlerTest extends munit.FunSuite:
   }
 
   val handler = Pac4jSecurityHandler(securityConfig, SharafHandler.routes(appRoutes))
-  var server: Option[JdkHttpServerSharafServer] = None
+  var server: Option[UndertowSharafServer] = None
 
   override def beforeAll(): Unit =
-    val s = JdkHttpServerSharafServer("localhost", handler)
+    val s = UndertowSharafServer("localhost", handler)
     s.start()
     server = Some(s)
 

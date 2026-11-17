@@ -3,6 +3,7 @@
 - disable CORS by default on server route convenience methods
 - add `CorsSettings.disabled` for explicitly removing CORS processing
 - reduce CORS hot-path header lookups
+- remove the Helidon and JDK HTTP server integrations
 
 ## 0.16.0
 - add static files handler

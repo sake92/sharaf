@@ -6,12 +6,12 @@ import org.pac4j.oidc.client.OidcClient
 import org.pac4j.testkit.OidcScenarios
 import org.pac4j.testkit.TestConfigs
 import ba.sake.sharaf.*
-import ba.sake.sharaf.jdkhttp.JdkHttpServerSharafServer
+import ba.sake.sharaf.undertow.UndertowSharafServer
 
 class OidcSelfTest extends munit.FunSuite:
 
   var mockOAuthServer: Option[MockOAuth2Server] = None
-  var sharafServer: Option[JdkHttpServerSharafServer] = None
+  var sharafServer: Option[UndertowSharafServer] = None
   var serverUrl: String = uninitialized
 
   override def beforeAll(): Unit =
@@ -40,7 +40,7 @@ class OidcSelfTest extends munit.FunSuite:
       }))
     )
 
-    val s = JdkHttpServerSharafServer("localhost", handler)
+    val s = UndertowSharafServer("localhost", handler)
     s.start()
     serverUrl = s"http://localhost:${s.port}"
     oidcClient.setCallbackUrl(s"$serverUrl/callback")

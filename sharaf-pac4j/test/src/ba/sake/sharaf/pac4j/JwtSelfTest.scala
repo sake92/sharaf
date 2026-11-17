@@ -5,11 +5,11 @@ import org.pac4j.jwt.credentials.authenticator.JwtAuthenticator
 import org.pac4j.testkit.JwtScenarios
 import org.pac4j.testkit.TestConfigs
 import ba.sake.sharaf.*
-import ba.sake.sharaf.jdkhttp.JdkHttpServerSharafServer
+import ba.sake.sharaf.undertow.UndertowSharafServer
 
 class JwtSelfTest extends munit.FunSuite:
 
-  var server: Option[JdkHttpServerSharafServer] = None
+  var server: Option[UndertowSharafServer] = None
   var serverUrl: String = uninitialized
 
   override def beforeAll(): Unit =
@@ -50,7 +50,7 @@ class JwtSelfTest extends munit.FunSuite:
         else userHandler.handle(ctx)
     }
 
-    val s = JdkHttpServerSharafServer("localhost", handler)
+    val s = UndertowSharafServer("localhost", handler)
     s.start()
     serverUrl = s"http://localhost:${s.port}"
     server = Some(s)

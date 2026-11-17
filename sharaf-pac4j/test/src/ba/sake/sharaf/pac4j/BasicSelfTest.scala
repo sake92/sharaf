@@ -5,11 +5,11 @@ import org.pac4j.core.client.Clients
 import org.pac4j.http.client.direct.DirectBasicAuthClient
 import org.pac4j.testkit.BasicAuthScenarios
 import ba.sake.sharaf.*
-import ba.sake.sharaf.jdkhttp.JdkHttpServerSharafServer
+import ba.sake.sharaf.undertow.UndertowSharafServer
 
 class BasicSelfTest extends munit.FunSuite:
 
-  var server: Option[JdkHttpServerSharafServer] = None
+  var server: Option[UndertowSharafServer] = None
   var serverUrl: String = uninitialized
 
   override def beforeAll(): Unit =
@@ -34,7 +34,7 @@ class BasicSelfTest extends munit.FunSuite:
     }
 
     val handler = Pac4jSecurityHandler(securityConfig, SharafHandler.routes(routes))
-    val s = JdkHttpServerSharafServer("localhost", handler)
+    val s = UndertowSharafServer("localhost", handler)
     s.start()
     serverUrl = s"http://localhost:${s.port}"
     server = Some(s)

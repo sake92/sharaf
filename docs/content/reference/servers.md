@@ -10,20 +10,12 @@ description: Sharaf server modules and platform support
 | --- | --- | --- | --- | --- |
 | `sharaf-undertow` | Undertow | JVM | Stable | URL encoded and multipart |
 | `sharaf-http4s` | http4s | JVM, Scala Native | Beta | URL encoded and multipart |
-| `sharaf-jdk-httpserver` | JDK HTTP server | JVM, Scala Native | Beta | URL encoded and multipart |
-| `sharaf-helidon` | Helidon | JVM | Experimental | URL encoded and multipart |
 | `sharaf-potateh` | Potateh | JVM, Scala Native | Experimental | URL encoded and multipart |
 | `sharaf-snunit` | snunit | Scala Native | Experimental | URL encoded and multipart |
 
 `sharaf-core` supports JVM and Scala Native. The companion libraries `formson`, `querson`, and `validson` also support Scala.js.
 
-On Scala Native, JDK HTTP server uses an explicitly composed `SharafHandler`.
-Its routes convenience overload wires classpath resources and requires JVM APIs.
-
-The JDK HTTP server uses a ten-thread pool by default and shuts it down when stopped. To supply your own
-`java.util.concurrent.Executor`, pass `Some(executor)` when creating the server; you own its shutdown.
-
-Native executable examples cover three deployment paths:
+Native executable examples cover these deployment paths:
 
 - [GraalVM Native Image with Undertow]({{site.data.project.gh.sourcesUrl}}/examples/scala-cli/hello-undertow-graalvm.scala)
 - [Scala Native with http4s/Ember]({{site.data.project.gh.sourcesUrl}}/examples/scala-cli/hello-http4s-native.scala)
@@ -44,8 +36,8 @@ with AWS Lambda Web Adapter and includes Terraform configuration and local integ
 
 ## Choosing a port
 
-Undertow, Helidon, and JDK HTTP server wrappers accept port `0` to let the operating system
-choose a port. Their overloads without a port do the same. Read `server.port` after starting:
+The Undertow wrapper accepts port `0` to let the operating system choose a port.
+Its overload without a port does the same. Read `server.port` after starting:
 
 ```scala
 val server = UndertowSharafServer("127.0.0.1", routes)

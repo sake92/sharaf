@@ -26,5 +26,5 @@ Body-generated headers are applied before explicit header updates. Header names 
 updates run in builder order, with the last set or removal taking effect. Setting a sequence replaces
 all previous values for that name; an empty sequence removes the header. Repeated values are retained,
 and cookie updates append to explicit `Set-Cookie` headers. Explicit headers also apply without a body.
-These rules apply to Undertow, Potateh, JDK HTTP server, http4s, and Helidon; transport framing remains
+These rules apply to Undertow, Potateh, and http4s; transport framing remains
 managed by each server.

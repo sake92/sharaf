@@ -6,11 +6,11 @@ import org.pac4j.testkit.AuthorizerScenarios
 import org.pac4j.testkit.TestConfigs
 import org.pac4j.testkit.TestConstants
 import ba.sake.sharaf.*
-import ba.sake.sharaf.jdkhttp.JdkHttpServerSharafServer
+import ba.sake.sharaf.undertow.UndertowSharafServer
 
 class PathMatcherSelfTest extends munit.FunSuite:
 
-  var server: Option[JdkHttpServerSharafServer] = None
+  var server: Option[UndertowSharafServer] = None
   var serverUrl: String = uninitialized
 
   override def beforeAll(): Unit =
@@ -47,7 +47,7 @@ class PathMatcherSelfTest extends munit.FunSuite:
         else protectedHandler.handle(ctx)
     }
 
-    val s = JdkHttpServerSharafServer("localhost", handler)
+    val s = UndertowSharafServer("localhost", handler)
     s.start()
     serverUrl = s"http://localhost:${s.port}"
     server = Some(s)
