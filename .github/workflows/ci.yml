@@ -22,9 +22,9 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: .deder/out
-          key: deder-${{ github.sha }}
+          key: deder-${{ hashFiles('deder.pkl') }}-${{ github.sha }}
           restore-keys: |
-            deder-
+            deder-${{ hashFiles('deder.pkl') }}-
       - uses: coursier/cache-action@v7
         with:
           extraFiles: deder.pkl
@@ -65,7 +65,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: .deder/out
-          key: deder-${{ github.sha }}
+          key: deder-${{ hashFiles('deder.pkl') }}-${{ github.sha }}
       - name: Deder output
         if: failure()
         uses: actions/upload-artifact@v4
@@ -92,9 +92,9 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: .deder/out
-          key: deder-${{ github.sha }}
+          key: deder-${{ hashFiles('deder.pkl') }}-${{ github.sha }}
           restore-keys: |
-            deder-
+            deder-${{ hashFiles('deder.pkl') }}-
       - uses: actions/setup-java@v3
         with:
           distribution: temurin
