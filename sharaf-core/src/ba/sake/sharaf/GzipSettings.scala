@@ -12,8 +12,8 @@ final class GzipSettings private (
   require(bufferSize > 0, "Gzip buffer size must be positive")
   require(compressibleMediaTypes.nonEmpty, "At least one compressible media type is required")
   require(
-    compressibleMediaTypes.forall(GzipSettings.isValidMediaRange),
-    "Compressible media types must be valid media ranges"
+    compressibleMediaTypes.forall(GzipSettings.isValidMediaType),
+    "Compressible media types must contain a type and subtype"
   )
 
   def withLevel(level: Int): GzipSettings = copy(level = level)
@@ -25,8 +25,7 @@ final class GzipSettings private (
 
   private[sharaf] def isCompressibleMediaType(contentType: String): Boolean = {
     val mediaType = contentType.takeWhile(_ != ';').trim.toLowerCase(Locale.ROOT)
-    mediaType != "text/event-stream" &&
-    compressibleMediaTypes.exists(pattern => GzipSettings.mediaRangeMatches(pattern, mediaType))
+    mediaType != "text/event-stream" && compressibleMediaTypes.contains(mediaType)
   }
 
   private def copy(
@@ -44,13 +43,17 @@ final class GzipSettings private (
 object GzipSettings {
 
   private val defaultCompressibleMediaTypes = Set(
-    "text/*",
+    "text/html",
+    "text/plain",
+    "text/css",
+    "text/csv",
+    "text/xml",
+    "text/javascript",
     "application/json",
-    "application/*+json",
     "application/xml",
-    "application/*+xml",
     "application/javascript",
     "application/x-javascript",
+    "application/rtf",
     "image/svg+xml"
   )
 
@@ -67,31 +70,11 @@ object GzipSettings {
   private def normalizeMediaTypes(mediaTypes: Set[String]): Set[String] =
     mediaTypes.map(_.trim.toLowerCase(Locale.ROOT))
 
-  private def isValidMediaRange(value: String): Boolean = {
+  private def isValidMediaType(value: String): Boolean = {
     val normalized = value.trim.toLowerCase(Locale.ROOT)
     val slash = normalized.indexOf('/')
     slash > 0 &&
     slash < normalized.length - 1 &&
     normalized.indexOf('/', slash + 1) < 0
-  }
-
-  private def mediaRangeMatches(mediaRange: String, mediaType: String): Boolean = {
-    val rangeSlash = mediaRange.indexOf('/')
-    val typeSlash = mediaType.indexOf('/')
-    if rangeSlash <= 0 || typeSlash <= 0 then false
-    else {
-      val rangeType = mediaRange.substring(0, rangeSlash)
-      val rangeSubtype = mediaRange.substring(rangeSlash + 1)
-      val actualType = mediaType.substring(0, typeSlash)
-      val actualSubtype = mediaType.substring(typeSlash + 1)
-      val typeMatches = rangeType == "*" || rangeType == actualType
-      val subtypeMatches = rangeSubtype match {
-        case "*" => true
-        case suffixWildcard if suffixWildcard.startsWith("*+") =>
-          actualSubtype.endsWith(suffixWildcard.drop(1))
-        case exact => exact == actualSubtype
-      }
-      typeMatches && subtypeMatches
-    }
   }
 }
