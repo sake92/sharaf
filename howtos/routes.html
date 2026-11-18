@@ -121,9 +121,7 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
   <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">routes</span></span>: <span class="hljs-type">Routes</span> = <span class="hljs-type">Routes</span>:
     <span class="hljs-keyword">case</span> ...
     
-<span class="hljs-keyword">val</span> server = <span class="hljs-type">UndertowSharafServer</span>(
-  <span class="hljs-keyword">new</span> <span class="hljs-type">MyController1</span>, <span class="hljs-keyword">new</span> <span class="hljs-type">MyController2</span>
-)
+<span class="hljs-keyword">val</span> allRoutes = <span class="hljs-type">Routes</span>.merge(<span class="hljs-type">Seq</span>(<span class="hljs-keyword">new</span> <span class="hljs-type">MyController1</span>().routes, <span class="hljs-keyword">new</span> <span class="hljs-type">MyController2</span>().routes))
 </code></pre>
      <div role="group">
       <a role="button" href="https://sake92.github.io/sharaf/howtos/patch-requests.html">⬅️ PATCH Requests</a> <span></span> <a role="button" href="https://sake92.github.io/sharaf/howtos/upload-file.html">Upload File ➡️</a>

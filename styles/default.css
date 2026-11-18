@@ -75,10 +75,10 @@ body > main > div > aside { position: sticky; top: 5rem; max-height: calc(100vh 
 body > main > div > aside > details { margin: 0; padding: .65rem .75rem; border: 1px solid var(--pico-muted-border-color); border-radius: var(--pico-border-radius); }
 body > main > div > aside > details summary { font-weight: 600; }
 body > main > div > aside > details nav { margin-top: .4rem; }
-body > main > div > aside > details ul { margin: 0; padding-left: 1rem; list-style: none; }
+body > main > div > aside > details ul { display: block; margin: 0; padding-left: 1rem; list-style: none; }
 body > main > div > aside > details > nav > ul { padding-left: 0; }
-body > main > div > aside > details li { margin: .3rem 0; }
-body > main.pico > div > aside > details a { text-decoration: none; }
+body > main > div > aside > details li { display: block; margin: .3rem 0; padding: 0; }
+body > main.pico > div > aside > details a { display: inline; margin: 0; padding: 0; text-decoration: none; }
 body > main.pico > div > aside > details a:hover { text-decoration: underline; }
 
 #search-status { color: var(--pico-muted-color); }

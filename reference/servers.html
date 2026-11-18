@@ -45,38 +45,28 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
         <th>Module</th>
         <th>Server integration</th>
         <th>Platform</th>
-        <th>Support tier</th>
-        <th>Form bodies</th>
        </tr>
       </thead>
       <tbody>
        <tr>
+        <td><code>sharaf-potateh</code></td>
+        <td>Potateh</td>
+        <td>JVM, Scala Native</td>
+       </tr>
+       <tr>
         <td><code>sharaf-undertow</code></td>
         <td>Undertow</td>
         <td>JVM</td>
-        <td>Stable</td>
-        <td>URL encoded and multipart</td>
        </tr>
        <tr>
         <td><code>sharaf-http4s</code></td>
         <td>http4s</td>
         <td>JVM, Scala Native</td>
-        <td>Beta</td>
-        <td>URL encoded and multipart</td>
-       </tr>
-       <tr>
-        <td><code>sharaf-potateh</code></td>
-        <td>Potateh</td>
-        <td>JVM, Scala Native</td>
-        <td>Experimental</td>
-        <td>URL encoded and multipart</td>
        </tr>
        <tr>
         <td><code>sharaf-snunit</code></td>
         <td>snunit</td>
         <td>Scala Native</td>
-        <td>Experimental</td>
-        <td>URL encoded and multipart</td>
        </tr>
       </tbody>
      </table>
@@ -84,23 +74,32 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
      <p>Native executable examples cover these deployment paths:</p>
      <ul>
       <li><a href="https://github.com/sake92/sharaf/tree/main/examples/scala-cli/hello-undertow-graalvm.scala">GraalVM Native Image with Undertow</a></li>
+      <li><a href="https://github.com/sake92/sharaf/tree/main/examples/scala-cli/hello-potateh-graalvm.scala">GraalVM Native Image with Potateh</a></li>
       <li><a href="https://github.com/sake92/sharaf/tree/main/examples/scala-cli/hello-http4s-native.scala">Scala Native with http4s/Ember</a></li>
       <li><a href="https://github.com/sake92/sharaf/tree/main/examples/scala-cli/hello-potateh-native.scala">Scala Native with Potateh</a></li>
       <li><a href="https://github.com/sake92/sharaf/tree/main/examples/snunit">Scala Native with snunit and external Unit</a></li>
      </ul>
-     <p>The GraalVM example covers Undertow and its example dependencies; it does not establish Native Image compatibility for every JVM adapter. The snunit example requires <code>libunit</code> at build time and a separately configured Unit daemon.</p>
+     <p>The GraalVM examples cover their respective servers and example dependencies; they do not establish Native Image compatibility for every JVM adapter or application dependency. The snunit example requires <code>libunit</code> at build time and a separately configured Unit daemon.</p>
      <p>Local size, startup, and memory figures are listed in the <a href="https://sake92.github.io/sharaf/reference/native-footprint.html">native footprint reference</a>.</p>
-     <p>Stable is the recommended server integration. Beta integrations support the listed platforms with less production coverage. Experimental integrations have incomplete request features and may change between releases.</p>
-     <p>The <a href="https://sake92.github.io/sharaf/tutorials/quickstart.html">quickstart</a> uses Undertow. Adapter examples are in the <a href="https://github.com/sake92/sharaf/tree/main/examples">repository</a>.</p>
+     <p>Potateh is the default integration used in the introductory examples.</p>
+     <p>Potateh serves HTTP/1 and does not support protocol upgrades such as WebSockets. It manages connection and response framing; an application response cannot request <code>Connection: close</code>. Unlike the Undertow routes convenience method, Potateh does not automatically serve classpath resources or WebJars. Configure a resource handler as shown in the <a href="https://sake92.github.io/sharaf/tutorials/static-files.html">static files tutorial</a>.</p>
+     <p>The <a href="https://sake92.github.io/sharaf/tutorials/quickstart.html">quickstart</a> uses Potateh. Adapter examples are in the <a href="https://github.com/sake92/sharaf/tree/main/examples">repository</a>.</p>
      <p>The <a href="https://github.com/sake92/sharaf-aws-lambda-starter">AWS Lambda starter</a> packages an Undertow/JVM application with AWS Lambda Web Adapter and includes Terraform configuration and local integration tests.</p>
      <h2 id="choosing-a-port">Choosing a port<a href="#choosing-a-port" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
-     <p>The Undertow wrapper accepts port <code>0</code> to let the operating system choose a port. Its overload without a port does the same. Read <code>server.port</code> after starting:</p>
-     <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">val</span> server = <span class="hljs-type">UndertowSharafServer</span>(<span class="hljs-string">"127.0.0.1"</span>, routes)
-server.start()
-println(server.port)
+     <p>Potateh accepts port <code>0</code> in its bind address to let the operating system choose a port. Read the bound port from the server:</p>
+     <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">import</span> java.net.<span class="hljs-type">InetSocketAddress</span>
+<span class="hljs-keyword">import</span> ba.sake.potateh.<span class="hljs-type">ServerConfig</span>
+<span class="hljs-keyword">import</span> ba.sake.sharaf.potateh.<span class="hljs-type">PotatehSharafServer</span>
+
+<span class="hljs-keyword">val</span> config = <span class="hljs-type">ServerConfig</span>.<span class="hljs-type">Default</span>.withBindAddress(<span class="hljs-keyword">new</span> <span class="hljs-type">InetSocketAddress</span>(<span class="hljs-string">"127.0.0.1"</span>, <span class="hljs-number">0</span>))
+<span class="hljs-keyword">val</span> server = <span class="hljs-type">PotatehSharafServer</span>.start(config, routes)
+println(server.address.getPort)
 </code></pre>
-     <p>Potateh also accepts port <code>0</code> in its bind address and exposes the bound port through <code>server.address.getPort</code>. With http4s Ember, use port <code>0</code> and read <code>server.address.port.value</code>. Pass an explicit port for a fixed address.</p>
+     <p>Pass an explicit port for a fixed address. Undertow exposes <code>server.port</code> after starting; with http4s Ember, use port <code>0</code> and read <code>server.address.port.value</code>.</p>
      <p>Request parsing behavior and verification are described in the <a href="https://sake92.github.io/sharaf/reference/parsing.html">parsing reference</a>.</p>
+     <h2 id="tls">TLS<a href="#tls" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p>On the JVM, <code>TlsConfig</code> holds an initialized <code>javax.net.ssl.SSLContext</code> with the application's server credentials and trust settings. The same configuration can be passed to <code>UndertowSharafServer</code> as <code>tls = Some(config)</code>, <code>PotatehTls.configure</code>, or <code>Http4sTls.context[IO]</code> (for Ember's <code>withTLS</code>). Potateh serves HTTP/1; its TLS context must not negotiate HTTP/2 via ALPN.</p>
+     <p>The http4s integration supplies an application handler; the application owns its server and TLS listener. The snunit integration runs behind a separately configured Unit daemon, which owns TLS configuration. The shared JVM configuration is unavailable on Scala Native. Native TLS depends on the server and its platform-specific TLS provider or an external TLS terminator.</p>
      <div role="group">
       <a role="button" href="https://sake92.github.io/sharaf/reference/errors.html">⬅️ Errors</a> <span></span> <a role="button" href="https://sake92.github.io/sharaf/reference/parsing.html">Request parsing ➡️</a>
      </div>
@@ -113,6 +112,7 @@ println(server.port)
         <li><a href="#servers-and-platforms">Servers and platforms</a>
          <ul>
           <li><a href="#choosing-a-port">Choosing a port</a></li>
+          <li><a href="#tls">TLS</a></li>
          </ul></li>
        </ul>
       </nav>
