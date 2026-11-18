@@ -73,7 +73,7 @@ lazy val api = project
   .enablePlugins(OpenApi4sPlugin)
   .settings(
     scalaVersion := "3.9.0",
-    libraryDependencies += "ba.sake" %% "sharaf-undertow" % "0.21.0",
+    libraryDependencies += "ba.sake" %% "sharaf-potateh" % "0.23.0",
     openApi4sPackage := "com.example.greetings",
     openApi4sFile := canonicalOpenApiFile,
     openApi4sModels := "tupson",
@@ -130,19 +130,25 @@ class GreetingsController {
 Wire it as you would any other Sharaf routes:
 
 ```scala
-import ba.sake.sharaf.Routes
-import ba.sake.sharaf.undertow.UndertowSharafServer
+import java.net.InetSocketAddress
+import ba.sake.potateh.ServerConfig
+import ba.sake.sharaf.{Routes, SharafHandler}
+import ba.sake.sharaf.potateh.PotatehSharafServer
 import com.example.greetings.controllers.GreetingsController
 
 val routes = Routes.merge(Seq(GreetingsController().routes))
-UndertowSharafServer(routes, host = "0.0.0.0", port = 8080).start()
+val resources = SharafHandler.classpathResources(
+  "public",
+  SharafHandler.classpathResources("META-INF/resources/webjars")
+)
+val config = ServerConfig.Default.withBindAddress(new InetSocketAddress("0.0.0.0", 8080))
+PotatehSharafServer.start(config, routes, notFoundHandler = resources)
 ```
 
 ## 4. Serve the contract and Swagger UI
 
-Copy the canonical contract to `modules/api/src/main/resources/public/openapi.yaml`. `UndertowSharafServer` serves
-classpath resources from `public`, so the document is then available as `/openapi.yaml`. Add the Swagger UI WebJar to
-the `api` project:
+Copy the canonical contract to `modules/api/src/main/resources/public/openapi.yaml`. The configured resource handler
+serves it as `/openapi.yaml` and serves WebJar assets from the classpath. Add the Swagger UI WebJar to the `api` project:
 
 ```scala
 libraryDependencies += "org.webjars" % "swagger-ui" % "5.20.1"

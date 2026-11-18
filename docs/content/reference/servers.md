@@ -6,12 +6,12 @@ description: Sharaf server modules and platform support
 
 # {{ page.title }}
 
-| Module | Server integration | Platform | Support tier | Form bodies |
-| --- | --- | --- | --- | --- |
-| `sharaf-undertow` | Undertow | JVM | Stable | URL encoded and multipart |
-| `sharaf-http4s` | http4s | JVM, Scala Native | Beta | URL encoded and multipart |
-| `sharaf-potateh` | Potateh | JVM, Scala Native | Experimental | URL encoded and multipart |
-| `sharaf-snunit` | snunit | Scala Native | Experimental | URL encoded and multipart |
+| Module | Server integration | Platform |
+| --- | --- | --- |
+| `sharaf-potateh` | Potateh | JVM, Scala Native |
+| `sharaf-undertow` | Undertow | JVM |
+| `sharaf-http4s` | http4s | JVM, Scala Native |
+| `sharaf-snunit` | snunit | Scala Native |
 
 `sharaf-core` supports JVM and Scala Native. The companion libraries `formson`, `querson`, and `validson` also support Scala.js.
 
@@ -29,9 +29,12 @@ and a separately configured Unit daemon.
 
 Local size, startup, and memory figures are listed in the [native footprint reference](/reference/native-footprint.html).
 
-Potateh is the default integration used in the introductory examples. Undertow remains the stable integration;
-Potateh is experimental and may change between releases. Beta integrations support the listed platforms with less
-production coverage.
+Potateh is the default integration used in the introductory examples.
+
+Potateh serves HTTP/1 and does not support protocol upgrades such as WebSockets. It manages connection and response
+framing; an application response cannot request `Connection: close`. Unlike the Undertow routes convenience method,
+Potateh does not automatically serve classpath resources or WebJars. Configure a resource handler as shown in the
+[static files tutorial](/tutorials/static-files.html).
 
 The [quickstart](/tutorials/quickstart.html) uses Potateh. Adapter examples are in the [repository]({{site.data.project.gh.sourcesUrl}}/examples).
 
