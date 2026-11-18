@@ -6,8 +6,18 @@ description: Sharaf How To External Config
 
 # {{ page.title }}
 
-The [typesafe config](https://github.com/lightbend/config) library is already included in Sharaf.  
-Also included is the [tupson-config](https://sake92.github.io/tupson/tutorials/parsing-config.html#usage-1) which simplifies the process:
+For JVM applications, including those packaged with GraalVM Native Image, add
+[tupson-config](https://sake92.github.io/tupson/tutorials/parsing-config.html#usage-1) to parse
+[Typesafe Config](https://github.com/lightbend/config) into Scala case classes:
+
+```scala
+//> using dep ba.sake::tupson-config:0.32.1
+```
+
+Use the equivalent dependency declaration in your build tool. Typesafe Config is included transitively;
+`sharaf-undertow` already includes this dependency.
+
+Then parse your configuration:
 
 ```scala
 import java.net.URL

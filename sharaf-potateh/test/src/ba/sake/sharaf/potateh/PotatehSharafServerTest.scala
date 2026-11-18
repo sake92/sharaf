@@ -47,24 +47,24 @@ class PotatehSharafServerTest extends munit.FunSuite {
 
   private val config = ServerConfig.Default.withBindAddress(new InetSocketAddress("127.0.0.1", 0))
   private def runningServer(config: ServerConfig, routes: Routes, exceptionMapper: ExceptionMapper = ExceptionMapper.default): PotatehSharafServer =
-    PotatehSharafServer("127.0.0.1", 0, routes, exceptionMapper = exceptionMapper).withConfig(config).tap(_.start())
+    PotatehSharafServer(routes, "127.0.0.1", 0, exceptionMapper = exceptionMapper).withConfig(config).tap(_.start())
 
   private def runningServer(config: ServerConfig, handler: SharafHandler): PotatehSharafServer =
-    PotatehSharafServer("127.0.0.1", 0, handler).withConfig(config).tap(_.start())
+    PotatehSharafServer(handler, "127.0.0.1", 0).withConfig(config).tap(_.start())
 
   private def withServer[A](mapper: ExceptionMapper = ExceptionMapper.default)(f: PotatehSharafServer => A): A = {
-    val server = PotatehSharafServer("127.0.0.1", 0, routes, exceptionMapper = mapper).tap(_.start())
+    val server = PotatehSharafServer(routes, "127.0.0.1", 0, exceptionMapper = mapper).tap(_.start())
     try f(server)
     finally server.stop()
   }
 
   test("host and port convenience starts routes on the selected address") {
-    val configured = PotatehSharafServer("127.0.0.1", 0, routes)
+    val configured = PotatehSharafServer(routes)
     intercept[IllegalStateException](configured.port)
     val server = configured.tap(_.start())
     try {
       intercept[IllegalArgumentException](server.start())
-      val another = PotatehSharafServer("127.0.0.1", 0, routes).tap(_.start())
+      val another = PotatehSharafServer(routes, "127.0.0.1", 0).tap(_.start())
       try {
         assert(server.port > 0)
         assertNotEquals(server.port, another.port)
@@ -80,7 +80,7 @@ class PotatehSharafServerTest extends munit.FunSuite {
   }
 
   test("host and port convenience starts a custom handler") {
-    val server = PotatehSharafServer("127.0.0.1", 0, SharafHandler.routes(routes)).tap(_.start())
+    val server = PotatehSharafServer(SharafHandler.routes(routes), "127.0.0.1", 0).tap(_.start())
     try {
       Using.resource(new HttpConnection(new InetSocketAddress("127.0.0.1", server.port))) { connection =>
         val response = connection.request("GET", "/ok")
@@ -92,7 +92,7 @@ class PotatehSharafServerTest extends munit.FunSuite {
 
   test("route constructor applies the supplied not-found handler") {
     val notFound: SharafHandler = _ => Response.withBody("custom missing").withStatus(StatusCode.NotFound)
-    val server = PotatehSharafServer("127.0.0.1", 0, routes, notFoundHandler = notFound).tap(_.start())
+    val server = PotatehSharafServer(routes, "127.0.0.1", 0, notFoundHandler = notFound).tap(_.start())
     try {
       Using.resource(new HttpConnection(new InetSocketAddress("127.0.0.1", server.port))) { connection =>
         val response = connection.request("GET", "/missing")
@@ -235,7 +235,7 @@ class PotatehSharafServerTest extends munit.FunSuite {
   }
 
   test("composed handler uses default mapper for bootstrap failures") {
-    val server = PotatehSharafServer("127.0.0.1", 0, SharafHandler.routes(routes)).tap(_.start())
+    val server = PotatehSharafServer(SharafHandler.routes(routes), "127.0.0.1", 0).tap(_.start())
     try
       Using.resource(new HttpConnection(new InetSocketAddress("127.0.0.1", server.port))) { connection =>
         assertEquals(connection.request("FOO", "/ok").status, 501)
@@ -320,7 +320,7 @@ class PotatehSharafServerTest extends munit.FunSuite {
       sender.send(ServerSentEvent.Message("live"))
       Response.withBody(sender)
     }
-    val server = PotatehSharafServer("127.0.0.1", 0, streaming).tap(_.start())
+    val server = PotatehSharafServer(streaming, "127.0.0.1", 0).tap(_.start())
     try {
       Using.resource(new HttpConnection(new InetSocketAddress("127.0.0.1", server.port))) { connection =>
         connection.send("GET", "/events")
@@ -354,7 +354,7 @@ class PotatehSharafServerTest extends munit.FunSuite {
     sender.send(ServerSentEvent.Message("done"))
     sender.send(ServerSentEvent.Done())
     val streaming = Routes { case GET -> Path("events") => Response.withBody(sender) }
-    val server = PotatehSharafServer("127.0.0.1", 0, streaming).tap(_.start())
+    val server = PotatehSharafServer(streaming, "127.0.0.1", 0).tap(_.start())
     try
       Using.resource(new HttpConnection(new InetSocketAddress("127.0.0.1", server.port))) { connection =>
         val response = connection.request("GET", "/events")
@@ -399,7 +399,7 @@ class PotatehSharafServerTest extends munit.FunSuite {
         if scenario.status == 500 then response.settingHeader("Content-Length", "-2")
         else response.withStatus(StatusCode(scenario.status))
       }
-      val server = PotatehSharafServer("127.0.0.1", 0, uploadRoutes).tap(_.start())
+      val server = PotatehSharafServer(uploadRoutes, "127.0.0.1", 0).tap(_.start())
       try {
         Using.resource(new HttpConnection(new InetSocketAddress("127.0.0.1", server.port))) { connection =>
           val body =

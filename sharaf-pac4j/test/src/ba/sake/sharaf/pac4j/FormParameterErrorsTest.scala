@@ -23,7 +23,7 @@ class FormParameterErrorsTest extends munit.FunSuite {
       try check(s"http://127.0.0.1:${server.port}")
       finally server.stop()
     } else {
-      val server = PotatehSharafServer("127.0.0.1", 0, handler).tap(_.start())
+      val server = PotatehSharafServer(handler, "127.0.0.1", 0).tap(_.start())
       try check(s"http://127.0.0.1:${server.port}")
       finally server.stop()
     }

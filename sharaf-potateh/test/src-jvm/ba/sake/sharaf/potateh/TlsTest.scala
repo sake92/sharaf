@@ -10,7 +10,7 @@ class TlsTest extends munit.FunSuite {
     val tls = TlsTestSupport.config()
     val config = ServerConfig.Default.withBindAddress(new InetSocketAddress("127.0.0.1", 0))
     val routes = Routes { case GET -> Path() => Response.withBody("secure") }
-    val server = PotatehSharafServer("127.0.0.1", 0, routes).withConfig(PotatehTls.configure(config, tls)).tap(_.start())
+    val server = PotatehSharafServer(routes, "127.0.0.1", 0).withConfig(PotatehTls.configure(config, tls)).tap(_.start())
     try assert(TlsTestSupport.get(tls, server.port).endsWith("secure"))
     finally server.stop()
   }

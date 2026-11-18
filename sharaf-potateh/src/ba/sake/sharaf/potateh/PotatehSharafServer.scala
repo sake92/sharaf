@@ -32,9 +32,9 @@ final class PotatehSharafServer private (config: ServerConfig, startServer: Serv
 
 object PotatehSharafServer {
   def apply(
-      host: String,
-      port: Int,
       routes: Routes,
+      host: String = "127.0.0.1",
+      port: Int = 0,
       corsSettings: CorsSettings = CorsSettings.disabled,
       exceptionMapper: ExceptionMapper = ExceptionMapper.default,
       notFoundHandler: SharafHandler = SharafHandler.DefaultNotFoundHandler
@@ -47,7 +47,7 @@ object PotatehSharafServer {
     new PotatehSharafServer(config, value => startServer(value, handler, exceptionMapper))
   }
 
-  def apply(host: String, port: Int, handler: SharafHandler): PotatehSharafServer = {
+  def apply(handler: SharafHandler, host: String, port: Int): PotatehSharafServer = {
     val config = ServerConfig.Default.withBindAddress(new InetSocketAddress(host, port))
     new PotatehSharafServer(config, value => startServer(value, handler, ExceptionMapper.default))
   }

@@ -10,15 +10,17 @@
 import java.net.InetSocketAddress
 import java.io.ByteArrayInputStream
 import java.nio.charset.StandardCharsets.UTF_8
+import ba.sake.formson.FormDataRW
 import ba.sake.potateh.ServerConfig
+import ba.sake.querson.QueryStringRW
 import ba.sake.sharaf.*
 import ba.sake.sharaf.potateh.PotatehSharafServer
 import ba.sake.tupson.JsonRW
 import sttp.model.StatusCode
 
 case class Message(text: String) derives JsonRW
-case class Search(q: Seq[String]) derives ba.sake.querson.QueryStringRW
-case class Form(name: String, tags: Seq[String]) derives ba.sake.formson.FormDataRW
+case class Search(q: Seq[String]) derives QueryStringRW
+case class Form(name: String, tags: Seq[String]) derives FormDataRW
 
 object PotatehExample {
   def main(args: Array[String]): Unit = {
@@ -55,15 +57,7 @@ object PotatehExample {
       case GET -> Path("fail")  => throw new IllegalStateException("example failure")
     }
     val server = PotatehSharafServer.start(ServerConfig.Default.withBindAddress(new InetSocketAddress("127.0.0.1", port)), routes)
-    val hook = new Thread(() => server.stop())
-    Runtime.getRuntime.addShutdownHook(hook)
     println(s"LISTENING ${server.address.getPort}")
     System.out.flush()
-    try System.in.read()
-    finally {
-      server.stop()
-      try Runtime.getRuntime.removeShutdownHook(hook)
-      catch { case _: IllegalStateException => () }
-    }
   }
 }
