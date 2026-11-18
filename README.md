@@ -8,10 +8,8 @@ Documentation at https://sake92.github.io/sharaf/
 Hello world example:
 ```scala
 //> using scala 3.9.0
-//> using dep ba.sake::sharaf-potateh:0.23.0
+//> using dep ba.sake::sharaf-potateh:0.24.0
 
-import java.net.InetSocketAddress
-import ba.sake.potateh.ServerConfig
 import ba.sake.sharaf.*
 import ba.sake.sharaf.potateh.PotatehSharafServer
 
@@ -20,7 +18,7 @@ val routes = Routes {
     Response.withBody(s"Hello $name")
 }
 
-PotatehSharafServer.start(ServerConfig.Default.withBindAddress(new InetSocketAddress("localhost", 8181)), routes)
+PotatehSharafServer(routes, host = "localhost", port = 8181).start()
 ```
 
 ## OpenAPI-first APIs
@@ -194,7 +192,7 @@ def IndexView =
 ```scala
 case GET -> Path("sse-events") =>
   val sseSender = SseSender()
-  new Thread(() => {
+  Thread.ofVirtual().start(() => {
     for i <- 1 to 5 do
       sseSender.send(
         ServerSentEvent.Message(
@@ -203,6 +201,6 @@ case GET -> Path("sse-events") =>
       )
       Thread.sleep(1_000)
     sseSender.send(ServerSentEvent.Done())
-  }).start()
+  })
   Response.withBody(sseSender)
 ```

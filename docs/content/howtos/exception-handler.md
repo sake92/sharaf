@@ -8,9 +8,8 @@ description: Sharaf How To Exception Handler
 
 How to customize the Exception handler?
 
-Use the `exceptionMapper` parameter of `PotatehSharafServer.start`:
+Use the `exceptionMapper` parameter of `PotatehSharafServer`:
 ```scala
-import ba.sake.potateh.ServerConfig
 import ba.sake.sharaf.potateh.PotatehSharafServer
 
 val customExceptionMapper: ExceptionMapper = {
@@ -21,11 +20,11 @@ val customExceptionMapper: ExceptionMapper = {
 }
 val finalExceptionMapper = customExceptionMapper.orElse(ExceptionMapper.default)
 
-val server = PotatehSharafServer.start(
-    ServerConfig.Default.withBindAddress(new java.net.InetSocketAddress("localhost", port)),
-    routes,
+val server = PotatehSharafServer(
+    routes, host = "localhost", port = port,
     exceptionMapper = finalExceptionMapper
   )
+server.start()
 ```
 
 The `ExceptionMapper` is a partial function from an exception to `Response`.  

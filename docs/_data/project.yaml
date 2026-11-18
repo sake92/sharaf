@@ -9,7 +9,7 @@ gh:
 artifact:
   org: "ba.sake"
   name: "sharaf-potateh"
-  version: "0.23.0"
+  version: "0.24.0"
 
 tutorials:
   - label: "Quickstart"

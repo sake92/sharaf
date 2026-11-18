@@ -36,7 +36,7 @@ val routes = Routes {
     val sseSender = SseSender()
       .onComplete(() => println("SSE stream completed"))
       .onError(e => println(s"SSE error (client disconnected?): ${e.getMessage}"))
-    new Thread(() => {
+    Thread.ofVirtual().start(() => {
       for i <- 1 to 5 do
         sseSender.send(
           ServerSentEvent.Message(
@@ -45,7 +45,7 @@ val routes = Routes {
         )
         Thread.sleep(1_000)
       sseSender.send(ServerSentEvent.Done())
-    }).start()
+    })
     Response.withBody(sseSender)
 }
 

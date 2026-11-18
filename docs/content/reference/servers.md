@@ -46,13 +46,11 @@ with AWS Lambda Web Adapter and includes Terraform configuration and local integ
 Potateh accepts port `0` in its bind address to let the operating system choose a port. Read the bound port from the server:
 
 ```scala
-import java.net.InetSocketAddress
-import ba.sake.potateh.ServerConfig
 import ba.sake.sharaf.potateh.PotatehSharafServer
 
-val config = ServerConfig.Default.withBindAddress(new InetSocketAddress("127.0.0.1", 0))
-val server = PotatehSharafServer.start(config, routes)
-println(server.address.getPort)
+val server = PotatehSharafServer(routes, host = "127.0.0.1", port = 0)
+server.start()
+println(server.port)
 ```
 
 Pass an explicit port for a fixed address. Undertow exposes `server.port` after starting; with http4s Ember,

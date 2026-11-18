@@ -1,13 +1,11 @@
 //> using scala 3.9.0
 //> using dep com.h2database:h2:2.4.240
-//> using dep ba.sake::sharaf-potateh:0.23.0
+//> using dep ba.sake::sharaf-potateh:0.24.0
 //> using dep ba.sake::squery:0.8.2
 
 import ba.sake.tupson.JsonRW
 import ba.sake.squery.{*, given}
 import ba.sake.sharaf.*
-import java.net.InetSocketAddress
-import ba.sake.potateh.ServerConfig
 import ba.sake.sharaf.potateh.PotatehSharafServer
 
 val ds = org.h2.jdbcx.JdbcDataSource()
@@ -45,6 +43,6 @@ val routes = Routes:
   case GET -> _ =>
     Response.withBody("Try http://localhost:8181/customers with GET or POST")
 
-PotatehSharafServer.start(ServerConfig.Default.withBindAddress(new InetSocketAddress("localhost", 8181)), routes)
+PotatehSharafServer(routes, host = "localhost", port = 8181).start()
 
 println(s"Server started at http://localhost:8181")

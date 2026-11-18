@@ -1,10 +1,8 @@
 //> using scala 3.9.0
-//> using dep ba.sake::sharaf-potateh:0.23.0
+//> using dep ba.sake::sharaf-potateh:0.24.0
 
 import ba.sake.tupson.JsonRW
 import ba.sake.sharaf.*
-import java.net.InetSocketAddress
-import ba.sake.potateh.ServerConfig
 import ba.sake.sharaf.potateh.PotatehSharafServer
 
 case class Car(brand: String, model: String, quantity: Int) derives JsonRW
@@ -29,6 +27,6 @@ val routes = Routes:
     CarsDb.add(reqBody)
     Response.withBody(reqBody)
 
-PotatehSharafServer.start(ServerConfig.Default.withBindAddress(new InetSocketAddress("localhost", 8181)), routes, exceptionMapper = ExceptionMapper.json)
+PotatehSharafServer(routes, host = "localhost", port = 8181, exceptionMapper = ExceptionMapper.json).start()
 
 println("Server started at http://localhost:8181")

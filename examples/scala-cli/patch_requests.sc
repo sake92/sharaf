@@ -1,9 +1,7 @@
 //> using scala 3.9.0
-//> using dep ba.sake::sharaf-potateh:0.23.0
+//> using dep ba.sake::sharaf-potateh:0.24.0
 
 import ba.sake.sharaf.*
-import java.net.InetSocketAddress
-import ba.sake.potateh.ServerConfig
 import ba.sake.sharaf.potateh.PotatehSharafServer
 import ba.sake.tupson.{given, *}
 
@@ -32,5 +30,5 @@ val routes = Routes:
   case PATCH -> Path("user") =>
     Response.withBody(Users.patch(Request.current.bodyJson[UserPatch]))
 
-PotatehSharafServer.start(ServerConfig.Default.withBindAddress(new InetSocketAddress("localhost", 8181)), routes, exceptionMapper = ExceptionMapper.json)
+PotatehSharafServer(routes, host = "localhost", port = 8181, exceptionMapper = ExceptionMapper.json).start()
 println("Server started at http://localhost:8181")

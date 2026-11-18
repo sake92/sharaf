@@ -1,10 +1,8 @@
 //> using scala 3.9.0
-//> using dep ba.sake::sharaf-potateh:0.23.0
+//> using dep ba.sake::sharaf-potateh:0.24.0
 
 import ba.sake.formson.FormDataRW
 import ba.sake.sharaf.{*, given}
-import java.net.InetSocketAddress
-import ba.sake.potateh.ServerConfig
 import ba.sake.sharaf.potateh.PotatehSharafServer
 
 val routes = Routes:
@@ -15,7 +13,7 @@ val routes = Routes:
     val formData = Request.current.bodyForm[ContactUsForm]
     Response.withBody(s"Got form data: ${formData}")
 
-PotatehSharafServer.start(ServerConfig.Default.withBindAddress(new InetSocketAddress("localhost", 8181)), routes)
+PotatehSharafServer(routes, host = "localhost", port = 8181).start()
 
 println("Server started at http://localhost:8181")
 

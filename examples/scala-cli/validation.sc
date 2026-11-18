@@ -1,12 +1,10 @@
 //> using scala 3.9.0
-//> using dep ba.sake::sharaf-potateh:0.23.0
+//> using dep ba.sake::sharaf-potateh:0.24.0
 
 import ba.sake.querson.QueryStringRW
 import ba.sake.tupson.JsonRW
 import ba.sake.validson.Validator
 import ba.sake.sharaf.*
-import java.net.InetSocketAddress
-import ba.sake.potateh.ServerConfig
 import ba.sake.sharaf.potateh.PotatehSharafServer
 
 val routes = Routes:
@@ -18,7 +16,7 @@ val routes = Routes:
     val json = Request.current.bodyJsonValidated[Car]
     Response.withBody(CarApiResult(s"JSON body OK: ${json}"))
 
-PotatehSharafServer.start(ServerConfig.Default.withBindAddress(new InetSocketAddress("localhost", 8181)), routes, exceptionMapper = ExceptionMapper.json)
+PotatehSharafServer(routes, host = "localhost", port = 8181, exceptionMapper = ExceptionMapper.json).start()
 
 println(s"Server started at http://localhost:8181")
 

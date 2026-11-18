@@ -16,8 +16,6 @@ Create a file `json_api.sc` and paste this code into it:
 //> using dep {{site.data.project.artifact.org}}::{{site.data.project.artifact.name}}:{{site.data.project.artifact.version}}
 
 import ba.sake.tupson.JsonRW
-import java.net.InetSocketAddress
-import ba.sake.potateh.ServerConfig
 import ba.sake.sharaf.*
 import ba.sake.sharaf.potateh.PotatehSharafServer
 
@@ -66,11 +64,7 @@ Then we add it to the database.
 
 Finally, start up the server:
 ```scala
-PotatehSharafServer.start(
-  ServerConfig.Default.withBindAddress(new InetSocketAddress("localhost", 8181)),
-  routes,
-  exceptionMapper = ExceptionMapper.json
-)
+PotatehSharafServer(routes, host = "localhost", port = 8181, exceptionMapper = ExceptionMapper.json).start()
 
 println("Server started at http://localhost:8181")
 ```

@@ -1,13 +1,11 @@
 //> using scala 3.9.0
-//> using dep ba.sake::sharaf-potateh:0.23.0
-//> using dep ba.sake::sharaf-hepek-components:0.23.0
+//> using dep ba.sake::sharaf-potateh:0.24.0
+//> using dep ba.sake::sharaf-hepek-components:0.24.0
 
 import scalatags.Text.all.*
 import ba.sake.hepek.html.HtmlPage
 import ba.sake.sharaf.*
 import ba.sake.sharaf.hepek.given
-import java.net.InetSocketAddress
-import ba.sake.potateh.ServerConfig
 import ba.sake.sharaf.potateh.PotatehSharafServer
 
 val routes = Routes:
@@ -16,7 +14,7 @@ val routes = Routes:
   case GET -> Path("hello", name) =>
     Response.withBody(HelloView(name))
 
-PotatehSharafServer.start(ServerConfig.Default.withBindAddress(new InetSocketAddress("localhost", 8181)), routes)
+PotatehSharafServer(routes, host = "localhost", port = 8181).start()
 
 println(s"Server started at http://localhost:8181")
 

@@ -15,14 +15,12 @@ You can lots of examples in [examples/htmx]({{site.data.project.gh.sourcesUrl}}/
 ---
 
 Let's make a simple page that sends 5 SSE events and then a "stop" message.  
-Create a file `sse.sc` and paste this code into it:
+This example requires JDK 21 or newer for virtual threads. Create a file `sse.sc` and paste this code into it:
 
 ```scala
 //> using scala 3.9.0
 //> using dep ba.sake::sharaf-potateh:{{site.data.project.artifact.version}}
 
-import java.net.InetSocketAddress
-import ba.sake.potateh.ServerConfig
 import ba.sake.sharaf.{*, given}
 import ba.sake.sharaf.potateh.PotatehSharafServer
 
@@ -47,7 +45,7 @@ val routes = Routes {
     )
   case GET -> Path("sse-events") =>
     val sseSender = SseSender()
-    new Thread(() => {
+    Thread.ofVirtual().start(() => {
       for i <- 1 to 5 do
         sseSender.send(
           ServerSentEvent.Message(
@@ -56,11 +54,11 @@ val routes = Routes {
         )
         Thread.sleep(1_000)
       sseSender.send(ServerSentEvent.Done())
-    }).start()
+    })
     Response.withBody(sseSender)
 }
 
-PotatehSharafServer.start(ServerConfig.Default.withBindAddress(new InetSocketAddress("localhost", 8181)), routes)
+PotatehSharafServer(routes, host = "localhost", port = 8181).start()
 println(s"Server started at http://localhost:8181")
 ```
 

@@ -5,13 +5,11 @@
 //> using scala 3.9.0
 //> using platform native
 //> using nativeVersion 0.5.12
-//> using dep ba.sake::sharaf-potateh::0.23.0
+//> using dep ba.sake::sharaf-potateh::0.24.0
 
-import java.net.InetSocketAddress
 import java.io.ByteArrayInputStream
 import java.nio.charset.StandardCharsets.UTF_8
 import ba.sake.formson.FormDataRW
-import ba.sake.potateh.ServerConfig
 import ba.sake.querson.QueryStringRW
 import ba.sake.sharaf.*
 import ba.sake.sharaf.potateh.PotatehSharafServer
@@ -56,8 +54,8 @@ object PotatehExample {
       case GET -> Path("empty") => Response.withStatus(StatusCode.NoContent)
       case GET -> Path("fail")  => throw new IllegalStateException("example failure")
     }
-    val server = PotatehSharafServer.start(ServerConfig.Default.withBindAddress(new InetSocketAddress("127.0.0.1", port)), routes)
-    println(s"LISTENING ${server.address.getPort}")
-    System.out.flush()
+    val server = PotatehSharafServer(routes, host = "127.0.0.1", port = port)
+    server.start()
+    println(s"LISTENING ${server.port}")
   }
 }

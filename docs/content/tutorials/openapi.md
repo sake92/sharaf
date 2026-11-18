@@ -73,7 +73,7 @@ lazy val api = project
   .enablePlugins(OpenApi4sPlugin)
   .settings(
     scalaVersion := "3.9.0",
-    libraryDependencies += "ba.sake" %% "sharaf-potateh" % "0.23.0",
+    libraryDependencies += "ba.sake" %% "sharaf-potateh" % "0.24.0",
     openApi4sPackage := "com.example.greetings",
     openApi4sFile := canonicalOpenApiFile,
     openApi4sModels := "tupson",
@@ -130,8 +130,6 @@ class GreetingsController {
 Wire it as you would any other Sharaf routes:
 
 ```scala
-import java.net.InetSocketAddress
-import ba.sake.potateh.ServerConfig
 import ba.sake.sharaf.{Routes, SharafHandler}
 import ba.sake.sharaf.potateh.PotatehSharafServer
 import com.example.greetings.controllers.GreetingsController
@@ -141,8 +139,7 @@ val resources = SharafHandler.classpathResources(
   "public",
   SharafHandler.classpathResources("META-INF/resources/webjars")
 )
-val config = ServerConfig.Default.withBindAddress(new InetSocketAddress("0.0.0.0", 8080))
-PotatehSharafServer.start(config, routes, notFoundHandler = resources)
+PotatehSharafServer(routes, host = "0.0.0.0", port = 8080, notFoundHandler = resources).start()
 ```
 
 ## 4. Serve the contract and Swagger UI

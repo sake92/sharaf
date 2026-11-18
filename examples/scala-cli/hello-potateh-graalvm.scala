@@ -5,10 +5,8 @@
 // curl http://localhost:8181/hello/Scala
 // curl -H 'Content-Type: application/json' -d '{"name":"Scala"}' http://localhost:8181/hello
 //> using scala 3.9.0
-//> using dep ba.sake::sharaf-potateh:0.23.0
+//> using dep ba.sake::sharaf-potateh:0.24.0
 
-import java.net.InetSocketAddress
-import ba.sake.potateh.ServerConfig
 import ba.sake.sharaf.*
 import ba.sake.sharaf.potateh.PotatehSharafServer
 import ba.sake.tupson.JsonRW
@@ -26,6 +24,5 @@ val routes = Routes:
     Response.withBody(Greeting(s"Hello ${request.name}"))
 
 @main def run(): Unit =
-  val config = ServerConfig.Default.withBindAddress(new InetSocketAddress("127.0.0.1", 8181))
-  PotatehSharafServer.start(config, routes, exceptionMapper = ExceptionMapper.json)
+  PotatehSharafServer(routes, host = "127.0.0.1", port = 8181, exceptionMapper = ExceptionMapper.json).start()
   println("Server started at http://localhost:8181")
