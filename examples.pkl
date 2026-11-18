@@ -1,4 +1,4 @@
-import "https://sake92.github.io/deder/config/v0.22.2/DederProject.pkl" as D
+import "https://sake92.github.io/deder/config/v0.23.0/DederProject.pkl" as D
 
 class Examples {
   libraryTemplate: D.ScalaModule
