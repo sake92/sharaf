@@ -19,10 +19,12 @@ Create a file `sse.sc` and paste this code into it:
 
 ```scala
 //> using scala 3.9.0
-//> using dep ba.sake::sharaf-undertow:{{site.data.project.artifact.version}}
+//> using dep ba.sake::sharaf-potateh:{{site.data.project.artifact.version}}
 
+import java.net.InetSocketAddress
+import ba.sake.potateh.ServerConfig
 import ba.sake.sharaf.{*, given}
-import ba.sake.sharaf.undertow.UndertowSharafServer
+import ba.sake.sharaf.potateh.PotatehSharafServer
 
 val routes = Routes {
   case GET -> Path() =>
@@ -58,7 +60,7 @@ val routes = Routes {
     Response.withBody(sseSender)
 }
 
-UndertowSharafServer("localhost", 8181, routes).start()
+PotatehSharafServer.start(ServerConfig.Default.withBindAddress(new InetSocketAddress("localhost", 8181)), routes)
 println(s"Server started at http://localhost:8181")
 ```
 

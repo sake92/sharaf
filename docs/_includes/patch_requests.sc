@@ -1,8 +1,10 @@
 //> using scala 3.9.0
-//> using dep ba.sake::sharaf-undertow:0.21.0
+//> using dep ba.sake::sharaf-potateh:0.23.0
 
 import ba.sake.sharaf.*
-import ba.sake.sharaf.undertow.UndertowSharafServer
+import java.net.InetSocketAddress
+import ba.sake.potateh.ServerConfig
+import ba.sake.sharaf.potateh.PotatehSharafServer
 import ba.sake.tupson.{given, *}
 
 case class User(name: String, address: Option[String]) derives JsonRW
@@ -30,5 +32,5 @@ val routes = Routes:
   case PATCH -> Path("user") =>
     Response.withBody(Users.patch(Request.current.bodyJson[UserPatch]))
 
-UndertowSharafServer("localhost", 8181, routes, exceptionMapper = ExceptionMapper.json).start()
+PotatehSharafServer.start(ServerConfig.Default.withBindAddress(new InetSocketAddress("localhost", 8181)), routes, exceptionMapper = ExceptionMapper.json)
 println("Server started at http://localhost:8181")

@@ -8,17 +8,19 @@ Documentation at https://sake92.github.io/sharaf/
 Hello world example:
 ```scala
 //> using scala 3.9.0
-//> using dep ba.sake::sharaf-undertow:0.21.0
+//> using dep ba.sake::sharaf-potateh:0.23.0
 
+import java.net.InetSocketAddress
+import ba.sake.potateh.ServerConfig
 import ba.sake.sharaf.*
-import ba.sake.sharaf.undertow.UndertowSharafServer
+import ba.sake.sharaf.potateh.PotatehSharafServer
 
 val routes = Routes {
   case GET -> Path("hello", name) =>
     Response.withBody(s"Hello $name")
 }
 
-UndertowSharafServer(routes, port = 8181).start()
+PotatehSharafServer.start(ServerConfig.Default.withBindAddress(new InetSocketAddress("localhost", 8181)), routes)
 ```
 
 ## OpenAPI-first APIs
@@ -34,8 +36,9 @@ and integration tests.
 
 ## Native executables
 
-- [GraalVM Native Image](examples/scala-cli/hello-undertow-graalvm.scala): build the Undertow example as a native
+- [GraalVM Native Image](examples/scala-cli/hello-potateh-graalvm.scala): build the Potateh example as a native
   executable, including JSON requests and responses.
+- [Scala Native with Potateh](examples/scala-cli/hello-potateh-native.scala): compile directly with Scala Native.
 - [Scala Native with http4s/Ember](examples/scala-cli/hello-http4s-native.scala): compile directly with Scala Native.
 - [Scala Native with snunit/Unit](examples/snunit): experimental integration requiring Unit and `libunit`.
 

@@ -1,8 +1,10 @@
 //> using scala 3.9.0
-//> using dep ba.sake::sharaf-undertow:0.21.0
+//> using dep ba.sake::sharaf-potateh:0.23.0
 
 import ba.sake.sharaf.*
-import ba.sake.sharaf.undertow.UndertowSharafServer
+import java.net.InetSocketAddress
+import ba.sake.potateh.ServerConfig
+import ba.sake.sharaf.potateh.PotatehSharafServer
 
 val routes = Routes:
   case GET -> Path("hello", name) =>
@@ -10,6 +12,6 @@ val routes = Routes:
   case GET -> _ =>
     Response.withBody("Go to http://localhost:8181/hello/your-name")
 
-UndertowSharafServer("localhost", 8181, routes).start()
+PotatehSharafServer.start(ServerConfig.Default.withBindAddress(new InetSocketAddress("localhost", 8181)), routes)
 
 println(s"Server started at http://localhost:8181")

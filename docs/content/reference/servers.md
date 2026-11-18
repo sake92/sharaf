@@ -29,26 +29,31 @@ and a separately configured Unit daemon.
 
 Local size, startup, and memory figures are listed in the [native footprint reference](/reference/native-footprint.html).
 
-Stable is the recommended server integration. Beta integrations support the listed platforms with less production coverage. Experimental integrations have incomplete request features and may change between releases.
+Potateh is the default integration used in the introductory examples. Undertow remains the stable integration;
+Potateh is experimental and may change between releases. Beta integrations support the listed platforms with less
+production coverage.
 
-The [quickstart](/tutorials/quickstart.html) uses Undertow. Adapter examples are in the [repository]({{site.data.project.gh.sourcesUrl}}/examples).
+The [quickstart](/tutorials/quickstart.html) uses Potateh. Adapter examples are in the [repository]({{site.data.project.gh.sourcesUrl}}/examples).
 
 The [AWS Lambda starter](https://github.com/sake92/sharaf-aws-lambda-starter) packages an Undertow/JVM application
 with AWS Lambda Web Adapter and includes Terraform configuration and local integration tests.
 
 ## Choosing a port
 
-The Undertow wrapper defaults to `127.0.0.1` and port `0`, which lets the operating system choose a port. Read `server.port` after starting:
+Potateh accepts port `0` in its bind address to let the operating system choose a port. Read the bound port from the server:
 
 ```scala
-val server = UndertowSharafServer(routes)
-server.start()
-println(server.port)
+import java.net.InetSocketAddress
+import ba.sake.potateh.ServerConfig
+import ba.sake.sharaf.potateh.PotatehSharafServer
+
+val config = ServerConfig.Default.withBindAddress(new InetSocketAddress("127.0.0.1", 0))
+val server = PotatehSharafServer.start(config, routes)
+println(server.address.getPort)
 ```
 
-Potateh also accepts port `0` in its bind address and exposes the bound port through
-`server.address.getPort`. With http4s Ember, use port `0` and read `server.address.port.value`.
-Pass an explicit port for a fixed address.
+Pass an explicit port for a fixed address. Undertow exposes `server.port` after starting; with http4s Ember,
+use port `0` and read `server.address.port.value`.
 
 Request parsing behavior and verification are described in the [parsing reference](/reference/parsing.html).
 

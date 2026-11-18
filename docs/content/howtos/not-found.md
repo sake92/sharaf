@@ -9,16 +9,18 @@ description: Sharaf How To NotFound
 How to customize 404 NotFound handler?
 
 
-Use the `notFoundHandler` parameter of `UndertowSharafServer`:
+Use the `notFoundHandler` parameter of `PotatehSharafServer.start`:
 ```scala
+import ba.sake.potateh.ServerConfig
+import ba.sake.sharaf.potateh.PotatehSharafServer
+
 val customNotFoundHandler: SharafHandler = _ =>
   Response.withBody("Page not found")
     .withStatus(StatusCode.NotFound)
 
-val server = UndertowSharafServer(
+val server = PotatehSharafServer.start(
+    ServerConfig.Default.withBindAddress(new java.net.InetSocketAddress("localhost", port)),
     routes,
-    host = "localhost",
-    port = port,
     notFoundHandler = customNotFoundHandler
   )
 ```

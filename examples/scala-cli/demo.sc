@@ -1,10 +1,12 @@
 //> using scala 3.9.0
-//> using dep ba.sake::sharaf-undertow:0.21.0
+//> using dep ba.sake::sharaf-potateh:0.23.0
 
 import ba.sake.tupson.JsonRW
 import ba.sake.validson.Validator
 import ba.sake.sharaf.*
-import ba.sake.sharaf.undertow.UndertowSharafServer
+import java.net.InetSocketAddress
+import ba.sake.potateh.ServerConfig
+import ba.sake.sharaf.potateh.PotatehSharafServer
 
 val routes = Routes:
   case GET -> Path("cars") =>
@@ -19,7 +21,7 @@ val routes = Routes:
     CarsDb.add(newCar)
     Response.withBody(newCar)
 
-UndertowSharafServer("localhost", 8181, routes, exceptionMapper = ExceptionMapper.json).start()
+PotatehSharafServer.start(ServerConfig.Default.withBindAddress(new InetSocketAddress("localhost", 8181)), routes, exceptionMapper = ExceptionMapper.json)
 println("Server started at http://localhost:8181")
 
 object CarsDb {

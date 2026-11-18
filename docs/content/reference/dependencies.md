@@ -8,7 +8,7 @@ description: Sharaf artifact coordinates and build settings
 
 The coordinates below use Scala 3.9.0 and Sharaf {{site.data.project.artifact.version}}. Artifact group: `{{site.data.project.artifact.org}}`.
 
-| Build tool | Undertow dependency |
+| Build tool | Potateh dependency |
 | --- | --- |
 | Scala CLI | `//> using dep {{site.data.project.artifact.org}}::{{site.data.project.artifact.name}}:{{site.data.project.artifact.version}}` |
 | sbt | `"{{site.data.project.artifact.org}}" %% "{{site.data.project.artifact.name}}" % "{{site.data.project.artifact.version}}"` |

@@ -1,12 +1,14 @@
 //> using scala 3.9.0
 //> using dep com.h2database:h2:2.4.240
-//> using dep ba.sake::sharaf-undertow:0.21.0
+//> using dep ba.sake::sharaf-potateh:0.23.0
 //> using dep ba.sake::squery:0.8.2
 
 import ba.sake.tupson.JsonRW
 import ba.sake.squery.{*, given}
 import ba.sake.sharaf.*
-import ba.sake.sharaf.undertow.UndertowSharafServer
+import java.net.InetSocketAddress
+import ba.sake.potateh.ServerConfig
+import ba.sake.sharaf.potateh.PotatehSharafServer
 
 val ds = org.h2.jdbcx.JdbcDataSource()
 ds.setUrl("jdbc:h2:mem:mydb;DB_CLOSE_DELAY=-1")
@@ -43,6 +45,6 @@ val routes = Routes:
   case GET -> _ =>
     Response.withBody("Try http://localhost:8181/customers with GET or POST")
 
-UndertowSharafServer("localhost", 8181, routes).start()
+PotatehSharafServer.start(ServerConfig.Default.withBindAddress(new InetSocketAddress("localhost", 8181)), routes)
 
 println(s"Server started at http://localhost:8181")

@@ -1,5 +1,6 @@
 package ba.sake.sharaf.potateh
 
+import scala.util.chaining.*
 import java.net.InetSocketAddress
 import java.nio.file.{Files, Path as NioPath}
 import scala.util.Using
@@ -7,7 +8,7 @@ import scala.concurrent.duration.*
 import java.util.concurrent.{CountDownLatch, Executor, Executors, RejectedExecutionException, TimeUnit}
 import java.util.concurrent.atomic.{AtomicBoolean, AtomicInteger, AtomicReference}
 import sttp.model.StatusCode
-import ba.sake.potateh.{Server, ServerConfig}
+import ba.sake.potateh.ServerConfig
 import ba.sake.sharaf.*
 import ba.sake.tupson.*
 import ba.sake.sharaf.handlers.HttpConnection
@@ -45,15 +46,65 @@ class PotatehSharafServerTest extends munit.FunSuite {
   }
 
   private val config = ServerConfig.Default.withBindAddress(new InetSocketAddress("127.0.0.1", 0))
-  private def withServer[A](mapper: ExceptionMapper = ExceptionMapper.default)(f: Server => A): A = {
-    val server = PotatehSharafServer.start(config, routes, exceptionMapper = mapper)
+  private def runningServer(config: ServerConfig, routes: Routes, exceptionMapper: ExceptionMapper = ExceptionMapper.default): PotatehSharafServer =
+    PotatehSharafServer("127.0.0.1", 0, routes, exceptionMapper = exceptionMapper).withConfig(config).tap(_.start())
+
+  private def runningServer(config: ServerConfig, handler: SharafHandler): PotatehSharafServer =
+    PotatehSharafServer("127.0.0.1", 0, handler).withConfig(config).tap(_.start())
+
+  private def withServer[A](mapper: ExceptionMapper = ExceptionMapper.default)(f: PotatehSharafServer => A): A = {
+    val server = PotatehSharafServer("127.0.0.1", 0, routes, exceptionMapper = mapper).tap(_.start())
     try f(server)
     finally server.stop()
   }
 
+  test("host and port convenience starts routes on the selected address") {
+    val configured = PotatehSharafServer("127.0.0.1", 0, routes)
+    intercept[IllegalStateException](configured.port)
+    val server = configured.tap(_.start())
+    try {
+      intercept[IllegalArgumentException](server.start())
+      val another = PotatehSharafServer("127.0.0.1", 0, routes).tap(_.start())
+      try {
+        assert(server.port > 0)
+        assertNotEquals(server.port, another.port)
+        Using.resource(new HttpConnection(new InetSocketAddress("127.0.0.1", server.port))) { connection =>
+          val response = connection.request("GET", "/ok")
+          assertEquals(response.status, 200)
+          assertEquals(response.body, "ok")
+        }
+      } finally another.stop()
+    } finally server.stop()
+    server.stop()
+    intercept[IllegalArgumentException](server.start())
+  }
+
+  test("host and port convenience starts a custom handler") {
+    val server = PotatehSharafServer("127.0.0.1", 0, SharafHandler.routes(routes)).tap(_.start())
+    try {
+      Using.resource(new HttpConnection(new InetSocketAddress("127.0.0.1", server.port))) { connection =>
+        val response = connection.request("GET", "/ok")
+        assertEquals(response.status, 200)
+        assertEquals(response.body, "ok")
+      }
+    } finally server.stop()
+  }
+
+  test("route constructor applies the supplied not-found handler") {
+    val notFound: SharafHandler = _ => Response.withBody("custom missing").withStatus(StatusCode.NotFound)
+    val server = PotatehSharafServer("127.0.0.1", 0, routes, notFoundHandler = notFound).tap(_.start())
+    try {
+      Using.resource(new HttpConnection(new InetSocketAddress("127.0.0.1", server.port))) { connection =>
+        val response = connection.request("GET", "/missing")
+        assertEquals(response.status, 404)
+        assertEquals(response.body, "custom missing")
+      }
+    } finally server.stop()
+  }
+
   test("known lengths use UTF-8 bytes and preserve keep-alive framing") {
     withServer() { server =>
-      Using.resource(new HttpConnection(server.address)) { connection =>
+      Using.resource(new HttpConnection(new InetSocketAddress("127.0.0.1", server.port))) { connection =>
         for ((path, expected) <- Seq("/length" -> "ok", "/unicode-length" -> "ć", "/ok" -> "ok")) {
           val response = connection.request("GET", path)
           assertEquals(response.status, 200)
@@ -67,7 +118,7 @@ class PotatehSharafServerTest extends munit.FunSuite {
 
   test("engine-owned and Connection-nominated headers do not leak") {
     withServer() { server =>
-      Using.resource(new HttpConnection(server.address)) { connection =>
+      Using.resource(new HttpConnection(new InetSocketAddress("127.0.0.1", server.port))) { connection =>
         val response = connection.request("GET", "/hop")
         assertEquals(response.status, 200)
         assertEquals(response.body, "ok")
@@ -81,7 +132,7 @@ class PotatehSharafServerTest extends munit.FunSuite {
 
   test("426 responses retain the required Upgrade header") {
     withServer() { server =>
-      Using.resource(new HttpConnection(server.address)) { connection =>
+      Using.resource(new HttpConnection(new InetSocketAddress("127.0.0.1", server.port))) { connection =>
         val response = connection.request("GET", "/upgrade-required")
         assertEquals(response.status, 426)
         assertEquals(response.headers.get("upgrade"), Some("websocket"))
@@ -99,7 +150,7 @@ class PotatehSharafServerTest extends munit.FunSuite {
             (method = "GET", target = "/path/%ED%A0%80", status = 400)
           )
         do
-          Using.resource(new HttpConnection(server.address)) { connection =>
+          Using.resource(new HttpConnection(new InetSocketAddress("127.0.0.1", server.port))) { connection =>
             val response = connection.request(scenario.method, scenario.target)
             assertEquals(response.status, scenario.status)
             if mapper == ExceptionMapper.json then
@@ -112,19 +163,19 @@ class PotatehSharafServerTest extends munit.FunSuite {
   test("protocol-level malformed URI returns 400 and closes; server recovers") {
     withServer() { server =>
       for (target <- Seq("/query?a=%ZZ", "/path/%ZZ")) {
-        Using.resource(new HttpConnection(server.address)) { connection =>
+        Using.resource(new HttpConnection(new InetSocketAddress("127.0.0.1", server.port))) { connection =>
           val response = connection.request("GET", target)
           assertEquals(response.status, 400)
           assertEquals(response.headers.get("connection"), Some("close"))
         }
       }
-      Using.resource(new HttpConnection(server.address))(c => assertEquals(c.request("GET", "/ok").body, "ok"))
+      Using.resource(new HttpConnection(new InetSocketAddress("127.0.0.1", server.port)))(c => assertEquals(c.request("GET", "/ok").body, "ok"))
     }
   }
 
   test("HEAD and bodyless status codes preserve the next response") {
     withServer() { server =>
-      Using.resource(new HttpConnection(server.address)) { connection =>
+      Using.resource(new HttpConnection(new InetSocketAddress("127.0.0.1", server.port))) { connection =>
         val head = connection.request("HEAD", "/head")
         assertEquals(head.status, 200)
         assertEquals(head.headers.get("content-length"), Some("2"))
@@ -149,12 +200,12 @@ class PotatehSharafServerTest extends munit.FunSuite {
   test("invalid or contradictory framing fails safely before the body") {
     withServer() { server =>
       for (path <- Seq("/bad-length", "/conflict", "/close")) {
-        Using.resource(new HttpConnection(server.address)) { connection =>
+        Using.resource(new HttpConnection(new InetSocketAddress("127.0.0.1", server.port))) { connection =>
           assertEquals(connection.request("GET", path).status, 500)
         }
       }
       for (path <- Seq("/short", "/long")) {
-        Using.resource(new HttpConnection(server.address)) { connection =>
+        Using.resource(new HttpConnection(new InetSocketAddress("127.0.0.1", server.port))) { connection =>
           connection.send("GET", path)
           // A buffered head may never reach the peer. If it does, validation must reject the
           // mismatch before any successful response body or second response can follow.
@@ -163,7 +214,7 @@ class PotatehSharafServerTest extends munit.FunSuite {
           assert(!wire.endsWith("\r\n\r\nok"))
         }
       }
-      Using.resource(new HttpConnection(server.address))(c => assertEquals(c.request("GET", "/ok").body, "ok"))
+      Using.resource(new HttpConnection(new InetSocketAddress("127.0.0.1", server.port)))(c => assertEquals(c.request("GET", "/ok").body, "ok"))
     }
   }
 
@@ -173,7 +224,7 @@ class PotatehSharafServerTest extends munit.FunSuite {
       Response.withBody("custom").withStatus(StatusCode.BadRequest)
     }
     withServer(mapper) { server =>
-      Using.resource(new HttpConnection(server.address)) { connection =>
+      Using.resource(new HttpConnection(new InetSocketAddress("127.0.0.1", server.port))) { connection =>
         for ((method, target) <- Seq("FOO" -> "/ok", "GET" -> "/path/%FF")) {
           val response = connection.request(method, target)
           assertEquals(response.status, 400)
@@ -184,9 +235,9 @@ class PotatehSharafServerTest extends munit.FunSuite {
   }
 
   test("composed handler uses default mapper for bootstrap failures") {
-    val server = PotatehSharafServer.start(config, SharafHandler.routes(routes))
+    val server = PotatehSharafServer("127.0.0.1", 0, SharafHandler.routes(routes)).tap(_.start())
     try
-      Using.resource(new HttpConnection(server.address)) { connection =>
+      Using.resource(new HttpConnection(new InetSocketAddress("127.0.0.1", server.port))) { connection =>
         assertEquals(connection.request("FOO", "/ok").status, 501)
         assertEquals(connection.request("GET", "/path/%FF").status, 400)
         assertEquals(connection.request("GET", "/ok").body, "ok")
@@ -204,9 +255,9 @@ class PotatehSharafServerTest extends munit.FunSuite {
     try {
       for (useRoutes <- Seq(true, false)) {
         val server =
-          if useRoutes then PotatehSharafServer.start(config.withExecutor(executor), routes)
-          else PotatehSharafServer.start(config.withExecutor(executor), SharafHandler.routes(routes))
-        try Using.resource(new HttpConnection(server.address))(c => assertEquals(c.request("GET", "/ok").body, "ok"))
+          if useRoutes then runningServer(config.withExecutor(executor), routes)
+          else runningServer(config.withExecutor(executor), SharafHandler.routes(routes))
+        try Using.resource(new HttpConnection(new InetSocketAddress("127.0.0.1", server.port)))(c => assertEquals(c.request("GET", "/ok").body, "ok"))
         finally server.stop()
       }
       assertEquals(dispatched.get(), 2)
@@ -231,18 +282,18 @@ class PotatehSharafServerTest extends munit.FunSuite {
       } else pool.execute(task)
     }
     try {
-      val server = PotatehSharafServer.start(config.withExecutor(executor), SharafHandler.routes(routes))
+      val server = runningServer(config.withExecutor(executor), SharafHandler.routes(routes))
       try {
         // Native may report the immediate rejected close during connect or read.
         try
-          Using.resource(new HttpConnection(server.address)) { connection =>
+          Using.resource(new HttpConnection(new InetSocketAddress("127.0.0.1", server.port))) { connection =>
             val remaining = connection.remaining()
             assertEquals(remaining, "")
           }
         catch case _: java.net.SocketException => ()
         val wasRejected = rejected.await(5, TimeUnit.SECONDS)
         assert(wasRejected, "The server must actually reject an admitted connection")
-        Using.resource(new HttpConnection(server.address)) { connection =>
+        Using.resource(new HttpConnection(new InetSocketAddress("127.0.0.1", server.port))) { connection =>
           val response = connection.request("GET", "/ok")
           assertEquals(response.status, 200)
           assertEquals(response.body, "ok")
@@ -269,9 +320,9 @@ class PotatehSharafServerTest extends munit.FunSuite {
       sender.send(ServerSentEvent.Message("live"))
       Response.withBody(sender)
     }
-    val server = PotatehSharafServer.start(config, streaming)
+    val server = PotatehSharafServer("127.0.0.1", 0, streaming).tap(_.start())
     try {
-      Using.resource(new HttpConnection(server.address)) { connection =>
+      Using.resource(new HttpConnection(new InetSocketAddress("127.0.0.1", server.port))) { connection =>
         connection.send("GET", "/events")
         assertEquals(connection.line().split(" ")(1), "200")
         var line = connection.line()
@@ -303,9 +354,9 @@ class PotatehSharafServerTest extends munit.FunSuite {
     sender.send(ServerSentEvent.Message("done"))
     sender.send(ServerSentEvent.Done())
     val streaming = Routes { case GET -> Path("events") => Response.withBody(sender) }
-    val server = PotatehSharafServer.start(config, streaming)
+    val server = PotatehSharafServer("127.0.0.1", 0, streaming).tap(_.start())
     try
-      Using.resource(new HttpConnection(server.address)) { connection =>
+      Using.resource(new HttpConnection(new InetSocketAddress("127.0.0.1", server.port))) { connection =>
         val response = connection.request("GET", "/events")
         assertEquals(response.status, 200)
         val callbackRan = completed.await(5, TimeUnit.SECONDS)
@@ -348,9 +399,9 @@ class PotatehSharafServerTest extends munit.FunSuite {
         if scenario.status == 500 then response.settingHeader("Content-Length", "-2")
         else response.withStatus(StatusCode(scenario.status))
       }
-      val server = PotatehSharafServer.start(config, uploadRoutes)
+      val server = PotatehSharafServer("127.0.0.1", 0, uploadRoutes).tap(_.start())
       try {
-        Using.resource(new HttpConnection(server.address)) { connection =>
+        Using.resource(new HttpConnection(new InetSocketAddress("127.0.0.1", server.port))) { connection =>
           val body =
             "--boundary\r\nContent-Disposition: form-data; name=\"file\"; filename=\"test.txt\"\r\n\r\nhello\r\n--boundary--\r\n"
           val response = connection.request(scenario.method, "/upload", body, "multipart/form-data; boundary=boundary")

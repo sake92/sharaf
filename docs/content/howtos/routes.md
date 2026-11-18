@@ -117,7 +117,5 @@ class MyController2 extends SharafController:
   override def routes: Routes = Routes:
     case ...
     
-val server = UndertowSharafServer(
-  new MyController1, new MyController2
-)
+val allRoutes = Routes.merge(Seq(new MyController1().routes, new MyController2().routes))
 ```

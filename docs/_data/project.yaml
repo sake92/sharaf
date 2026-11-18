@@ -8,8 +8,8 @@ gh:
 
 artifact:
   org: "ba.sake"
-  name: "sharaf-undertow"
-  version: "0.21.0"
+  name: "sharaf-potateh"
+  version: "0.23.0"
 
 tutorials:
   - label: "Quickstart"

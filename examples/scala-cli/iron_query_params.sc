@@ -1,10 +1,12 @@
-//> using dep ba.sake::sharaf-undertow:0.21.0
+//> using dep ba.sake::sharaf-potateh:0.23.0
 //> using dep io.github.iltotore::iron:3.3.2
 
 import ba.sake.querson.*
 import ba.sake.sharaf.*
 import ba.sake.sharaf.exceptions.{ExceptionMapper, ProblemDetails}
-import ba.sake.sharaf.undertow.UndertowSharafServer
+import java.net.InetSocketAddress
+import ba.sake.potateh.ServerConfig
+import ba.sake.sharaf.potateh.PotatehSharafServer
 import io.github.iltotore.iron.*
 import io.github.iltotore.iron.constraint.all.*
 import sttp.model.StatusCode
@@ -45,4 +47,4 @@ val routes = Routes {
     Response.withBody(Request.current.queryParams[SearchQuery].term)
 }
 
-UndertowSharafServer("localhost", 8181, routes, exceptionMapper = exceptionMapper).start()
+PotatehSharafServer.start(ServerConfig.Default.withBindAddress(new InetSocketAddress("localhost", 8181)), routes, exceptionMapper = exceptionMapper)

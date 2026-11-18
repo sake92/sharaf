@@ -6,7 +6,8 @@ description: Sharaf Tutorial Static Files
 
 # {{ page.title }}
 
-The static files are automatically served from the `resources/public` folder (on the classpath):
+The example serves static files from the `resources/public` folder on the classpath using
+`SharafHandler.classpathResources` as its not-found handler:
 - in Mill those are under `my_project/resources/public`
 - in sbt those are under `src/main/resources/public`
 - in scala you need to manually tell it where to look for with `--resource-dir resources`

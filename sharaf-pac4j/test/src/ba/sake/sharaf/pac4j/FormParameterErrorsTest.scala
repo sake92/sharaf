@@ -1,9 +1,8 @@
 package ba.sake.sharaf.pac4j
 
-import java.net.InetSocketAddress
+import scala.util.chaining.*
 import sttp.client4.quick.*
 import sttp.model.{HttpVersion, StatusCode}
-import ba.sake.potateh.ServerConfig
 import ba.sake.sharaf.*
 import ba.sake.sharaf.potateh.PotatehSharafServer
 import ba.sake.sharaf.undertow.UndertowSharafServer
@@ -24,9 +23,8 @@ class FormParameterErrorsTest extends munit.FunSuite {
       try check(s"http://127.0.0.1:${server.port}")
       finally server.stop()
     } else {
-      val config = ServerConfig.Default.withBindAddress(InetSocketAddress("127.0.0.1", 0))
-      val server = PotatehSharafServer.start(config, handler)
-      try check(s"http://127.0.0.1:${server.address.getPort}")
+      val server = PotatehSharafServer("127.0.0.1", 0, handler).tap(_.start())
+      try check(s"http://127.0.0.1:${server.port}")
       finally server.stop()
     }
 
