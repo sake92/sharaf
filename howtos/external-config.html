@@ -39,9 +39,11 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
    <div>
     <div class="content">
      <h1 id="external-config">External Config<a href="#external-config" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
-     <p>The <a href="https://github.com/lightbend/config">typesafe config</a> library is already included in Sharaf.
-      <br>
-      Also included is the <a href="https://sake92.github.io/tupson/tutorials/parsing-config.html#usage-1">tupson-config</a> which simplifies the process:</p>
+     <p>For JVM applications, including those packaged with GraalVM Native Image, add <a href="https://sake92.github.io/tupson/tutorials/parsing-config.html#usage-1">tupson-config</a> to parse <a href="https://github.com/lightbend/config">Typesafe Config</a> into Scala case classes:</p>
+     <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">ba.sake::tupson-config:0.32.1</span>
+</code></pre>
+     <p>Use the equivalent dependency declaration in your build tool. Typesafe Config is included transitively; <code>sharaf-undertow</code> already includes this dependency.</p>
+     <p>Then parse your configuration:</p>
      <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">import</span> java.net.<span class="hljs-type">URL</span>
 <span class="hljs-keyword">import</span> com.typesafe.config.<span class="hljs-type">ConfigFactory</span>
 <span class="hljs-keyword">import</span> ba.sake.tupson.{<span class="hljs-keyword">given</span>, *}
