@@ -10,11 +10,12 @@ Local Linux x86_64 measurements for a small application with plain-text and JSON
 
 | Deployment | Packaged MiB | Stripped MiB | First HTTP ms | Idle RSS MiB | After requests RSS MiB |
 | --- | ---: | ---: | ---: | ---: | ---: |
+| Potateh / GraalVM Native Image | ~17 MB | ~17 MB | — | — | — |
+| Potateh / Scala Native, release-size | 6.48 | 5.11 | 11.8 | 11.2 | 16.3 |
 | Undertow / GraalVM Native Image | 41.56 | 41.56 | 30.5 | 34.7 | 41.3 |
 | Undertow / JVM | 17.71 | — | 599.4 | 94.3 | 105.2 |
 | http4s / JVM | 36.70 | — | 1413.8 | 183.2 | 201.8 |
 | http4s / Scala Native, release-size | 21.81 | 18.00 | 31.8 | 30.5 | 43.2 |
-| Potateh / Scala Native, release-size | 6.48 | 5.11 | 11.8 | 11.2 | 16.3 |
 
 The [Potateh GraalVM example]({{site.data.project.gh.sourcesUrl}}/examples/scala-cli/hello-potateh-graalvm.scala)
 produced a 17 MB executable on Linux x86_64 with GraalVM Community 25.0.2,
