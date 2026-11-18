@@ -31,6 +31,8 @@ class PotatehSharafServerTest extends munit.FunSuite {
         .settingHeader("Transfer-Encoding", "chunked")
     case GET -> Path("close")      => Response.withBody("ok").settingHeader("Connection", "close")
     case GET -> Path("bad-length") => Response.withBody("ok").settingHeader("Content-Length", "-2")
+    case GET -> Path("upgrade-required") =>
+      Response.withStatus(StatusCode.UpgradeRequired).settingHeader("Upgrade", "websocket")
     case GET -> Path("hop") =>
       Response
         .withBody("ok")
@@ -73,6 +75,16 @@ class PotatehSharafServerTest extends munit.FunSuite {
         assertEquals(response.headers.get("set-cookie"), Some("token=value"))
         assert(!response.headers.contains("x-private"))
         assert(!response.headers.contains("keep-alive"))
+      }
+    }
+  }
+
+  test("426 responses retain the required Upgrade header") {
+    withServer() { server =>
+      Using.resource(new HttpConnection(server.address)) { connection =>
+        val response = connection.request("GET", "/upgrade-required")
+        assertEquals(response.status, 426)
+        assertEquals(response.headers.get("upgrade"), Some("websocket"))
       }
     }
   }
@@ -192,8 +204,8 @@ class PotatehSharafServerTest extends munit.FunSuite {
     try {
       for (useRoutes <- Seq(true, false)) {
         val server =
-          if useRoutes then PotatehSharafServer.start(config, routes, executor = executor)
-          else PotatehSharafServer.start(config, SharafHandler.routes(routes), executor)
+          if useRoutes then PotatehSharafServer.start(config.withExecutor(executor), routes)
+          else PotatehSharafServer.start(config.withExecutor(executor), SharafHandler.routes(routes))
         try Using.resource(new HttpConnection(server.address))(c => assertEquals(c.request("GET", "/ok").body, "ok"))
         finally server.stop()
       }
@@ -219,7 +231,7 @@ class PotatehSharafServerTest extends munit.FunSuite {
       } else pool.execute(task)
     }
     try {
-      val server = PotatehSharafServer.start(config, SharafHandler.routes(routes), executor)
+      val server = PotatehSharafServer.start(config.withExecutor(executor), SharafHandler.routes(routes))
       try {
         // Native may report the immediate rejected close during connect or read.
         try

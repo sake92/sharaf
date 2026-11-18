@@ -4,15 +4,25 @@ import io.undertow.{Undertow, UndertowOptions}
 import io.undertow.server.handlers.BlockingHandler
 import ba.sake.sharaf.*
 
-class UndertowSharafServer(host: String, listenPort: Int, handler: SharafUndertowHandler) {
+class UndertowSharafServer private (
+    host: String,
+    listenPort: Int,
+    handler: SharafUndertowHandler,
+    tls: Option[TlsConfig]
+) {
 
   private val finalHandler = BlockingHandler(handler)
-  private val server = Undertow
-    .builder()
-    .addHttpListener(listenPort, host)
-    .setServerOption(UndertowOptions.ALLOW_EQUALS_IN_COOKIE_VALUE, java.lang.Boolean.TRUE)
-    .setHandler(finalHandler)
-    .build()
+  private val server = {
+    val builder = Undertow.builder()
+    tls match {
+      case Some(value) => builder.addHttpsListener(listenPort, host, value.context)
+      case None        => builder.addHttpListener(listenPort, host)
+    }
+    builder
+      .setServerOption(UndertowOptions.ALLOW_EQUALS_IN_COOKIE_VALUE, java.lang.Boolean.TRUE)
+      .setHandler(finalHandler)
+      .build()
+  }
 
   /** The bound port; available after the server starts. */
   def port: Int = server.getListenerInfo.get(0).getAddress.asInstanceOf[java.net.InetSocketAddress].getPort
@@ -24,26 +34,20 @@ class UndertowSharafServer(host: String, listenPort: Int, handler: SharafUnderto
 
 object UndertowSharafServer {
 
-  def apply(host: String, handler: SharafHandler): UndertowSharafServer = apply(host, 0, handler)
-
-  def apply(host: String, routes: Routes): UndertowSharafServer = apply(host, 0, routes)
-
-  def apply(host: String, port: Int, sharafHandler: SharafHandler): UndertowSharafServer =
-    new UndertowSharafServer(host, port, SharafUndertowHandler(sharafHandler))
-
   def apply(
-      host: String,
-      port: Int,
       routes: Routes,
+      host: String = "127.0.0.1",
+      port: Int = 0,
       corsSettings: CorsSettings = CorsSettings.disabled,
       exceptionMapper: ExceptionMapper = ExceptionMapper.default,
-      notFoundHandler: SharafHandler = SharafHandler.DefaultNotFoundHandler
+      notFoundHandler: SharafHandler = SharafHandler.DefaultNotFoundHandler,
+      tls: Option[TlsConfig] = None
   ): UndertowSharafServer = {
     val cpResHandler = SharafHandler.classpathResources(
       "public",
       SharafHandler.classpathResources("META-INF/resources/webjars", notFoundHandler)
     )
-    val finalHandler = SharafUndertowHandler(
+    val handler = SharafUndertowHandler(
       SharafHandler.exceptions(
         SharafHandler.cors(
           SharafHandler.routes(routes, cpResHandler),
@@ -52,7 +56,10 @@ object UndertowSharafServer {
         exceptionMapper
       )
     )
-    new UndertowSharafServer(host, port, finalHandler)
+    new UndertowSharafServer(host, port, handler, tls)
   }
+
+  def apply(handler: SharafHandler, host: String, port: Int, tls: Option[TlsConfig]): UndertowSharafServer =
+    new UndertowSharafServer(host, port, SharafUndertowHandler(handler), tls)
 
 }

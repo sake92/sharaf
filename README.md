@@ -18,7 +18,7 @@ val routes = Routes {
     Response.withBody(s"Hello $name")
 }
 
-UndertowSharafServer("localhost", 8181, routes).start()
+UndertowSharafServer(routes, port = 8181).start()
 ```
 
 ## OpenAPI-first APIs

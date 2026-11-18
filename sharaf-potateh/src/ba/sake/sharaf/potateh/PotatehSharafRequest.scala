@@ -1,41 +1,18 @@
 package ba.sake.sharaf.potateh
 
-import java.net.URI
 import java.nio.charset.StandardCharsets.UTF_8
 import ba.sake.formson.*
 import ba.sake.querson.*
 import ba.sake.sharaf.*
 import ba.sake.sharaf.routing.Path
-import ba.sake.sharaf.exceptions.BadRequestException
 
 final class PotatehSharafRequest(val underlying: ba.sake.potateh.Request) extends Request {
 
   private val uploads = new MultipartUploads
   private[sharaf] def closeUploads(): Unit = uploads.close()
 
-  private[potateh] lazy val uri: URI =
-    try {
-      val target = underlying.target
-      val absolute = if target.startsWith("/") then "http://request.invalid" + target else target
-      URI.create(absolute)
-    } catch case _: IllegalArgumentException => throw BadRequestException("Invalid request target")
-
-  private lazy val rawPathAndQuery: (rawPath: String, rawQuery: String) = {
-    val target = underlying.target
-    if target.startsWith("/") then {
-      val queryStart = target.indexOf('?')
-      if queryStart < 0 then (rawPath = target, rawQuery = "")
-      else (rawPath = target.substring(0, queryStart), rawQuery = target.substring(queryStart + 1))
-    } else {
-      (
-        rawPath = Option(uri.getRawPath).getOrElse(""),
-        rawQuery = Option(uri.getRawQuery).getOrElse("")
-      )
-    }
-  }
-
   private[potateh] def path: Path =
-    RequestDecoding.path(rawPathAndQuery.rawPath)
+    RequestDecoding.path(underlying.rawPath.getOrElse(""))
 
   override lazy val headers: Map[HttpString, Seq[String]] =
     underlying.headers.fields.groupMap { case (name, _) => HttpString(name) } { case (_, value) => value }
@@ -57,7 +34,7 @@ final class PotatehSharafRequest(val underlying: ba.sake.potateh.Request) extend
   }
 
   override lazy val queryParamsRaw: QueryStringMap =
-    UrlEncoded.query(rawPathAndQuery.rawQuery)
+    UrlEncoded.query(underlying.rawQuery.getOrElse(""))
 
   override lazy val bodyString: String = {
     val contentType = underlying.headers.first("Content-Type").getOrElse("")

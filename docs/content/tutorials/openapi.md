@@ -135,7 +135,7 @@ import ba.sake.sharaf.undertow.UndertowSharafServer
 import com.example.greetings.controllers.GreetingsController
 
 val routes = Routes.merge(Seq(GreetingsController().routes))
-UndertowSharafServer("0.0.0.0", 8080, routes).start()
+UndertowSharafServer(routes, host = "0.0.0.0", port = 8080).start()
 ```
 
 ## 4. Serve the contract and Swagger UI

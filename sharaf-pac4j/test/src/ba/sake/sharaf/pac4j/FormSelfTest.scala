@@ -79,7 +79,7 @@ class FormSelfTest extends munit.FunSuite:
     // Wrap with session handler so cookies are loaded/saved across requests
     val handler = SharafHandler.sessions(combinedHandler)
 
-    val s = UndertowSharafServer("localhost", handler)
+    val s = UndertowSharafServer(handler, "localhost", 0, None)
     s.start()
     serverUrl = s"http://localhost:${s.port}"
     server = Some(s)

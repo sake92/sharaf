@@ -1,7 +1,6 @@
 package ba.sake.sharaf.potateh
 
 import ba.sake.potateh.{Headers, ResponseBody, Server, ServerConfig}
-import java.util.concurrent.Executor
 import ba.sake.sharaf.*
 import ba.sake.sharaf.exceptions.{BadRequestException, UnsupportedMethodException}
 
@@ -9,66 +8,29 @@ object PotatehSharafServer {
   private val ManagedHeaders =
     Vector("Content-Length", "Transfer-Encoding", "Connection", "Keep-Alive", "Upgrade", "Trailer")
 
-  /** Starts a server owned by the caller. Call stop() on the returned server at shutdown. Failures before a request
-    * context exists use the default exception mapper.
-    */
-  def start(config: ServerConfig, handler: SharafHandler): Server =
-    startServer(config, handler, ExceptionMapper.default, None)
-
-  /** The caller retains ownership of the executor, including after server.stop(). Each task serves a whole persistent
-    * connection. Small fixed pools can starve clients; rejected submissions must throw.
-    */
-  def start(config: ServerConfig, handler: SharafHandler, executor: Executor): Server =
-    startServer(config, handler, ExceptionMapper.default, Some(executor))
-
+  /** The caller owns the server and must call stop() at shutdown. */
   def start(
       config: ServerConfig,
       routes: Routes,
       corsSettings: CorsSettings = CorsSettings.disabled,
       exceptionMapper: ExceptionMapper = ExceptionMapper.default,
       notFoundHandler: SharafHandler = SharafHandler.DefaultNotFoundHandler
-  ): Server = startRoutes(config, routes, corsSettings, exceptionMapper, notFoundHandler, None)
-
-  /** Starts routes with a caller-owned executor; ownership and scheduling follow the handler overload. */
-  def start(config: ServerConfig, routes: Routes, executor: Executor): Server =
-    startRoutes(
-      config,
-      routes,
-      CorsSettings.disabled,
-      ExceptionMapper.default,
-      SharafHandler.DefaultNotFoundHandler,
-      Some(executor)
-    )
-
-  def start(
-      config: ServerConfig,
-      routes: Routes,
-      corsSettings: CorsSettings,
-      exceptionMapper: ExceptionMapper,
-      notFoundHandler: SharafHandler,
-      executor: Executor
-  ): Server = startRoutes(config, routes, corsSettings, exceptionMapper, notFoundHandler, Some(executor))
-
-  private def startRoutes(
-      config: ServerConfig,
-      routes: Routes,
-      corsSettings: CorsSettings,
-      exceptionMapper: ExceptionMapper,
-      notFoundHandler: SharafHandler,
-      executor: Option[Executor]
   ): Server = {
     val handler = SharafHandler.exceptions(
       SharafHandler.cors(SharafHandler.routes(routes, notFoundHandler), corsSettings),
       exceptionMapper
     )
-    startServer(config, handler, exceptionMapper, executor)
+    startServer(config, handler, exceptionMapper)
   }
+
+  /** Failures before a request context exists use the default exception mapper. */
+  def start(config: ServerConfig, handler: SharafHandler): Server =
+    startServer(config, handler, ExceptionMapper.default)
 
   private def startServer(
       config: ServerConfig,
       handler: SharafHandler,
-      bootstrapMapper: ExceptionMapper,
-      executor: Option[Executor]
+      bootstrapMapper: ExceptionMapper
   ): Server = {
     val handle: ba.sake.potateh.Request => ba.sake.potateh.Response = underlying => {
       val request = PotatehSharafRequest(underlying)
@@ -87,10 +49,7 @@ object PotatehSharafServer {
       }
       toResponse(response, underlying.method)
     }
-    executor match {
-      case Some(value) => Server.start(config, value)(handle)
-      case None        => Server.start(config)(handle)
-    }
+    Server.start(config)(handle)
   }
 
   private def parseMethod(value: String): HttpMethod = value match {
@@ -114,7 +73,7 @@ object PotatehSharafServer {
 
     val connectionFields = values("Connection").flatMap(_.split(',')).map(_.trim)
     require(!connectionFields.exists(_.equalsIgnoreCase("close")), "Potateh does not support response-requested close")
-    require(values("Upgrade").isEmpty, "Potateh does not support protocol upgrades")
+    require(response.status.code == 426 || values("Upgrade").isEmpty, "Potateh does not support protocol upgrades")
     require(values("Trailer").isEmpty, "Potateh does not support response trailers")
     val lengths = values("Content-Length")
     val length = lengths.headOption.map { text =>
@@ -141,7 +100,9 @@ object PotatehSharafServer {
 
     val fields = Vector.newBuilder[(name: String, value: String)]
     resolved.foreach {
-      case HeaderUpdate.Set(name, headerValues) if !isManaged(name.toString, connectionFields) =>
+      case HeaderUpdate.Set(name, headerValues)
+          if (response.status.code == 426 && name.toString.equalsIgnoreCase("Upgrade")) ||
+            !isManaged(name.toString, connectionFields) =>
         val headerName = name.toString
         headerValues.foreach(value => fields += ((name = headerName, value = value)))
       case _ => ()

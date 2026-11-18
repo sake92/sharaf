@@ -15,9 +15,9 @@ use the `corsSettings` parameter to set desired config:
 val corsSettings = CorsSettings.default.withAllowedOrigins(Set("https://example.com"))
 
 val server = UndertowSharafServer(
-    "localhost",
-    port,
     routes,
+    host = "localhost",
+    port = port,
     corsSettings = corsSettings
   )
 ```

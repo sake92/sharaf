@@ -47,7 +47,7 @@ class Pac4jSecurityHandlerTest extends munit.FunSuite:
   var server: Option[UndertowSharafServer] = None
 
   override def beforeAll(): Unit =
-    val s = UndertowSharafServer("localhost", handler)
+    val s = UndertowSharafServer(handler, "localhost", 0, None)
     s.start()
     server = Some(s)
 

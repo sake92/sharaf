@@ -60,7 +60,8 @@ class UserPassFormModule(port: Int):
   private val appRoutes = new AppRoutes(callbackUrl)
 
   val server = UndertowSharafServer(
+    Pac4jSecurityHandler(securityConfig, SharafHandler.routes(appRoutes.routes)),
     "localhost",
     port,
-    Pac4jSecurityHandler(securityConfig, SharafHandler.routes(appRoutes.routes))
+    None
   )

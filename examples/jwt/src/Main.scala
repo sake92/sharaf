@@ -68,7 +68,8 @@ class JwtModule(port: Int):
   }
 
   val server = UndertowSharafServer(
+    Pac4jSecurityHandler(securityConfig, SharafHandler.routes(appRoutes)),
     "localhost",
     port,
-    Pac4jSecurityHandler(securityConfig, SharafHandler.routes(appRoutes))
+    None
   )

@@ -13,8 +13,9 @@ class AppModule(port: Int, clients: Clients) {
   private val appRoutes = AppRoutes()
 
   val server = UndertowSharafServer(
+    Pac4jSecurityHandler(securityConfig.securityConfig, SharafHandler.routes(appRoutes.routes)),
     "localhost",
     port,
-    Pac4jSecurityHandler(securityConfig.securityConfig, SharafHandler.routes(appRoutes.routes))
+    None
   )
 }

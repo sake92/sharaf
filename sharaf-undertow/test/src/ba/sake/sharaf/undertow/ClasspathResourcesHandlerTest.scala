@@ -7,8 +7,10 @@ import ba.sake.sharaf.undertow.UndertowSharafServer
 class ClasspathResourcesHandlerTest extends AbstractClasspathResourcesHandlerTest {
   val server =
     UndertowSharafServer(
+      SharafHandler.exceptions(classpathResourcesHandler, ExceptionMapper.default),
       "localhost",
-      SharafHandler.exceptions(classpathResourcesHandler, ExceptionMapper.default)
+      0,
+      None
     )
   def port: Int = server.port
   def startServer(): Unit = server.start()

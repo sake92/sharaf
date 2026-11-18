@@ -19,9 +19,9 @@ val customExceptionMapper: ExceptionMapper = {
 val finalExceptionMapper = customExceptionMapper.orElse(ExceptionMapper.default)
 
 val server = UndertowSharafServer(
-    "localhost",
-    port,
     routes,
+    host = "localhost",
+    port = port,
     exceptionMapper = finalExceptionMapper
   )
 ```

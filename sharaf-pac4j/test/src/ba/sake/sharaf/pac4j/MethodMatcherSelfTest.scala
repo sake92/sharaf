@@ -35,7 +35,7 @@ class MethodMatcherSelfTest extends munit.FunSuite:
     }
     val handler = Pac4jSecurityHandler(securityConfig, SharafHandler.routes(routes))
 
-    val s = UndertowSharafServer("localhost", handler)
+    val s = UndertowSharafServer(handler, "localhost", 0, None)
     s.start()
     serverUrl = s"http://localhost:${s.port}"
     server = Some(s)

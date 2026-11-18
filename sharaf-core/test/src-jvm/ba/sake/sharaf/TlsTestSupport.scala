@@ -1,0 +1,67 @@
+package ba.sake.sharaf
+
+import java.io.ByteArrayInputStream
+import java.security.KeyStore
+import java.util.Base64
+import javax.net.ssl.{KeyManagerFactory, SSLContext, TrustManagerFactory}
+
+object TlsTestSupport {
+  def config(): TlsConfig = {
+    val encoded = """
+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
+"""
+    val keys = KeyStore.getInstance("PKCS12")
+    val password = "changeit".toCharArray
+    keys.load(new ByteArrayInputStream(Base64.getMimeDecoder.decode(encoded)), password)
+    val keyManagers = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm)
+    keyManagers.init(keys, password)
+    val trustManagers = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm)
+    trustManagers.init(keys)
+    val context = SSLContext.getInstance("TLS")
+    context.init(keyManagers.getKeyManagers, trustManagers.getTrustManagers, null)
+    new TlsConfig(context)
+  }
+
+  def get(tls: TlsConfig, port: Int): String = {
+    val socket = tls.context.getSocketFactory.createSocket("127.0.0.1", port)
+    try {
+      socket.setSoTimeout(5000)
+      socket.getOutputStream.write("GET / HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n".getBytes("UTF-8"))
+      new String(socket.getInputStream.readAllBytes(), "UTF-8")
+    } finally socket.close()
+  }
+}

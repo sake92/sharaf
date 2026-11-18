@@ -44,5 +44,5 @@ class FullstackModule(port: Int) {
       }).start()
       Response.withBody(sseSender)
 
-  val server = UndertowSharafServer("localhost", port, routes)
+  val server = UndertowSharafServer(routes, "localhost", port)
 }

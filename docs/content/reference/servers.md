@@ -36,11 +36,10 @@ with AWS Lambda Web Adapter and includes Terraform configuration and local integ
 
 ## Choosing a port
 
-The Undertow wrapper accepts port `0` to let the operating system choose a port.
-Its overload without a port does the same. Read `server.port` after starting:
+The Undertow wrapper defaults to `127.0.0.1` and port `0`, which lets the operating system choose a port. Read `server.port` after starting:
 
 ```scala
-val server = UndertowSharafServer("127.0.0.1", routes)
+val server = UndertowSharafServer(routes)
 server.start()
 println(server.port)
 ```
@@ -50,3 +49,15 @@ Potateh also accepts port `0` in its bind address and exposes the bound port thr
 Pass an explicit port for a fixed address.
 
 Request parsing behavior and verification are described in the [parsing reference](/reference/parsing.html).
+
+## TLS
+
+On the JVM, `TlsConfig` holds an initialized `javax.net.ssl.SSLContext` with the application's server
+credentials and trust settings. The same configuration can be passed to `UndertowSharafServer` as `tls = Some(config)`,
+`PotatehTls.configure`, or `Http4sTls.context[IO]` (for Ember's `withTLS`). Potateh serves HTTP/1;
+its TLS context must not negotiate HTTP/2 via ALPN.
+
+The http4s integration supplies an application handler; the application owns its server and TLS listener.
+The snunit integration runs behind a separately configured Unit daemon, which owns TLS configuration.
+The shared JVM configuration is unavailable on Scala Native. Native TLS depends on the server and its
+platform-specific TLS provider or an external TLS terminator.

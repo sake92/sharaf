@@ -53,7 +53,7 @@ class ClientChainingSelfTest extends munit.FunSuite:
         else userHandler.handle(ctx)
     }
 
-    val s = UndertowSharafServer("localhost", handler)
+    val s = UndertowSharafServer(handler, "localhost", 0, None)
     s.start()
     serverUrl = s"http://localhost:${s.port}"
     server = Some(s)

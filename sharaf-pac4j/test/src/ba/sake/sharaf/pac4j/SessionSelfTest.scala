@@ -79,7 +79,7 @@ class SessionSelfTest extends munit.FunSuite:
     // Wrap with session handler
     val handler = SharafHandler.sessions(combinedHandler)
 
-    val s = UndertowSharafServer("localhost", handler)
+    val s = UndertowSharafServer(handler, "localhost", 0, None)
     s.start()
     serverUrl = s"http://localhost:${s.port}"
     server = Some(s)

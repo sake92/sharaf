@@ -40,7 +40,7 @@ class OidcSelfTest extends munit.FunSuite:
       }))
     )
 
-    val s = UndertowSharafServer("localhost", handler)
+    val s = UndertowSharafServer(handler, "localhost", 0, None)
     s.start()
     serverUrl = s"http://localhost:${s.port}"
     oidcClient.setCallbackUrl(s"$serverUrl/callback")

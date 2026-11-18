@@ -19,7 +19,7 @@ class FormParameterErrorsTest extends munit.FunSuite {
 
   private def withServer(adapter: String)(check: String => Unit): Unit =
     if adapter == "undertow" then {
-      val server = UndertowSharafServer("127.0.0.1", handler)
+      val server = UndertowSharafServer(handler, "127.0.0.1", 0, None)
       server.start()
       try check(s"http://127.0.0.1:${server.port}")
       finally server.stop()

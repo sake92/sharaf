@@ -16,9 +16,9 @@ val customNotFoundHandler: SharafHandler = _ =>
     .withStatus(StatusCode.NotFound)
 
 val server = UndertowSharafServer(
-    "localhost",
-    port,
     routes,
+    host = "localhost",
+    port = port,
     notFoundHandler = customNotFoundHandler
   )
 ```

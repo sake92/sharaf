@@ -17,7 +17,7 @@ class UndertowExchangeWriteTest extends munit.FunSuite {
     Response.default
   }
 
-  val server = UndertowSharafServer("localhost", routes)
+  val server = UndertowSharafServer(routes)
 
   override def beforeAll(): Unit = server.start()
 
