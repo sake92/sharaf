@@ -18,12 +18,14 @@ description: Sharaf server modules and platform support
 Native executable examples cover these deployment paths:
 
 - [GraalVM Native Image with Undertow]({{site.data.project.gh.sourcesUrl}}/examples/scala-cli/hello-undertow-graalvm.scala)
+- [GraalVM Native Image with Potateh]({{site.data.project.gh.sourcesUrl}}/examples/scala-cli/hello-potateh-graalvm.scala)
 - [Scala Native with http4s/Ember]({{site.data.project.gh.sourcesUrl}}/examples/scala-cli/hello-http4s-native.scala)
 - [Scala Native with Potateh]({{site.data.project.gh.sourcesUrl}}/examples/scala-cli/hello-potateh-native.scala)
 - [Scala Native with snunit and external Unit]({{site.data.project.gh.sourcesUrl}}/examples/snunit)
 
-The GraalVM example covers Undertow and its example dependencies; it does not establish Native Image compatibility
-for every JVM adapter. The snunit example requires `libunit` at build time and a separately configured Unit daemon.
+The GraalVM examples cover their respective servers and example dependencies; they do not establish Native Image
+compatibility for every JVM adapter or application dependency. The snunit example requires `libunit` at build time
+and a separately configured Unit daemon.
 
 Local size, startup, and memory figures are listed in the [native footprint reference](/reference/native-footprint.html).
 

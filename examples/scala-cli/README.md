@@ -22,6 +22,7 @@ Authorization examples progress from authentication to ABAC and scoped membershi
 Native executable examples (build and run commands are at the top of each file):
 
 - [GraalVM Native Image with Undertow](hello-undertow-graalvm.scala)
+- [GraalVM Native Image with Potateh](hello-potateh-graalvm.scala)
 - [Scala Native with http4s/Ember](hello-http4s-native.scala)
 - [Scala Native with Potateh](hello-potateh-native.scala)
 

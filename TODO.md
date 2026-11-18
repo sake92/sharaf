@@ -1,11 +1,9 @@
 
-- add SSL support handler on JVM
-
 - check skipped tests
 
 
 
-
+- clean pac4j integration, uglyy
 
 
 
