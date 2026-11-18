@@ -40,19 +40,18 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
     <div class="content">
      <h1 id="notfound">NotFound<a href="#notfound" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
      <p>How to customize 404 NotFound handler?</p>
-     <p>Use the <code>notFoundHandler</code> parameter of <code>PotatehSharafServer.start</code>:</p>
-     <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">import</span> ba.sake.potateh.<span class="hljs-type">ServerConfig</span>
-<span class="hljs-keyword">import</span> ba.sake.sharaf.potateh.<span class="hljs-type">PotatehSharafServer</span>
+     <p>Use the <code>notFoundHandler</code> parameter of <code>PotatehSharafServer</code>:</p>
+     <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">import</span> ba.sake.sharaf.potateh.<span class="hljs-type">PotatehSharafServer</span>
 
 <span class="hljs-keyword">val</span> customNotFoundHandler: <span class="hljs-type">SharafHandler</span> = _ =&gt;
   <span class="hljs-type">Response</span>.withBody(<span class="hljs-string">"Page not found"</span>)
     .withStatus(<span class="hljs-type">StatusCode</span>.<span class="hljs-type">NotFound</span>)
 
-<span class="hljs-keyword">val</span> server = <span class="hljs-type">PotatehSharafServer</span>.start(
-    <span class="hljs-type">ServerConfig</span>.<span class="hljs-type">Default</span>.withBindAddress(<span class="hljs-keyword">new</span> java.net.<span class="hljs-type">InetSocketAddress</span>(<span class="hljs-string">"localhost"</span>, port)),
-    routes,
+<span class="hljs-keyword">val</span> server = <span class="hljs-type">PotatehSharafServer</span>(
+    routes, host = <span class="hljs-string">"localhost"</span>, port = port,
     notFoundHandler = customNotFoundHandler
   )
+server.start()
 </code></pre>
      <p>The handler receives a <code>RequestContext</code> if the response depends on the request.</p>
      <div role="group">

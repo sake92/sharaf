@@ -90,7 +90,7 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
   .enablePlugins(<span class="hljs-type">OpenApi4sPlugin</span>)
   .settings(
     scalaVersion := <span class="hljs-string">"3.9.0"</span>,
-    libraryDependencies += <span class="hljs-string">"ba.sake"</span> %% <span class="hljs-string">"sharaf-potateh"</span> % <span class="hljs-string">"0.23.0"</span>,
+    libraryDependencies += <span class="hljs-string">"ba.sake"</span> %% <span class="hljs-string">"sharaf-potateh"</span> % <span class="hljs-string">"0.24.0"</span>,
     openApi4sPackage := <span class="hljs-string">"com.example.greetings"</span>,
     openApi4sFile := canonicalOpenApiFile,
     openApi4sModels := <span class="hljs-string">"tupson"</span>,
@@ -126,9 +126,7 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
 }
 </code></pre>
      <p>Wire it as you would any other Sharaf routes:</p>
-     <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">import</span> java.net.<span class="hljs-type">InetSocketAddress</span>
-<span class="hljs-keyword">import</span> ba.sake.potateh.<span class="hljs-type">ServerConfig</span>
-<span class="hljs-keyword">import</span> ba.sake.sharaf.{<span class="hljs-type">Routes</span>, <span class="hljs-type">SharafHandler</span>}
+     <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">import</span> ba.sake.sharaf.{<span class="hljs-type">Routes</span>, <span class="hljs-type">SharafHandler</span>}
 <span class="hljs-keyword">import</span> ba.sake.sharaf.potateh.<span class="hljs-type">PotatehSharafServer</span>
 <span class="hljs-keyword">import</span> com.example.greetings.controllers.<span class="hljs-type">GreetingsController</span>
 
@@ -137,8 +135,7 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
   <span class="hljs-string">"public"</span>,
   <span class="hljs-type">SharafHandler</span>.classpathResources(<span class="hljs-string">"META-INF/resources/webjars"</span>)
 )
-<span class="hljs-keyword">val</span> config = <span class="hljs-type">ServerConfig</span>.<span class="hljs-type">Default</span>.withBindAddress(<span class="hljs-keyword">new</span> <span class="hljs-type">InetSocketAddress</span>(<span class="hljs-string">"0.0.0.0"</span>, <span class="hljs-number">8080</span>))
-<span class="hljs-type">PotatehSharafServer</span>.start(config, routes, notFoundHandler = resources)
+<span class="hljs-type">PotatehSharafServer</span>(routes, host = <span class="hljs-string">"0.0.0.0"</span>, port = <span class="hljs-number">8080</span>, notFoundHandler = resources).start()
 </code></pre>
      <h2 id="4-serve-the-contract-and-swagger-ui">4. Serve the contract and Swagger UI<a href="#4-serve-the-contract-and-swagger-ui" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
      <p>Copy the canonical contract to <code>modules/api/src/main/resources/public/openapi.yaml</code>. The configured resource handler serves it as <code>/openapi.yaml</code> and serves WebJar assets from the classpath. Add the Swagger UI WebJar to the <code>api</code> project:</p>

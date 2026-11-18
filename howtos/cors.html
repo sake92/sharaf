@@ -41,16 +41,15 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
      <h1 id="cors">CORS<a href="#cors" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
      <p>CORS middleware is disabled by default on the server route convenience methods, so requests do not pay for CORS processing unless you configure it.</p>
      <p>If you want it to be available for other domains, use the <code>corsSettings</code> parameter to set desired config:</p>
-     <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">import</span> ba.sake.potateh.<span class="hljs-type">ServerConfig</span>
-<span class="hljs-keyword">import</span> ba.sake.sharaf.potateh.<span class="hljs-type">PotatehSharafServer</span>
+     <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">import</span> ba.sake.sharaf.potateh.<span class="hljs-type">PotatehSharafServer</span>
 
 <span class="hljs-keyword">val</span> corsSettings = <span class="hljs-type">CorsSettings</span>.<span class="hljs-keyword">default</span>.withAllowedOrigins(<span class="hljs-type">Set</span>(<span class="hljs-string">"https://example.com"</span>))
 
-<span class="hljs-keyword">val</span> server = <span class="hljs-type">PotatehSharafServer</span>.start(
-    <span class="hljs-type">ServerConfig</span>.<span class="hljs-type">Default</span>.withBindAddress(<span class="hljs-keyword">new</span> java.net.<span class="hljs-type">InetSocketAddress</span>(<span class="hljs-string">"localhost"</span>, port)),
-    routes,
+<span class="hljs-keyword">val</span> server = <span class="hljs-type">PotatehSharafServer</span>(
+    routes, host = <span class="hljs-string">"localhost"</span>, port = port,
     corsSettings = corsSettings
   )
+server.start()
 </code></pre>
      <div role="group">
       <a role="button" href="https://sake92.github.io/sharaf/howtos/external-config.html">⬅️ External Config</a> <span></span> <a role="button" href="https://sake92.github.io/sharaf/howtos/exception-handler.html">Exception Handler ➡️</a>

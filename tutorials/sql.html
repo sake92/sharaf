@@ -43,14 +43,12 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
      <p>Create a file named <code>sql_db.sc</code>:</p>
      <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">scala</span> <span class="hljs-string">3.9.0</span>
 <span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">com.h2database:h2:2.4.240</span>
-<span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">ba.sake::sharaf-potateh:0.23.0</span>
+<span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">ba.sake::sharaf-potateh:0.24.0</span>
 <span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">ba.sake::squery:0.8.2</span>
 
 <span class="hljs-keyword">import</span> ba.sake.tupson.<span class="hljs-type">JsonRW</span>
 <span class="hljs-keyword">import</span> ba.sake.squery.{*, <span class="hljs-keyword">given</span>}
 <span class="hljs-keyword">import</span> ba.sake.sharaf.*
-<span class="hljs-keyword">import</span> java.net.<span class="hljs-type">InetSocketAddress</span>
-<span class="hljs-keyword">import</span> ba.sake.potateh.<span class="hljs-type">ServerConfig</span>
 <span class="hljs-keyword">import</span> ba.sake.sharaf.potateh.<span class="hljs-type">PotatehSharafServer</span>
 
 <span class="hljs-keyword">val</span> ds = org.h2.jdbcx.<span class="hljs-type">JdbcDataSource</span>()
@@ -88,7 +86,7 @@ ctx.runTransaction {
   <span class="hljs-keyword">case</span> <span class="hljs-type">GET</span> -&gt; _ =&gt;
     <span class="hljs-type">Response</span>.withBody(<span class="hljs-string">"Try http://localhost:8181/customers with GET or POST"</span>)
 
-<span class="hljs-type">PotatehSharafServer</span>.start(<span class="hljs-type">ServerConfig</span>.<span class="hljs-type">Default</span>.withBindAddress(<span class="hljs-keyword">new</span> <span class="hljs-type">InetSocketAddress</span>(<span class="hljs-string">"localhost"</span>, <span class="hljs-number">8181</span>)), routes)
+<span class="hljs-type">PotatehSharafServer</span>(routes, host = <span class="hljs-string">"localhost"</span>, port = <span class="hljs-number">8181</span>).start()
 
 println(<span class="hljs-string">s"Server started at http://localhost:8181"</span>)
 

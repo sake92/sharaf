@@ -46,12 +46,10 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
      <hr>
      <p>Let's make a simple page that sends 5 SSE events and then a "stop" message.
       <br>
-      Create a file <code>sse.sc</code> and paste this code into it:</p>
+      This example requires JDK 21 or newer for virtual threads. Create a file <code>sse.sc</code> and paste this code into it:</p>
      <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">scala</span> <span class="hljs-string">3.9.0</span>
-<span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">ba.sake::sharaf-potateh:0.23.0</span>
+<span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">ba.sake::sharaf-potateh:0.24.0</span>
 
-<span class="hljs-keyword">import</span> java.net.<span class="hljs-type">InetSocketAddress</span>
-<span class="hljs-keyword">import</span> ba.sake.potateh.<span class="hljs-type">ServerConfig</span>
 <span class="hljs-keyword">import</span> ba.sake.sharaf.{*, <span class="hljs-keyword">given</span>}
 <span class="hljs-keyword">import</span> ba.sake.sharaf.potateh.<span class="hljs-type">PotatehSharafServer</span>
 
@@ -76,7 +74,7 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
     )
   case GET -&gt; Path("sse-events") =&gt;
     val sseSender = SseSender()
-    new Thread(() =&gt; {
+    Thread.ofVirtual().start(() =&gt; {
       for i &lt;- 1 to 5 do
         sseSender.send(
           ServerSentEvent.Message(
@@ -85,11 +83,11 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
         )
         Thread.sleep(1_000)
       sseSender.send(ServerSentEvent.Done())
-    }).start()
+    })
     Response.withBody(sseSender)
 }
 
-PotatehSharafServer.start(ServerConfig.Default.withBindAddress(new InetSocketAddress("localhost", 8181)), routes)
+PotatehSharafServer(routes, host = "localhost", port = 8181).start()
 println(s"Server started at http://localhost:8181")
 </span></code></pre>
      <p>and run it like this:</p>

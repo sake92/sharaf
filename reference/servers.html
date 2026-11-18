@@ -87,13 +87,11 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
      <p>The <a href="https://github.com/sake92/sharaf-aws-lambda-starter">AWS Lambda starter</a> packages an Undertow/JVM application with AWS Lambda Web Adapter and includes Terraform configuration and local integration tests.</p>
      <h2 id="choosing-a-port">Choosing a port<a href="#choosing-a-port" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
      <p>Potateh accepts port <code>0</code> in its bind address to let the operating system choose a port. Read the bound port from the server:</p>
-     <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">import</span> java.net.<span class="hljs-type">InetSocketAddress</span>
-<span class="hljs-keyword">import</span> ba.sake.potateh.<span class="hljs-type">ServerConfig</span>
-<span class="hljs-keyword">import</span> ba.sake.sharaf.potateh.<span class="hljs-type">PotatehSharafServer</span>
+     <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-keyword">import</span> ba.sake.sharaf.potateh.<span class="hljs-type">PotatehSharafServer</span>
 
-<span class="hljs-keyword">val</span> config = <span class="hljs-type">ServerConfig</span>.<span class="hljs-type">Default</span>.withBindAddress(<span class="hljs-keyword">new</span> <span class="hljs-type">InetSocketAddress</span>(<span class="hljs-string">"127.0.0.1"</span>, <span class="hljs-number">0</span>))
-<span class="hljs-keyword">val</span> server = <span class="hljs-type">PotatehSharafServer</span>.start(config, routes)
-println(server.address.getPort)
+<span class="hljs-keyword">val</span> server = <span class="hljs-type">PotatehSharafServer</span>(routes, host = <span class="hljs-string">"127.0.0.1"</span>, port = <span class="hljs-number">0</span>)
+server.start()
+println(server.port)
 </code></pre>
      <p>Pass an explicit port for a fixed address. Undertow exposes <code>server.port</code> after starting; with http4s Ember, use port <code>0</code> and read <code>server.address.port.value</code>.</p>
      <p>Request parsing behavior and verification are described in the <a href="https://sake92.github.io/sharaf/reference/parsing.html">parsing reference</a>.</p>
