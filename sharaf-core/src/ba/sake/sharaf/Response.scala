@@ -56,8 +56,11 @@ object Response {
 
   private val LocationHeader = HttpString("Location")
 
+  private val DefaultHeaders = HeaderUpdates(Seq(HeaderUpdate.Set(HttpString("X-Content-Type-Options"), Seq("nosniff"))))
+
+  /** The default response includes a nosniff header, which applications can override or remove. */
   val default: Response[String] =
-    new Response[String](StatusCode.Ok, HeaderUpdates(Seq.empty), CookieUpdates(Seq.empty), None)
+    new Response[String](StatusCode.Ok, DefaultHeaders, CookieUpdates(Seq.empty), None)
 
   def withStatus(status: StatusCode): Response[String] =
     default.withStatus(status)
