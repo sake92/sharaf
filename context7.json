@@ -4,6 +4,10 @@
   "description": "A Scala 3 web framework with routing, JSON and form handling, validation, and integrations for multiple HTTP servers.",
   "rules": [
     "Use Scala 3 and choose the Sharaf server adapter module that matches the application's HTTP server.",
+    "Use SharafHandler.routes, files, and classpathResources to dispatch routes and serve static content with explicit fallbacks. Use exceptions, cors, gzip, and sessions to wrap a handler. See docs/content/reference/handlers.md for defaults and composition.",
+    "CORS is disabled by default on server routes convenience methods. Gzip is opt-in via SharafHandler.gzip. Responses include X-Content-Type-Options: nosniff by default.",
+    "For JVM HTTPS, initialize an SSLContext with server credentials and wrap it in TlsConfig. Use UndertowSharafServer(tls = Some(tls)), PotatehTls.configure with PotatehSharafServer(...).withConfig(...), or Http4sTls.context with Ember withTLS. See docs/content/howtos/https.md. snunit delegates TLS to Unit; Scala Native TLS depends on the server or external TLS terminator.",
+    "For Sharaf 0.24.0 Potateh examples, construct PotatehSharafServer(routes, host = ..., port = ...) and call start() on the instance. See docs/content/reference/servers.md for JVM and native packaging options.",
     "Sharaf core already includes Tupson, sttp client4, Formson, Querson, and Validson. Reuse them before adding overlapping JSON, HTTP, parsing, or validation libraries; add an alternative only for a concrete application requirement.",
     "Use sttp client4 for outbound HTTP calls and HTTP integration tests instead of java.net.http.HttpClient; sttp.client4.quick.* is suitable for simple synchronous JVM tests. Choose a backend supported on the target platform.",
     "Derive FormDataRW from ba.sake.formson for typed form models; use bodyFormValidated[T] with a Validson Validator when form input needs validation.",

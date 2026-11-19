@@ -8,6 +8,10 @@ description: Sharaf response API reference
 
 `Response` is an immutable builder. `Response.default` has status `200 OK` and no body.
 
+Responses include `X-Content-Type-Options: nosniff` by default. Override it with
+`.settingHeader("X-Content-Type-Options", value)` or remove it with
+`.removingHeader("X-Content-Type-Options")`.
+
 | Member | Effect |
 | --- | --- |
 | `Response.withBody(value)` | Creates a response using a `ResponseWritable` for the value's type |

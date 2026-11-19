@@ -60,6 +60,8 @@ Request parsing behavior and verification are described in the [parsing referenc
 
 ## TLS
 
+See [Serve HTTPS on the JVM](/howtos/https.html) for keystore loading and adapter setup examples.
+
 On the JVM, `TlsConfig` holds an initialized `javax.net.ssl.SSLContext` with the application's server
 credentials and trust settings. The same configuration can be passed to `UndertowSharafServer` as `tls = Some(config)`,
 `PotatehTls.configure`, or `Http4sTls.context[IO]` (for Ember's `withTLS`). Potateh serves HTTP/1;
