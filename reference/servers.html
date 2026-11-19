@@ -96,6 +96,7 @@ println(server.port)
      <p>Pass an explicit port for a fixed address. Undertow exposes <code>server.port</code> after starting; with http4s Ember, use port <code>0</code> and read <code>server.address.port.value</code>.</p>
      <p>Request parsing behavior and verification are described in the <a href="https://sake92.github.io/sharaf/reference/parsing.html">parsing reference</a>.</p>
      <h2 id="tls">TLS<a href="#tls" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p>See <a href="https://sake92.github.io/sharaf/howtos/https.html">Serve HTTPS on the JVM</a> for keystore loading and adapter setup examples.</p>
      <p>On the JVM, <code>TlsConfig</code> holds an initialized <code>javax.net.ssl.SSLContext</code> with the application's server credentials and trust settings. The same configuration can be passed to <code>UndertowSharafServer</code> as <code>tls = Some(config)</code>, <code>PotatehTls.configure</code>, or <code>Http4sTls.context[IO]</code> (for Ember's <code>withTLS</code>). Potateh serves HTTP/1; its TLS context must not negotiate HTTP/2 via ALPN.</p>
      <p>The http4s integration supplies an application handler; the application owns its server and TLS listener. The snunit integration runs behind a separately configured Unit daemon, which owns TLS configuration. The shared JVM configuration is unavailable on Scala Native. Native TLS depends on the server and its platform-specific TLS provider or an external TLS terminator.</p>
      <div role="group">

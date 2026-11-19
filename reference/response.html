@@ -40,6 +40,7 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
     <div class="content">
      <h1 id="response">Response<a href="#response" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
      <p><code>Response</code> is an immutable builder. <code>Response.default</code> has status <code>200 OK</code> and no body.</p>
+     <p>Responses include <code>X-Content-Type-Options: nosniff</code> by default. Override it with <code>.settingHeader("X-Content-Type-Options", value)</code> or remove it with <code>.removingHeader("X-Content-Type-Options")</code>.</p>
      <table>
       <thead>
        <tr>
