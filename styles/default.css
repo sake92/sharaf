@@ -74,12 +74,44 @@ blockquote { padding: .75rem 1rem; border-left: 3px solid var(--pico-primary); b
 body > main > div > aside { position: sticky; top: 5rem; max-height: calc(100vh - 6rem); overflow: auto; font-size: .88rem; }
 body > main > div > aside > details { margin: 0; padding: .65rem .75rem; border: 1px solid var(--pico-muted-border-color); border-radius: var(--pico-border-radius); }
 body > main > div > aside > details summary { font-weight: 600; }
-body > main > div > aside > details nav { margin-top: .4rem; }
-body > main > div > aside > details ul { display: block; margin: 0; padding-left: 1rem; list-style: none; }
-body > main > div > aside > details > nav > ul { padding-left: 0; }
-body > main > div > aside > details li { display: block; margin: .3rem 0; padding: 0; }
-body > main.pico > div > aside > details a { display: inline; margin: 0; padding: 0; text-decoration: none; }
-body > main.pico > div > aside > details a:hover { text-decoration: underline; }
+.pico nav[aria-label="Table of contents"] {
+    display: block;
+    margin-block-start: .55rem;
+    font-size: .88rem;
+    line-height: 1.4;
+}
+.pico nav[aria-label="Table of contents"] ul {
+    display: block;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.pico nav[aria-label="Table of contents"] li {
+    display: block;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.pico nav[aria-label="Table of contents"] li > ul {
+    margin: .15rem 0 .3rem .3rem;
+    padding-inline-start: .6rem;
+    border-inline-start: 1px solid var(--pico-muted-border-color);
+}
+.pico nav[aria-label="Table of contents"] a {
+    display: block;
+    margin: 0;
+    padding: .2rem .3rem;
+    border-radius: 4px;
+    overflow-wrap: anywhere;
+    text-decoration: none;
+}
+.pico nav[aria-label="Table of contents"] > ul > li > a {
+    font-weight: 600;
+}
+.pico nav[aria-label="Table of contents"] a:is(:hover, :focus-visible) {
+    background: var(--pico-card-sectioning-background-color);
+    text-decoration: underline;
+}
 
 #search-status { color: var(--pico-muted-color); }
 #search-results > article { margin: 0; padding: .75rem 0; border: 0; border-bottom: 1px solid var(--pico-muted-border-color); border-radius: 0; background: transparent; box-shadow: none; }

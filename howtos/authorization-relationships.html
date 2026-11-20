@@ -71,6 +71,7 @@ scala <span class="hljs-built_in">test</span> 05_relationships.scala 05_relation
      <p>This starts and stops the real server on a free port. No other examples or manually started servers are needed.</p>
      <h2 id="complete-runnable-example">Complete runnable example<a href="#complete-runnable-example" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
      <p><a href="https://github.com/sake92/sharaf/tree/main/examples/scala-cli/authorization/05_relationships.scala">Source</a>. The listing is synchronized from the tested source.</p>
+     <!-- example:start examples/scala-cli/authorization/05_relationships.scala -->
      <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">scala</span> <span class="hljs-string">3.9.0</span>
 <span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">ba.sake::sharaf-undertow:0.21.0</span>
 <span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">ba.sake::sharaf-pac4j:0.21.0</span>
@@ -197,8 +198,8 @@ scala <span class="hljs-built_in">test</span> 05_relationships.scala 05_relation
     sys.addShutdownHook(app.stop())
     app.start()
     println(<span class="hljs-string">"Server started at http://localhost:8181"</span>)
-
 </code></pre>
+     <!-- example:end -->
     </div>
     <aside aria-label="On this page">
      <details open>

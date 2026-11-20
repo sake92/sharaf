@@ -41,6 +41,7 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
      <h1 id="sql">SQL<a href="#sql" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
      <p>In this lesson, you will add a customer and read it back. The example uses an in-memory H2 database, so no database setup is needed.</p>
      <p>Create a file named <code>sql_db.sc</code>:</p>
+     <!-- example:start examples/scala-cli/sql_db.sc -->
      <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">scala</span> <span class="hljs-string">3.9.0</span>
 <span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">com.h2database:h2:2.4.240</span>
 <span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">ba.sake::sharaf-potateh:0.24.0</span>
@@ -89,8 +90,8 @@ ctx.runTransaction {
 <span class="hljs-type">PotatehSharafServer</span>(routes, host = <span class="hljs-string">"localhost"</span>, port = <span class="hljs-number">8181</span>).start()
 
 println(<span class="hljs-string">s"Server started at http://localhost:8181"</span>)
-
 </code></pre>
+     <!-- example:end -->
      <p>Run the server:</p>
      <pre><code class="language-sh hljs language-bash" data-highlighted="yes">scala sql_db.sc
 </code></pre>

@@ -53,6 +53,7 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
       and then use it like this: <code>Request.current.queryParams[MyParams]</code></p>
      <hr>
      <p>Create a file <code>query_params.sc</code> and paste this code into it:</p>
+     <!-- example:start examples/scala-cli/query_params.sc -->
      <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">scala</span> <span class="hljs-string">3.9.0</span>
 <span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">ba.sake::sharaf-potateh:0.24.0</span>
 
@@ -76,8 +77,8 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
 <span class="hljs-type">PotatehSharafServer</span>(routes, host = <span class="hljs-string">"localhost"</span>, port = <span class="hljs-number">8181</span>).start()
 
 println(<span class="hljs-string">s"Server started at http://localhost:8181"</span>)
-
 </code></pre>
+     <!-- example:end -->
      <p>Then run it like this:</p>
      <pre><code class="language-sh hljs language-bash" data-highlighted="yes">scala query_params.sc 
 </code></pre>

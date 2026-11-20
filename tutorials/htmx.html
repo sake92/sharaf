@@ -47,6 +47,7 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
      <p>Let's make a simple page that triggers a POST request to fetch a HTML snippet.
       <br>
       Create a file <code>htmx_load_snippet.sc</code> and paste this code into it:</p>
+     <!-- example:start examples/htmx/htmx_load_snippet.sc -->
      <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">scala</span> <span class="hljs-string">3.9.0</span>
 <span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">ba.sake::sharaf-undertow:0.21.0</span>
 
@@ -81,8 +82,8 @@ println(<span class="hljs-string">s"Server started at http://localhost:8181"</sp
     &lt;/body&gt;
     &lt;/html&gt;
   <span class="hljs-string">"""
-
 </span></code></pre>
+     <!-- example:end -->
      <p>and run it like this:</p>
      <pre><code class="language-sh hljs language-bash" data-highlighted="yes">scala htmx_load_snippet.sc 
 </code></pre>

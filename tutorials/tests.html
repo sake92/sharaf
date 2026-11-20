@@ -43,6 +43,7 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
       <br>
       This example tests the server from the <a href="https://sake92.github.io/sharaf/tutorials/json.html">JSON API tutorial</a> with MUnit and sttp client4.</p>
      <p>Create a file <code>json_api.test.scala</code> and paste this code into it:</p>
+     <!-- example:start examples/scala-cli/json_api.test.scala -->
      <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">scala</span> <span class="hljs-string">3.9.0</span>
 <span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">ba.sake::tupson:0.18.0</span>
 <span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">com.softwaremill.sttp.client4::core::4.0.13</span>
@@ -81,8 +82,8 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
     }
   }
 }
-
 </code></pre>
+     <!-- example:end -->
      <p>First run the API server in one shell:</p>
      <pre><code class="language-sh hljs language-bash" data-highlighted="yes">scala json_api.sc
 </code></pre>

@@ -47,6 +47,7 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
 <span class="hljs-keyword">case</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">UserPatch</span>(<span class="hljs-params">name: <span class="hljs-type">Patch</span>[<span class="hljs-type">String</span>], address: <span class="hljs-type">Patch</span>[<span class="hljs-type">Option</span>[<span class="hljs-type">String</span>]]</span>) <span class="hljs-title">derives</span> <span class="hljs-title">JsonRW</span></span>
 </code></pre>
      <p>The runnable Scala CLI example applies the patch to a user resource:</p>
+     <!-- example:start examples/scala-cli/patch_requests.sc -->
      <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">scala</span> <span class="hljs-string">3.9.0</span>
 <span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">ba.sake::sharaf-potateh:0.24.0</span>
 
@@ -81,8 +82,8 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
 
 <span class="hljs-type">PotatehSharafServer</span>(routes, host = <span class="hljs-string">"localhost"</span>, port = <span class="hljs-number">8181</span>, exceptionMapper = <span class="hljs-type">ExceptionMapper</span>.json).start()
 println(<span class="hljs-string">"Server started at http://localhost:8181"</span>)
-
 </code></pre>
+     <!-- example:end -->
      <p>Start it from <code>examples/scala-cli</code>:</p>
      <pre><code class="language-sh hljs language-bash" data-highlighted="yes">scala patch_requests.sc
 </code></pre>

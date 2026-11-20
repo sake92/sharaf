@@ -43,6 +43,7 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
       <br>
       The <code>MyData</code> needs to have a <code>FormDataRW</code> given instance.</p>
      <p>Create a file <code>form_handling.sc</code> and paste this code into it:</p>
+     <!-- example:start examples/scala-cli/form_handling.sc -->
      <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">scala</span> <span class="hljs-string">3.9.0</span>
 <span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">ba.sake::sharaf-potateh:0.24.0</span>
 
@@ -79,8 +80,8 @@ println(<span class="hljs-string">"Server started at http://localhost:8181"</spa
     &lt;/body&gt;
     &lt;/html&gt;
   "</span><span class="hljs-string">""</span>
-
 </code></pre>
+     <!-- example:end -->
      <p>Then run it like this:</p>
      <pre><code class="language-sh hljs language-bash" data-highlighted="yes">scala form_handling.sc 
 </code></pre>

@@ -41,6 +41,7 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
      <h1 id="quickstart">Quickstart<a href="#quickstart" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
      <p>This lesson starts a Sharaf server and makes one request. You need JDK 21 and <a href="https://scala-cli.virtuslab.org/">Scala CLI</a> installed.</p>
      <p>Create a file named <code>hello.sc</code> with this content:</p>
+     <!-- example:start examples/scala-cli/hello.sc -->
      <pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">scala</span> <span class="hljs-string">3.9.0</span>
 <span class="hljs-comment">//&gt;</span> <span class="hljs-keyword">using</span> <span class="hljs-type">dep</span> <span class="hljs-string">ba.sake::sharaf-potateh:0.24.0</span>
 
@@ -56,8 +57,8 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
 <span class="hljs-type">PotatehSharafServer</span>(routes, host = <span class="hljs-string">"localhost"</span>, port = <span class="hljs-number">8181</span>).start()
 
 println(<span class="hljs-string">s"Server started at http://localhost:8181"</span>)
-
 </code></pre>
+     <!-- example:end -->
      <p>Run it from the directory containing the file:</p>
      <pre><code class="language-sh hljs language-bash" data-highlighted="yes">scala hello.sc
 </code></pre>
