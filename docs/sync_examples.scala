@@ -1,7 +1,8 @@
 //> using scala 3.9.0
 
-import java.nio.file.{Files, Path, StandardCopyOption}
-import java.util.Arrays
+import java.nio.file.{Files, Path}
+import java.util.regex.Matcher
+import scala.jdk.CollectionConverters.*
 
 @main def syncExamples(args: String*): Unit =
   val write = args.toSeq match
@@ -11,40 +12,43 @@ import java.util.Arrays
       System.err.println("Usage: scala docs/sync_examples.scala [-- --write]")
       sys.exit(2)
 
-  val examples = Seq(
-    "authorization-authenticated.scala" -> "examples/scala-cli/authorization/01_authenticated.scala",
-    "authorization-roles.scala" -> "examples/scala-cli/authorization/02_roles.scala",
-    "authorization-ownership.scala" -> "examples/scala-cli/authorization/03_ownership.scala",
-    "authorization-abac.scala" -> "examples/scala-cli/authorization/04_abac.scala",
-    "authorization-relationships.scala" -> "examples/scala-cli/authorization/05_relationships.scala",
-    "form_handling.sc" -> "examples/scala-cli/form_handling.sc",
-    "hello.sc" -> "examples/scala-cli/hello.sc",
-    "html.sc" -> "examples/scala-cli/html.sc",
-    "htmx_load_snippet.sc" -> "examples/htmx/htmx_load_snippet.sc",
-    "json_api.test.scala" -> "examples/scala-cli/json_api.test.scala",
-    "patch_requests.sc" -> "examples/scala-cli/patch_requests.sc",
-    "path_params.sc" -> "examples/scala-cli/path_params.sc",
-    "query_params.sc" -> "examples/scala-cli/query_params.sc",
-    "sql_db.sc" -> "examples/scala-cli/sql_db.sc",
-    "static_files.sc" -> "examples/scala-cli/static_files.sc",
-    "validation.sc" -> "examples/scala-cli/validation.sc"
-  )
+  val marker = "(?m)^<!-- example:(?:start .+|end) -->$".r
+  val block = "(?ms)^<!-- example:start ([^\\r\\n]+) -->\\R.*?^<!-- example:end -->$".r
 
-  val drift = examples.flatMap { (name, sourceName) =>
-    val source = Path.of(sourceName)
-    val target = Path.of("docs", "_includes", name)
-    if !Files.isRegularFile(source) then
-      System.err.println(s"Missing example: $source")
-      sys.exit(1)
+  def fail(message: String): Nothing =
+    System.err.println(message)
+    sys.exit(1)
 
-    if !Files.isRegularFile(target) || !Arrays.equals(Files.readAllBytes(source), Files.readAllBytes(target)) then
-      if write then Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING)
-      Some(name)
-    else None
+  val docs = Files.walk(Path.of("docs", "content"))
+  val pages =
+    try docs.iterator().asScala.filter(path => Files.isRegularFile(path) && path.toString.endsWith(".md")).toList.sorted
+    finally docs.close()
+
+  val updates = pages.flatMap { page =>
+    val original = Files.readString(page)
+    val blocks = block.findAllMatchIn(original).toList
+    if marker.findAllIn(original).size != blocks.size * 2 then
+      fail(s"Unpaired example markers in $page")
+
+    val updated = block.replaceAllIn(
+      original,
+      matched =>
+        val source = Path.of(matched.group(1))
+        if !Files.isRegularFile(source) then fail(s"Missing example in $page: $source")
+
+        val code = Files.readString(source).stripLineEnd
+        val longestRun = "`+".r.findAllIn(code).map(_.length).maxOption.getOrElse(0)
+        val fence = "`" * math.max(3, longestRun + 1)
+        Matcher.quoteReplacement(
+          s"<!-- example:start $source -->\n${fence}scala\n$code\n$fence\n<!-- example:end -->"
+        )
+    )
+    Option.when(updated != original)(page -> updated)
   }
 
-  if drift.nonEmpty then
+  if updates.nonEmpty then
+    if write then updates.foreach { (page, content) => Files.writeString(page, content) }
     val state = if write then "updated" else "out of date"
-    System.err.println(s"Documentation snippets $state: ${drift.mkString(", ")}")
+    System.err.println(s"Documentation snippets $state: ${updates.map(_._1).mkString(", ")}")
     if !write then sys.exit(1)
   else println("Documentation snippets match their examples")

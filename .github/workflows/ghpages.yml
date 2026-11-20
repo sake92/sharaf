@@ -18,7 +18,6 @@ jobs:
         with:
           jvm: temurin:21
       - name: Check documentation examples
-        continue-on-error: true
         run: scala-cli docs/sync_examples.scala
       - name: Build
         env: 

@@ -10,9 +10,25 @@ This lesson starts a Sharaf server and makes one request. You need JDK 21 and [S
 
 Create a file named `hello.sc` with this content:
 
+<!-- example:start examples/scala-cli/hello.sc -->
 ```scala
-{% include "hello.sc" %}
+//> using scala 3.9.0
+//> using dep ba.sake::sharaf-potateh:0.24.0
+
+import ba.sake.sharaf.*
+import ba.sake.sharaf.potateh.PotatehSharafServer
+
+val routes = Routes:
+  case GET -> Path("hello", name) =>
+    Response.withBody(s"Hello $name")
+  case GET -> _ =>
+    Response.withBody("Go to http://localhost:8181/hello/your-name")
+
+PotatehSharafServer(routes, host = "localhost", port = 8181).start()
+
+println(s"Server started at http://localhost:8181")
 ```
+<!-- example:end -->
 
 Run it from the directory containing the file:
 

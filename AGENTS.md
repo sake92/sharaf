@@ -42,9 +42,11 @@ deder exec -t publishLocal                 # publish jars to local ~/.ivy2
 - **Immutable builder pattern** for `Response`, `CorsSettings`, `Cookie` — use `.withStatus()`, `.settingHeader()`, `.settingCookie()` etc.
 - **Context functions** for `Request` access: route handlers get `given Request`, use `Request.current` anywhere
 - **Typeclass-based serialization**: use `derives JsonRW`, `derives QueryStringRW`, `derives FormDataRW` on case classes. Validation uses `derives Validator` from validson
-- **JSON endpoints**: import `JsonRW` from `ba.sake.tupson`; use `Request.current.bodyJson[T]` and `Response.withBody(value)`. Configure `ExceptionMapper.json` for JSON errors. When derivation uses default values, enable `-Yretain-trees` in compiler options.
+- **JSON endpoints** use `JsonRW` from `ba.sake.tupson` and `Response.withBody(value)`. Configure `ExceptionMapper.json` for JSON errors. When derivation uses default values, enable `-Yretain-trees` in compiler options.
 - **Existing core dependencies**: reuse Tupson for JSON, sttp client4 for outbound HTTP/tests, Formson for forms, Querson for queries, and Validson for validation. Avoid parallel JSON libraries or `java.net.http.HttpClient` unless a concrete requirement calls for them; select a platform-compatible sttp backend.
-- **Forms and query parameters**: derive `FormDataRW` or `QueryStringRW` for typed parsing. Parsing alone does not validate input; use `bodyFormValidated[T]` or `queryParamsValidated[T]` with a `Validator` when needed. Multipart form support varies by server adapter.
+- **Request validation** belongs at the route boundary. Define input constraints with `ba.sake.validson.Validator[T]` and use `Request.current.bodyJsonValidated[T]`, `bodyFormValidated[T]`, or `queryParamsValidated[T]`. Plain `bodyJson[T]`, `bodyForm[T]`, and `queryParams[T]` only parse. See `docs/content/tutorials/validation.md`.
+- **Business rule failures** such as duplicate records or invalid state transitions should be explicit domain results (for example, `Either[DomainError, T]`). Map them to HTTP responses in the route. Reserve exceptions in business logic for unexpected failures.
+- **Multipart forms** have adapter-specific support. See `docs/content/reference/servers.md`.
 - **Server adapters**: Undertow is stable; http4s is beta; Potateh and snunit are experimental. Check platform and multipart support in `docs/content/reference/servers.md`.
 - **Authentication (JVM)**: use `sharaf-pac4j` (`Pac4jSecurityConfig`, `Pac4jSecurityHandler`, `SecurityService`); add pac4j HTTP/JWT/OAuth/OIDC modules as needed. Follow `examples/user-pass-form/`, `examples/jwt/`, `examples/oauth2/`, and `sharaf-pac4j/test/`. Production browser auth needs HTTPS, CSRF protection, shared persistent sessions for replicas, and external secrets; stateless bearer APIs can use `NoOpSessionStore`.
 - **JDBC sessions (JVM/Native)**: `sharaf-jdbc-session` supplies Squery-backed `JdbcSessionStore`; add a driver and any JVM pool, apply application-owned migrations from its schema templates, and schedule `deleteExpired()`. See `docs/content/howtos/security.md`.
@@ -87,4 +89,4 @@ deder exec -t publishLocal                 # publish jars to local ~/.ivy2
 ## Docs
 
 - Static site built with FlatMark, stored in `docs/`, served via GitHub Pages
-- Sync example snippets into `docs/_includes/` with `scala docs/sync_examples.scala -- --write`; CI checks them with `scala docs/sync_examples.scala`
+- Sync example snippets between HTML comment markers in `docs/content/` with `scala docs/sync_examples.scala -- --write`; CI checks them with `scala docs/sync_examples.scala`

@@ -20,9 +20,25 @@ pagination:
 <div class="home-example">
 <div class="home-example-title"><span>hello.sc</span><span>A web app in a few lines.</span></div>
 
+<!-- example:start examples/scala-cli/hello.sc -->
 ```scala
-{% include "hello.sc" %}
+//> using scala 3.9.0
+//> using dep ba.sake::sharaf-potateh:0.24.0
+
+import ba.sake.sharaf.*
+import ba.sake.sharaf.potateh.PotatehSharafServer
+
+val routes = Routes:
+  case GET -> Path("hello", name) =>
+    Response.withBody(s"Hello $name")
+  case GET -> _ =>
+    Response.withBody("Go to http://localhost:8181/hello/your-name")
+
+PotatehSharafServer(routes, host = "localhost", port = 8181).start()
+
+println(s"Server started at http://localhost:8181")
 ```
+<!-- example:end -->
 
 <div class="home-example-run"><span>Run it with Scala CLI</span><code>scala hello.sc</code></div>
 </div>
