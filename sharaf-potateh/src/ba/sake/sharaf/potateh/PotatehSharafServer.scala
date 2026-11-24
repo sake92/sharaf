@@ -1,9 +1,11 @@
 package ba.sake.sharaf.potateh
 
+import java.io.OutputStream
 import java.net.InetSocketAddress
 import ba.sake.potateh.{Server, ServerConfig}
 import ba.sake.sharaf.*
 import ba.sake.sharaf.exceptions.{BadRequestException, UnsupportedMethodException}
+import sttp.model.StatusCode
 
 final class PotatehSharafServer private (config: ServerConfig, startServer: ServerConfig => Server) {
   private var server: Option[Server] = None
@@ -31,6 +33,9 @@ final class PotatehSharafServer private (config: ServerConfig, startServer: Serv
 }
 
 object PotatehSharafServer {
+  private val serverOptionsResponse =
+    PotatehConversions.toResponse(Response.withStatus(StatusCode.NoContent), "OPTIONS")
+
   def apply(
       routes: Routes,
       host: String = "127.0.0.1",
@@ -58,22 +63,27 @@ object PotatehSharafServer {
       bootstrapMapper: ExceptionMapper
   ): Server = {
     val handle: ba.sake.potateh.Request => ba.sake.potateh.Response = underlying => {
-      val request = PotatehSharafRequest(underlying)
-      underlying.onResponseComplete(request.closeUploads())
-      val context =
-        try {
-          val method = PotatehConversions.parseMethod(underlying.method)
-          val path = RequestDecoding.path(underlying.rawPath.getOrElse(""))
-          Right(RequestContext((method = method, path = path), request))
-        } catch {
-          case error: BadRequestException        => Left(error)
-          case error: UnsupportedMethodException => Left(error)
+      if underlying.method == "OPTIONS" && underlying.target == "*" then {
+        underlying.body.transferTo(OutputStream.nullOutputStream())
+        serverOptionsResponse
+      } else {
+        val request = PotatehSharafRequest(underlying)
+        underlying.onResponseComplete(request.closeUploads())
+        val context =
+          try {
+            val method = PotatehConversions.parseMethod(underlying.method)
+            val path = RequestDecoding.path(underlying.rawPath.getOrElse(""))
+            Right(RequestContext((method = method, path = path), request))
+          } catch {
+            case error: BadRequestException        => Left(error)
+            case error: UnsupportedMethodException => Left(error)
+          }
+        val response = context match {
+          case Right(value) => handler.handle(value)
+          case Left(error)  => bootstrapMapper.applyOrElse(error, (unmapped: Throwable) => throw unmapped)
         }
-      val response = context match {
-        case Right(value) => handler.handle(value)
-        case Left(error)  => bootstrapMapper.applyOrElse(error, (unmapped: Throwable) => throw unmapped)
+        PotatehConversions.toResponse(response, underlying.method)
       }
-      PotatehConversions.toResponse(response, underlying.method)
     }
     Server.start(config)(handle)
   }

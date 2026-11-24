@@ -15,6 +15,7 @@ import ba.sake.sharaf.handlers.HttpConnection
 
 class PotatehSharafServerTest extends munit.FunSuite {
   private val routes = Routes {
+    case OPTIONS -> Path()             => Response.withBody("root options")
     case GET -> Path("ok")             => Response.withBody("ok")
     case GET -> Path("path", value)    => Response.withBody(value)
     case GET -> Path("length")         => Response.withBody("ok").settingHeader("Content-Length", "2")
@@ -100,6 +101,17 @@ class PotatehSharafServerTest extends munit.FunSuite {
         assertEquals(response.body, "custom missing")
       }
     } finally server.stop()
+  }
+
+  test("server-wide OPTIONS is distinct from the root route and preserves keep-alive") {
+    withServer() { server =>
+      Using.resource(new HttpConnection(new InetSocketAddress("127.0.0.1", server.port))) { connection =>
+        val response = connection.request("OPTIONS", "*", "ignored", "text/plain")
+        assertEquals(response.status, 204)
+        assertEquals(response.body, "")
+        assertEquals(connection.request("OPTIONS", "/").body, "root options")
+      }
+    }
   }
 
   test("known lengths use UTF-8 bytes and preserve keep-alive framing") {
