@@ -1,5 +1,6 @@
 package ba.sake.sharaf.undertow
 
+import java.io.InputStream
 import java.nio.charset.StandardCharsets
 import scala.jdk.CollectionConverters.*
 import io.undertow.server.HttpServerExchange
@@ -28,8 +29,10 @@ final class UndertowSharafRequest(val underlyingHttpServerExchange: HttpServerEx
   override lazy val queryParamsRaw: QueryStringMap =
     UrlEncoded.query(underlyingHttpServerExchange.getQueryString)
 
+  override def bodyInputStream: InputStream = underlyingHttpServerExchange.getInputStream
+
   override lazy val bodyString: String = {
-    val input = underlyingHttpServerExchange.getInputStream
+    val input = bodyInputStream
     val contentType = headers.get(HttpString("Content-Type")).flatMap(_.headOption).getOrElse("")
     if UrlEncoded.isForm(contentType) then
       try UrlEncoded.readFormBody(input)
@@ -44,7 +47,7 @@ final class UndertowSharafRequest(val underlyingHttpServerExchange: HttpServerEx
   override lazy val bodyFormRaw: FormDataMap =
     val contentType = headers.get(HttpString("Content-Type")).flatMap(_.headOption).getOrElse("")
     if Multipart.isMultipart(contentType) then
-      Multipart.parse(underlyingHttpServerExchange.getInputStream, contentType, uploads)
+      Multipart.parse(bodyInputStream, contentType, uploads)
     else super.bodyFormRaw
 
   override def toString(): String =

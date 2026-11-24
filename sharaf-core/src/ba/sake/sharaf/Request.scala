@@ -1,5 +1,6 @@
 package ba.sake.sharaf
 
+import java.io.InputStream
 import scala.NamedTuple.AnyNamedTuple
 import ba.sake.tupson.*
 import ba.sake.formson.*
@@ -28,6 +29,13 @@ trait Request {
   def queryParamsValidated[T <: Product | AnyNamedTuple: QueryStringRW: Validator]: T =
     try queryParams[T].validateOrThrow
     catch case e: ValidsonException => throw RequestHandlingException(e)
+
+  /** The single-use request body, after HTTP framing has been decoded.
+    * Consume it within this request and use it instead of the text, JSON or form readers.
+    * Application-defined request implementations must override this method to support binary reads.
+    */
+  def bodyInputStream: InputStream =
+    throw new UnsupportedOperationException("This request implementation does not expose a body input stream")
 
   def bodyString: String
 

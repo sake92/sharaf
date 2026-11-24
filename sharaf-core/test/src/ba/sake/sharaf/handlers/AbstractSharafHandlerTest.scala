@@ -24,6 +24,10 @@ abstract class AbstractSharafHandlerTest extends munit.FunSuite with ServerFixtu
     case GET -> Path("hello")       => Response.withBody("Hello Scala! čćž")
     case GET -> Path("query")       => Response.withBody(Request.current.queryParamsRaw("tag").mkString("|"))
     case POST -> Path("json")       => Response.withBody(Request.current.bodyJson[Greeting])
+    case POST -> Path("binary") =>
+      val first = Request.current.bodyInputStream.readNBytes(1)
+      val rest = Request.current.bodyInputStream.readAllBytes()
+      Response.withBody(new ByteArrayInputStream(first ++ rest))
     case POST -> Path("request-string") =>
       val description = Request.current.toString
       Response.withBody(description + "\n" + Request.current.bodyString)
@@ -85,6 +89,19 @@ abstract class AbstractSharafHandlerTest extends munit.FunSuite with ServerFixtu
       for secret <- Seq("query-secret", "header-secret", "cookie-secret", "body-secret") do
         assert(!parts(0).contains(secret), s"Request string exposed $secret")
       assertEquals(parts(1), "body-secret")
+    }
+  }
+
+  test("request body stream preserves binary bytes and keeps its read position") {
+    withServer(routes, ExceptionMapper.default) { base =>
+      val binary = Array[Byte](0, 1, -1, -128, 13, 10)
+      MultipartRequests.withClient(base, "application/octet-stream") { send =>
+        for bytes <- Seq(binary, Array.emptyByteArray) do {
+          val response = send("binary", bytes)
+          assertEquals(response.status, StatusCode.Ok.code)
+          assertEquals(response.body.toSeq, bytes.toSeq)
+        }
+      }
     }
   }
 

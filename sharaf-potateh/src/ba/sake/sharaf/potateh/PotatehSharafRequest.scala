@@ -1,5 +1,6 @@
 package ba.sake.sharaf.potateh
 
+import java.io.InputStream
 import java.nio.charset.StandardCharsets.UTF_8
 import ba.sake.formson.*
 import ba.sake.querson.*
@@ -36,15 +37,17 @@ final class PotatehSharafRequest(val underlying: ba.sake.potateh.Request) extend
   override lazy val queryParamsRaw: QueryStringMap =
     UrlEncoded.query(underlying.rawQuery.getOrElse(""))
 
+  override def bodyInputStream: InputStream = underlying.body
+
   override lazy val bodyString: String = {
     val contentType = underlying.headers.first("Content-Type").getOrElse("")
-    if UrlEncoded.isForm(contentType) then UrlEncoded.readFormBody(underlying.body)
-    else new String(underlying.body.readAllBytes(), UTF_8)
+    if UrlEncoded.isForm(contentType) then UrlEncoded.readFormBody(bodyInputStream)
+    else new String(bodyInputStream.readAllBytes(), UTF_8)
   }
 
   override lazy val bodyFormRaw: FormDataMap = {
     val contentType = underlying.headers.first("Content-Type").getOrElse("")
-    if Multipart.isMultipart(contentType) then Multipart.parse(underlying.body, contentType, uploads)
+    if Multipart.isMultipart(contentType) then Multipart.parse(bodyInputStream, contentType, uploads)
     else super.bodyFormRaw
   }
 

@@ -1,5 +1,6 @@
 package ba.sake.sharaf.http4s
 
+import java.io.{FilterInputStream, InputStream}
 import cats.effect.*
 import cats.effect.unsafe.implicits.global
 import ba.sake.formson.*
@@ -9,7 +10,11 @@ import ba.sake.sharaf.*
 class Http4sSharafRequest(underlyingRequest: Http4sRequest) extends Request {
 
   private val uploads = new MultipartUploads
-  private[sharaf] def closeUploads(): Unit = uploads.close()
+  private var openedBody: Option[InputStream] = None
+
+  private[http4s] def closeResources(): Unit =
+    try openedBody.foreach(_.close())
+    finally uploads.close()
 
   /* *** HEADERS *** */
   def headers: Map[HttpString, Seq[String]] =
@@ -29,6 +34,21 @@ class Http4sSharafRequest(underlyingRequest: Http4sRequest) extends Request {
     underlyingRequest.uri.query.multiParams
 
   /* *** BODY *** */
+  override lazy val bodyInputStream: InputStream = {
+    val (input, release) = fs2.io.toInputStreamResource(underlyingRequest.body).allocated.unsafeRunSync()
+    val stream = new FilterInputStream(input) {
+      private var closed = false
+
+      override def close(): Unit =
+        if !closed then {
+          closed = true
+          release.unsafeRunSync()
+        }
+    }
+    openedBody = Some(stream)
+    stream
+  }
+
   override lazy val bodyString: String =
     underlyingRequest.body.through(fs2.text.utf8.decode).compile.string.unsafeRunSync()
 

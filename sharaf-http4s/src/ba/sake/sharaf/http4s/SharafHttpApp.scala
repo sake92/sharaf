@@ -60,5 +60,5 @@ def SharafHttpApp(sharafHandler: SharafHandler) =
           )
         )
       yield response
-    }(request => IO.blocking(request.closeUploads()))
+    }(request => IO.blocking(request.closeResources()))
   }

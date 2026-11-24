@@ -11,6 +11,12 @@ class RequestDefaultsTest extends munit.FunSuite {
     def bodyString: String = body
   }
 
+  test("a custom request can keep its text reader without implementing a binary reader") {
+    val req = request(Map.empty, "text")
+    assertEquals(req.bodyString, "text")
+    intercept[UnsupportedOperationException](req.bodyInputStream)
+  }
+
   test("default cookies preserve repeated cookie headers and values") {
     val req = request(Map(HttpString("cookie") -> Seq("a=one; a=two", "token=a=b")), "")
     assertEquals(req.cookies.map(c => c.name -> c.value), Seq("a" -> "one", "a" -> "two", "token" -> "a=b"))

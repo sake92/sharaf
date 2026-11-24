@@ -8,7 +8,9 @@ import java.nio.file.Files
   * adding a Native TLS dependency to these HTTP-only tests.
   */
 private[sharaf] object MultipartRequests {
-  def withClient(base: String)(check: ((String, Array[Byte]) => (status: Int, body: Array[Byte])) => Unit): Unit = {
+  def withClient(base: String, contentType: String = "multipart/form-data; boundary=\"upload-boundary\"")(
+      check: ((String, Array[Byte]) => (status: Int, body: Array[Byte])) => Unit
+  ): Unit = {
     val directory = Files.createTempDirectory("sharaf-multipart-http-")
     val upload = directory.resolve("request.bin")
     val download = directory.resolve("response.bin")
@@ -25,7 +27,7 @@ private[sharaf] object MultipartRequests {
           "--max-time",
           "5",
           "--header",
-          "Content-Type: multipart/form-data; boundary=\"upload-boundary\"",
+          s"Content-Type: $contentType",
           "--data-binary",
           s"@$upload",
           "--output",
