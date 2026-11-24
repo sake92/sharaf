@@ -6,9 +6,9 @@ import ba.sake.sharaf.exceptions.BadRequestException
 
 /** Wire format shared by adapters without their own cookie support. */
 private[sharaf] object CookieHeaders {
-  val defaultMaxCookies: Int = 200
+  private val MaxCookies = 200
 
-  def parse(headers: Seq[String], maxCookies: Int = defaultMaxCookies): Seq[Cookie] = {
+  def parse(headers: Seq[String]): Seq[Cookie] = {
     val cookies = Seq.newBuilder[Cookie]
     var count = 0
     headers.foreach { header =>
@@ -21,7 +21,7 @@ private[sharaf] object CookieHeaders {
         val name = (if equals < 0 then item else item.substring(0, equals)).trim
         if name.nonEmpty then {
           count += 1
-          if count > maxCookies then throw BadRequestException("Cookie count limit exceeded")
+          if count > MaxCookies then throw BadRequestException("Cookie count limit exceeded")
           val value = if equals < 0 then "" else item.substring(equals + 1).trim
           cookies += Cookie(name, value)
         }

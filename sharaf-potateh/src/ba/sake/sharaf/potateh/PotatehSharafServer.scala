@@ -63,7 +63,8 @@ object PotatehSharafServer {
       val context =
         try {
           val method = PotatehConversions.parseMethod(underlying.method)
-          Right(RequestContext((method = method, path = request.path), request))
+          val path = RequestDecoding.path(underlying.rawPath.getOrElse(""))
+          Right(RequestContext((method = method, path = path), request))
         } catch {
           case error: BadRequestException        => Left(error)
           case error: UnsupportedMethodException => Left(error)

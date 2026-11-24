@@ -16,6 +16,7 @@ import scala.util.control.NonFatal
 import ba.sake.formson.*
 import ba.sake.sharaf.exceptions.*
 
+// TODO clean up def part, magic numbers etc..
 /** Request-owned uploads. Adapters must close this after response serialization, including failures. */
 private[sharaf] final class MultipartUploads(directory: Option[Path] = None) extends AutoCloseable {
   private val paths = mutable.ArrayBuffer.empty[Path]

@@ -22,8 +22,8 @@ For a scoped cookie, `settingCookie` with the matching path/domain and a past
 Undertow, Potateh, and snunit share request-cookie
 parsing; http4s uses its engine parser. The shared parser accepts up to 200 named
 cookie pairs, including duplicates, across all Cookie headers. It returns 400 via
-the configured exception mapper if the limit is exceeded. Undertow uses its
-configured `MAX_COOKIES` value instead. This limit applies when cookies are read.
+the configured exception mapper if the limit is exceeded. This limit applies
+when cookies are read.
 
 ## Query strings and URL-encoded forms
 

@@ -7,14 +7,13 @@ import ba.sake.formson.*
 import ba.sake.querson.*
 import ba.sake.sharaf.*
 
-class Http4sSharafRequest(underlyingRequest: Http4sRequest) extends Request {
+class Http4sSharafRequest(underlyingRequest: Http4sRequest) extends MultipartRequest {
 
-  private val uploads = new MultipartUploads
   private var openedBody: Option[InputStream] = None
 
   private[http4s] def closeResources(): Unit =
     try openedBody.foreach(_.close())
-    finally uploads.close()
+    finally closeUploads()
 
   /* *** HEADERS *** */
   def headers: Map[HttpString, Seq[String]] =
@@ -52,16 +51,13 @@ class Http4sSharafRequest(underlyingRequest: Http4sRequest) extends Request {
   override lazy val bodyString: String =
     underlyingRequest.body.through(fs2.text.utf8.decode).compile.string.unsafeRunSync()
 
-  override lazy val bodyFormRaw: FormDataMap =
-    val contentType = headers.get(HttpString("Content-Type")).flatMap(_.headOption).getOrElse("")
-    if Multipart.isMultipart(contentType) then
-      fs2.io
-        .toInputStreamResource(underlyingRequest.body)
-        .use { input =>
-          IO.blocking(Multipart.parse(input, contentType, uploads))
-        }
-        .unsafeRunSync()
-    else super.bodyFormRaw
+  private[sharaf] override def readMultipartForm(contentType: String): FormDataMap =
+    fs2.io
+      .toInputStreamResource(underlyingRequest.body)
+      .use { input =>
+        IO.blocking(parseMultipartForm(input, contentType))
+      }
+      .unsafeRunSync()
 
   override def toString(): String =
     "Http4sSharafRequest(...)"

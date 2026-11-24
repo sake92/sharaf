@@ -3,14 +3,10 @@ package ba.sake.sharaf.snunit
 import java.io.{ByteArrayInputStream, InputStream}
 import java.nio.charset.StandardCharsets
 import snunit.{Request as SnunitRequest, *}
-import ba.sake.formson.*
 import ba.sake.querson.*
 import ba.sake.sharaf.*
 
-class SnunitSharafRequest(underlyingRequest: SnunitRequest) extends Request {
-
-  private val uploads = new MultipartUploads
-  private[sharaf] def closeUploads(): Unit = uploads.close()
+class SnunitSharafRequest(underlyingRequest: SnunitRequest) extends MultipartRequest {
 
   def headers: Map[HttpString, Seq[String]] =
     val underlyingHeaders = underlyingRequest.headers
@@ -35,12 +31,6 @@ class SnunitSharafRequest(underlyingRequest: SnunitRequest) extends Request {
 
   override lazy val bodyString: String =
     String(bodyBytes, StandardCharsets.UTF_8)
-
-  override lazy val bodyFormRaw: FormDataMap =
-    val contentType = headers.get(HttpString("Content-Type")).flatMap(_.headOption).getOrElse("")
-    if Multipart.isMultipart(contentType) then
-      Multipart.parse(bodyInputStream, contentType, uploads)
-    else super.bodyFormRaw
 
 }
 

@@ -8,7 +8,7 @@ import sttp.model.StatusCode
 import ba.sake.sharaf.*
 
 class DuplicateCookieTest extends ba.sake.sharaf.handlers.AbstractDuplicateCookieTest with UndertowServerFixture {
-  test("Undertow honors its configured cookie limit") {
+  test("Sharaf uses its own cookie limit on Undertow") {
     val routes = Routes {
       case GET -> Path("cookies") => Response.withBody(Request.current.cookies.size.toString)
     }
@@ -22,10 +22,9 @@ class DuplicateCookieTest extends ba.sake.sharaf.handlers.AbstractDuplicateCooki
     try {
       val port = server.getListenerInfo.get(0).getAddress.asInstanceOf[InetSocketAddress].getPort
       val base = s"http://127.0.0.1:$port"
-      val allowed = request.get(uri"$base/cookies").header("Cookie", "a=1; b=2").send(httpBackend)
-      assertEquals(allowed.body, "2")
-      val excessive = request.get(uri"$base/cookies").header("Cookie", "a=1; b=2; c=3").send(httpBackend)
-      assertEquals(excessive.code, StatusCode.BadRequest)
+      val response = request.get(uri"$base/cookies").header("Cookie", "a=1; b=2; c=3").send(httpBackend)
+      assertEquals(response.code, StatusCode.Ok)
+      assertEquals(response.body, "3")
     } finally server.stop()
   }
 }

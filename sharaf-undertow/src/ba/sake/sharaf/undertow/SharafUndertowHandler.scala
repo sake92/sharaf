@@ -12,7 +12,7 @@ final class SharafUndertowHandler(sharafHandler: SharafHandler, notFoundHandler:
 
   override def handleRequest(exchange: HttpServerExchange): Unit =
     val reqParams = fillReqParams(exchange)
-    val req = UndertowSharafRequest.create(exchange)
+    val req = new UndertowSharafRequest(exchange)
     val requestContext = RequestContext(reqParams, req)
     try {
       val res = sharafHandler.handle(requestContext)
