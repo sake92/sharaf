@@ -3,6 +3,7 @@ amends "https://sake92.github.io/deder/config/v0.23.0/DederProject.pkl"
 import
   "https://sake92.github.io/deder-plugins/config/deder-web-dashboard/v0.6.0/WebDashboardPlugin.pkl"
   as WD
+import "https://sake92.github.io/deder-plugins/config/deder-jmh/early-access/JmhPlugin.pkl" as Jmh
 
 import "examples.pkl" as Examples
 
@@ -29,6 +30,10 @@ local const versions = new {
 plugins {
   new WD.WebDashboardPlugin {
     version = "0.6.0"
+  }
+  new Jmh.JmhPlugin {
+    version = "0.7.1-SNAPSHOT"
+    config { modules { ["jvm-jmh"] = new Jmh.ModuleOverride { enabled = true } } }
   }
 }
 
@@ -452,6 +457,14 @@ local const microBenchmarks = (baseTemplate.asNative()) {
   moduleDeps { sharafCoreModules.native }
 }
 
+// JVM JMH benchmarks: time and allocation (-prof gc) for core and Potateh adapter hot paths.
+local const jvmJmh = (baseTemplate) {
+  id = "jvm-jmh"
+  root = "microbenchmarks/jvm"
+  moduleDeps { sharafPotatehModules.jvm }
+  deps { "org.openjdk.jmh:jmh-core:1.37" }
+}
+
 local const exampleModules = new Examples.Examples {
   libraryTemplate = baseTemplate
   dependencyVersions = versions
@@ -490,5 +503,6 @@ modules {
   sharafPotatehModules.native
   sharafPotatehModules.native_test
   microBenchmarks
+  jvmJmh
   ...exampleModules
 }
