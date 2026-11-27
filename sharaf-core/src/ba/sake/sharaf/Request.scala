@@ -47,7 +47,7 @@ trait Request {
   private lazy val decodedBodyString: String = {
     val input = bodyInputStream
     if UrlEncoded.isForm(bodyContentType) then readUrlEncodedBody(input)
-    else new String(input.readAllBytes(), UTF_8)
+    else new String(BodyBytes.read(input, BodyBytes.declaredLength(headerValues(Request.ContentLengthHeader))), UTF_8)
   }
 
   def bodyString: String = decodedBodyString
@@ -106,6 +106,7 @@ private[sharaf] trait MultipartRequest extends Request {
 
 object Request {
   private val ContentTypeHeader = HttpString("Content-Type")
+  private val ContentLengthHeader = HttpString("Content-Length")
 
   def current[Req <: Request](using req: Req): Req = req
 }
